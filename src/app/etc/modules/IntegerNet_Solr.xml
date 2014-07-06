@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <IntegerNet_Solr>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_Catalog/>
+                <Mage_Index/>
+
+            </depends>
+        </IntegerNet_Solr>
+    </modules>
+</config>

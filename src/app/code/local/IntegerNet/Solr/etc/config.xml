@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <IntegerNet_Solr>
+            <version>0.1.0</version>
+        </IntegerNet_Solr>
+    </modules>
+    <global>
+        <models>
+            <integernet_solr>
+                <class>IntegerNet_Solr_Model</class>
+                <resourceModel>integernet_solr_resource</resourceModel>
+            </integernet_solr>
+
+            <integernet_solr_resource>
+                <class>IntegerNet_Solr_Model_Resource</class>
+            </integernet_solr_resource>
+        </models>
+
+        <blocks>
+            <integernet_solr>
+                <class>IntegerNet_Solr_Block</class>
+            </integernet_solr>
+        </blocks>
+
+        <helpers>
+            <integernet_solr>
+                <class>IntegerNet_Solr_Helper</class>
+            </integernet_solr>
+        </helpers>
+
+        <index>
+            <indexer>
+                <integernet_solr>
+                    <model>integernet_solr/indexer</model>
+                    <depends>
+                        <catalog_url/>
+                        <catalog_price/>
+                    </depends>
+                </integernet_solr>
+            </indexer>
+        </index>
+    </global>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <integernet_solr>
+                    <files>
+                        <default>IntegerNet_Solr.csv</default>
+                    </files>
+                </integernet_solr>
+            </modules>
+        </translate>
+    </adminhtml>
+</config>

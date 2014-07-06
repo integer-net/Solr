@@ -3,11 +3,10 @@
     <modules>
         <IntegerNet_Solr>
             <active>true</active>
-            <codePool>local</codePool>
+            <codePool>community</codePool>
             <depends>
                 <Mage_Catalog/>
                 <Mage_Index/>
-
             </depends>
         </IntegerNet_Solr>
     </modules>

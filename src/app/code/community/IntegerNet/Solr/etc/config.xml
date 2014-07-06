@@ -53,4 +53,12 @@
             </modules>
         </translate>
     </adminhtml>
+
+    <phpunit>
+        <suite>
+            <modules>
+                <IntegerNet_Solr/>
+            </modules>
+        </suite>
+    </phpunit>
 </config>

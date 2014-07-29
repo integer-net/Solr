@@ -75,6 +75,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
             $document->addField($key, $value);
         }
         $response = $this->getSolr($storeId)->addDocument($document);
+        $this->getSolr($storeId)->commit();
         return $response;
     }
 
@@ -96,6 +97,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
         }
 
         $response = $this->getSolr($storeId)->addDocuments($documents);
+        $this->getSolr($storeId)->commit();
         return $response;
     }
 
@@ -105,7 +107,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
      */
     public function deleteAllDocuments($storeId)
     {
-        $response = $this->getSolr($storeId)->deleteByQuery('type:magento_performance');
+        $response = $this->getSolr($storeId)->deleteByQuery('store_id:' . $storeId);
         return $response;
     }
 

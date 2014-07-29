@@ -818,13 +818,13 @@ class Apache_Solr_Service
 	 *
 	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
 	 */
-	public function commit($expungeDeletes = false, $waitFlush = true, $waitSearcher = true, $timeout = 3600)
+	public function commit($expungeDeletes = false, $waitFlush = null, $waitSearcher = null, $timeout = 3600)
 	{
 		$expungeValue = $expungeDeletes ? 'true' : 'false';
 		$flushValue = $waitFlush ? 'true' : 'false';
 		$searcherValue = $waitSearcher ? 'true' : 'false';
 
-		$rawPost = '<commit expungeDeletes="' . $expungeValue . '" waitFlush="' . $flushValue . '" waitSearcher="' . $searcherValue . '" />';
+		$rawPost = '<commit expungeDeletes="' . $expungeValue . '"' . ( !is_null($waitFlush) ? ' waitFlush="' . $flushValue . '"' : '' ) . ' waitSearcher="' . $searcherValue . '" />';
 
 		return $this->_sendRawPost($this->_updateUrl, $rawPost, $timeout);
 	}

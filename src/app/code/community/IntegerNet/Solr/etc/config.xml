@@ -53,6 +53,15 @@
             </modules>
         </translate>
     </adminhtml>
+    
+    <default>
+        <integernet_solr>
+            <general>
+                <is_active>1</is_active>
+                <log>1</log>
+            </general>
+        </integernet_solr>
+    </default>
 
     <phpunit>
         <suite>

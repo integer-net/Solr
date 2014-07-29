@@ -157,7 +157,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
             /** @var Mage_Core_Model_Store $store */
             $storeId = $store->getId();
 
-            if (!Mage::getStoreConfigFlag('sfp_typo3solr/general/is_active', $storeId)) {
+            if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
                 continue;
             }
 
@@ -180,11 +180,12 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     protected function _getProductData($product)
     {
         if ($this->_canIndexProduct($product)) {
-            $urlParts = parse_url($product->getProductUrl());
             return array(
-                'title' => $product->getName(),
-                'content' => $this->_getContent($product),
-                'url' => $urlParts['path'] . (isset($urlParts['query']) ? '?' . $urlParts['query'] : ''),
+                'id' => $product->getId(),
+                'product_id' => $product->getId(),
+                'name' => $product->getName(),
+                'store_id' => $product->getStoreId(),
+                'content_type' => 'product',
             );
         }
 

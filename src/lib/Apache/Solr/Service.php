@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2007-2011, Servigistics, Inc.
+ * Copyright (c) 2007-2012, Servigistics, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,25 +27,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @copyright Copyright 2007-2011 Servigistics, Inc. (http://servigistics.com)
+ * @copyright Copyright 2007-2012 Servigistics, Inc. (http://servigistics.com)
  * @license http://solr-php-client.googlecode.com/svn/trunk/COPYING New BSD
- * @version $Id: Service.php 59 2011-02-08 20:38:59Z donovan.jimenez $
+ * @version $Id$
  *
  * @package Apache
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
-
-// See Issue #1 (http://code.google.com/p/solr-php-client/issues/detail?id=1)
-// Doesn't follow typical include path conventions, but is more convenient for users
-require_once(dirname(__FILE__) . '/Exception.php');
-require_once(dirname(__FILE__) . '/HttpTransportException.php');
-require_once(dirname(__FILE__) . '/InvalidArgumentException.php');
-
-require_once(dirname(__FILE__) . '/Document.php');
-require_once(dirname(__FILE__) . '/Response.php');
-
-require_once(dirname(__FILE__) . '/HttpTransport/Interface.php');
 
 /**
  * Starting point for the Solr API. Represents a Solr server resource and has
@@ -88,12 +77,12 @@ class Apache_Solr_Service
 	/**
 	 * SVN Revision meta data for this class
 	 */
-	const SVN_REVISION = '$Revision: 59 $';
+	const SVN_REVISION = '$Revision$';
 
 	/**
 	 * SVN ID meta data for this class
 	 */
-	const SVN_ID = '$Id: Service.php 59 2011-02-08 20:38:59Z donovan.jimenez $';
+	const SVN_ID = '$Id$';
 
 	/**
 	 * Response writer we'll request - JSON. See http://code.google.com/p/solr-php-client/issues/detail?id=6#c1 for reasoning
@@ -118,6 +107,7 @@ class Apache_Solr_Service
 	const PING_SERVLET = 'admin/ping';
 	const UPDATE_SERVLET = 'update';
 	const SEARCH_SERVLET = 'select';
+	const SYSTEM_SERVLET = 'admin/system';
 	const THREADS_SERVLET = 'admin/threads';
 	const EXTRACT_SERVLET = 'update/extract';
 
@@ -165,7 +155,7 @@ class Apache_Solr_Service
 	 *
 	 * @var string
 	 */
-	protected $_pingUrl, $_updateUrl, $_searchUrl, $_threadsUrl;
+	protected $_pingUrl, $_updateUrl, $_searchUrl, $_systemUrl, $_threadsUrl;
 
 	/**
 	 * Keep track of whether our URLs have been constructed
@@ -180,6 +170,11 @@ class Apache_Solr_Service
 	 * @var Apache_Solr_HttpTransport_Interface
 	 */
 	protected $_httpTransport = false;
+
+	/**
+	 * @var Apache_Solr_Compatibility_CompatibilityLayer
+	 */
+	protected $_compatibilityLayer;
 
 	/**
 	 * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
@@ -232,8 +227,13 @@ class Apache_Solr_Service
 	 * @param string $path
 	 * @param Apache_Solr_HttpTransport_Interface $httpTransport
 	 */
-	public function __construct($host = 'localhost', $port = 8180, $path = '/solr/', $httpTransport = false)
-	{
+	public function __construct(
+		$host = 'localhost',
+		$port = 8180,
+		$path = '/solr/',
+		$httpTransport = false,
+		$compatibilityLayer = false
+	) {
 		$this->setHost($host);
 		$this->setPort($port);
 		$this->setPath($path);
@@ -243,6 +243,22 @@ class Apache_Solr_Service
 		if ($httpTransport)
 		{
 			$this->setHttpTransport($httpTransport);
+		}
+
+		if ($compatibilityLayer !== false)
+		{
+			if ($compatibilityLayer instanceof Apache_Solr_Compatibility_CompatibilityLayer)
+			{
+				$this->setCompatibilityLayer($compatibilityLayer);
+			}
+			else
+			{
+				throw new Apache_Solr_InvalidArgumentException("Given compatibility layer doesn't implement Apache_Solr_Compatibility_CompatibilityLayer");
+			}
+		}
+		else
+		{
+			$this->setCompatibilityLayer(new Apache_Solr_Compatibility_Solr3CompatibilityLayer);
 		}
 
 		// check that our php version is >= 5.1.3 so we can correct for http_build_query behavior later
@@ -286,6 +302,7 @@ class Apache_Solr_Service
 		$this->_extractUrl = $this->_constructUrl(self::EXTRACT_SERVLET);
 		$this->_pingUrl = $this->_constructUrl(self::PING_SERVLET);
 		$this->_searchUrl = $this->_constructUrl(self::SEARCH_SERVLET);
+		$this->_systemUrl = $this->_constructUrl(self::SYSTEM_SERVLET, array('wt' => self::SOLR_WRITER));
 		$this->_threadsUrl = $this->_constructUrl(self::THREADS_SERVLET, array('wt' => self::SOLR_WRITER ));
 		$this->_updateUrl = $this->_constructUrl(self::UPDATE_SERVLET, array('wt' => self::SOLR_WRITER ));
 
@@ -458,7 +475,14 @@ class Apache_Solr_Service
 	{
 		$path = trim($path, '/');
 
-		$this->_path = '/' . $path . '/';
+		if (strlen($path) > 0)
+		{
+			$this->_path = '/' . $path . '/';
+		}
+		else
+		{
+			$this->_path = '/';
+		}
 
 		if ($this->_urlsInited)
 		{
@@ -476,8 +500,6 @@ class Apache_Solr_Service
 		// lazy load a default if one has not be set
 		if ($this->_httpTransport === false)
 		{
-			require_once(dirname(__FILE__) . '/HttpTransport/FileGetContents.php');
-
 			$this->_httpTransport = new Apache_Solr_HttpTransport_FileGetContents();
 		}
 
@@ -492,6 +514,22 @@ class Apache_Solr_Service
 	public function setHttpTransport(Apache_Solr_HttpTransport_Interface $httpTransport)
 	{
 		$this->_httpTransport = $httpTransport;
+	}
+
+	/**
+	 * @return Apache_Solr_Compatibility_CompatibilityLayer
+	 */
+	public function getCompatibilityLayer()
+	{
+		return $this->_compatibilityLayer;
+	}
+	
+	/**
+	 * @param Apache_Solr_Compatibility_CompatibilityLayer $compatibilityLayer
+	 */
+	public function setCompatibilityLayer($compatibilityLayer)
+	{
+		$this->_compatibilityLayer = $compatibilityLayer;
 	}
 
 	/**
@@ -558,6 +596,17 @@ class Apache_Solr_Service
 	public function setDefaultTimeout($timeout)
 	{
 		$this->getHttpTransport()->setDefaultTimeout($timeout);
+	}
+	
+	/**
+	 * Convenience method to set authentication credentials on the current HTTP transport implementation
+	 * 
+	 * @param string $username
+	 * @param string $password
+	 */
+	public function setAuthenticationCredentials($username, $password)
+	{
+		$this->getHttpTransport()->setAuthenticationCredentials($username, $password);
 	}
 
 	/**
@@ -641,6 +690,18 @@ class Apache_Solr_Service
 			return false;
 		}
 	}
+	
+	/**
+	 * Call the /admin/system servlet and retrieve system information about Solr
+	 * 
+	 * @return Apache_Solr_Response
+	 *
+	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 */
+	public function system()
+	{
+		return $this->_sendRawGet($this->_systemUrl);
+	}
 
 	/**
 	 * Call the /admin/threads servlet and retrieve information about all threads in the
@@ -683,18 +744,15 @@ class Apache_Solr_Service
 	 */
 	public function addDocument(Apache_Solr_Document $document, $allowDups = false, $overwritePending = true, $overwriteCommitted = true, $commitWithin = 0)
 	{
-		$dupValue = $allowDups ? 'true' : 'false';
-		$pendingValue = $overwritePending ? 'true' : 'false';
-		$committedValue = $overwriteCommitted ? 'true' : 'false';
-		
-		$commitWithin = (int) $commitWithin;
-		$commitWithinString = $commitWithin > 0 ? " commitWithin=\"{$commitWithin}\"" : '';
-		
-		$rawPost = "<add allowDups=\"{$dupValue}\" overwritePending=\"{$pendingValue}\" overwriteCommitted=\"{$committedValue}\"{$commitWithinString}>";
-		$rawPost .= $this->_documentToXmlFragment($document);
-		$rawPost .= '</add>';
+		$documentXmlFragment = $this->_documentToXmlFragment($document);
 
-		return $this->add($rawPost);
+		return $this->addRawDocuments(
+			$documentXmlFragment,
+			$allowDups,
+			$overwritePending,
+			$overwriteCommitted,
+			$commitWithin
+		);
 	}
 
 	/**
@@ -711,6 +769,40 @@ class Apache_Solr_Service
 	 */
 	public function addDocuments($documents, $allowDups = false, $overwritePending = true, $overwriteCommitted = true, $commitWithin = 0)
 	{
+		$documentsXmlFragment = '';
+
+		foreach ($documents as $document)
+		{
+			if ($document instanceof Apache_Solr_Document)
+			{
+				$documentsXmlFragment .= $this->_documentToXmlFragment($document);
+			}
+		}
+
+		return $this->addRawDocuments(
+			$documentsXmlFragment,
+			$allowDups,
+			$overwritePending,
+			$overwriteCommitted,
+			$commitWithin
+		);
+	}
+
+	/**
+	 * @param $documentsXmlFragment
+	 * @param $allowDups
+	 * @param $overwritePending
+	 * @param $overwriteCommitted
+	 * @param $commitWithin
+	 * @return Apache_Solr_Response
+	 */
+	private function addRawDocuments(
+		$documentsXmlFragment,
+		$allowDups,
+		$overwritePending,
+		$overwriteCommitted,
+		$commitWithin
+	) {
 		$dupValue = $allowDups ? 'true' : 'false';
 		$pendingValue = $overwritePending ? 'true' : 'false';
 		$committedValue = $overwriteCommitted ? 'true' : 'false';
@@ -718,17 +810,22 @@ class Apache_Solr_Service
 		$commitWithin = (int) $commitWithin;
 		$commitWithinString = $commitWithin > 0 ? " commitWithin=\"{$commitWithin}\"" : '';
 
-		$rawPost = "<add allowDups=\"{$dupValue}\" overwritePending=\"{$pendingValue}\" overwriteCommitted=\"{$committedValue}\"{$commitWithinString}>";
+		$compatibilityLayer = $this->getCompatibilityLayer();
 
-		foreach ($documents as $document)
-		{
-			if ($document instanceof Apache_Solr_Document)
-			{
-				$rawPost .= $this->_documentToXmlFragment($document);
-			}
+		if ($compatibilityLayer instanceof Apache_Solr_Compatibility_AddDocumentXmlCreator) {
+			$rawPost = $compatibilityLayer->createAddDocumentXmlFragment(
+				$documentsXmlFragment,
+				$allowDups,
+				$overwritePending,
+				$overwriteCommitted,
+				$commitWithin
+			);
+		} else {
+			$rawPost = "<add allowDups=\"{$dupValue}\" overwritePending=\"{$pendingValue}\" "
+				. "overwriteCommitted=\"{$committedValue}\"{$commitWithinString}>";
+			$rawPost .= $documentsXmlFragment;
+			$rawPost .= '</add>';
 		}
-
-		$rawPost .= '</add>';
 
 		return $this->add($rawPost);
 	}
@@ -751,8 +848,8 @@ class Apache_Solr_Service
 
 		foreach ($document as $key => $value)
 		{
-			$key = htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
 			$fieldBoost = $document->getFieldBoost($key);
+			$key = htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
 
 			if (is_array($value))
 			{
@@ -814,19 +911,38 @@ class Apache_Solr_Service
 	 * @param boolean $waitFlush Defaults to true,  block until index changes are flushed to disk
 	 * @param boolean $waitSearcher Defaults to true, block until a new searcher is opened and registered as the main query searcher, making the changes visible
 	 * @param float $timeout Maximum expected duration (in seconds) of the commit operation on the server (otherwise, will throw a communication exception). Defaults to 1 hour
+	 * @param boolean $softCommit Whether to perform a soft commit instead of a hard commit.
 	 * @return Apache_Solr_Response
 	 *
 	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
 	 */
-	public function commit($expungeDeletes = false, $waitFlush = null, $waitSearcher = null, $timeout = 3600)
+	public function commit($expungeDeletes = false, $waitFlush = true, $waitSearcher = true, $timeout = 3600, $softCommit = false)
 	{
-		$expungeValue = $expungeDeletes ? 'true' : 'false';
-		$flushValue = $waitFlush ? 'true' : 'false';
-		$searcherValue = $waitSearcher ? 'true' : 'false';
-
-		$rawPost = '<commit expungeDeletes="' . $expungeValue . '"' . ( !is_null($waitFlush) ? ' waitFlush="' . $flushValue . '"' : '' ) . ' waitSearcher="' . $searcherValue . '" />';
+		$rawPost = $this->getCompatibilityLayer()->createCommitXml(
+			$expungeDeletes,
+			$waitFlush,
+			$waitSearcher,
+			$timeout,
+			$softCommit
+		);
 
 		return $this->_sendRawPost($this->_updateUrl, $rawPost, $timeout);
+	}
+
+	/**
+	 * Send a soft commit command. Will be synchronous unless both wait parameters are set to false.
+	 *
+	 * @param boolean $expungeDeletes Defaults to false, merge segments with deletes away
+	 * @param boolean $waitFlush Defaults to true,  block until index changes are flushed to disk
+	 * @param boolean $waitSearcher Defaults to true, block until a new searcher is opened and registered as the main query searcher, making the changes visible
+	 * @param float $timeout Maximum expected duration (in seconds) of the commit operation on the server (otherwise, will throw a communication exception). Defaults to 1 hour
+	 * @return Apache_Solr_Response
+	 *
+	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 */
+	public function softCommit($expungeDeletes = false, $waitFlush = true, $waitSearcher = true, $timeout = 3600)
+	{
+		return $this->commit($expungeDeletes, $waitFlush, $waitSearcher, $timeout, true);
 	}
 
 	/**
@@ -1116,10 +1232,11 @@ class Apache_Solr_Service
 	 */
 	public function optimize($waitFlush = true, $waitSearcher = true, $timeout = 3600)
 	{
-		$flushValue = $waitFlush ? 'true' : 'false';
-		$searcherValue = $waitSearcher ? 'true' : 'false';
-
-		$rawPost = '<optimize waitFlush="' . $flushValue . '" waitSearcher="' . $searcherValue . '" />';
+		$rawPost = $this->getCompatibilityLayer()->createOptimizeXml(
+			$waitFlush,
+			$waitSearcher,
+			$timeout
+		);
 
 		return $this->_sendRawPost($this->_updateUrl, $rawPost, $timeout);
 	}

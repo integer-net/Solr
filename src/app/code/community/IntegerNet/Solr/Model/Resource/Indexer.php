@@ -44,7 +44,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
             $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
-            $this->_solr[$storeId] = new Apache_Solr_Service($host, $port, $path);
+            $this->_solr[$storeId] = new Apache_Solr_Service($host, $port, $path, false, new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
         }
         return $this->_solr[$storeId];
     }
@@ -108,6 +108,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
     public function deleteAllDocuments($storeId)
     {
         $response = $this->getSolr($storeId)->deleteByQuery('store_id:' . $storeId);
+        $this->getSolr($storeId)->commit();
         return $response;
     }
 
@@ -119,6 +120,7 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
     public function deleteByMultipleIds($storeId, $skus)
     {
         $response = $this->getSolr($storeId)->deleteByMultipleIds($skus);
+        $this->getSolr($storeId)->commit();
         return $response;
     }
 }

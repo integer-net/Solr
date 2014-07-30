@@ -181,7 +181,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         if ($this->_canIndexProduct($product)) {
             return array(
-                'id' => $product->getId(),
+                'id' => $product->getId() . '_' . $product->getStoreId(), // primary identifier, must be unique
                 'product_id' => $product->getId(),
                 'name' => $product->getName(),
                 'store_id' => $product->getStoreId(),
@@ -217,23 +217,6 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         );
 
         return $attributeCodes;
-    }
-
-    /**
-     * @param $product
-     * @return string
-     */
-    protected function _getContent($product)
-    {
-        $content = array();
-
-        foreach ($this->_getSearchableAttributeCodes() as $attributeCode) {
-            if ($value = $this->_getRawAttributeValue($product, $attributeCode)) {
-                $content[] = $value;
-            }
-        }
-
-        return strip_tags(implode(', ', $content));
     }
 
     /**

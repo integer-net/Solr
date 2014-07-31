@@ -114,12 +114,12 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
 
     /**
      * @param int $storeId
-     * @param string[] $skus
+     * @param string[] $ids
      * @return Apache_Solr_Response
      */
-    public function deleteByMultipleIds($storeId, $skus)
+    public function deleteByMultipleIds($storeId, $ids)
     {
-        $response = $this->getSolr($storeId)->deleteByMultipleIds($skus);
+        $response = $this->getSolr($storeId)->deleteByMultipleIds($ids);
         $this->getSolr($storeId)->commit();
         return $response;
     }

@@ -18,8 +18,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_resourceName = 'integernet_solr/indexer';
 
     /**
-     * @param array|null $productIds
-     * @param boolean $emptyIndex
+     * @param array|null $productIds Restrict to given Products if this is set
+     * @param boolean $emptyIndex Whether to truncate the index before refilling it 
      */
     public function reindex($productIds = null, $emptyIndex = false)
     {
@@ -31,39 +31,32 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
                 continue;
             }
-
-            /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-            $productCollection = Mage::getResourceModel('catalog/product_collection')
-                ->setStoreId($storeId)
-                ->addUrlRewrite()
-                ->addAttributeToSelect(array('visibility', 'status'))
-                ->addAttributeToSelect($this->_getSearchableAttributes()->getColumnValues('attribute_code'))
-                ->addAttributeToSelect($this->_getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
-
             
+            $productCollection = $this->_getProductCollection($storeId);
+
             if (is_array($productIds)) {
                 $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
             }
 
             $combinedProductData = array();
-            $productIdsForDeletion = array();
+            $idsForDeletion = array();
 
             foreach($productCollection as $product) {
                 /** @var Mage_Catalog_Model_Product $product */
+                
                 $product->setStoreId($storeId);
-                $productData = $this->_getProductData($product);
-                if (is_array($productData)) {
-                    $combinedProductData[] = $productData;
+                if ($this->_canIndexProduct($product)) {
+                    $combinedProductData[] = $this->_getProductData($product);
                 } else {
-                    $productIdsForDeletion[] = $product->getId() . '_' . $product->getStoreId();
+                    $idsForDeletion[] = $this->_getSolrId($product);
                 }
             }
 
             if ($emptyIndex) {
                 $this->getResource()->deleteAllDocuments($storeId);
             } else {
-                if (sizeof($productIdsForDeletion)) {
-                    $this->getResource()->deleteByMultipleIds($storeId, $productIdsForDeletion);
+                if (sizeof($idsForDeletion)) {
+                    $this->getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
                 }
             }
 
@@ -100,21 +93,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Mage_Catalog_Model_Product $product
-     * @return array|null
+     * @return array
      */
     protected function _getProductData($product)
     {
-        if ($this->_canIndexProduct($product)) {
-            return array(
-                'id' => $product->getId() . '_' . $product->getStoreId(), // primary identifier, must be unique
-                'product_id' => $product->getId(),
-                'name' => $product->getName(),
-                'store_id' => $product->getStoreId(),
-                'content_type' => 'product',
-            );
-        }
-
-        return null;
+        return array(
+            'id' => $this->_getSolrId($product), // primary identifier, must be unique
+            'product_id' => $product->getId(),
+            'name' => $product->getName(),
+            'store_id' => $product->getStoreId(),
+            'content_type' => 'product',
+        );
     }
 
     /**
@@ -130,6 +119,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             return false;
         } 
         if (!in_array($product->getStore()->getWebsiteId(), $product->getWebsiteIds())) {
+            return false;
+        }
+        if (!$product->getStockItem()->getIsInStock() && !Mage::helper('cataloginventory')->isShowOutOfStock()) {
             return false;
         }
         return true;
@@ -163,5 +155,34 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
 
         return $this->_filterableInSearchAttributes;
+    }
+
+    /**
+     * @param $storeId
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    protected function _getProductCollection($storeId)
+    {
+        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
+        $productCollection = Mage::getResourceModel('catalog/product_collection')
+            ->setStoreId($storeId)
+            ->addMinimalPrice()
+            ->addFinalPrice()
+            ->addTaxPercents()
+            ->addUrlRewrite()
+            ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
+            ->addAttributeToSelect(array('visibility', 'status'))
+            ->addAttributeToSelect($this->_getSearchableAttributes()->getColumnValues('attribute_code'))
+            ->addAttributeToSelect($this->_getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
+        return $productCollection;
+    }
+
+    /**
+     * @param $product
+     * @return string
+     */
+    protected function _getSolrId($product)
+    {
+        return $product->getId() . '_' . $product->getStoreId();
     }
 }

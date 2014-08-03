@@ -36,17 +36,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $productCollection = Mage::getResourceModel('catalog/product_collection')
                 ->setStoreId($storeId)
                 ->addUrlRewrite()
-                ->addAttributeToFilter('vibility', array('in' => Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds()))
-                ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
                 ->addAttributeToSelect(array('visibility', 'status'))
                 ->addAttributeToSelect($this->_getSearchableAttributes()->getColumnValues('attribute_code'))
                 ->addAttributeToSelect($this->_getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
 
+            
             if (is_array($productIds)) {
                 $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
             }
 
             $combinedProductData = array();
+            $productIdsForDeletion = array();
 
             foreach($productCollection as $product) {
                 /** @var Mage_Catalog_Model_Product $product */
@@ -54,11 +54,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $productData = $this->_getProductData($product);
                 if (is_array($productData)) {
                     $combinedProductData[] = $productData;
+                } else {
+                    $productIdsForDeletion[] = $product->getId() . '_' . $product->getStoreId();
                 }
             }
 
             if ($emptyIndex) {
                 $this->getResource()->deleteAllDocuments($storeId);
+            } else {
+                if (sizeof($productIdsForDeletion)) {
+                    $this->getResource()->deleteByMultipleIds($storeId, $productIdsForDeletion);
+                }
             }
 
             if (sizeof($combinedProductData)) {
@@ -117,6 +123,15 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _canIndexProduct($product)
     {
+        if ($product->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+            return false;
+        }
+        if (!in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds())) {
+            return false;
+        } 
+        if (!in_array($product->getStore()->getWebsiteId(), $product->getWebsiteIds())) {
+            return false;
+        }
         return true;
     }
 

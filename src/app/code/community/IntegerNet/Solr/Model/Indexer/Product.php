@@ -92,6 +92,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
 
     /**
+     * Generate single product data for Solr
+     * 
      * @param Mage_Catalog_Model_Product $product
      * @return array
      */
@@ -101,6 +103,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
             'name' => $product->getName(),
+            'sku' => $product->getSku(),
+            'category' => $product->getCategoryIds(),
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );
@@ -178,7 +182,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * @param $product
+     * Get unique identifier for Solr
+     * 
+     * @param Mage_Catalog_Model_Product $product
      * @return string
      */
     protected function _getSolrId($product)

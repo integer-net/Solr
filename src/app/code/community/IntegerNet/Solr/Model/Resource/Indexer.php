@@ -91,7 +91,13 @@ class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Ab
 
             $document = new Apache_Solr_Document();
             foreach($data as $key => $value) {
-                $document->addField($key, $value);
+                if (is_array($value)) {
+                    foreach($value as $subValue) {
+                        $document->addField($key, $subValue);
+                    }
+                } else {
+                    $document->addField($key, $value);
+                }
             }
             $documents[] = $document;
         }

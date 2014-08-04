@@ -129,9 +129,19 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             }
             
             $attribute->setStoreId($product->getStoreId());
-            if ($product->getData($attribute->getAttributeCode()) 
-                && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))) {
-                $productData[$attribute->getAttributeCode() . '_t'] = $value;
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    if ($value = $product->getData($attribute->getAttributeCode())) {
+                        $productData[$attribute->getAttributeCode() . '_f'] = $value;
+                    }
+                    
+                    break;
+                
+                default:
+                    if ($product->getData($attribute->getAttributeCode())
+                        && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))) {
+                        $productData[$attribute->getAttributeCode() . '_t'] = $value;
+                    }
             }
         }        
         

@@ -96,7 +96,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      * 
      * @param Mage_Catalog_Model_Product $product
      * @return array
-     * @todo add facets
      */
     protected function _getProductData($product)
     {
@@ -107,44 +106,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );
-        
-        /*foreach($this->_getFilterableInSearchAttributes() as $attribute) {
-            
-            $attribute->setStoreId($product->getStoreId());
-            if (($rawValue = $product->getData($attribute->getAttributeCode())) 
-                && ($value = strip_tags($attribute->getFrontend()->getValue($product)))) {
-                $productData[$attribute->getAttributeCode() . '_t'] = $value;
-                $productData[$attribute->getAttributeCode() . '_facet'] = $rawValue;
-            }
-        } */       
-        
-        foreach($this->_getSearchableAttributes() as $attribute) {
-            
-            if (isset($productData[$attribute->getAttributeCode() . '_t'])) {
-                continue;
-            }
-            
-            if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
-                //continue;
-            }
-            
-            $attribute->setStoreId($product->getStoreId());
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    if ($value = $product->getData($attribute->getAttributeCode())) {
-                        $productData[$attribute->getAttributeCode() . '_f'] = $value;
-                    }
-                    
-                    break;
-                
-                default:
-                    if ($product->getData($attribute->getAttributeCode())
-                        && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))) {
-                        $productData[$attribute->getAttributeCode() . '_t'] = $value;
-                    }
-            }
-        }        
-        
+
+        $this->_addFacetsToProductData($product, $productData);
+
+        $this->_addSearchDataToProductData($product, $productData);
+
         return $productData;
     }
 
@@ -232,5 +198,59 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _getSolrId($product)
     {
         return $product->getId() . '_' . $product->getStoreId();
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @param array $productData
+     */
+    protected function _addFacetsToProductData($product, &$productData)
+    {
+        foreach ($this->_getFilterableInSearchAttributes() as $attribute) {
+
+            switch ($attribute->getFrontendInput()) {
+                case 'select':
+                    if ($rawValue = $product->getData($attribute->getAttributeCode())) {
+                        $productData[$attribute->getAttributeCode() . '_facet'] = $rawValue;
+                    }
+                    break;
+                case 'multiselect':
+                    if ($rawValue = $product->getData($attribute->getAttributeCode())) {
+                        $productData[$attribute->getAttributeCode() . '_facet'] = explode(',', $rawValue);
+                    }
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @param array $productData
+     */
+    protected function _addSearchDataToProductData($product, &$productData)
+    {
+        foreach ($this->_getSearchableAttributes() as $attribute) {
+
+            if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
+                continue;
+            }
+
+            $attribute->setStoreId($product->getStoreId());
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    if ($value = $product->getData($attribute->getAttributeCode())) {
+                        $productData[$attribute->getAttributeCode() . '_f'] = $value;
+                    }
+
+                    break;
+
+                default:
+                    if ($product->getData($attribute->getAttributeCode())
+                        && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
+                    ) {
+                        $productData[$attribute->getAttributeCode() . '_t'] = $value;
+                    }
+            }
+        }
     }
 }

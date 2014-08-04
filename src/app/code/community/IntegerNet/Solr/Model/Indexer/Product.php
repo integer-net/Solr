@@ -14,6 +14,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_filterableInSearchAttributes = null;
+    
+    /** @var IntegerNet_Solr_Block_Result_Item */
+    protected $_resultBlock = null;
 
     protected $_resourceName = 'integernet_solr/indexer';
 
@@ -110,6 +113,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $this->_addFacetsToProductData($product, $productData);
 
         $this->_addSearchDataToProductData($product, $productData);
+        
+        $this->_addResultHtmlToProductData($product, $productData);
 
         return $productData;
     }
@@ -183,9 +188,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addTaxPercents()
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
-            ->addAttributeToSelect(array('visibility', 'status'))
+            ->addAttributeToSelect(array('visibility', 'status', 'url_key'))
             ->addAttributeToSelect($this->_getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect($this->_getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
+        
         return $productCollection;
     }
 
@@ -252,5 +258,36 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     }
             }
         }
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @param array $productData
+     */
+    protected function _addResultHtmlToProductData($product, &$productData)
+    {
+        /** @var IntegerNet_Solr_Block_Result_Item $block */
+        $block = $this->_getResultItemBlock();
+        if ($block->getStoreId() != $product->getStoreId()) {
+            $appEmulation = Mage::getSingleton('core/app_emulation');
+            $appEmulation->startEnvironmentEmulation($product->getStoreId());
+            $block->setStoreId($product->getStoreId());
+        }
+        
+        $block->setProduct($product);
+        
+        $productData['result_html_t'] = $block->toHtml();
+    }
+
+    /**
+     * @return IntegerNet_Solr_Block_Result_Item
+     */
+    protected function _getResultItemBlock()
+    {
+        if (is_null($this->_resultBlock)) {
+            $this->_resultBlock = Mage::app()->getLayout()->createBlock('integernet_solr/result_item', 'solr_result_item')
+                ->setTemplate('integernet/solr/result/item.phtml');
+        }
+        return $this->_resultBlock;
     }
 }

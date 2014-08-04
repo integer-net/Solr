@@ -96,18 +96,46 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      * 
      * @param Mage_Catalog_Model_Product $product
      * @return array
+     * @todo add facets
      */
     protected function _getProductData($product)
     {
-        return array(
+        $productData = array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
-            'name' => $product->getName(),
-            'sku' => $product->getSku(),
             'category' => $product->getCategoryIds(),
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );
+        
+        /*foreach($this->_getFilterableInSearchAttributes() as $attribute) {
+            
+            $attribute->setStoreId($product->getStoreId());
+            if (($rawValue = $product->getData($attribute->getAttributeCode())) 
+                && ($value = strip_tags($attribute->getFrontend()->getValue($product)))) {
+                $productData[$attribute->getAttributeCode() . '_t'] = $value;
+                $productData[$attribute->getAttributeCode() . '_facet'] = $rawValue;
+            }
+        } */       
+        
+        foreach($this->_getSearchableAttributes() as $attribute) {
+            
+            if (isset($productData[$attribute->getAttributeCode() . '_t'])) {
+                continue;
+            }
+            
+            if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
+                //continue;
+            }
+            
+            $attribute->setStoreId($product->getStoreId());
+            if ($product->getData($attribute->getAttributeCode()) 
+                && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))) {
+                $productData[$attribute->getAttributeCode() . '_t'] = $value;
+            }
+        }        
+        
+        return $productData;
     }
 
     /**
@@ -140,7 +168,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
             $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsSearchableFilter();
+                ->addIsSearchableFilter()
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
         }
 
         return $this->_searchableAttributes;
@@ -155,7 +185,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
             $this->_filterableInSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsFilterableInSearchFilter();
+                ->addIsFilterableInSearchFilter()
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
         }
 
         return $this->_filterableInSearchAttributes;

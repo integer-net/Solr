@@ -240,6 +240,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
                 continue;
             }
+            
+            if ($attribute->getAttributeCode() == 'price') {
+                $productData['price_f'] = $product->getFinalPrice();
+                continue;
+            }
 
             $attribute->setStoreId($product->getStoreId());
             switch ($attribute->getBackendType()) {

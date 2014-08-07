@@ -53,7 +53,17 @@
             </modules>
         </translate>
     </adminhtml>
-    
+
+    <frontend>
+        <layout>
+            <updates>
+                <integernet_solr>
+                    <file>integernet/solr.xml</file>
+                </integernet_solr>
+            </updates>
+        </layout>
+    </frontend>
+
     <default>
         <integernet_solr>
             <general>

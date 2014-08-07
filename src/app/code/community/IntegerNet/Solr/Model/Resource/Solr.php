@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Resource_Indexer extends Mage_Core_Model_Resource_Abstract
+class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstract
 {
     /** @var Apache_Solr_Service[] */
     protected $_solr;

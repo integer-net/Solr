@@ -17,7 +17,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         ),
     );
 
-    protected $_resourceName = 'integernet_solr/indexer';
+    protected $_resourceName = 'integernet_solr/solr';
 
     public function getName()
     {

@@ -28,6 +28,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     public function loadData($printQuery = false, $logQuery = false)
     {
+
         $this->_items = array(1,2,3);
         return $this;
     }

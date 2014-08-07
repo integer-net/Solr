@@ -36,7 +36,10 @@ $_helper = $this->helper('catalog/output');
             <ul class="products-grid">
         <?php endif ?>
             <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
-                <?php //echo $this->getChild('item')->setProduct($_product)->toHtml() ?>
+                <?php echo $this
+                    ->getChild('item')
+                    ->setProduct($_product)
+                    ->toHtml() ?>
             </li>
             <?php if ($i%$_columnCount==0 || $i==$_collectionSize): ?>
             </ul>

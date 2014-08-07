@@ -8,7 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 
-class IntegerNet_Solr_Block_Result_Item extends Mage_Catalog_Block_Product_Abstract
+class IntegerNet_Solr_Block_Indexer_Item extends Mage_Catalog_Block_Product_Abstract
 {
     
 }

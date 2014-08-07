@@ -271,7 +271,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addResultHtmlToProductData($product, &$productData)
     {
-        /** @var IntegerNet_Solr_Block_Result_Item $block */
+        /** @var IntegerNet_Solr_Block_Indexer_Item $block */
         $block = $this->_getResultItemBlock();
         if ($block->getStoreId() != $product->getStoreId()) {
             $appEmulation = Mage::getSingleton('core/app_emulation');
@@ -285,12 +285,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * @return IntegerNet_Solr_Block_Result_Item
+     * @return IntegerNet_Solr_Block_Indexer_Item
      */
     protected function _getResultItemBlock()
     {
         if (is_null($this->_resultBlock)) {
-            $this->_resultBlock = Mage::app()->getLayout()->createBlock('integernet_solr/result_item', 'solr_result_item')
+            $this->_resultBlock = Mage::app()->getLayout()
+                ->createBlock('integernet_solr/indexer_item', 'solr_result_item')
                 ->setTemplate('integernet/solr/result/item.phtml');
         }
         return $this->_resultBlock;

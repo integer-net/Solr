@@ -56,6 +56,6 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         $query = Mage::helper('catalogsearch')->getQuery()->getQueryText();
         $params = array('fq' => 'store_id:' . $storeId);
-        return $this->_getResource()->search($storeId, $query, 0, 10, $params);
+        return $this->_getResource()->search($storeId, $query, 0, 3, $params);
     }
 }

@@ -11,6 +11,12 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
 {
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
+    
+    /** @var null|Apache_Solr_Response */
+    protected $_solrResult = null;
+    
+    /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
+    protected $_toolbarBlock = null;
 
     /**
      * Collection constructor
@@ -41,21 +47,89 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     public function loadData($printQuery = false, $logQuery = false)
     {
-        $storeId = Mage::app()->getStore()->getId();
         /** @var Apache_Solr_Response $result */
-        $result = $this->_getSolrResult($storeId);
+        $result = $this->_getSolrResult();
         $this->_items = $result->response->docs;
         return $this;
+    }
+
+    /**
+     * Retrieve collection all items count
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        $this->load();
+        if (is_null($this->_totalRecords)) {
+            $this->_totalRecords = $this->_getSolrResult()->response->numFound;
+        }
+        return intval($this->_totalRecords);
     }
 
     /**
      * @param $storeId
      * @return Apache_Solr_Response
      */
-    protected function _getSolrResult($storeId)
+    protected function _getSolrResult($storeId = null)
     {
-        $query = Mage::helper('catalogsearch')->getQuery()->getQueryText();
-        $params = array('fq' => 'store_id:' . $storeId);
-        return $this->_getResource()->search($storeId, $query, 0, 3, $params);
+        if (is_null($this->_solrResult)) {
+            if (is_null($storeId)) {
+                $storeId = Mage::app()->getStore()->getId();
+            }
+            $this->_solrResult = $this->_getResource()->search(
+                $storeId,
+                $this->_getQueryText(), 
+                $this->_getCurrentPage() * $this->_getPageSize(), // Start item
+                $this->_getPageSize(), // Items per page
+                $this->_getParams($storeId)
+            );
+        }
+        
+        return $this->_solrResult;
+    }
+
+    /**
+     * @return int
+     */
+    protected function _getCurrentPage()
+    {
+        return $this->_getToolbarBlock()->getCurrentPage() - 1;
+    }
+
+    /**
+     * @return int
+     */
+    protected function _getPageSize()
+    {
+        return $this->_getToolbarBlock()->getLimit();
+    }
+
+    /**
+     * @return Mage_Catalog_Block_Product_List_Toolbar
+     */
+    protected function _getToolbarBlock()
+    {
+        if (is_null($this->_toolbarBlock)) {
+            $this->_toolbarBlock = Mage::app()->getLayout()->getBlock('product_list_toolbar');
+        }
+        return $this->_toolbarBlock;
+    }
+
+    /**
+     * @param $storeId
+     * @return array
+     */
+    protected function _getParams($storeId)
+    {
+        return array('fq' => 'store_id:' . $storeId);
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getQueryText()
+    {
+        return Mage::helper('catalogsearch')->getQuery()->getQueryText();
     }
 }

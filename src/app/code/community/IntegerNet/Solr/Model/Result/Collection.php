@@ -100,6 +100,14 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     /**
      * @return int
      */
+    protected function _getCurrentOrder()
+    {
+        return $this->_getToolbarBlock()->getCurrentOrder();
+    }
+
+    /**
+     * @return int
+     */
     protected function _getPageSize()
     {
         return $this->_getToolbarBlock()->getLimit();
@@ -122,7 +130,20 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     protected function _getParams($storeId)
     {
-        return array('fq' => 'store_id:' . $storeId);
+        $params = array('fq' => 'store_id:' . $storeId);
+        
+        switch($this->_getCurrentOrder()) {
+            case 'position':
+                $params['sort'] = '';
+                break;
+            case 'price':
+                $params['sort'] = 'price_f asc';
+                break;
+            default:
+                $params['sort'] = $this->_getCurrentOrder() . '_t asc'; 
+                
+        }
+        return $params;
     }
 
     /**

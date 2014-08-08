@@ -181,6 +181,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _getProductCollection($storeId)
     {
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
+
         /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = Mage::getResourceModel('catalog/product_collection')
             ->setStoreId($storeId)
@@ -196,6 +199,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         Mage::dispatchEvent('catalog_block_product_list_collection', array(
             'collection' => $productCollection
         ));
+
+        $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
 
         return $productCollection;
     }
@@ -286,7 +291,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         
         $block->setProduct($product);
         
-        $productData['result_html_t'] = $block->toHtml();
+        $block->setTemplate('integernet/solr/result/list/item.phtml');
+        $productData['result_html_list_t'] = $block->toHtml();
+        
+        $block->setTemplate('integernet/solr/result/grid/item.phtml');
+        $productData['result_html_grid_t'] = $block->toHtml();
     }
 
     /**
@@ -296,8 +305,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         if (is_null($this->_itemBlock)) {
             $this->_itemBlock = Mage::app()->getLayout()
-                ->createBlock('integernet_solr/indexer_item', 'solr_result_item')
-                ->setTemplate('integernet/solr/result/item.phtml');
+                ->createBlock('integernet_solr/indexer_item', 'solr_result_item');
         }
         return $this->_itemBlock;
     }

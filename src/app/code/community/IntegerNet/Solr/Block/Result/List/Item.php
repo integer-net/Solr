@@ -19,7 +19,14 @@ class IntegerNet_Solr_Block_Result_List_Item extends Mage_Core_Block_Abstract
         /** @var Apache_Solr_Document $product */
         $product = $this->getProduct();
 
-        $field = $product->getField('result_html_t');
+        switch ($this->getListType()) {
+            case 'list':
+                $field = $product->getField('result_html_list_t');
+                break;
+            
+            default:
+                $field = $product->getField('result_html_grid_t');
+        }
         return $field['value'];
     }
 }

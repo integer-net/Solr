@@ -40,6 +40,18 @@
                 </integernet_solr>
             </indexer>
         </index>
+
+        <events>
+            <catalog_block_product_list_collection>
+                <observers>
+                    <review>
+                        <type>model</type>
+                        <class>review/observer</class>
+                        <method>catalogBlockProductCollectionBeforeToHtml</method>
+                    </review>
+                </observers>
+            </catalog_block_product_list_collection>
+        </events>
     </global>
 
     <adminhtml>
@@ -62,6 +74,15 @@
                 </integernet_solr>
             </updates>
         </layout>
+        <events>
+            <catalog_block_product_list_collection>
+                <observers>
+                    <review>
+                        <type>disabled</type>
+                    </review>
+                </observers>
+            </catalog_block_product_list_collection>
+        </events>
     </frontend>
 
     <default>

@@ -175,8 +175,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      * @return Mage_Catalog_Model_Resource_Product_Collection
+     * @todo emulate store for getting correct reviews
      */
     protected function _getProductCollection($storeId)
     {
@@ -191,7 +192,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(array('visibility', 'status', 'url_key'))
             ->addAttributeToSelect($this->_getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect($this->_getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
-        
+
+        Mage::dispatchEvent('catalog_block_product_list_collection', array(
+            'collection' => $productCollection
+        ));
+
         return $productCollection;
     }
 

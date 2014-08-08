@@ -6,6 +6,7 @@
             <codePool>community</codePool>
             <depends>
                 <Mage_Catalog/>
+                <Mage_CatalogSearch/>
                 <Mage_Index/>
             </depends>
         </IntegerNet_Solr>

@@ -111,6 +111,14 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     protected function _getCurrentSortDirection()
     {
+        if ($this->_getCurrentSort() == 'position') {
+            switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
+                case 'desc':
+                    return 'asc';
+                default:
+                    return 'desc';
+            }
+        }
         return $this->_getToolbarBlock()->getCurrentDirection();
     }
 
@@ -141,7 +149,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         $params = array(
             'fq' => 'store_id:' . $storeId,
-            'fl' => 'result_html_list_t,result_html_grid_t',
+            'fl' => 'result_html_list_t,result_html_grid_t,score',
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
             'facet.sort' => 'true',
@@ -168,7 +176,11 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     protected function _getQueryText()
     {
-        return Mage::helper('catalogsearch')->getQuery()->getQueryText();
+        $queryText = Mage::helper('catalogsearch')->getQuery()->getQueryText();
+        if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
+            $queryText .= '~' . Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+        }
+        return $queryText;
     }
 
     /**

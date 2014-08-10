@@ -91,6 +91,10 @@
                 <is_active>1</is_active>
                 <log>1</log>
             </general>
+            <fuzzy>
+                <is_active>1</is_active>
+                <sensitivity>0.6</sensitivity>
+            </fuzzy>
         </integernet_solr>
     </default>
 

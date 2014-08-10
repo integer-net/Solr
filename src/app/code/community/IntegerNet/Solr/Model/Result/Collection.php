@@ -50,7 +50,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
         /** @var Apache_Solr_Response $result */
         $result = $this->_getSolrResult();
         $this->_items = $result->response->docs;
-        Mage::log($result);
+
         return $this;
     }
 
@@ -85,6 +85,26 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
                 $this->_getPageSize(), // Items per page
                 $this->_getParams($storeId)
             );
+
+            if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
+
+                $resultClone = unserialize(serialize($this->_solrResult));
+                if (isset($resultClone->response->docs)) {
+                    foreach($resultClone->response->docs as $key => $doc) {
+                        /** @var Apache_Solr_Document $doc */
+                        foreach($doc->getFieldNames() as $fieldName) {
+                            $field = $doc->getField($fieldName);
+                            $value = str_replace(array("\n", "\r"), '', $field['value']);
+                            if (strlen($value) > 50) {
+                                $value = substr($value, 0, 50) . '...';
+                                $doc->setField($fieldName, $value);
+                                $resultClone->response->docs[$key] = $doc;
+                            }
+                        }
+                    }
+                }
+                Mage::log($resultClone, null, 'solr.log');
+            }
         }
         
         return $this->_solrResult;
@@ -149,15 +169,13 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         $params = array(
             'fq' => 'store_id:' . $storeId,
-            'fl' => 'result_html_list_t,result_html_grid_t,score',
+            'fl' => 'result_html_list_t,result_html_grid_t,score,sku_s,name_s',
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
             'facet.sort' => 'true',
             'facet.mincount' => '1',
             'facet.field' => $this->_getFacetFieldCodes(),
         );
-
-        Mage::log($params);
 
         return $params;
     }

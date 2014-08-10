@@ -12,7 +12,7 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
     /**
      * Retrieve loaded category collection
      *
-     * @return Mage_Eav_Model_Entity_Collection_Abstract
+     * @return IntegerNet_Solr_Model_Result_Collection
      */
     protected function _getProductCollection()
     {
@@ -20,8 +20,7 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
     }
 
     /**
-     * Need use as _prepareLayout - but problem in declaring collection from
-     * another block (was problem with search result)
+     * @return IntegerNet_Solr_Block_Result_List
      */
     protected function _beforeToHtml()
     {

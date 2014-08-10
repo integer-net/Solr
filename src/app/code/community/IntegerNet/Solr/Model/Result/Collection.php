@@ -50,6 +50,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
         /** @var Apache_Solr_Response $result */
         $result = $this->_getSolrResult();
         $this->_items = $result->response->docs;
+        Mage::log($result);
         return $this;
     }
 
@@ -140,12 +141,26 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         $params = array(
             'fq' => 'store_id:' . $storeId,
+            'fl' => 'result_html_list_t,result_html_grid_t',
             'sort' => $this->_getSortParam(),
+            'facet' => 'true',
+            'facet.sort' => 'true',
+            'facet.mincount' => '1',
+            'facet.field' => $this->_getFacetFieldCodes(),
         );
 
         Mage::log($params);
 
         return $params;
+    }
+
+    protected function _getFacetFieldCodes()
+    {
+        $codes = array();
+        foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
+            $codes[] = $attribute->getAttributeCode() . '_facet';
+        }
+        return $codes;
     }
 
     /**

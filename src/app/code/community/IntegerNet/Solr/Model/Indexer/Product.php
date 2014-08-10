@@ -262,6 +262,15 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     if ($value = $product->getData($attribute->getAttributeCode())) {
                         $productData[$attribute->getAttributeCode() . '_f'] = $value;
                     }
+                    break;
+
+                case 'text':
+
+                    if ($product->getData($attribute->getAttributeCode())
+                        && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
+                    ) {
+                        $productData[$attribute->getAttributeCode() . '_t'] = $value;
+                    }
 
                     break;
 
@@ -269,7 +278,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     if ($product->getData($attribute->getAttributeCode())
                         && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
                     ) {
-                        $productData[$attribute->getAttributeCode() . '_t'] = $value;
+                        $productData[$attribute->getAttributeCode() . '_s'] = $value;
                     }
             }
         }

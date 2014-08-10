@@ -100,9 +100,17 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     /**
      * @return int
      */
-    protected function _getCurrentOrder()
+    protected function _getCurrentSort()
     {
         return $this->_getToolbarBlock()->getCurrentOrder();
+    }
+
+    /**
+     * @return int
+     */
+    protected function _getCurrentSortDirection()
+    {
+        return $this->_getToolbarBlock()->getCurrentDirection();
     }
 
     /**
@@ -130,19 +138,13 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     protected function _getParams($storeId)
     {
-        $params = array('fq' => 'store_id:' . $storeId);
-        
-        switch($this->_getCurrentOrder()) {
-            case 'position':
-                $params['sort'] = '';
-                break;
-            case 'price':
-                $params['sort'] = 'price_f asc';
-                break;
-            default:
-                $params['sort'] = $this->_getCurrentOrder() . '_t asc'; 
-                
-        }
+        $params = array(
+            'fq' => 'store_id:' . $storeId,
+            'sort' => $this->_getSortParam(),
+        );
+
+        Mage::log($params);
+
         return $params;
     }
 
@@ -152,5 +154,25 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     protected function _getQueryText()
     {
         return Mage::helper('catalogsearch')->getQuery()->getQueryText();
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getSortParam()
+    {
+        switch ($this->_getCurrentSort()) {
+            case 'position':
+                $param = 'relevance';
+                break;
+            case 'price':
+                $param = 'price_f';
+                break;
+            default:
+                $param = $this->_getCurrentSort() . '_s';
+        }
+
+        $param .= ' ' . $this->_getCurrentSortDirection();
+        return $param;
     }
 }

@@ -309,12 +309,16 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @return IntegerNet_Solr_Block_Indexer_Item
+     * @todo add correct price block types from layout xmls
      */
     protected function _getResultItemBlock()
     {
         if (is_null($this->_itemBlock)) {
+            /** @var IntegerNet_Solr_Block_Indexer_Item _itemBlock */
             $this->_itemBlock = Mage::app()->getLayout()
                 ->createBlock('integernet_solr/indexer_item', 'solr_result_item');
+            $this->_itemBlock
+                ->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
         }
         return $this->_itemBlock;
     }

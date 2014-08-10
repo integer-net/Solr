@@ -163,7 +163,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         switch ($this->_getCurrentSort()) {
             case 'position':
-                $param = 'relevance';
+                $param = 'score';
                 break;
             case 'price':
                 $param = 'price_f';

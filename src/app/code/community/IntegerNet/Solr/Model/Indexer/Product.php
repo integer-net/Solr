@@ -15,8 +15,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_filterableInSearchAttributes = null;
     
-    /** @var IntegerNet_Solr_Block_Indexer_Item */
-    protected $_itemBlock = null;
+    /** @var IntegerNet_Solr_Block_Indexer_Item[] */
+    protected $_itemBlocks = array();
 
     protected $_resourceName = 'integernet_solr/solr';
 
@@ -252,7 +252,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             }
             
             if ($attribute->getAttributeCode() == 'price') {
-                $productData['price_f'] = $product->getFinalPrice();
+                $price = $product->getFinalPrice();
+                if ($price == 0) {
+                    $price = $product->getMinimalPrice();
+                }
+                $productData['price_f'] = $price;
                 continue;
             }
 
@@ -290,14 +294,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addResultHtmlToProductData($product, &$productData)
     {
-        /** @var IntegerNet_Solr_Block_Indexer_Item $block */
-        $block = $this->_getResultItemBlock();
-        if ($block->getStoreId() != $product->getStoreId()) {
+        if (Mage::app()->getStore()->getId() != $product->getStoreId()) {
             $appEmulation = Mage::getSingleton('core/app_emulation');
             $appEmulation->startEnvironmentEmulation($product->getStoreId());
-            $block->setStoreId($product->getStoreId());
         }
-        
+
+        /** @var IntegerNet_Solr_Block_Indexer_Item $block */
+        $block = $this->_getResultItemBlock();
+
         $block->setProduct($product);
         
         $block->setTemplate('integernet/solr/result/list/item.phtml');
@@ -309,17 +313,46 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @return IntegerNet_Solr_Block_Indexer_Item
-     * @todo add correct price block types from layout xmls
      */
     protected function _getResultItemBlock()
     {
-        if (is_null($this->_itemBlock)) {
+        if (!isset($this->_itemBlocks[Mage::app()->getStore()->getId()])) {
             /** @var IntegerNet_Solr_Block_Indexer_Item _itemBlock */
-            $this->_itemBlock = Mage::app()->getLayout()
-                ->createBlock('integernet_solr/indexer_item', 'solr_result_item');
-            $this->_itemBlock
-                ->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
+            $block = Mage::app()->getLayout()->createBlock('integernet_solr/indexer_item', 'solr_result_item');
+            $this->_addPriceBlockTypes($block);
+            $this->_itemBlocks[Mage::app()->getStore()->getId()] = $block;
         }
-        return $this->_itemBlock;
+
+        return $this->_itemBlocks[Mage::app()->getStore()->getId()];
+    }
+
+    /**
+     * @param IntegerNet_Solr_Block_Indexer_Item $block
+     */
+    protected function _addPriceBlockTypes($block)
+    {
+        $block->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
+
+        $priceBlockType = 'germansetup/catalog_product_price';
+        if (Mage::app()->getLayout()->createBlock($priceBlockType)) {
+
+            $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('grouped', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('downloadable', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('bundle', 'germansetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
+        }
+        
+        $priceBlockType = 'magesetup/catalog_product_price';
+        if (Mage::app()->getLayout()->createBlock($priceBlockType)) {
+
+            $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('grouped', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('downloadable', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
+            $block->addPriceBlockType('bundle', 'magesetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
+        }
     }
 }

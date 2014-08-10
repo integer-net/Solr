@@ -16,7 +16,7 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _getProductCollection()
     {
-        return Mage::getModel('integernet_solr/result_collection');
+        return Mage::getSingleton('integernet_solr/result_collection');
     }
 
     /**

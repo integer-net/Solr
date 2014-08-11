@@ -15,6 +15,11 @@
             <integernet_solr_resource>
                 <class>IntegerNet_Solr_Model_Resource</class>
             </integernet_solr_resource>
+            <catalog_resource>
+                <rewrite>
+                    <layer_filter_attribute>IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute</layer_filter_attribute>
+                </rewrite>
+            </catalog_resource>
         </models>
 
         <blocks>

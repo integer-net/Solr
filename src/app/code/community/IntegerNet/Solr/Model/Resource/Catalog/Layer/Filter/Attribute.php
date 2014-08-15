@@ -22,6 +22,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
             return parent::applyFilterToCollection($filter, $value);
         } 
         
+        Mage::getSingleton('integernet_solr/result')->addFilter($filter->getAttributeModel(), $value);
         return $this;
     }
     

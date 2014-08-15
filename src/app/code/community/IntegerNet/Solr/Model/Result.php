@@ -17,6 +17,8 @@ class IntegerNet_Solr_Model_Result
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
     protected $_toolbarBlock = null;
+    
+    protected $_filters = array();
 
     /**
      * @return IntegerNet_Solr_Model_Resource_Solr
@@ -193,14 +195,28 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         $filterQuery = 'store_id:' . $storeId;
-        foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) { 
-            /** @var Mage_Catalog_Model_Entity_Attribute $attribute*/
-            $attributeCode = $attribute->getAttributeCode();
-            if ($value = Mage::app()->getRequest()->getParam($attributeCode)) {
-                $filterQuery .= ' AND ' . $attributeCode . '_facet:' . $value;
-            }
+        
+        foreach($this->getFilters() as $attributeCode => $value) { 
+            $filterQuery .= ' AND ' . $attributeCode . '_facet:' . $value;
         }
         
         return $filterQuery;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Entity_Attribute$attribute
+     * @param int $value
+     */
+    public function addFilter($attribute, $value) 
+    {
+        $this->_filters[$attribute->getAttributeCode()] = $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilters()
+    {
+        return $this->_filters;
     }
 }

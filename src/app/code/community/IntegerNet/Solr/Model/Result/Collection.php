@@ -46,6 +46,40 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     }
 
     /**
+     * Adding product count to categories collection
+     *
+     * @param Mage_Eav_Model_Entity_Collection_Abstract $categoryCollection
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    public function addCountToCategories($categoryCollection)
+    {
+        $isAnchor    = array();
+        $isNotAnchor = array();
+        foreach ($categoryCollection as $category) {
+            if ($category->getIsAnchor()) {
+                $isAnchor[]    = $category->getId();
+            } else {
+                $isNotAnchor[] = $category->getId();
+            }
+        }
+        $productCounts = array();
+        if ($isAnchor || $isNotAnchor) {
+
+            $productCounts = (array)$this->_getSolrResult()->facet_counts->facet_fields->category;
+        }
+
+        foreach ($categoryCollection as $category) {
+            $_count = 0;
+            if (isset($productCounts[(string)$category->getId()])) {
+                $_count = $productCounts[(string)$category->getId()];
+            }
+            $category->setProductCount($_count);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return stdClass
      */
     protected function _getSolrResult()

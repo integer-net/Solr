@@ -99,7 +99,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $productData = array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
-            'category' => $product->getCategoryIds(),
+            'category' => $product->getCategoryIds(), // @todo get category ids from parent anchor categories as well
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );

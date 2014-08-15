@@ -130,7 +130,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getParams($storeId)
     {
         $params = array(
-            'fq' => 'store_id:' . $storeId,
+            'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_list_t,result_html_grid_t,score,sku_s,name_s',
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
@@ -147,7 +147,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getFacetFieldCodes()
     {
-        $codes = array();
+        $codes = array('category');
         foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
@@ -184,5 +184,23 @@ class IntegerNet_Solr_Model_Result
 
         $param .= ' ' . $this->_getCurrentSortDirection();
         return $param;
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    protected function _getFilterQuery($storeId)
+    {
+        $filterQuery = 'store_id:' . $storeId;
+        foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) { 
+            /** @var Mage_Catalog_Model_Entity_Attribute $attribute*/
+            $attributeCode = $attribute->getAttributeCode();
+            if ($value = Mage::app()->getRequest()->getParam($attributeCode)) {
+                $filterQuery .= ' AND ' . $attributeCode . '_facet:' . $value;
+            }
+        }
+        
+        return $filterQuery;
     }
 }

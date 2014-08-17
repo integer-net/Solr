@@ -189,7 +189,7 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      * @return string
      */
     protected function _getFilterQuery($storeId)
@@ -197,19 +197,27 @@ class IntegerNet_Solr_Model_Result
         $filterQuery = 'store_id:' . $storeId;
         
         foreach($this->getFilters() as $attributeCode => $value) { 
-            $filterQuery .= ' AND ' . $attributeCode . '_facet:' . $value;
+            $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
         }
         
         return $filterQuery;
     }
 
     /**
-     * @param Mage_Catalog_Model_Entity_Attribute$attribute
+     * @param Mage_Catalog_Model_Entity_Attribute $attribute
      * @param int $value
      */
-    public function addFilter($attribute, $value) 
+    public function addAttributeFilter($attribute, $value) 
     {
-        $this->_filters[$attribute->getAttributeCode()] = $value;
+        $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     */
+    public function addCategoryFilter($category) 
+    {
+        $this->_filters['category'] = $category->getId();
     }
 
     /**

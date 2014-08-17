@@ -48,8 +48,8 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     /**
      * Adding product count to categories collection
      *
-     * @param Mage_Eav_Model_Entity_Collection_Abstract $categoryCollection
-     * @return Mage_Catalog_Model_Resource_Product_Collection
+     * @param Mage_Catalog_Model_Resource_Category_Collection $categoryCollection
+     * @return IntegerNet_Solr_Model_Result_Collection
      */
     public function addCountToCategories($categoryCollection)
     {
@@ -65,17 +65,31 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
         $productCounts = array();
         if ($isAnchor || $isNotAnchor) {
 
-            $productCounts = (array)$this->_getSolrResult()->facet_counts->facet_fields->category;
+            foreach((array)$this->_getSolrResult()->facet_counts->facet_fields->category as $categoryId => $productCount) {
+                $productCounts[intval($categoryId)] = intval($productCount);
+            }
         }
 
         foreach ($categoryCollection as $category) {
             $_count = 0;
-            if (isset($productCounts[(string)$category->getId()])) {
-                $_count = $productCounts[(string)$category->getId()];
+            if (isset($productCounts[$category->getId()])) {
+                $_count = $productCounts[$category->getId()];
             }
             $category->setProductCount($_count);
         }
 
+        return $this;
+    }
+
+    /**
+     * Specify category filter for product collection
+     *
+     * @param Mage_Catalog_Model_Category $category
+     * @return IntegerNet_Solr_Model_Result_Collection
+     */
+    public function addCategoryFilter(Mage_Catalog_Model_Category $category)
+    {
+        Mage::getSingleton('integernet_solr/result')->addCategoryFilter($category);
         return $this;
     }
 

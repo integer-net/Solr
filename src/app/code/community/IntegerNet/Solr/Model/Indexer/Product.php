@@ -99,7 +99,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $productData = array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
-            'category' => $product->getCategoryIds(), // @todo get category ids from parent anchor categories as well
+            'category' => $this->_getCategoryIds($product), // @todo get category ids from parent anchor categories as well
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );
@@ -304,4 +304,25 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
     }
 
+    /**
+     * @param $product
+     * @return int[]
+     */
+    protected function _getCategoryIds($product)
+    {
+        $categoryIds = $product->getCategoryIds();
+        
+        /** @var $categories Mage_Catalog_Model_Resource_Category_Collection */
+        $categories = Mage::getResourceModel('catalog/category_collection')
+            ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
+            ->addAttributeToFilter('is_active', 1)        
+            ->addAttributeToFilter('include_in_menu', 1);
+            
+        foreach($categories->getColumnValues('path') as $path) {
+            $categoryIds = array_merge($categoryIds, explode('/', $path));
+        }
+        $categoryIds = array_unique($categoryIds);
+
+        return $categoryIds;
+    }
 }

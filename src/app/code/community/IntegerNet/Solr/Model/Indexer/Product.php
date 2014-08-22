@@ -268,6 +268,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             /** @var IntegerNet_Solr_Block_Indexer_Item _itemBlock */
             $block = Mage::app()->getLayout()->createBlock('integernet_solr/indexer_item', 'solr_result_item');
             $this->_addPriceBlockTypes($block);
+            // support for rwd theme
+            $block->setChild('name.after', Mage::app()->getLayout()->createBlock('core/text_list'));
+            $block->setChild('after', Mage::app()->getLayout()->createBlock('core/text_list'));
             $this->_itemBlocks[Mage::app()->getStore()->getId()] = $block;
         }
 

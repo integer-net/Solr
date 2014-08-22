@@ -63,6 +63,15 @@
                 </observers>
             </catalog_block_product_list_collection>
         </events>
+
+        <resources>
+            <integernet_solr_setup>
+                <setup>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                    <module>IntegerNet_Solr</module>
+                </setup>
+            </integernet_solr_setup>
+        </resources>
     </global>
 
     <adminhtml>

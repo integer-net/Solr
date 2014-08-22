@@ -72,6 +72,10 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
     {
         $document = new Apache_Solr_Document();
         foreach($data as $key => $value) {
+            if ($key == '_boost') {
+                $document->setBoost($value);
+                continue;
+            }
             $document->addField($key, $value);
         }
         $response = $this->getSolr($storeId)->addDocument($document);
@@ -91,6 +95,10 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
             $document = new Apache_Solr_Document();
             foreach($data as $key => $value) {
+                if ($key == '_boost') {
+                    $document->setBoost($value);
+                    continue;
+                }
                 if (is_array($value)) {
                     foreach($value as $subValue) {
                         $document->addField($key, $subValue);

@@ -14,6 +14,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends Mage_Cat
      *
      * @param Mage_Catalog_Model_Layer_Filter_Price $filter
      * @return float
+     * @todo return correct value
      */
     public function getMaxPrice($filter)
     {

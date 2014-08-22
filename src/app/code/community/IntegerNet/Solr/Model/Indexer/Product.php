@@ -106,6 +106,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             'content_type' => 'product',
         );
 
+        $this->_addBoostToProductData($product, $productData);
+
         $this->_addFacetsToProductData($product, $productData);
 
         $this->_addSearchDataToProductData($product, $productData);
@@ -155,7 +157,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addTaxPercents()
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
-            ->addAttributeToSelect(array('visibility', 'status', 'url_key'))
+            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
 
@@ -364,6 +366,19 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 array_shift($categoryPathIds);
                 array_shift($categoryPathIds);
                 $this->_pathCategoryIds[$category->getId()] = $categoryPathIds;
+            }
+        }
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @param array $productData
+     */
+    protected function _addBoostToProductData($product, &$productData)
+    {
+        if ($boost = $product->getSolrBoost()) {
+            if ($boost > 0) {
+                $productData['_boost'] = $boost;
             }
         }
     }

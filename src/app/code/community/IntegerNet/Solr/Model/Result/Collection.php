@@ -94,6 +94,17 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     }
 
     /**
+     * Retrieve maximal price
+     *
+     * @return float
+     * @todo return correct value
+     */
+    public function getMaxPrice()
+    {
+        return 200;
+    }
+
+    /**
      * @return stdClass
      */
     protected function _getSolrResult()

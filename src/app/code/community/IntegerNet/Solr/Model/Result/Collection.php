@@ -46,6 +46,54 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     }
 
     /**
+     * Adding product count to categories collection
+     *
+     * @param Mage_Catalog_Model_Resource_Category_Collection $categoryCollection
+     * @return IntegerNet_Solr_Model_Result_Collection
+     */
+    public function addCountToCategories($categoryCollection)
+    {
+        $isAnchor    = array();
+        $isNotAnchor = array();
+        foreach ($categoryCollection as $category) {
+            if ($category->getIsAnchor()) {
+                $isAnchor[]    = $category->getId();
+            } else {
+                $isNotAnchor[] = $category->getId();
+            }
+        }
+        $productCounts = array();
+        if ($isAnchor || $isNotAnchor) {
+
+            foreach((array)$this->_getSolrResult()->facet_counts->facet_fields->category as $categoryId => $productCount) {
+                $productCounts[intval($categoryId)] = intval($productCount);
+            }
+        }
+
+        foreach ($categoryCollection as $category) {
+            $_count = 0;
+            if (isset($productCounts[$category->getId()])) {
+                $_count = $productCounts[$category->getId()];
+            }
+            $category->setProductCount($_count);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Specify category filter for product collection
+     *
+     * @param Mage_Catalog_Model_Category $category
+     * @return IntegerNet_Solr_Model_Result_Collection
+     */
+    public function addCategoryFilter(Mage_Catalog_Model_Category $category)
+    {
+        Mage::getSingleton('integernet_solr/result')->addCategoryFilter($category);
+        return $this;
+    }
+
+    /**
      * @return stdClass
      */
     protected function _getSolrResult()

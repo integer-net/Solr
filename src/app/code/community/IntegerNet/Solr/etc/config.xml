@@ -18,8 +18,14 @@
             <catalog_resource>
                 <rewrite>
                     <layer_filter_attribute>IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute</layer_filter_attribute>
+                    <layer_filter_price>IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price</layer_filter_price>
                 </rewrite>
             </catalog_resource>
+            <catalogsearch>
+                <rewrite>
+                    <layer>IntegerNet_Solr_Model_CatalogSearch_Layer</layer>
+                </rewrite>
+            </catalogsearch>
         </models>
 
         <blocks>

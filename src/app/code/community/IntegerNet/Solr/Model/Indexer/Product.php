@@ -13,6 +13,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_itemBlocks = array();
 
     protected $_resourceName = 'integernet_solr/solr';
+    
+    protected $_pathCategoryIds = array();
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
@@ -99,7 +101,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $productData = array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
-            'category' => $product->getCategoryIds(),
+            'category' => $this->_getCategoryIds($product), // @todo get category ids from parent anchor categories as well
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         );
@@ -278,6 +280,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
+     * Add custom price blocks for correct price display
+     * 
      * @param IntegerNet_Solr_Block_Indexer_Item $block
      */
     protected function _addPriceBlockTypes($block)
@@ -307,4 +311,60 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
     }
 
+    /**
+     * Get category ids of assigned categories and all parents
+     * 
+     * @param Mage_Catalog_Model_Product $product
+     * @return int[]
+     */
+    protected function _getCategoryIds($product)
+    {
+        $categoryIds = $product->getCategoryIds();
+        
+        if (!sizeof($categoryIds)) {
+            return array();
+        }
+ 
+        $lookupCategoryIds = array_diff($categoryIds, array_keys($this->_pathCategoryIds));
+        $this->_lookupCategoryIdPaths($lookupCategoryIds);
+
+        $foundCategoryIds = array();
+        foreach($categoryIds as $categoryId) {
+            $categoryPathIds = $this->_pathCategoryIds[$categoryId];
+            $foundCategoryIds = array_merge($foundCategoryIds, $categoryPathIds);
+        }
+
+        $foundCategoryIds = array_unique($foundCategoryIds);
+
+        return $foundCategoryIds;
+    }
+
+    /**
+     * Lookup and store all parent category ids and its own id of given category ids
+     * 
+     * @param int[] $categoryIds
+     */
+    protected function _lookupCategoryIdPaths($categoryIds)
+    {
+        if (!sizeof($categoryIds)) {
+            return;
+        }
+
+        /** @var $categories Mage_Catalog_Model_Resource_Category_Collection */
+        $categories = Mage::getResourceModel('catalog/category_collection')
+            ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
+            ->addAttributeToSelect(array('is_active', 'include_in_menu'));
+
+        foreach ($categories as $category) {
+            /** @var Mage_Catalog_Model_Category $categoryPathIds */
+            if (!$category->getIsActive() || !$category->getIncludeInMenu()) {
+                $this->_pathCategoryIds[$category->getId()] = array();
+            } else {
+                $categoryPathIds = explode('/', $category->getPath());
+                array_shift($categoryPathIds);
+                array_shift($categoryPathIds);
+                $this->_pathCategoryIds[$category->getId()] = $categoryPathIds;
+            }
+        }
+    }
 }

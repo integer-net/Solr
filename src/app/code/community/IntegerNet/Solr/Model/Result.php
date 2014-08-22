@@ -17,6 +17,8 @@ class IntegerNet_Solr_Model_Result
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
     protected $_toolbarBlock = null;
+    
+    protected $_filters = array();
 
     /**
      * @return IntegerNet_Solr_Model_Resource_Solr
@@ -130,7 +132,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getParams($storeId)
     {
         $params = array(
-            'fq' => 'store_id:' . $storeId,
+            'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_list_t,result_html_grid_t,score,sku_s,name_s',
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
@@ -147,7 +149,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getFacetFieldCodes()
     {
-        $codes = array();
+        $codes = array('category');
         foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
@@ -184,5 +186,45 @@ class IntegerNet_Solr_Model_Result
 
         $param .= ' ' . $this->_getCurrentSortDirection();
         return $param;
+    }
+
+    /**
+     * @param int $storeId
+     * @return string
+     */
+    protected function _getFilterQuery($storeId)
+    {
+        $filterQuery = 'store_id:' . $storeId;
+        
+        foreach($this->getFilters() as $attributeCode => $value) { 
+            $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
+        }
+        
+        return $filterQuery;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param int $value
+     */
+    public function addAttributeFilter($attribute, $value) 
+    {
+        $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     */
+    public function addCategoryFilter($category) 
+    {
+        $this->_filters['category'] = $category->getId();
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilters()
+    {
+        return $this->_filters;
     }
 }

@@ -10,6 +10,23 @@
 class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage_Catalog_Model_Resource_Layer_Filter_Attribute
 {
     /**
+     * Apply attribute filter to product collection
+     *
+     * @param Mage_Catalog_Model_Layer_Filter_Attribute $filter
+     * @param int $value
+     * @return Mage_Catalog_Model_Resource_Layer_Filter_Attribute
+     */
+    public function applyFilterToCollection($filter, $value)
+    {
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+            return parent::applyFilterToCollection($filter, $value);
+        } 
+        
+        Mage::getSingleton('integernet_solr/result')->addAttributeFilter($filter->getAttributeModel(), $value);
+        return $this;
+    }
+    
+    /**
      * Retrieve array with products counts per attribute option
      *
      * @param Mage_Catalog_Model_Layer_Filter_Attribute $filter
@@ -17,6 +34,10 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function getCount($filter)
     {
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+            return parent::getCount($filter);
+        }
+        
         /** @var $solrResult StdClass */
         $solrResult = Mage::getSingleton('integernet_solr/result')->getSolrResult();
 

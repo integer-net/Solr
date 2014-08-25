@@ -49,6 +49,9 @@ class IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection extends Vari
     {
         $suggestions = (array)$this->_getSolrSuggestion()->spellcheck->suggestions;
 
+        if (!is_object(current($suggestions)) || !isset(current($suggestions)->suggestion)) {
+            return $this;
+        }
         foreach (current($suggestions)->suggestion as $suggestion) {
             $this->_items[] = new Varien_Object(array(
                 'query_text' => $suggestion,

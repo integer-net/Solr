@@ -21,11 +21,11 @@ class IntegerNet_Solr_Block_Result_List_Item extends Mage_Core_Block_Abstract
 
         switch ($this->getListType()) {
             case 'list':
-                $field = $product->getField('result_html_list_t');
+                $field = $product->getField('result_html_list_nonindex');
                 break;
             
             default:
-                $field = $product->getField('result_html_grid_t');
+                $field = $product->getField('result_html_grid_nonindex');
         }
         return $field['value'];
     }

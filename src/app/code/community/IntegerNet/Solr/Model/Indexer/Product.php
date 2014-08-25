@@ -257,10 +257,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $block->setProduct($product);
         
         $block->setTemplate('integernet/solr/result/list/item.phtml');
-        $productData['result_html_list_t'] = $block->toHtml();
+        $productData['result_html_list_nonindex'] = $block->toHtml();
         
         $block->setTemplate('integernet/solr/result/grid/item.phtml');
-        $productData['result_html_grid_t'] = $block->toHtml();
+        $productData['result_html_grid_nonindex'] = $block->toHtml();
     }
 
     /**

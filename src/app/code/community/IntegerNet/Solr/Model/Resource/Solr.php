@@ -9,7 +9,7 @@
  */
 class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstract
 {
-    /** @var Apache_Solr_Service[] */
+    /** @var IntegerNet_Solr_Model_Resource_Solr_Service[] */
     protected $_solr;
     
     protected function _construct()
@@ -35,7 +35,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
     /**
      * @param int $storeId
-     * @return Apache_Solr_Service
+     * @return IntegerNet_Solr_Model_Resource_Solr_Service
      */
     public function getSolr($storeId)
     {
@@ -44,7 +44,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
-            $this->_solr[$storeId] = new Apache_Solr_Service($host, $port, $path, false, new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
+            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, false, new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
         }
         return $this->_solr[$storeId];
     }
@@ -60,6 +60,20 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
         $response = $this->getSolr($storeId)->search($query, $offset, $limit, $params);
+        return $response;
+    }
+
+    /**
+     * @param int $storeId
+     * @param string $query The raw query string
+     * @param int $offset The starting offset for result documents
+     * @param int $limit The maximum number of result documents to return
+     * @param array $params key / value pairs for other query parameters (see Solr documentation), use arrays for parameter keys used more than once (e.g. facet.field)
+     * @return Apache_Solr_Response
+     */
+    public function suggest($storeId, $query, $offset = 0, $limit = 10, $params = array())
+    {
+        $response = $this->getSolr($storeId)->suggest($query, $offset, $limit, $params);
         return $response;
     }
 

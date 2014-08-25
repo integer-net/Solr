@@ -12,7 +12,7 @@ class IntegerNet_Solr_Model_Result
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
 
-    /** @var null|Apache_Solr_Response */
+    /** @var null|IntegerNet_Solr_Model_Resource_Solr_Service */
     protected $_solrResult = null;
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
@@ -119,6 +119,7 @@ class IntegerNet_Solr_Model_Result
         $params = array(
             'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_list_t,result_html_grid_t,score,sku_s,name_s',
+            'qf' => $this->_getSearchFieldCodes(),
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
             'facet.sort' => 'true',
@@ -137,6 +138,18 @@ class IntegerNet_Solr_Model_Result
         $codes = array('category');
         foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
+        }
+        return $codes;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getSearchFieldCodes()
+    {
+        $codes = array('category');
+        foreach(Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
+            $codes[] = Mage::helper('integernet_solr')->getFieldName($attribute);
         }
         return $codes;
     }

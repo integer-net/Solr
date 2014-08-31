@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
-class IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection extends Varien_Data_Collection
+class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
 {
     protected $_storeId = null;
 
@@ -21,7 +21,7 @@ class IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection extends Vari
 
     /**
      * @param int $storeId
-     * @return IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection
+     * @return IntegerNet_Solr_Model_Suggestion_Collection
      */
     public function setStoreId($storeId)
     {
@@ -31,7 +31,7 @@ class IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection extends Vari
 
     /**
      * @param string $queryText
-     * @return IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection
+     * @return IntegerNet_Solr_Model_Suggestion_Collection
      */
     public function setQueryFilter($queryText)
     {
@@ -43,7 +43,7 @@ class IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection extends Vari
      *
      * @param bool $printQuery
      * @param bool $logQuery
-     * @return  Varien_Data_Collection
+     * @return  IntegerNet_Solr_Model_Suggestion_Collection
      */
     public function loadData($printQuery = false, $logQuery = false)
     {

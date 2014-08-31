@@ -18,14 +18,14 @@
  */
 ?>
 
-<?php if ($suggestData = $this->getKeywordSuggestions()): ?>
+<?php if ($searchwordSuggestions = $this->getSearchwordSuggestions()): ?>
 
     <ul>
         <li style="display:none"></li>
 
-    <?php foreach ($suggestData as $index => $item): ?>
+    <?php foreach ($searchwordSuggestions as $index => $item): ?>
         <li title="<?php echo $this->escapeHtml($item['title'])?>" class="<?php echo $item['row_class'] ?>">
-            <span class="amount"><?php echo  $item['num_of_results'] ?></span>
+            <span class="amount"><?php echo $item['num_of_results'] ?></span>
             <?php echo  $this->escapeHtml($item['title']) ?>
         </li>
     <?php endforeach ?>

@@ -30,7 +30,7 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_Core_Block_T
             
             $_data = array(
                 'title' => $item->getQueryText(),
-                'row_class' => $counter%2?'odd':'even',
+                'row_class' => $counter % 2 ? 'odd' : 'even',
                 'num_of_results' => $item->getNumResults()
             );
 
@@ -47,8 +47,17 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_Core_Block_T
             }
         }
         
-        $data[max(array_keys($data))]['row_class'] .= ' last';
+        if (sizeof($data)) {
+            $data[max(array_keys($data))]['row_class'] .= ' last';
+        }
         
         return $data;
+    }
+    
+    public function getProductSuggestions()
+    {
+        $collection = Mage::getModel('integernet_solr/result_collection');
+        
+        return $collection;
     }
 }

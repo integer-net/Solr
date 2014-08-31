@@ -24,9 +24,24 @@
         <li style="display:none"></li>
 
     <?php foreach ($searchwordSuggestions as $index => $item): ?>
-        <li title="<?php echo $this->escapeHtml($item['title'])?>" class="<?php echo $item['row_class'] ?>">
+        <li title="<?php echo $this->escapeHtml($item['title']) ?>" class="<?php echo $item['row_class'] ?>">
             <span class="amount"><?php echo $item['num_of_results'] ?></span>
             <?php echo  $this->escapeHtml($item['title']) ?>
+        </li>
+    <?php endforeach ?>
+
+    </ul>
+    
+<?php endif ?>
+
+<?php if ($productSuggestions = $this->getProductSuggestions()): ?>
+
+    <ul>
+        <li style="display:none"></li>
+
+    <?php foreach ($productSuggestions as $index => $item): ?>
+        <li title="<?php echo $this->escapeHtml($item->name_s) ?>" class="">
+            <?php echo $item->result_html_autosuggest_nonindex ?>
         </li>
     <?php endforeach ?>
 

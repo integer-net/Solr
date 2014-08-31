@@ -125,6 +125,7 @@
             <autosuggest>
                 <is_active>1</is_active>
                 <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
+                <max_number_product_suggestions>4</max_number_product_suggestions>
             </autosuggest>
         </integernet_solr>
     </default>

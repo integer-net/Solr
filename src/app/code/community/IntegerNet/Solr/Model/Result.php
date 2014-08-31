@@ -64,6 +64,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCurrentPage()
     {
+        if (!$this->_getToolbarBlock()) {
+            return 0;
+        }
         return $this->_getToolbarBlock()->getCurrentPage() - 1;
     }
 
@@ -72,6 +75,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCurrentSort()
     {
+        if (!$this->_getToolbarBlock()) {
+            return 'position';
+        }
         return $this->_getToolbarBlock()->getCurrentOrder();
     }
 
@@ -80,6 +86,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCurrentSortDirection()
     {
+        if (!$this->_getToolbarBlock()) {
+            return 'desc';
+        }
         if ($this->_getCurrentSort() == 'position') {
             switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
                 case 'desc':
@@ -96,6 +105,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getPageSize()
     {
+        if (!$this->_getToolbarBlock()) {
+            return intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
+        }
         return $this->_getToolbarBlock()->getLimit();
     }
 
@@ -118,7 +130,7 @@ class IntegerNet_Solr_Model_Result
     {
         $params = array(
             'fq' => $this->_getFilterQuery($storeId),
-            'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,score,sku_s,name_s',
+            'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s',
             'qf' => $this->_getSearchFieldCodes(),
             'sort' => $this->_getSortParam(),
             'facet' => 'true',

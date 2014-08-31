@@ -7,6 +7,12 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+/**
+ * Class IntegerNet_Solr_Model_Indexer
+ * 
+ * @todo fix URLs for comparison to not include referrer URL
+ */
 class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 {
     protected $_matchedEntities = array(

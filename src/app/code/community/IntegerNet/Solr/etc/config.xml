@@ -28,18 +28,17 @@
                     <layer>IntegerNet_Solr_Model_CatalogSearch_Layer</layer>
                 </rewrite>
             </catalogsearch>
-
-            <catalogsearch_resource>
-                <rewrite>
-                    <query_collection>IntegerNet_Solr_Model_Resource_CatalogSearch_Query_Collection</query_collection>
-                </rewrite>
-            </catalogsearch_resource>
         </models>
 
         <blocks>
             <integernet_solr>
                 <class>IntegerNet_Solr_Block</class>
             </integernet_solr>
+            <catalogsearch>
+                <rewrite>
+                    <autocomplete>IntegerNet_Solr_Block_CatalogSearch_Autocomplete</autocomplete>
+                </rewrite>
+            </catalogsearch>
         </blocks>
 
         <helpers>

@@ -122,6 +122,10 @@
                 <is_active>1</is_active>
                 <sensitivity>0.6</sensitivity>
             </fuzzy>
+            <autosuggest>
+                <is_active>1</is_active>
+                <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
+            </autosuggest>
         </integernet_solr>
     </default>
 

@@ -17,6 +17,20 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearc
             return $html;
         }
 
+        $html .= $this->_getSuggestHtml();
+        
+        $html .= '<div>Test</div>';
+        
+        return $html;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getSuggestHtml()
+    {
+        $html = '';
+
         $suggestData = $this->getSuggestData();
         if (!($count = count($suggestData))) {
             return $html;
@@ -34,11 +48,11 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearc
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li title="'.$this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
-                . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
+            $html .= '<li title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
+                . '<span class="amount">' . $item['num_of_results'] . '</span>' . $this->escapeHtml($item['title']) . '</li>';
         }
 
-        $html.= '</ul>';
+        $html .= '</ul>';
 
         return $html;
     }
@@ -50,7 +64,14 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearc
             $query = $this->helper('catalogsearch')->getQueryText();
             $counter = 0;
             $data = array();
+            $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
+            
             foreach ($collection as $item) {
+
+                if ($counter >= $maxNumberSearchwordSuggestions) {
+                    break;
+                }
+                
                 $_data = array(
                     'title' => $item->getQueryText(),
                     'row_class' => (++$counter)%2?'odd':'even',

@@ -20,6 +20,10 @@ class IntegerNet_Solr_Block_Result_List_Item extends Mage_Core_Block_Abstract
         $product = $this->getProduct();
 
         switch ($this->getListType()) {
+            case 'autosuggest':
+                $field = $product->getField('result_html_autosuggest_nonindex');
+                break;
+            
             case 'list':
                 $field = $product->getField('result_html_list_nonindex');
                 break;

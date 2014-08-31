@@ -256,6 +256,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
         $block->setProduct($product);
         
+        $block->setTemplate('integernet/solr/result/autosuggest/item.phtml');
+        $productData['result_html_autosuggest_nonindex'] = $block->toHtml();
+        
         $block->setTemplate('integernet/solr/result/list/item.phtml');
         $productData['result_html_list_nonindex'] = $block->toHtml();
         

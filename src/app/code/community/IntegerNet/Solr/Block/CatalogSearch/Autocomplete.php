@@ -7,57 +7,16 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
-class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete 
+class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_Core_Block_Template 
 {
-    protected function _toHtml()
+    protected $_suggestData = null;
+
+    protected function _construct()
     {
-        $html = '';
-
-        if (!$this->_beforeToHtml()) {
-            return $html;
-        }
-
-        $html .= $this->_getSuggestHtml();
-        
-        $html .= '<div>Test</div>';
-        
-        return $html;
+        $this->setTemplate('integernet/solr/autosuggest.phtml');
     }
-
-    /**
-     * @return string
-     */
-    protected function _getSuggestHtml()
-    {
-        $html = '';
-
-        $suggestData = $this->getSuggestData();
-        if (!($count = count($suggestData))) {
-            return $html;
-        }
-
-        $count--;
-
-        $html = '<ul><li style="display:none"></li>';
-        foreach ($suggestData as $index => $item) {
-            if ($index == 0) {
-                $item['row_class'] .= ' first';
-            }
-
-            if ($index == $count) {
-                $item['row_class'] .= ' last';
-            }
-
-            $html .= '<li title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
-                . '<span class="amount">' . $item['num_of_results'] . '</span>' . $this->escapeHtml($item['title']) . '</li>';
-        }
-
-        $html .= '</ul>';
-
-        return $html;
-    }
-
-    public function getSuggestData()
+    
+    public function getKeywordSuggestions()
     {
         if (!$this->_suggestData) {
             $collection = Mage::getResourceModel('integernet_solr/catalogSearch_query_collection');
@@ -68,15 +27,20 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearc
             
             foreach ($collection as $item) {
 
-                if ($counter >= $maxNumberSearchwordSuggestions) {
+                if (++$counter > $maxNumberSearchwordSuggestions) {
                     break;
                 }
                 
                 $_data = array(
                     'title' => $item->getQueryText(),
-                    'row_class' => (++$counter)%2?'odd':'even',
+                    'row_class' => $counter%2?'odd':'even',
                     'num_of_results' => $item->getNumResults()
                 );
+
+                if ($counter == 1) {
+                    $_data['row_class'] .= ' first';
+                }
+
 
                 if ($item->getQueryText() == $query) {
                     array_unshift($data, $_data);
@@ -85,6 +49,9 @@ class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_CatalogSearc
                     $data[] = $_data;
                 }
             }
+            
+            $data[max(array_keys($data))]['row_class'] .= ' last';
+            
             $this->_suggestData = $data;
         }
         return $this->_suggestData;

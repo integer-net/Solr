@@ -1,0 +1,35 @@
+<?php
+/**
+ * integer_net Magento Module
+ *
+ * @category   IntegerNet
+ * @package    IntegerNet_Solr
+ * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Andreas von Studnitz <avs@integer-net.de>
+ */
+?>
+
+<?php
+/**
+ * Autosuggest box template
+ *
+ * @see IntegerNet_Solr_Block_CatalogSearch_Autocomplete
+ * @var $this IntegerNet_Solr_Block_CatalogSearch_Autocomplete
+ */
+?>
+
+<?php if ($suggestData = $this->getKeywordSuggestions()): ?>
+
+    <ul>
+        <li style="display:none"></li>
+
+    <?php foreach ($suggestData as $index => $item): ?>
+        <li title="<?php echo $this->escapeHtml($item['title'])?>" class="<?php echo $item['row_class'] ?>">
+            <span class="amount"><?php echo  $item['num_of_results'] ?></span>
+            <?php echo  $this->escapeHtml($item['title']) ?>
+        </li>
+    <?php endforeach ?>
+
+    </ul>
+    
+<?php endif ?>

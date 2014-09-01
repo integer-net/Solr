@@ -91,6 +91,18 @@
                 </integernet_solr>
             </modules>
         </translate>
+        
+        <events>
+            <adminhtml_catalog_product_attribute_edit_prepare_form>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>adminhtmlCatalogProductAttributeEditPrepareForm</method>
+                    </integernet_solr>
+                </observers>
+            </adminhtml_catalog_product_attribute_edit_prepare_form>
+        </events>
     </adminhtml>
 
     <frontend>
@@ -101,6 +113,7 @@
                 </integernet_solr>
             </updates>
         </layout>
+        
         <events>
             <catalog_block_product_list_collection>
                 <observers>

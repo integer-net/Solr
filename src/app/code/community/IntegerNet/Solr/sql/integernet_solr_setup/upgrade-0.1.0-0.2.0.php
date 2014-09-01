@@ -13,6 +13,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-$installer->getConnection()->addColumn($installer->getTable('catalog/eav_attribute'), 'solr_boost', 'float( 12,4 ) UNSIGNED NOT NULL DEFAULT 0');
+$installer->getConnection()->addColumn($installer->getTable('catalog/eav_attribute'), 'solr_boost', 'float( 12,4 ) UNSIGNED NOT NULL DEFAULT 1');
 
 $installer->endSetup();

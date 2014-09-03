@@ -43,6 +43,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             $this->_filterableInSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addIsFilterableInSearchFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+                ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC)
             ;
         }
 

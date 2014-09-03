@@ -58,26 +58,54 @@
 
 
 <?php $categorySuggestions = $this->getCategorySuggestions() ?>
-<?php if (sizeof($categorySuggestions)): ?>
+<?php $attributeSuggestions = $this->getAttributeSuggestions() ?>
 
+<?php if (sizeof($categorySuggestions) || sizeof($attributeSuggestions)): ?>
 
-    <div class="categories-box">
+    <div class="additional-box">
+        <?php if (sizeof($categorySuggestions)): ?>
 
-        <h3>
-            <strong><?php echo $this->__('Categories') ?></strong>
-            <?php echo $this->__('for your Search') ?>
-        </h3>
+            <div class="categories-box">
 
-        <ul class="categories">
+                <h3>
+                    <strong><?php echo $this->__('Categories') ?></strong>
+                    <?php echo $this->__('for your Search') ?>
+                </h3>
 
-        <?php foreach ($categorySuggestions as $index => $item): ?>
-            <li>
-                <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
-            </li>
+                <ul class="categories">
+
+                <?php foreach ($categorySuggestions as $index => $item): ?>
+                    <li>
+                        <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
+                    </li>
+                <?php endforeach ?>
+                </ul>
+
+            </div>
+        <?php endif ?>
+
+        <?php foreach($attributeSuggestions as $attributeCode => $attributeSuggestion): ?>
+
+            <div class="categories-box">
+
+                <h3>
+                    <strong><?php echo $this->getAttribute($attributeCode)->getFrontendLabel() ?></strong>
+                </h3>
+
+                <ul class="categories">
+
+                    <?php foreach ($attributeSuggestion as $index => $item): ?>
+                        <li>
+                            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
+                        </li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
         <?php endforeach ?>
 
-            <li class="last"></li>
-        </ul>
+        <div class="last"></div>
     </div>
 
 <?php endif ?>
+
+

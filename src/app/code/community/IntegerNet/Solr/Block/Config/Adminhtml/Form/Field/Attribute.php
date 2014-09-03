@@ -22,7 +22,7 @@ class IntegerNet_Solr_Block_Config_Adminhtml_Form_Field_Attribute extends Mage_C
 
     /**
      * @param string $value
-     * @return mixed
+     * @return IntegerNet_Solr_Block_Config_Adminhtml_Form_Field_Attribute
      */
     public function setInputName($value)
     {

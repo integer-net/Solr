@@ -9,6 +9,8 @@
  */ 
 class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
 {
+    protected $_attributes = array();
+
     protected function _construct()
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
@@ -107,6 +109,57 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
     }
 
     /**
+     * @return array
+     */
+    public function getAttributeSuggestions()
+    {
+        $attributesConfig = @unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
+
+        if (!$attributesConfig) {
+            return array();
+        }
+
+        $attributesConfig = $this->_getSortedAttributesConfig($attributesConfig);
+        $attributeSuggestions = array();
+
+        foreach($attributesConfig as $attributeConfig) {
+
+            $attributeCode = $attributeConfig['attribute_code'];
+            $optionIds = (array)Mage::getSingleton('integernet_solr/result')->getSolrResult()->facet_counts->facet_fields->{$attributeCode . '_facet'};
+
+            $maxNumberAttribute = intval($attributeConfig['max_number_suggestions']);
+            $counter = 0;
+            foreach($optionIds as $optionId => $numResults) {
+                $attributeSuggestions[$attributeCode][] = array(
+                    'title' => $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
+                    'row_class' => '',
+                    'num_of_results' => $numResults,
+                    'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId)),
+                );
+
+                if (++$counter >= $maxNumberAttribute) {
+                    break;
+                }
+            }
+        }
+
+        return $attributeSuggestions;
+    }
+
+    /**
+     * @param string $attributeCode
+     * @return Mage_Catalog_Model_Entity_Attribute
+     */
+    public function getAttribute($attributeCode)
+    {
+        if (!isset($this->_attributes[$attributeCode])) {
+            $this->_attributes[$attributeCode] = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+        }
+
+        return $this->_attributes[$attributeCode];
+    }
+
+    /**
      * @param string $resultText
      * @param string $query
      * @return string
@@ -139,5 +192,27 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
     public function getQuery()
     {
         return $this->helper('catalogsearch')->getQueryText();
+    }
+
+    /**
+     * @param array $attributesConfig
+     * @return array
+     */
+    protected function _getSortedAttributesConfig($attributesConfig)
+    {
+        $newAttributesConfig = array();
+        foreach ($attributesConfig as $attributeConfig) {
+            $sorting = intval($attributeConfig['sorting']);
+            $newAttributesConfig[$sorting][] = $attributeConfig;
+        }
+        ksort($newAttributesConfig);
+
+        $attributesConfig = array();
+        foreach ($newAttributesConfig as $configs) {
+            foreach ($configs as $config) {
+                $attributesConfig[] = $config;
+            }
+        }
+        return $attributesConfig;
     }
 }

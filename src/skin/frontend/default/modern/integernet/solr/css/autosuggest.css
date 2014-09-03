@@ -129,11 +129,16 @@
     display: none;
 }
 
-#search_autocomplete .categories-box {
+#search_autocomplete .additional-box {
     border-right: 1px solid #dbdbdb;
     background: #ffffff;
     width: 740px;
+}
+
+#search_autocomplete .categories-box {
+    width: 370px;
     padding-bottom: 20px;
+    float: left;
 }
 
 #search_autocomplete .categories-box  h3 {
@@ -169,3 +174,14 @@
 #search_autocomplete ul.categories li a {
     color: #414141;
 }
+
+#search_autocomplete .additional-box .last {
+    clear: both;
+    float: none;
+    visibility: hidden;
+    width: 720px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+}
+

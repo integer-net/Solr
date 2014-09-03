@@ -153,6 +153,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </max_number_product_suggestions>
+                        <max_number_category_suggestions translate="label">
+                            <label>Maximum number of category suggestions</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </max_number_category_suggestions>
                     </fields>
                 </autosuggest>
             </groups>

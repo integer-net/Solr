@@ -32,7 +32,8 @@
     
 <?php endif ?>
 
-<?php if ($productSuggestions = $this->getProductSuggestions()): ?>
+<?php $productSuggestions = $this->getProductSuggestions() ?>
+<?php if (sizeof($productSuggestions)): ?>
 
     <div class="products-box">
 
@@ -53,4 +54,30 @@
         </ul>
     </div>
     
+<?php endif ?>
+
+
+<?php $categorySuggestions = $this->getCategorySuggestions() ?>
+<?php if (sizeof($categorySuggestions)): ?>
+
+
+    <div class="categories-box">
+
+        <h3>
+            <strong><?php echo $this->__('Categories') ?></strong>
+            <?php echo $this->__('for your Search') ?>
+        </h3>
+
+        <ul class="categories">
+
+        <?php foreach ($categorySuggestions as $index => $item): ?>
+            <li>
+                <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
+            </li>
+        <?php endforeach ?>
+
+            <li class="last"></li>
+        </ul>
+    </div>
+
 <?php endif ?>

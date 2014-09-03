@@ -28,6 +28,7 @@
 #search_autocomplete ul.searchwords li {
     background: none;
     line-height: 25px;
+    cursor: auto;
 }
 
 #search_autocomplete ul.searchwords li a {
@@ -42,6 +43,7 @@
 
 #search_autocomplete .products-box {
     border-right: 1px solid #dbdbdb;
+    border-bottom: 1px solid #dbdbdb;
     background: #ffffff;
     width: 740px;
 }
@@ -67,6 +69,7 @@
     border-left: 1px solid #d9d9d9;
     margin-bottom: 25px;
     min-height: 90px;
+    cursor: auto;
 }
 
 #search_autocomplete ul.products li:first-child {
@@ -124,4 +127,45 @@
 
 #search_autocomplete ul.products li .tax-details {
     display: none;
+}
+
+#search_autocomplete .categories-box {
+    border-right: 1px solid #dbdbdb;
+    background: #ffffff;
+    width: 740px;
+    padding-bottom: 20px;
+}
+
+#search_autocomplete .categories-box  h3 {
+    padding: 25px 15px 5px 15px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #414141;
+}
+
+#search_autocomplete ul.categories {
+    border: 0;
+    width: 370px;
+}
+
+#search_autocomplete ul.categories li {
+    float: left;
+    width: 158px;
+    padding: 0 0 0 15px;
+    border: 0;
+    cursor: auto;
+}
+
+#search_autocomplete ul.categories li.last {
+    clear: both;
+    float: none;
+    visibility: hidden;
+    width: 350px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+#search_autocomplete ul.categories li a {
+    color: #414141;
 }

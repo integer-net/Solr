@@ -139,6 +139,11 @@ class IntegerNet_Solr_Model_Result
             'facet.field' => $this->_getFacetFieldCodes(),
         );
 
+        if (!$this->_getToolbarBlock()) {
+            $params['rows'] = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
+        }
+
+
         return $params;
     }
 

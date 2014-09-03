@@ -14,14 +14,13 @@
  * Autosuggest box template
  *
  * @see IntegerNet_Solr_Block_CatalogSearch_Autocomplete
- * @var $this IntegerNet_Solr_Block_CatalogSearch_Autocomplete
+ * @var $this IntegerNet_Solr_Block_Autocomplete
  */
 ?>
 
 <?php if ($searchwordSuggestions = $this->getSearchwordSuggestions()): ?>
 
-    <ul>
-        <li style="display:none"></li>
+    <ul class="searchwords">
 
     <?php foreach ($searchwordSuggestions as $index => $item): ?>
         <li title="<?php echo $this->escapeHtml($item['title']) ?>" class="<?php echo $item['row_class'] ?>">
@@ -36,15 +35,23 @@
 
 <?php if ($productSuggestions = $this->getProductSuggestions()): ?>
 
-    <ul>
-        <li style="display:none"></li>
+    <div class="products-box">
 
-    <?php foreach ($productSuggestions as $index => $item): ?>
-        <li title="<?php echo $this->escapeHtml($item->name_s) ?>" class="">
-            <?php echo $item->result_html_autosuggest_nonindex ?>
-        </li>
-    <?php endforeach ?>
+        <h3>
+            <strong><?php echo $this->__('Product Suggestions') ?></strong>
+            <?php echo $this->__('for your Search') ?>
+        </h3>
 
-    </ul>
+        <ul class="products">
+
+        <?php foreach ($productSuggestions as $index => $item): ?>
+            <li title="<?php echo $this->escapeHtml($item->name_s) ?>" class="">
+                <?php echo $item->result_html_autosuggest_nonindex ?>
+            </li>
+        <?php endforeach ?>
+
+            <li class="last"></li>
+        </ul>
+    </div>
     
 <?php endif ?>

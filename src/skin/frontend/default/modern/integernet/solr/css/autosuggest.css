@@ -1,0 +1,117 @@
+
+.header-container {
+    position: relative;
+}
+
+#search_autocomplete {
+    width: 958px !important;
+    left: 0 !important;
+    top: 123px !important;
+    text-align: left;
+    background: #efefef;
+    border: 1px solid #b1b1b1;
+}
+
+#search_autocomplete ul {
+    background: #ffffff;
+}
+
+#search_autocomplete ul.searchwords {
+    background: #efefef;
+    float: right;
+    width: 187px;
+    border: 0;
+    padding: 15px;
+}
+
+#search_autocomplete ul.searchwords li {
+    background: none;
+    font-size: 14px;
+    line-height: 25px;
+}
+
+#search_autocomplete .products-box {
+    border-right: 1px solid #dbdbdb;
+    background: #ffffff;
+    width: 740px;
+}
+
+#search_autocomplete .products-box  h3 {
+    padding: 25px 15px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #e56406;
+}
+
+#search_autocomplete ul.products {
+    border: 0;
+}
+
+#search_autocomplete ul.products li {
+    float: left;
+    width: 200px;
+    background: #ffffff;
+    padding-left: 20px;
+    margin-left: 20px;
+    border: 0;
+    border-left: 1px solid #d9d9d9;
+    margin-bottom: 25px;
+    min-height: 90px;
+}
+
+#search_autocomplete ul.products li:first-child {
+    border: 0;
+    margin-left: 0;
+    padding-left: 15px;
+}
+
+#search_autocomplete ul.products li.last {
+    clear: both;
+    float: none;
+    visibility: hidden;
+    width: 720px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+#search_autocomplete ul.products li div.product-image {
+    float: left;
+    padding-right: 10px;
+}
+
+#search_autocomplete ul.products li .product-name a {
+    color: #414141;
+}
+
+#search_autocomplete ul.products li .product-price {
+    margin-left: 85px;
+}
+
+#search_autocomplete ul.products li .product-price .price-box {
+    margin-bottom: 0;
+    line-height: 15px;
+}
+
+#search_autocomplete ul.products li .product-price .price-label {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+#search_autocomplete ul.products li .product-price span.price {
+    color: #414141;
+    font-weight: bold;
+}
+
+#search_autocomplete ul.products li .product-price .minimal-price-link {
+    text-decoration: none;
+    font-size: 11px;
+}
+
+#search_autocomplete ul.products li .product-price .minimal-price-link span.price {
+    font-size: 11px;
+}
+
+#search_autocomplete ul.products li .tax-details {
+    display: none;
+}

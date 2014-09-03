@@ -111,6 +111,16 @@
     </adminhtml>
 
     <frontend>
+        <translate>
+            <modules>
+                <integernet_solr>
+                    <files>
+                        <default>IntegerNet_Solr.csv</default>
+                    </files>
+                </integernet_solr>
+            </modules>
+        </translate>
+
         <layout>
             <updates>
                 <integernet_solr>
@@ -144,7 +154,7 @@
                 <is_active>1</is_active>
                 <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
                 <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
-                <max_number_product_suggestions>4</max_number_product_suggestions>
+                <max_number_product_suggestions>3</max_number_product_suggestions>
             </autosuggest>
         </integernet_solr>
     </default>

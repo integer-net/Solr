@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
 
+    <default>
+        <reference name="head">
+            <action method="addCss"><stylesheet>integernet/solr/css/autosuggest.css</stylesheet></action>
+        </reference>
+    </default>
+
     <catalogsearch_result_index>
         <reference name="search.result">
             <block type="integernet_solr/result_list" name="search_result_list" template="integernet/solr/result.phtml">
                 <action method="unsetChild">
                     <name>product_list_toolbar</name>
                 </action>
-                <block type="integernet_solr/result_list_item" as="item" name="search_result_list_item" />
+                <block type="integernet_solr/result_list_item" as="item" name="search_result_list_item"/>
                 <block type="catalog/product_list_toolbar" name="product_list_toolbar"
                        template="catalog/product/list/toolbar.phtml">
                     <block type="page/html_pager" name="product_list_toolbar_pager"/>

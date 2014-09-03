@@ -24,7 +24,7 @@
 
     <?php foreach ($searchwordSuggestions as $index => $item): ?>
         <li>
-            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
+            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>&hellip;
         </li>
     <?php endforeach ?>
 

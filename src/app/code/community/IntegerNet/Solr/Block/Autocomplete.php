@@ -21,8 +21,15 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
     {
         $collection = Mage::getModel('integernet_solr/suggestion_collection');
         $query = $this->getQuery();
-        $counter = 0;
-        $data = array();
+        $counter = 1;
+        $data = array(
+            array(
+                'title' => $this->escapeHtml($query),
+                'row_class' => 'odd',
+                'num_of_results' => '',
+                'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($query)))
+            )
+        );
         $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
         
         foreach ($collection as $item) {
@@ -34,7 +41,8 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
             $_data = array(
                 'title' => $this->escapeHtml($item->getQueryText()),
                 'row_class' => $counter % 2 ? 'odd' : 'even',
-                'num_of_results' => $item->getNumResults()
+                'num_of_results' => $item->getNumResults(),
+                'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($item->getQueryText())))
             );
 
             if ($counter == 1) {

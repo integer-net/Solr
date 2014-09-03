@@ -11,11 +11,11 @@ class IntegerNet_Solr_Autosuggest
 {
     public function getHtml()
     {
-        $block = Mage::app()->getLayout()->createBlock('integernet_solr/autocomplete');
-
         if (!isset($_GET['q'])) {
             die('Query not given.');
         }
+
+        $block = Mage::app()->getLayout()->createBlock('integernet_solr/autocomplete');
 
         return $block->toHtml();
     }

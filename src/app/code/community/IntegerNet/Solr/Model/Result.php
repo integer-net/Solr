@@ -171,7 +171,11 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getQueryText()
     {
-        $queryText = Mage::helper('catalogsearch')->getQuery()->getQueryText();
+        $query = Mage::helper('catalogsearch')->getQuery();
+        $queryText = $query->getQueryText();
+        if ($query->getSynonymFor()) {
+            $queryText = $query->getSynonymFor();
+        }
         if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
             $queryText .= '~' . Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
         }

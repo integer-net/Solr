@@ -23,9 +23,8 @@
     <ul class="searchwords">
 
     <?php foreach ($searchwordSuggestions as $index => $item): ?>
-        <li title="<?php echo $this->escapeHtml($item['title']) ?>" class="<?php echo $item['row_class'] ?>">
-            <span class="amount"><?php echo $item['num_of_results'] ?></span>
-            <?php echo  $this->escapeHtml($item['title']) ?>
+        <li>
+            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
         </li>
     <?php endforeach ?>
 
@@ -45,8 +44,8 @@
         <ul class="products">
 
         <?php foreach ($productSuggestions as $index => $item): ?>
-            <li title="<?php echo $this->escapeHtml($item->name_s) ?>" class="">
-                <?php echo $item->result_html_autosuggest_nonindex ?>
+            <li>
+                <?php echo $this->highlight($item->result_html_autosuggest_nonindex, $this->getQuery()) ?>
             </li>
         <?php endforeach ?>
 

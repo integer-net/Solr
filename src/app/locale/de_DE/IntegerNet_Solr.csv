@@ -13,7 +13,7 @@
 "Value between 0 and 1. Smaller values mean more fuzzy search results.","Wert zwischen 0 und 1. Je kleiner, desto unschärfer."
 "Fuzzy Search","Unscharfe Suche"
 "Solr Boost","Solr Boost"
-"1 is default, use higher numbers for higher priority.","1 ist Standard, höhere Zahlen für höhere Priorität"
+"1 is default, use higher numbers for higher priority.","1 ist Standard, höhere Werte für höhere Priorität"
 "Autosuggest Box","Suchvorschlags-Box"
 "Maximum number of searchword suggestions","Maximale Anzahl Suchwort-Vorschläge"
 "Maximum number of product suggestions","Maximale Anzahl Produkt-Vorschläge"

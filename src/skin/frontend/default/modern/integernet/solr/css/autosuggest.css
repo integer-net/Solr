@@ -10,6 +10,7 @@
     text-align: left;
     background: #efefef;
     border: 1px solid #b1b1b1;
+    box-shadow: 0px 6px 2px -3px #b1b1b1;
 }
 
 #search_autocomplete ul {
@@ -26,8 +27,17 @@
 
 #search_autocomplete ul.searchwords li {
     background: none;
-    font-size: 14px;
     line-height: 25px;
+}
+
+#search_autocomplete ul.searchwords li a {
+    font-size: 14px;
+    color: #404040;
+}
+
+#search_autocomplete span.highlight {
+    color: #557601;
+    text-decoration: underline;
 }
 
 #search_autocomplete .products-box {

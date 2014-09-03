@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
-class IntegerNet_Solr_Block_CatalogSearch_Autocomplete extends Mage_Core_Block_Template 
+class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
 {
     protected function _construct()
     {

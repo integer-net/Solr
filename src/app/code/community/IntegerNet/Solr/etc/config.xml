@@ -36,7 +36,7 @@
             </integernet_solr>
             <catalogsearch>
                 <rewrite>
-                    <autocomplete>IntegerNet_Solr_Block_CatalogSearch_Autocomplete</autocomplete>
+                    <autocomplete>IntegerNet_Solr_Block_Autocomplete</autocomplete>
                 </rewrite>
             </catalogsearch>
         </blocks>
@@ -45,6 +45,11 @@
             <integernet_solr>
                 <class>IntegerNet_Solr_Helper</class>
             </integernet_solr>
+            <catalogsearch>
+                <rewrite>
+                    <data>IntegerNet_Solr_Helper_CatalogSearch_Data</data>
+                </rewrite>
+            </catalogsearch>
         </helpers>
 
         <index>
@@ -137,6 +142,7 @@
             </fuzzy>
             <autosuggest>
                 <is_active>1</is_active>
+                <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
                 <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
                 <max_number_product_suggestions>4</max_number_product_suggestions>
             </autosuggest>

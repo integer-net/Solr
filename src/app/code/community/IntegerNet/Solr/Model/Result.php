@@ -246,11 +246,24 @@ class IntegerNet_Solr_Model_Result
                 /** @var Apache_Solr_Document $doc */
                 foreach ($doc->getFieldNames() as $fieldName) {
                     $field = $doc->getField($fieldName);
-                    $value = str_replace(array("\n", "\r"), '', $field['value']);
-                    if (strlen($value) > 50) {
-                        $value = substr($value, 0, 50) . '...';
-                        $doc->setField($fieldName, $value);
-                        $resultClone->response->docs[$key] = $doc;
+                    $value = $field['value'];
+                    if (is_array($value)) {
+                        foreach($value as $subKey => $subValue) {
+                            $subValue = str_replace(array("\n", "\r"), '', $subValue);
+                            if (strlen($subValue) > 50) {
+                                $subValue = substr($subValue, 0, 50) . '...';
+                                $value[$subKey] = $subValue;
+                                $doc->setField($fieldName, $value);
+                                $resultClone->response->docs[$key] = $doc;
+                            }
+                        }
+                    } else {
+                        $value = str_replace(array("\n", "\r"), '', $value);
+                        if (strlen($value) > 50) {
+                            $value = substr($value, 0, 50) . '...';
+                            $doc->setField($fieldName, $value);
+                            $resultClone->response->docs[$key] = $doc;
+                        }
                     }
                 }
             }

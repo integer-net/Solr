@@ -215,6 +215,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addSearchDataToProductData($product, &$productData)
     {
+        $childProducts = $this->_getChildProductsCollection($product);
+
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
 
             if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
@@ -232,10 +234,28 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $attribute->setStoreId($product->getStoreId());
 
+            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
             if ($product->getData($attribute->getAttributeCode())
                 && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
             ) {
-                $productData[Mage::helper('integernet_solr')->getFieldName($attribute)] = $value;
+                $productData[$fieldName] = $value;
+            }
+
+            foreach($childProducts as $childProduct) {
+
+                if ($childProduct->getData($attribute->getAttributeCode())
+                    && $childValue = trim(strip_tags($attribute->getFrontend()->getValue($childProduct)))
+                ) {
+                    if (!isset($productData[$fieldName])) {
+                        $productData[$fieldName][] = $childValue;
+                    } elseif (is_array($productData[$fieldName])) {
+                        if (!in_array($childValue, $productData[$fieldName])) {
+                            $productData[$fieldName][] = $childValue;
+                        }
+                    } elseif ($productData[$fieldName] != $childValue) {
+                        $productData[$fieldName] = array($productData[$fieldName], $childValue);
+                    }
+                }
             }
         }
     }
@@ -384,5 +404,34 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $productData['_boost'] = $boost;
             }
         }
+    }
+
+    /**
+     * Retrieve model resource
+     *
+     * @return IntegerNet_Solr_Model_Resource_Solr
+     */
+    public function getResource()
+    {
+        return $this->_getResource();
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    protected function _getChildProductsCollection($product)
+    {
+        $childProductIds = $product->getTypeInstance(true)->getChildrenIds($product->getId());
+
+        /** @var $childProductCollection Mage_Catalog_Model_Resource_Product_Collection */
+        $childProductCollection = Mage::getResourceModel('catalog/product_collection')
+            ->setStoreId($product->getStoreId())
+            ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
+            ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
+            ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'));
+
+        return $childProductCollection;
     }
 }

@@ -247,13 +247,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     && $childValue = trim(strip_tags($attribute->getFrontend()->getValue($childProduct)))
                 ) {
                     if (!isset($productData[$fieldName])) {
-                        $productData[$fieldName][] = $childValue;
-                    } elseif (is_array($productData[$fieldName])) {
-                        if (!in_array($childValue, $productData[$fieldName])) {
-                            $productData[$fieldName][] = $childValue;
-                        }
+                        $productData[$fieldName] = $childValue;
                     } elseif ($productData[$fieldName] != $childValue) {
-                        $productData[$fieldName] = array($productData[$fieldName], $childValue);
+                        $productData[$fieldName] .= ' ' . $childValue;
                     }
                 }
             }

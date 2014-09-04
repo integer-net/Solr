@@ -137,12 +137,12 @@ class IntegerNet_Solr_Model_Result
             'facet.sort' => 'true',
             'facet.mincount' => '1',
             'facet.field' => $this->_getFacetFieldCodes(),
+            'defType' => 'edismax',
         );
 
         if (!$this->_getToolbarBlock()) {
             $params['rows'] = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
         }
-
 
         return $params;
     }
@@ -166,7 +166,12 @@ class IntegerNet_Solr_Model_Result
     {
         $codes = array('category');
         foreach(Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
-            $codes[] = Mage::helper('integernet_solr')->getFieldName($attribute);
+            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+            $solrBoost = floatval($attribute->getSolrBoost());
+            if ($solrBoost != 1) {
+                $fieldName .= '^' . $solrBoost;
+            }
+            $codes[] = $fieldName;
         }
         return $codes;
     }

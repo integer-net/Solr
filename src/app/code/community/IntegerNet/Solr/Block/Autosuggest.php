@@ -13,7 +13,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
 
     protected function _construct()
     {
-        
         $this->setTemplate('integernet/solr/autosuggest.phtml');
     }
 
@@ -51,7 +50,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             if ($counter == 1) {
                 $_data['row_class'] .= ' first';
             }
-
 
             if ($item->getQueryText() == $query) {
                 array_unshift($data, $_data);

@@ -1,7 +1,185 @@
 #search_autocomplete {
-    width: 950px !important;
-    right: -28px !important;
+    width: 954px !important;
+    right: -32px !important;
     left: auto !important;
     text-align: left;
+    background: #efefef;
+    border: 1px solid #b1b1b1;
+    box-shadow: 0 6px 2px -3px #b1b1b1;
+}
+
+#search_autocomplete ul {
     background: #ffffff;
 }
+
+#search_autocomplete ul.searchwords {
+    background: #efefef;
+    float: right;
+    width: 183px;
+    border: 0;
+    padding: 15px;
+}
+
+#search_autocomplete ul.searchwords li {
+    background: none;
+    line-height: 25px;
+    cursor: auto;
+}
+
+#search_autocomplete ul.searchwords li a {
+    font-size: 14px;
+    color: #404040;
+}
+
+#search_autocomplete span.highlight {
+    color: #557601;
+    text-decoration: underline;
+}
+
+#search_autocomplete .products-box {
+    border-right: 1px solid #dbdbdb;
+    border-bottom: 1px solid #dbdbdb;
+    background: #ffffff;
+    width: 740px;
+}
+
+#search_autocomplete .products-box  h3 {
+    padding: 25px 15px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #e56406;
+}
+
+#search_autocomplete ul.products {
+    border: 0;
+}
+
+#search_autocomplete ul.products li {
+    float: left;
+    width: 200px;
+    background: #ffffff;
+    padding-left: 20px;
+    margin-left: 20px;
+    border: 0;
+    border-left: 1px solid #d9d9d9;
+    margin-bottom: 25px;
+    min-height: 90px;
+    cursor: auto;
+}
+
+#search_autocomplete ul.products li:first-child {
+    border: 0;
+    margin-left: 0;
+    padding-left: 15px;
+}
+
+#search_autocomplete ul.products li.last {
+    clear: both;
+    float: none;
+    visibility: hidden;
+    width: 720px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+#search_autocomplete ul.products li div.product-image {
+    float: left;
+    padding-right: 10px;
+}
+
+#search_autocomplete ul.products li .product-name a {
+    color: #414141;
+}
+
+#search_autocomplete ul.products li .product-price {
+    margin-left: 85px;
+}
+
+#search_autocomplete ul.products li .product-price .price-box {
+    margin-bottom: 0;
+    line-height: 15px;
+}
+
+#search_autocomplete ul.products li .product-price .price-label {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+#search_autocomplete ul.products li .product-price span.price {
+    color: #414141;
+    font-weight: bold;
+}
+
+#search_autocomplete ul.products li .product-price .minimal-price-link {
+    text-decoration: none;
+    font-size: 11px;
+}
+
+#search_autocomplete ul.products li .product-price .minimal-price-link span.price {
+    font-size: 11px;
+}
+
+#search_autocomplete ul.products li .tax-details {
+    display: none;
+}
+
+#search_autocomplete .additional-box {
+    border-right: 1px solid #dbdbdb;
+    background: #f6f6f6;
+    width: 740px;
+}
+
+#search_autocomplete .categories-box,
+#search_autocomplete .attributes-box {
+    width: 370px;
+    padding-bottom: 20px;
+    float: left;
+}
+
+#search_autocomplete .categories-box  h3,
+#search_autocomplete .attributes-box  h3 {
+    padding: 25px 15px 5px 15px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #414141;
+}
+
+#search_autocomplete ul.categories,
+#search_autocomplete ul.attributes {
+    border: 0;
+    width: 370px;
+}
+
+#search_autocomplete ul.categories li,
+#search_autocomplete ul.attributes li {
+    float: left;
+    width: 158px;
+    padding: 0 0 0 15px;
+    border: 0;
+    cursor: auto;
+}
+
+#search_autocomplete ul.attributes li {
+    width: 331px;
+}
+
+#search_autocomplete ul.categories li a {
+    color: #414141;
+}
+
+#search_autocomplete ul.attributes li a {
+    color: #414141;
+    text-decoration: underline;
+}
+
+#search_autocomplete .additional-box .last {
+    clear: both;
+    float: none;
+    visibility: hidden;
+    width: 720px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+}
+

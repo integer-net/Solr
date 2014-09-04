@@ -84,21 +84,23 @@
             </div>
         <?php endif ?>
 
-        <?php foreach($attributeSuggestions as $attributeCode => $attributeSuggestion): ?>
+        <?php foreach($attributeSuggestions as $attributeCode => $attributeSuggestionsByAttribute): ?>
 
-            <div class="categories-box">
+            <div class="attributes-box">
 
                 <h3>
                     <strong><?php echo $this->getAttribute($attributeCode)->getFrontendLabel() ?></strong>
                 </h3>
 
-                <ul class="categories">
+                <ul class="attributes">
 
-                    <?php foreach ($attributeSuggestion as $index => $item): ?>
-                        <li>
-                            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
-                        </li>
-                    <?php endforeach ?>
+                    <li>
+                        <?php $items = array() ?>
+                        <?php foreach ($attributeSuggestionsByAttribute as $index => $item): ?>
+                            <?php $items[] = '<a href="' . $item['url'] . '">' . $this->highlight($item['title'], $this->getQuery()) . '</a>' ?>
+                        <?php endforeach ?>
+                        <?php echo implode(', ', $items) ?>
+                    </li>
                 </ul>
             </div>
         <?php endforeach ?>

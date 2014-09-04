@@ -314,7 +314,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $block->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
 
         $priceBlockType = 'germansetup/catalog_product_price';
-        if (Mage::app()->getLayout()->createBlock($priceBlockType)) {
+        if (class_exists(Mage::getConfig()->getBlockClassName($priceBlockType)) && Mage::app()->getLayout()->createBlock($priceBlockType)) {
 
             $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
             $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');
@@ -325,7 +325,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
         
         $priceBlockType = 'magesetup/catalog_product_price';
-        if (Mage::app()->getLayout()->createBlock($priceBlockType)) {
+        if (class_exists(Mage::getConfig()->getBlockClassName($priceBlockType)) && Mage::app()->getLayout()->createBlock($priceBlockType)) {
 
             $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
             $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');

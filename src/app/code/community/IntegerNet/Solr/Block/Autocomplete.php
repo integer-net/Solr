@@ -29,7 +29,7 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
                 'title' => $this->escapeHtml($query),
                 'row_class' => 'odd',
                 'num_of_results' => '',
-                'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($query)))
+                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
             )
         );
         $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
@@ -44,7 +44,7 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
                 'title' => $this->escapeHtml($item->getQueryText()),
                 'row_class' => $counter % 2 ? 'odd' : 'even',
                 'num_of_results' => $item->getNumResults(),
-                'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($item->getQueryText())))
+                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($item->getQueryText()))))
             );
 
             if ($counter == 1) {
@@ -96,7 +96,7 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
                     'title' => $this->escapeHtml($category->getName()),
                     'row_class' => '',
                     'num_of_results' => $numResults,
-                    'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($this->getQuery()), 'cat' => $categoryId)),
+                    'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), 'cat' => $categoryId))),
                 );
 
                 if (++$counter >= $maxNumberCategories) {
@@ -134,7 +134,7 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
                     'title' => $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
                     'row_class' => '',
                     'num_of_results' => $numResults,
-                    'url' => Mage::getUrl('catalogsearch/result', array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId)),
+                    'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
                 );
 
                 if (++$counter >= $maxNumberAttribute) {
@@ -167,7 +167,7 @@ class IntegerNet_Solr_Block_Autocomplete extends Mage_Core_Block_Template
     public function highlight($resultText, $query)
     {
         if (strpos($resultText, '<') === false) {
-            return str_replace(trim($query), '<span class="highlight">'.trim($query).'</span>', $resultText);
+            return preg_replace('/(' . trim($query) . ')/i', '<span class="highlight">$1</span>', $resultText);
         }
         return preg_replace_callback('/(' . trim($query) . ')(.*?>)/i',
             array($this, '_checkOpenTag'),

@@ -15,7 +15,7 @@ class IntegerNet_Solr_Autosuggest
             die('Query not given.');
         }
 
-        $block = Mage::app()->getLayout()->createBlock('integernet_solr/autocomplete');
+        $block = Mage::app()->getLayout()->createBlock('integernet_solr/autosuggest');
 
         return $block->toHtml();
     }

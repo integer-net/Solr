@@ -13,6 +13,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
 
     protected function _construct()
     {
+        
         $this->setTemplate('integernet/solr/autosuggest.phtml');
     }
 

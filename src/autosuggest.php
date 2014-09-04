@@ -28,7 +28,10 @@ if (!isset($_GET['store_id'])) {
     die('Store ID not given.');
 }
 
-Mage::app()->setCurrentStore(intval($_GET['store_id']));
+$storeId = intval($_GET['store_id']);
+Mage::app()->setCurrentStore($storeId);
+$appEmulation = Mage::getSingleton('core/app_emulation');
+$appEmulation->startEnvironmentEmulation($storeId);
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();
 

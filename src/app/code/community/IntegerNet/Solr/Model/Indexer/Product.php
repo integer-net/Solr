@@ -142,12 +142,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /**
      * @param int $storeId
      * @return Mage_Catalog_Model_Resource_Product_Collection
-     * @todo emulate store for getting correct reviews
      */
     protected function _getProductCollection($storeId)
     {
         $appEmulation = Mage::getSingleton('core/app_emulation');
         $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
+
+        Mage::app()->getStore()->setConfig('catalog/frontend/flat_catalog_product', 0);
 
         /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = Mage::getResourceModel('catalog/product_collection')
@@ -228,7 +229,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 if ($price == 0) {
                     $price = $product->getMinimalPrice();
                 }
-                $productData['price_f'] = $price;
+                $productData['price_f'] = floatval($price);
                 continue;
             }
 
@@ -241,15 +242,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $productData[$fieldName] = $value;
             }
 
-            foreach($childProducts as $childProduct) {
+            if ($attribute->getBackendType() != 'decimal') {
+                foreach($childProducts as $childProduct) {
 
-                if ($childProduct->getData($attribute->getAttributeCode())
-                    && $childValue = trim(strip_tags($attribute->getFrontend()->getValue($childProduct)))
-                ) {
-                    if (!isset($productData[$fieldName])) {
-                        $productData[$fieldName] = $childValue;
-                    } elseif ($productData[$fieldName] != $childValue) {
-                        $productData[$fieldName] .= ' ' . $childValue;
+                    if ($childProduct->getData($attribute->getAttributeCode())
+                        && $childValue = trim(strip_tags($attribute->getFrontend()->getValue($childProduct)))
+                    ) {
+                        if (!isset($productData[$fieldName])) {
+                            $productData[$fieldName] = $childValue;
+                        } elseif ($productData[$fieldName] != $childValue) {
+                            $productData[$fieldName] .= ' ' . $childValue;
+                        }
                     }
                 }
             }

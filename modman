@@ -1,6 +1,5 @@
 src/app/code/community/IntegerNet/Solr/                             app/code/community/IntegerNet/Solr/
 src/app/design/frontend/base/default/layout/integernet/solr.xml     app/design/frontend/base/default/layout/integernet/solr.xml
-src/app/design/frontend/base/default/template/integernet/solr/      app/design/frontend/base/default/template/integernet/solr/
 src/app/design/frontend/rwd/default/template/integernet/solr/       app/design/frontend/base/default/template/integernet/solr/
 src/app/etc/modules/IntegerNet_Solr.xml                             app/etc/modules/IntegerNet_Solr.xml
 src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/de_DE/IntegerNet_Solr.csv
@@ -8,3 +7,4 @@ src/lib/Apache/Solr/                                                lib/Apache/S
 src/skin/frontend/base/default/integernet/solr/                     skin/frontend/base/default/integernet/solr/
 src/skin/frontend/default/modern/integernet/solr                    skin/frontend/default/modern/integernet/solr
 src/autosuggest.php                                                 autosuggest.php
+src/app/design/frontend/base/default/template/integernet/solr/      app/design/frontend/base/default/template/integernet/solr/

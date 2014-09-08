@@ -91,16 +91,17 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         $counter = 0;
         foreach($categoryIds as $categoryId => $numResults) {
             if ($category = $categories->getItemById($categoryId)) {
+                if (++$counter > $maxNumberCategories) {
+                    break;
+                }
+
                 $categorySuggestions[] = array(
                     'title' => $this->escapeHtml($category->getName()),
                     'row_class' => '',
                     'num_of_results' => $numResults,
-                    'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), 'cat' => $categoryId))),
+                    'url' => $this->_getCategoryUrl($category),
                 );
 
-                if (++$counter >= $maxNumberCategories) {
-                    break;
-                }
             }
         }
 
@@ -213,5 +214,18 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             }
         }
         return $attributesConfig;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryUrl($category)
+    {
+        if (Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type') == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+            return Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), 'cat' => $category->getId())));
+        }
+        
+        return $category->getUrl();
     }
 }

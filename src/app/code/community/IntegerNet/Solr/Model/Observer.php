@@ -9,6 +9,9 @@
  */ 
 class IntegerNet_Solr_Model_Observer
 {
+    /**
+     * @param Varien_Event_Observer $observer
+     */
     public function adminhtmlCatalogProductAttributeEditPrepareForm(Varien_Event_Observer $observer)
     {
         /* @var $fieldset Varien_Data_Form_Element_Fieldset */
@@ -16,8 +19,8 @@ class IntegerNet_Solr_Model_Observer
 
         $field = $fieldset->addField('solr_boost', 'text', array(
             'name'      => 'solr_boost',
-            'label'     => Mage::helper('integernet_solr')->__('Solr Boost'),
-            'title'     => Mage::helper('integernet_solr')->__('Solr Boost'),
+            'label'     => Mage::helper('integernet_solr')->__('Solr Priority'),
+            'title'     => Mage::helper('integernet_solr')->__('Solr Priority'),
             'note'     => Mage::helper('integernet_solr')->__('1 is default, use higher numbers for higher priority.'),
             'class'     => 'validate-number',
         ));
@@ -37,7 +40,7 @@ class IntegerNet_Solr_Model_Observer
         if ($block instanceof Mage_Adminhtml_Block_Catalog_Product_Attribute_Grid) {
 
             $block->addColumnAfter('solr_boost', array(
-                'header' => Mage::helper('catalog')->__('Solr Boost'),
+                'header' => Mage::helper('catalog')->__('Solr Priority'),
                 'sortable' => true,
                 'index' => 'solr_boost',
                 'type' => 'number',

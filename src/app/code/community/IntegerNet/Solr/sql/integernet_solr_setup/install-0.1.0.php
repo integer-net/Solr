@@ -16,7 +16,7 @@ $installer->startSetup();
 $installer->addAttribute('catalog_product', 'solr_boost', array(
     'type' => 'decimal',
     'input' => 'text',
-    'label' => Mage::helper('integernet_solr')->__('Solr Boost'),
+    'label' => Mage::helper('integernet_solr')->__('Solr Priority'),
     'frontend_class' => 'validate-number',
     'required' => 0,
     'user_defined' => 1,

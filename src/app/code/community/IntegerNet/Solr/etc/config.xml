@@ -166,6 +166,7 @@
                 <max_number_product_suggestions>3</max_number_product_suggestions>
                 <max_number_category_suggestions>8</max_number_category_suggestions>
                 <category_link_type>filter</category_link_type>
+                <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>
         </integernet_solr>
     </default>

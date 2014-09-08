@@ -56,6 +56,10 @@
             <indexer>
                 <integernet_solr>
                     <model>integernet_solr/indexer</model>
+                    <depends>
+                        <catalog_url/>
+                        <catalog_price/>
+                    </depends>
                 </integernet_solr>
             </indexer>
         </index>
@@ -103,15 +107,15 @@
                     </integernet_solr>
                 </observers>
             </adminhtml_catalog_product_attribute_edit_prepare_form>
-            <core_block_abstract_prepare_layout_before>
+            <core_block_abstract_to_html_before>
                 <observers>
                     <integernet_solr>
                         <type>singleton</type>
                         <class>integernet_solr/observer</class>
-                        <method>coreBlockAbstractPrepareLayoutBefore</method>
+                        <method>coreBlockAbstractToHtmlBefore</method>
                     </integernet_solr>
                 </observers>
-            </core_block_abstract_prepare_layout_before>
+            </core_block_abstract_to_html_before>
         </events>
     </adminhtml>
 

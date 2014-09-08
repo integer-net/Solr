@@ -30,7 +30,7 @@ class IntegerNet_Solr_Model_Observer
      * Add new column "solr_boost" to attribute grid
      * @param Varien_Event_Observer $observer
      */
-    public function coreBlockAbstractPrepareLayoutBefore(Varien_Event_Observer $observer)
+    public function coreBlockAbstractToHtmlBefore(Varien_Event_Observer $observer)
     {
         $block = $observer->getBlock();
         
@@ -42,8 +42,6 @@ class IntegerNet_Solr_Model_Observer
                 'index' => 'solr_boost',
                 'type' => 'number',
             ), 'is_comparable');
-            
-            $block->sortColumnsByOrder();
         }
     }
 }

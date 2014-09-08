@@ -107,6 +107,15 @@
                     </integernet_solr>
                 </observers>
             </adminhtml_catalog_product_attribute_edit_prepare_form>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>coreBlockAbstractPrepareLayoutBefore</method>
+                    </integernet_solr>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
         </events>
     </adminhtml>
 

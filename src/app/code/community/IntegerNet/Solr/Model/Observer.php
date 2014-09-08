@@ -25,4 +25,25 @@ class IntegerNet_Solr_Model_Observer
         // Set default value
         $field->setValue('1.0000');
     }
+
+    /**
+     * Add new column "solr_boost" to attribute grid
+     * @param Varien_Event_Observer $observer
+     */
+    public function coreBlockAbstractPrepareLayoutBefore(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getBlock();
+        
+        if ($block instanceof Mage_Adminhtml_Block_Catalog_Product_Attribute_Grid) {
+
+            $block->addColumnAfter('solr_boost', array(
+                'header' => Mage::helper('catalog')->__('Solr Boost'),
+                'sortable' => true,
+                'index' => 'solr_boost',
+                'type' => 'number',
+            ), 'is_comparable');
+            
+            $block->sortColumnsByOrder();
+        }
+    }
 }

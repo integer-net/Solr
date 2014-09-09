@@ -6,13 +6,13 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
 {
     /**
      * Retrieve loaded category collection
      *
-     * @return IntegerNet_Solr_Model_Result_Collection
+     * @return IntegerNet_Solr_Model_Result_Collection|IntegerNet_Solr_Model_Resource_Catalog_Product_Collection
      */
     protected function _getProductCollection()
     {
@@ -20,9 +20,9 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
             return Mage::getSingleton('integernet_solr/result_collection');
         }
 
-        if (is_null($this->_productCollection)) {
-            
-            /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
+        if (is_null($this->_productCollection) || !($this->_productCollection instanceof IntegerNet_Solr_Model_Resource_Catalog_Product_Collection)) {
+
+            /** @var $productCollection IntegerNet_Solr_Model_Resource_Catalog_Product_Collection */
             $productCollection = Mage::getResourceModel('integernet_solr/catalog_product_collection')
                 ->setStoreId(Mage::app()->getStore()->getId())
                 ->addMinimalPrice()
@@ -31,14 +31,14 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
                 ->addUrlRewrite()
                 ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
                 ->addAttributeToSelect(array('url_key'));
-            
+
             Mage::dispatchEvent('catalog_block_product_list_collection', array(
                 'collection' => $productCollection
             ));
 
             $this->_productCollection = $productCollection;
         }
-        
+
         return $this->_productCollection;
     }
 

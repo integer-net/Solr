@@ -109,10 +109,31 @@
                     </fields>
                 </fuzzy>
 
+                <results translate="label">
+                    <label>Search Results</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <use_html_from_solr translate="label,comment">
+                            <label>Use HTML from Solr Index</label>
+                            <comment><![CDATA[Advantages: faster search<br />Disadvantages: slower indexing, no user dependant results]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_html_from_solr>
+                    </fields>
+                </results>
+
                 <autosuggest translate="label">
                     <label>Autosuggest Box</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>40</sort_order>
+                    <sort_order>50</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>

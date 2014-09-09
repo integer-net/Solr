@@ -9,7 +9,11 @@
 
     <catalogsearch_result_index>
         <reference name="search.result">
-            <block type="integernet_solr/result_list" name="search_result_list" template="integernet/solr/result.phtml">
+            <action method="unsetChild"><name>search_result_list</name></action>
+            <block type="integernet_solr/result_list" name="search_result_list" template="catalog/product/list.phtml">
+                <action method="setTemplate" ifconfig="integernet_solr/results/use_html_from_solr">
+                    <template>integernet/solr/result.phtml</template>
+                </action>
                 <action method="unsetChild">
                     <name>product_list_toolbar</name>
                 </action>

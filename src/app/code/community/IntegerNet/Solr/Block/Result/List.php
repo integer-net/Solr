@@ -16,7 +16,30 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _getProductCollection()
     {
-        return Mage::getSingleton('integernet_solr/result_collection');
+        if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
+            return Mage::getSingleton('integernet_solr/result_collection');
+        }
+
+        if (is_null($this->_productCollection)) {
+            
+            /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
+            $productCollection = Mage::getResourceModel('integernet_solr/catalog_product_collection')
+                ->setStoreId(Mage::app()->getStore()->getId())
+                ->addMinimalPrice()
+                ->addFinalPrice()
+                ->addTaxPercents()
+                ->addUrlRewrite()
+                ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
+                ->addAttributeToSelect(array('url_key'));
+            
+            Mage::dispatchEvent('catalog_block_product_list_collection', array(
+                'collection' => $productCollection
+            ));
+
+            $this->_productCollection = $productCollection;
+        }
+        
+        return $this->_productCollection;
     }
 
     /**

@@ -30,6 +30,19 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
 
         return $this;
     }
+    
+    public function getColumnValues($colName)
+    {
+        $this->load();
+
+        $col = array();
+        foreach ($this->getItems() as $item) {
+            $field = $item->getField($colName);
+            $col[] = $field['value'];
+        }
+        return $col;
+
+    }
 
     /**
      * Retrieve collection all items count

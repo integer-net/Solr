@@ -130,7 +130,7 @@ class IntegerNet_Solr_Model_Result
     {
         $params = array(
             'fq' => $this->_getFilterQuery($storeId),
-            'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s',
+            'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'qf' => $this->_getSearchFieldCodes(),
             'sort' => $this->_getSortParam(),
             'facet' => 'true',

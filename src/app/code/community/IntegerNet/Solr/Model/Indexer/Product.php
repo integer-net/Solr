@@ -277,12 +277,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         
         $block->setTemplate('integernet/solr/result/autosuggest/item.phtml');
         $productData['result_html_autosuggest_nonindex'] = $block->toHtml();
-        
-        $block->setTemplate('integernet/solr/result/list/item.phtml');
-        $productData['result_html_list_nonindex'] = $block->toHtml();
-        
-        $block->setTemplate('integernet/solr/result/grid/item.phtml');
-        $productData['result_html_grid_nonindex'] = $block->toHtml();
+
+        if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
+            $block->setTemplate('integernet/solr/result/list/item.phtml');
+            $productData['result_html_list_nonindex'] = $block->toHtml();
+            
+            $block->setTemplate('integernet/solr/result/grid/item.phtml');
+            $productData['result_html_grid_nonindex'] = $block->toHtml();
+        }
     }
 
     /**

@@ -127,7 +127,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             $attributeCode = $attributeConfig['attribute_code'];
             $optionIds = (array)Mage::getSingleton('integernet_solr/result')->getSolrResult()->facet_counts->facet_fields->{$attributeCode . '_facet'};
 
-            $maxNumberAttribute = intval($attributeConfig['max_number_suggestions']);
+            $maxNumberAttributeValues = intval($attributeConfig['max_number_suggestions']);
             $counter = 0;
             foreach($optionIds as $optionId => $numResults) {
                 $attributeSuggestions[$attributeCode][] = array(
@@ -137,7 +137,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                     'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
                 );
 
-                if (++$counter >= $maxNumberAttribute) {
+                if (++$counter >= $maxNumberAttributeValues && $maxNumberAttributeValues > 0) {
                     break;
                 }
             }

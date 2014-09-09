@@ -144,8 +144,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </max_number_searchword_suggestions>
-                        <max_number_product_suggestions translate="label">
+                        <max_number_product_suggestions translate="label,comment">
                             <label>Maximum number of product suggestions</label>
+                            <comment>0 = don't show</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
                             <sort_order>40</sort_order>
@@ -153,8 +154,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </max_number_product_suggestions>
-                        <max_number_category_suggestions translate="label">
+                        <max_number_category_suggestions translate="label,comment">
                             <label>Maximum number of category suggestions</label>
+                            <comment>0 = don't show</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
                             <sort_order>50</sort_order>
@@ -173,6 +175,7 @@
                         </category_link_type>
                         <attribute_filter_suggestions translate="label">
                             <label>Attribute Filter Suggestions</label>
+                            <comment>0 = show all</comment>
                             <frontend_model>integernet_solr/config_attributeFilterSuggestions</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>70</sort_order>

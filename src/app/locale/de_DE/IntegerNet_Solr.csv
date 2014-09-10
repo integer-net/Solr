@@ -36,3 +36,5 @@
 "Maximum number of suggestions","Max. Anzahl Vorschläge"
 "Sorting","Sortierung"
 "IntegerNet_Solr::Add","Hinzufügen"
+"Solr Connection could not be established.","Verbindung zum Solr-Server konnte nicht aufgebaut werden."
+"Solr Connection established.","Verbindung zum Solr-Server erfolgreich aufgebaut."

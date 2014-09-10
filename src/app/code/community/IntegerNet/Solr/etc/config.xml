@@ -116,6 +116,15 @@
                     </integernet_solr>
                 </observers>
             </core_block_abstract_to_html_before>
+            <admin_system_config_changed_section_integernet_solr>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>adminSystemConfigChangedSectionIntegernetSolr</method>
+                    </integernet_solr>
+                </observers>
+            </admin_system_config_changed_section_integernet_solr>
         </events>
     </adminhtml>
 

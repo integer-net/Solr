@@ -6,7 +6,7 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
 {
     protected $_attributes = array();
@@ -33,13 +33,13 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             )
         );
         $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
-        
+
         foreach ($collection as $item) {
 
             if (++$counter > $maxNumberSearchwordSuggestions) {
                 break;
             }
-            
+
             $_data = array(
                 'title' => $this->escapeHtml($item->getQueryText()),
                 'row_class' => $counter % 2 ? 'odd' : 'even',
@@ -58,11 +58,11 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                 $data[] = $_data;
             }
         }
-        
+
         if (sizeof($data)) {
             $data[max(array_keys($data))]['row_class'] .= ' last';
         }
-        
+
         return $data;
     }
 
@@ -72,7 +72,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     public function getProductSuggestions()
     {
         $products = Mage::getSingleton('integernet_solr/result')->getSolrResult()->response->docs;
-        
+
         return $products;
     }
 
@@ -133,6 +133,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                 $attributeSuggestions[$attributeCode][] = array(
                     'title' => $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
                     'row_class' => '',
+                    'option_id' => $optionId,
                     'num_of_results' => $numResults,
                     'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
                 );
@@ -226,12 +227,12 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         if ($linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
             return Mage::getUrl('catalogsearch/result', array(
                 '_query' => array(
-                    'q' => $this->escapeHtml($this->getQuery()), 
+                    'q' => $this->escapeHtml($this->getQuery()),
                     'cat' => $category->getId()
                 )
             ));
         }
-        
+
         return $category->getUrl();
     }
 }

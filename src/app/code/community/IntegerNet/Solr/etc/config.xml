@@ -56,10 +56,6 @@
             <indexer>
                 <integernet_solr>
                     <model>integernet_solr/indexer</model>
-                    <depends>
-                        <catalog_url/>
-                        <catalog_price/>
-                    </depends>
                 </integernet_solr>
             </indexer>
         </index>

@@ -38,3 +38,6 @@
 "IntegerNet_Solr::Add","Hinzufügen"
 "Solr Connection could not be established.","Verbindung zum Solr-Server konnte nicht aufgebaut werden."
 "Solr Connection established.","Verbindung zum Solr-Server erfolgreich aufgebaut."
+"Indexing","Indizierung"
+"Number of Products per Bunch","Anzahl Produkte pro Durchlauf"
+"Higher number means better indexing performance. Reduce if you are getting memory errors.","Höhere Anzahl ergibt eine bessere Performance bei der Indizierung. Reduzieren Sie die Anzahl, wenn Sie Speicherfehler erhalten."

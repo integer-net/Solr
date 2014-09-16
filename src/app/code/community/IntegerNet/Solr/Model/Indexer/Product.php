@@ -22,46 +22,39 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     public function reindex($productIds = null, $emptyIndex = false)
     {
+        $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
+        if ($pageSize <= 0) {
+            $pageSize = 100;
+        }
+        
         foreach(Mage::app()->getStores() as $store) {
-
             /** @var Mage_Core_Model_Store $store */
+
             $storeId = $store->getId();
 
             if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
                 continue;
             }
-            
-            $productCollection = $this->_getProductCollection($storeId);
-
-            if (is_array($productIds)) {
-                $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
-            }
-
-            $combinedProductData = array();
-            $idsForDeletion = array();
-
-            foreach($productCollection as $product) {
-                /** @var Mage_Catalog_Model_Product $product */
-                
-                $product->setStoreId($storeId);
-                if ($this->_canIndexProduct($product)) {
-                    $combinedProductData[] = $this->_getProductData($product);
-                } else {
-                    $idsForDeletion[] = $this->_getSolrId($product);
-                }
-            }
 
             if ($emptyIndex) {
                 $this->getResource()->deleteAllDocuments($storeId);
-            } else {
-                if (sizeof($idsForDeletion)) {
-                    $this->getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
-                }
             }
 
-            if (sizeof($combinedProductData)) {
-                $this->getResource()->addDocuments($storeId, $combinedProductData);
-            }
+            $pageNumber = 1;
+            do {
+                echo $pageNumber . "\n";
+                $productCollection = $this->_getProductCollection($storeId);
+    
+                if (is_array($productIds)) {
+                    $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
+                }
+    
+                $productCollection->setPageSize($pageSize);
+                $productCollection->setCurPage($pageNumber++);
+    
+                $this->_indexProductCollection($emptyIndex, $productCollection);
+
+            } while ($pageNumber <= $productCollection->getLastPageNumber());
         }
     }
 
@@ -162,9 +155,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
 
-        Mage::dispatchEvent('catalog_block_product_list_collection', array(
+/*        Mage::dispatchEvent('catalog_block_product_list_collection', array(
             'collection' => $productCollection
-        ));
+        ));*/
 
         $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
 
@@ -434,5 +427,39 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'));
 
         return $childProductCollection;
+    }
+
+    /**
+     * @param $emptyIndex
+     * @param $productCollection
+     * @return mixed
+     */
+    protected function _indexProductCollection($emptyIndex, $productCollection)
+    {
+        $combinedProductData = array();
+        $idsForDeletion = array();
+
+        foreach ($productCollection as $product) {
+            /** @var Mage_Catalog_Model_Product $product */
+
+            $storeId = $productCollection->getStoreId();
+            $product->setStoreId($storeId);
+
+            if ($this->_canIndexProduct($product)) {
+                $combinedProductData[] = $this->_getProductData($product);
+            } else {
+                $idsForDeletion[] = $this->_getSolrId($product);
+            }
+        }
+
+        if (!$emptyIndex && sizeof($idsForDeletion)) {
+            $this->getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
+        }
+
+        if (sizeof($combinedProductData)) {
+            $this->getResource()->addDocuments($storeId, $combinedProductData);
+            return $storeId;
+        }
+        return $storeId;
     }
 }

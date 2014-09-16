@@ -79,10 +79,31 @@
                     </fields>
                 </server>
 
+                <indexing translate="label">
+                    <label>Indexing</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <pagesize translate="label">
+                            <label>Number of Products per Bunch</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Higher number means better indexing performance. Reduce if you are getting memory errors.</comment>
+                        </pagesize>
+                    </fields>
+                </indexing>
+
                 <fuzzy translate="label">
                     <label>Fuzzy Search</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>30</sort_order>
+                    <sort_order>40</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -112,7 +133,7 @@
                 <results translate="label">
                     <label>Search Results</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>40</sort_order>
+                    <sort_order>50</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -133,7 +154,7 @@
                 <autosuggest translate="label">
                     <label>Autosuggest Box</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>50</sort_order>
+                    <sort_order>60</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>

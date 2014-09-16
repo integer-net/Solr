@@ -160,6 +160,9 @@
                 <is_active>1</is_active>
                 <log>1</log>
             </general>
+            <indexing>
+                <pagesize>1000</pagesize>
+            </indexing>
             <fuzzy>
                 <is_active>1</is_active>
                 <sensitivity>0.6</sensitivity>

@@ -44,7 +44,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
-            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, false, new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
+            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter(), new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
         }
         return $this->_solr[$storeId];
     }
@@ -150,5 +150,18 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
         $response = $this->getSolr($storeId)->deleteByMultipleIds($ids);
         $this->getSolr($storeId)->commit();
         return $response;
+    }
+
+    /**
+     * @return Apache_Solr_HttpTransport_Abstract
+     */
+    protected function _getHttpTransportAdapter()
+    {
+        switch (Mage::getStoreConfig('integernet_solr/server/http_method')) {
+            case IntegerNet_Solr_Model_Source_HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL:
+                return new Apache_Solr_HttpTransport_Curl();
+            default:
+                return new Apache_Solr_HttpTransport_FileGetContents();
+        }
     }
 }

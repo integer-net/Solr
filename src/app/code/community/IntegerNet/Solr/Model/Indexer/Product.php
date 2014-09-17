@@ -15,6 +15,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_resourceName = 'integernet_solr/solr';
     
     protected $_pathCategoryIds = array();
+    
+    protected $_excludedCategoryIds = null;
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
@@ -42,7 +44,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $pageNumber = 1;
             do {
-                echo $pageNumber . "\n";
                 $productCollection = $this->_getProductCollection($storeId);
     
                 if (is_array($productIds)) {
@@ -345,7 +346,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
  
         $lookupCategoryIds = array_diff($categoryIds, array_keys($this->_pathCategoryIds));
-        $this->_lookupCategoryIdPaths($lookupCategoryIds);
+        $this->_lookupCategoryIdPaths($lookupCategoryIds, $product->getStoreId());
 
         $foundCategoryIds = array();
         foreach($categoryIds as $categoryId) {
@@ -354,6 +355,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
 
         $foundCategoryIds = array_unique($foundCategoryIds);
+        
+        $foundCategoryIds = array_diff($foundCategoryIds, $this->_getExcludedCategoryIds($product->getStoreId()));
 
         return $foundCategoryIds;
     }
@@ -362,8 +365,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      * Lookup and store all parent category ids and its own id of given category ids
      * 
      * @param int[] $categoryIds
+     * @param int $storeId
      */
-    protected function _lookupCategoryIdPaths($categoryIds)
+    protected function _lookupCategoryIdPaths($categoryIds, $storeId)
     {
         if (!sizeof($categoryIds)) {
             return;
@@ -378,13 +382,50 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             /** @var Mage_Catalog_Model_Category $categoryPathIds */
             if (!$category->getIsActive() || !$category->getIncludeInMenu()) {
                 $this->_pathCategoryIds[$category->getId()] = array();
-            } else {
-                $categoryPathIds = explode('/', $category->getPath());
-                array_shift($categoryPathIds);
-                array_shift($categoryPathIds);
-                $this->_pathCategoryIds[$category->getId()] = $categoryPathIds;
+                continue;
             }
+            
+            $categoryPathIds = explode('/', $category->getPath());
+            if (!in_array(Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId(), $categoryPathIds)) {
+                $this->_pathCategoryIds[$category->getId()] = array();
+                continue;
+            }
+
+            array_shift($categoryPathIds);
+            array_shift($categoryPathIds);
+            $this->_pathCategoryIds[$category->getId()] = $categoryPathIds;
         }
+    }
+
+    /**
+     * @param int $storeId
+     * @return array
+     */
+    protected function _getExcludedCategoryIds($storeId) 
+    {
+        if (is_null($this->_excludedCategoryIds)) {
+
+            /** @var $excludedCategories Mage_Catalog_Model_Resource_Category_Collection */
+            $excludedCategories = Mage::getResourceModel('catalog/category_collection')
+                ->addFieldToFilter('solr_exclude', 1);
+
+            $this->_excludedCategoryIds = $excludedCategories->getAllIds();
+
+            /** @var $categoriesWithChildrenExcluded Mage_Catalog_Model_Resource_Category_Collection */
+            $categoriesWithChildrenExcluded = Mage::getResourceModel('catalog/category_collection')
+                ->addFieldToFilter('solr_exclude_children', 1);
+
+            $excludePaths = $categoriesWithChildrenExcluded->getColumnValues('path');
+
+            /** @var $excludedChildrenCategories Mage_Catalog_Model_Resource_Category_Collection */
+            $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection');
+            foreach($excludePaths as $excludePath) {
+                $excludedChildrenCategories->addAttributeToFilter('path', array('like' => $excludePath . '/%'));
+            }
+            $this->_excludedCategoryIds = array_merge($this->_excludedCategoryIds, $excludedChildrenCategories->getAllIds());
+        }
+        
+        return $this->_excludedCategoryIds;
     }
 
     /**

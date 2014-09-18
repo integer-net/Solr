@@ -413,16 +413,23 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             /** @var $categoriesWithChildrenExcluded Mage_Catalog_Model_Resource_Category_Collection */
             $categoriesWithChildrenExcluded = Mage::getResourceModel('catalog/category_collection')
+                ->setStoreId($storeId)
                 ->addFieldToFilter('solr_exclude_children', 1);
 
             $excludePaths = $categoriesWithChildrenExcluded->getColumnValues('path');
 
             /** @var $excludedChildrenCategories Mage_Catalog_Model_Resource_Category_Collection */
-            $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection');
+            $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection')
+                ->setStoreId($storeId);
+            
+            $excludePathConditions = array();
             foreach($excludePaths as $excludePath) {
-                $excludedChildrenCategories->addAttributeToFilter('path', array('like' => $excludePath . '/%'));
+                $excludePathConditions[] = array('like' => $excludePath . '/%');
             }
-            $this->_excludedCategoryIds = array_merge($this->_excludedCategoryIds, $excludedChildrenCategories->getAllIds());
+            if (sizeof($excludePathConditions)) {
+                $excludedChildrenCategories->addAttributeToFilter('path', $excludePathConditions);
+                $this->_excludedCategoryIds = array_merge($this->_excludedCategoryIds, $excludedChildrenCategories->getAllIds());
+            }
         }
         
         return $this->_excludedCategoryIds;

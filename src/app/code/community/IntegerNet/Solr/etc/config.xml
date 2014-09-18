@@ -151,6 +151,16 @@
                     </review>
                 </observers>
             </catalog_block_product_list_collection>
+
+            <controller_action_predispatch_catalogsearch_result_index>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>controllerActionPredispatchCatalogsearchResultIndex</method>
+                    </integernet_solr>
+                </observers>
+            </controller_action_predispatch_catalogsearch_result_index>
         </events>
     </frontend>
 

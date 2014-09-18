@@ -10,6 +10,8 @@
 class IntegerNet_Solr_Model_Observer
 {
     /**
+     * Add new field "solr_boost" to attribute form
+     * 
      * @param Varien_Event_Observer $observer
      */
     public function adminhtmlCatalogProductAttributeEditPrepareForm(Varien_Event_Observer $observer)
@@ -31,6 +33,7 @@ class IntegerNet_Solr_Model_Observer
 
     /**
      * Add new column "solr_boost" to attribute grid
+     * 
      * @param Varien_Event_Observer $observer
      */
     public function coreBlockAbstractToHtmlBefore(Varien_Event_Observer $observer)
@@ -48,6 +51,11 @@ class IntegerNet_Solr_Model_Observer
         }
     }
 
+    /**
+     * Check Solr connection on config save
+     * 
+     * @param Varien_Event_Observer $observer
+     */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
         $storeId = null;
@@ -69,6 +77,18 @@ class IntegerNet_Solr_Model_Observer
             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('integernet_solr')->__('Solr Connection could not be established.'));
         } else {
             Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('integernet_solr')->__('Solr Connection established.'));
+        }
+    }
+
+    public function controllerActionPredispatchCatalogsearchResultIndex(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Core_Controller_Varien_Action $action */
+        $action = $observer->getControllerAction();
+        
+        if ($order = $action->getRequest()->getParam('order')) {
+            if ($order === 'relevance') {
+                $_GET['order'] = 'position';
+            }
         }
     }
 }

@@ -48,3 +48,4 @@
 "Please change if you are getting communication errors","Bitte wechseln, falls Sie Übertragungsfehler erhalten"
 "file_get_contents (Default)","file_get_contents (Standard)"
 "cURL","cURL"
+"Exclude this Product from Solr Index","Dieses Produkt vom Solr-Index ausschließen"

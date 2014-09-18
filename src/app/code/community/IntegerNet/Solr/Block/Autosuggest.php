@@ -96,7 +96,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                 }
 
                 $categorySuggestions[] = array(
-                    'title' => $this->escapeHtml($category->getName()),
+                    'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
                     'row_class' => '',
                     'num_of_results' => $numResults,
                     'url' => $this->_getCategoryUrl($category),
@@ -234,5 +234,29 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         }
 
         return $category->getUrl();
+    }
+
+    /**
+     * Return category name or complete path, depending on what is configured
+     * 
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryTitle($category)
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/autosuggest/show_complete_category_path')) {
+            $categoryPathIds = $category->getPathIds();
+            array_shift($categoryPathIds);
+            array_shift($categoryPathIds);
+            array_pop($categoryPathIds);
+            
+            $categoryPathNames = array();
+            foreach($categoryPathIds as $categoryId) {
+                $categoryPathNames[] = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore()->getId());
+            }
+            $categoryPathNames[] = $category->getName();
+            return implode(' > ', $categoryPathNames);
+        }
+        return $category->getName();
     }
 }

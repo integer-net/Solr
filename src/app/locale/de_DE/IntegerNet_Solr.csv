@@ -49,3 +49,4 @@
 "file_get_contents (Default)","file_get_contents (Standard)"
 "cURL","cURL"
 "Exclude this Product from Solr Index","Dieses Produkt vom Solr-Index ausschließen"
+"Show complete category path","Kompletten Kategorie-Pfad anzeigen"

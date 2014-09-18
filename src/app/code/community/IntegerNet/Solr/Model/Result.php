@@ -42,18 +42,31 @@ class IntegerNet_Solr_Model_Result
             if (is_null($storeId)) {
                 $storeId = Mage::app()->getStore()->getId();
             }
+
+            $transportObject = new Varien_Object(array(
+                'store_id' => $storeId,
+                'query_text' => $this->_getQueryText(),
+                'start_item' => $this->_getCurrentPage() * $this->_getPageSize(),
+                'page_size' => $this->_getPageSize(),
+                'params' => $this->_getParams($storeId),
+            ));
+            
+            Mage::dispatchEvent('integernet_solr_before_search_request', array('transport' => $transportObject));
+
             $this->_solrResult = $this->_getResource()->search(
                 $storeId,
-                $this->_getQueryText(),
-                $this->_getCurrentPage() * $this->_getPageSize(), // Start item
-                $this->_getPageSize(), // Items per page
-                $this->_getParams($storeId)
+                $transportObject->getQueryText(),
+                $transportObject->getStartItem(), // Start item
+                $transportObject->getPageSize(), // Items per page
+                $transportObject->getParams()
             );
 
             if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
 
                 $this->_logResult();
             }
+
+            Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $this->_solrResult));
         }
 
         return $this->_solrResult;

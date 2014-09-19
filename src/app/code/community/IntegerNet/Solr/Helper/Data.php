@@ -15,6 +15,9 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_filterableInSearchAttributes = null;
 
+    /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    protected $_sortableAttributes = null;
+
     /**
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
@@ -30,6 +33,23 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $this->_searchableAttributes;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getSortableAttributes()
+    {
+        if (is_null($this->_sortableAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_sortableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addFieldToFilter('used_for_sort_by', 1)
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
+        }
+
+        return $this->_sortableAttributes;
     }
 
     /**
@@ -57,15 +77,28 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getFieldName($attribute)
     {
-        switch ($attribute->getBackendType()) {
-            case 'decimal':
-                return $attribute->getAttributeCode() . '_f';
+        if ($attribute->getUsedForSortBy()) {
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    return $attribute->getAttributeCode() . '_f';
 
-            case 'text':
-                return $attribute->getAttributeCode() . '_t';
+                case 'text':
+                    return $attribute->getAttributeCode() . '_t';
 
-            default:
-                return $attribute->getAttributeCode() . '_s';
+                default:
+                    return $attribute->getAttributeCode() . '_s';
+            }
+        } else {
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    return $attribute->getAttributeCode() . '_f_mv';
+
+                case 'text':
+                    return $attribute->getAttributeCode() . '_t_mv';
+
+                default:
+                    return $attribute->getAttributeCode() . '_s_mv';
+            }
         }
     }
 }

@@ -244,8 +244,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     ) {
                         if (!isset($productData[$fieldName])) {
                             $productData[$fieldName] = $childValue;
-                        } elseif ($productData[$fieldName] != $childValue) {
-                            $productData[$fieldName] .= ' ' . $childValue;
+                        } else {
+                            if (!$attribute->getUsedForSortBy()) {
+                                if (!is_array($productData[$fieldName]) && $childValue != $productData[$fieldName]) {
+                                    $productData[$fieldName] = array($productData[$fieldName], $childValue);
+                                } else {
+                                    if (is_array($productData[$fieldName]) && !in_array($childValue, $productData[$fieldName])) {
+
+                                        $productData[$fieldName][] = $childValue;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -217,6 +217,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
                 continue;
             }
+
+            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+
+            $solrBoost = floatval($attribute->getSolrBoost());
+            if ($solrBoost != 1) {
+                $productData[$fieldName . '_boost'] = $solrBoost;
+            }
             
             if ($attribute->getAttributeCode() == 'price') {
                 $price = $product->getFinalPrice();
@@ -495,11 +502,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         $combinedProductData = array();
         $idsForDeletion = array();
+        $storeId = $productCollection->getStoreId();
 
         foreach ($productCollection as $product) {
             /** @var Mage_Catalog_Model_Product $product */
 
-            $storeId = $productCollection->getStoreId();
             $product->setStoreId($storeId);
 
             if ($this->_canIndexProduct($product)) {

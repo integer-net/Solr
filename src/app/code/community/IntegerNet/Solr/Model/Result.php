@@ -144,7 +144,6 @@ class IntegerNet_Solr_Model_Result
         $params = array(
             'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
-            'qf' => $this->_getSearchFieldCodes(),
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
             'facet.sort' => 'true',
@@ -186,7 +185,7 @@ class IntegerNet_Solr_Model_Result
             }
             $codes[] = $fieldName;
         }
-        return $codes;
+        return implode(' ', $codes);
     }
 
     /**
@@ -200,7 +199,7 @@ class IntegerNet_Solr_Model_Result
             $queryText = $query->getSynonymFor();
         }
         if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
-            $queryText .= '~' . Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+            $queryText .= '~' . floatval(Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity'));
         }
         return $queryText;
     }

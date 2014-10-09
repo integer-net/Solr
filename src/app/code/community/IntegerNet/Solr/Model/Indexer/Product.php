@@ -92,13 +92,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _getProductData($product)
     {
-        $productData = array(
+        $productData = new Varien_Object(array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
             'category' => $this->_getCategoryIds($product), // @todo get category ids from parent anchor categories as well
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
-        );
+        ));
 
         $this->_addBoostToProductData($product, $productData);
 
@@ -107,8 +107,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $this->_addSearchDataToProductData($product, $productData);
         
         $this->_addResultHtmlToProductData($product, $productData);
+        
+        Mage::dispatchEvent('integernet_solr_get_product_data', array('product' => $product, 'product_data' => $productData));
 
-        return $productData;
+        return $productData->getData();
     }
 
     /**
@@ -117,6 +119,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _canIndexProduct($product)
     {
+        Mage::dispatchEvent('integernet_solr_can_index_product', array('product' => $product));
+        
         if ($product->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
             return false;
         }
@@ -178,37 +182,37 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Mage_Catalog_Model_Product $product
-     * @param array $productData
+     * @param Varien_Object $productData
      */
-    protected function _addFacetsToProductData($product, &$productData)
+    protected function _addFacetsToProductData($product, $productData)
     {
         foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
 
             switch ($attribute->getFrontendInput()) {
                 case 'select':
                     if ($rawValue = $product->getData($attribute->getAttributeCode())) {
-                        $productData[$attribute->getAttributeCode() . '_facet'] = $rawValue;
+                        $productData->setData($attribute->getAttributeCode() . '_facet', $rawValue);
                     }
                     break;
                 case 'multiselect':
                     if ($rawValue = $product->getData($attribute->getAttributeCode())) {
-                        $productData[$attribute->getAttributeCode() . '_facet'] = explode(',', $rawValue);
+                        $productData->setData($attribute->getAttributeCode() . '_facet', explode(',', $rawValue));
                     }
                     break;
             }
 
             $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
-            if (!isset($productData[$fieldName])) {
-                $productData[$fieldName] = trim(strip_tags($attribute->getFrontend()->getValue($product)));
+            if (!$productData->hasData($fieldName)) {
+                $productData->setData($fieldName, trim(strip_tags($attribute->getFrontend()->getValue($product))));
             }
         }
     }
 
     /**
      * @param Mage_Catalog_Model_Product $product
-     * @param array $productData
+     * @param Varien_Object $productData
      */
-    protected function _addSearchDataToProductData($product, &$productData)
+    protected function _addSearchDataToProductData($product, $productData)
     {
         $childProducts = $this->_getChildProductsCollection($product);
 
@@ -222,7 +226,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $solrBoost = floatval($attribute->getSolrBoost());
             if ($solrBoost != 1) {
-                $productData[$fieldName . '_boost'] = $solrBoost;
+                $productData->setData($fieldName . '_boost', $solrBoost);
             }
             
             if ($attribute->getAttributeCode() == 'price') {
@@ -230,17 +234,16 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 if ($price == 0) {
                     $price = $product->getMinimalPrice();
                 }
-                $productData['price_f'] = floatval($price);
+                $productData->setData('price_f', floatval($price));
                 continue;
             }
 
             $attribute->setStoreId($product->getStoreId());
 
-            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
             if ($product->getData($attribute->getAttributeCode())
                 && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
             ) {
-                $productData[$fieldName] = $value;
+                $productData->setData($fieldName, $value);
             }
 
             if ($attribute->getBackendType() != 'decimal') {
@@ -249,16 +252,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     if ($childProduct->getData($attribute->getAttributeCode())
                         && $childValue = trim(strip_tags($attribute->getFrontend()->getValue($childProduct)))
                     ) {
-                        if (!isset($productData[$fieldName])) {
-                            $productData[$fieldName] = $childValue;
+                        if (!$productData->hasData($fieldName)) {
+                            $productData->setData($fieldName, $childValue);
                         } else {
                             if (!$attribute->getUsedForSortBy()) {
-                                if (!is_array($productData[$fieldName]) && $childValue != $productData[$fieldName]) {
-                                    $productData[$fieldName] = array($productData[$fieldName], $childValue);
+                                $fieldValue = $productData->getData($fieldName);
+                                if (!is_array($fieldValue) && $childValue != $fieldValue) {
+                                    $productData->setData($fieldName, array($fieldValue, $childValue));
                                 } else {
-                                    if (is_array($productData[$fieldName]) && !in_array($childValue, $productData[$fieldName])) {
-
-                                        $productData[$fieldName][] = $childValue;
+                                    if (is_array($fieldValue) && !in_array($childValue, $fieldValue)) {
+                                        $fieldValue[] = $childValue;
+                                        $productData->setData($fieldName, $fieldValue);
                                     }
                                 }
                             }
@@ -271,9 +275,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Mage_Catalog_Model_Product $product
-     * @param array $productData
+     * @param Varien_Object $productData
      */
-    protected function _addResultHtmlToProductData($product, &$productData)
+    protected function _addResultHtmlToProductData($product, $productData)
     {
         if (Mage::app()->getStore()->getId() != $product->getStoreId()) {
             $appEmulation = Mage::getSingleton('core/app_emulation');
@@ -286,14 +290,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $block->setProduct($product);
         
         $block->setTemplate('integernet/solr/result/autosuggest/item.phtml');
-        $productData['result_html_autosuggest_nonindex'] = $block->toHtml();
+        $productData->setData('result_html_autosuggest_nonindex', $block->toHtml());
 
         if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
             $block->setTemplate('integernet/solr/result/list/item.phtml');
-            $productData['result_html_list_nonindex'] = $block->toHtml();
+            $productData->setData('result_html_list_nonindex', $block->toHtml());
             
             $block->setTemplate('integernet/solr/result/grid/item.phtml');
-            $productData['result_html_grid_nonindex'] = $block->toHtml();
+            $productData->setData('result_html_grid_nonindex', $block->toHtml());
         }
     }
 
@@ -453,13 +457,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Mage_Catalog_Model_Product $product
-     * @param array $productData
+     * @param Varien_Object $productData
      */
     protected function _addBoostToProductData($product, &$productData)
     {
         if ($boost = $product->getSolrBoost()) {
             if ($boost > 0) {
-                $productData['_boost'] = $boost;
+                $productData->setData('_boost', $boost);
             }
         }
     }

@@ -1307,43 +1307,46 @@
           -->
     </searchComponent>
 
-    <searchComponent name="suggest">
-        <lst name="spellchecker">
-            <str name="name">suggest</str>
-            <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+    <!-- A request handler for demonstrating the spellcheck component.
 
-            <!-- Define the Lookup class to use -->
-            <str name="lookupImpl">
-                org.apache.solr.spelling.suggest.fst.AnalyzingLookupFactory
-            </str>
+         NOTE: This is purely as an example.  The whole purpose of the
+         SpellCheckComponent is to hook it into the request handler that
+         handles your normal user queries so that a separate request is
+         not needed to get suggestions.
 
-            <!-- Only for AnalyzingSuggester -->
-            <str name="suggestAnalyzerFieldType">lowercase</str>
+         IN OTHER WORDS, THERE IS REALLY GOOD CHANCE THE SETUP BELOW IS
+         NOT WHAT YOU WANT FOR YOUR PRODUCTION SYSTEM!
 
-            <!-- On-disk storage -->
-            <str name="storeDir">dict_ac</str>
-
-            <!-- Needed to parse spellcheck.q -->
-            <str name="fieldType">string</str>
-
-            <!-- Field-based dictionary -->
-            <str name="field">text</str>
-
-            <!-- Settings for field-based dictionary -->
-            <float name="threshold">0.005</float>
-            <str name="buildOnCommit">true</str>
-        </lst>
-    </searchComponent>
-    <requestHandler name="/suggest">
+         See http://wiki.apache.org/solr/SpellCheckComponent for details
+         on the request parameters.
+      -->
+    <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
         <lst name="defaults">
-            <str name="echoParams">explicit</str>
-            <str name="spellcheck">true</str>
+            <str name="df">text</str>
+            <!-- Solr will use suggestions from both the 'default' spellchecker
+                 and from the 'wordbreak' spellchecker and combine them.
+                 collations (re-written queries) can include a combination of
+                 corrections from both spellcheckers -->
+            <!--str name="spellcheck.dictionary">default</str>
+            <str name="spellcheck.dictionary">wordbreak</str>
+            <str name="spellcheck">on</str>
+            <str name="spellcheck.extendedResults">false</str>
+            <str name="spellcheck.count">10</str>
+            <str name="spellcheck.alternativeTermCount">5</str>
+            <str name="spellcheck.maxResultsForSuggest">5</str>
+            <str name="spellcheck.collate">true</str>
+            <str name="spellcheck.collateExtendedResults">false</str>
+            <str name="spellcheck.maxCollationTries">10</str>
+            <str name="spellcheck.maxCollations">5</str -->
+
+            <str name="spellcheck">on</str>
             <str name="spellcheck.dictionary">suggest</str>
             <str name="spellcheck.onlyMorePopular">true</str>
             <str name="spellcheck.count">10</str>
+            <str name="spellcheck.collate">true</str>
         </lst>
-        <arr name="components">
-            <str>suggest</str>
+        <arr name="last-components">
+            <str>spellcheck</str>
         </arr>
     </requestHandler>
 

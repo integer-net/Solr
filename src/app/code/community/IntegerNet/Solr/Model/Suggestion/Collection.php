@@ -47,15 +47,15 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
      */
     public function loadData($printQuery = false, $logQuery = false)
     {
-        $suggestions = (array)$this->_getSolrSuggestion()->spellcheck->suggestions;
+        $suggestions = (array)$this->_getSolrSuggestion()->terms->text;
 
-        if (!is_object(current($suggestions)) || !isset(current($suggestions)->suggestion)) {
+        if (!sizeof($suggestions)) {
             return $this;
         }
-        foreach (current($suggestions)->suggestion as $suggestion) {
+        foreach ($suggestions as $suggestion => $numResults) {
             $this->_items[] = new Varien_Object(array(
                 'query_text' => $suggestion,
-                'num_of_results' => '',
+                'num_of_results' => $numResults,
             ));
         }
 

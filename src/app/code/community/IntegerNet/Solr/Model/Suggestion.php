@@ -63,7 +63,7 @@ class IntegerNet_Solr_Model_Suggestion
     protected function _getParams($storeId)
     {
         $params = array(
-            'qf' => $this->_getSearchFieldCodes(),
+            //'qf' => $this->_getSearchFieldCodes(),
         );
 
         return $params;

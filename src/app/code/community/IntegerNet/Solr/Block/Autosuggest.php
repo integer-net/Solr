@@ -24,7 +24,8 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         $collection = Mage::getModel('integernet_solr/suggestion_collection');
         $query = $this->getQuery();
         $counter = 1;
-        $title = strtolower(trim($this->escapeHtml($query)));
+        mb_internal_encoding('UTF-8');
+        $title = mb_strtolower(trim($this->escapeHtml($query)));
         $data = array(
             array(
                 'title' => $title,
@@ -42,7 +43,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                 break;
             }
 
-            $title = strtolower(trim($this->escapeHtml($item->getQueryText())));
+            $title = mb_strtolower(trim($this->escapeHtml($item->getQueryText())));
             if (in_array($title, $titles)) {
                 continue;
             }

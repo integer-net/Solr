@@ -288,6 +288,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
             Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
             $this->_currentStoreId = $storeId;
+            $appEmulation = Mage::getSingleton('core/app_emulation');
+            $appEmulation->startEnvironmentEmulation($storeId);
         }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */

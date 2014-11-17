@@ -18,6 +18,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     
     protected $_excludedCategoryIds = null;
 
+    protected $_currentStoreId = null;
+
     /**
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean $emptyIndex Whether to truncate the index before refilling it 
@@ -279,9 +281,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addResultHtmlToProductData($product, $productData)
     {
-        if (Mage::app()->getStore()->getId() != $product->getStoreId()) {
-            $appEmulation = Mage::getSingleton('core/app_emulation');
-            $appEmulation->startEnvironmentEmulation($product->getStoreId());
+        $storeId = $product->getStoreId();
+        if ($this->_currentStoreId != $storeId) {
+
+            $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
+            Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
+            Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+            $this->_currentStoreId = $storeId;
         }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */

@@ -203,7 +203,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
      */
     public function getQuery()
     {
-        return $this->helper('catalogsearch')->getQueryText();
+        return $this->escapeHtml($this->helper('catalogsearch')->getQueryText());
     }
 
     /**

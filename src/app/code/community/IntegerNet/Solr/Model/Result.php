@@ -87,6 +87,7 @@ class IntegerNet_Solr_Model_Result
                     );
                 }
 
+                $this->_mergeFacetFieldCounts($result, $fuzzyResult);
             }
 
             if ($firstItemNumber > 0) {
@@ -196,6 +197,32 @@ class IntegerNet_Solr_Model_Result
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
         return $codes;
+    }
+
+    /**
+     * Merge facet counts of both results and store them into $result
+     * 
+     * @param $result
+     * @param $fuzzyResult
+     */
+    public function _mergeFacetFieldCounts($result, $fuzzyResult)
+    {
+        $facetFields = (array)$fuzzyResult->facet_counts->facet_fields;
+        
+        foreach($facetFields as $facetName => $facetCounts) {
+            $facetCounts = (array)$facetCounts;
+            
+            foreach($facetCounts as $facetId => $facetCount) {
+                if (isset($result->facet_counts->facet_fields->$facetName->$facetId)) {
+                    $result->facet_counts->facet_fields->$facetName->$facetId = max(
+                        $result->facet_counts->facet_fields->$facetName->$facetId,
+                        $facetCount
+                    );
+                } else {
+                    $result->facet_counts->facet_fields->$facetName->$facetId = $facetCount;
+                }
+            }
+        }
     }
 
     /**

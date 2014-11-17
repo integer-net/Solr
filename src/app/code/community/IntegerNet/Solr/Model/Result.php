@@ -33,6 +33,8 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
+     * Call Solr server twice: Once without fuzzy search, once with (if configured)
+     * 
      * @param $storeId
      * @return Apache_Solr_Response
      */

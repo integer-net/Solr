@@ -167,7 +167,7 @@ class IntegerNet_Solr_Model_Result
      * @param $storeId
      * @return array
      */
-    protected function _getParams($storeId)
+    protected function _getParams($storeId, $fuzzy = true)
     {
         $params = array(
             'fq' => $this->_getFilterQuery($storeId),
@@ -179,6 +179,10 @@ class IntegerNet_Solr_Model_Result
             'facet.field' => $this->_getFacetFieldCodes(),
             'defType' => 'edismax',
         );
+        
+        if (!$fuzzy) {
+            $params['mm'] = '100%';
+        }
 
         if (!$this->_getToolbarBlock()) {
             $params['rows'] = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
@@ -254,6 +258,8 @@ class IntegerNet_Solr_Model_Result
         }
         if ($allowFuzzy && Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
             $queryText .= '~' . floatval(Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity'));
+        } else {
+            $queryText = 'text_plain:' . $queryText;
         }
         return $queryText;
     }
@@ -363,7 +369,7 @@ class IntegerNet_Solr_Model_Result
             'query_text' => $this->_getQueryText($fuzzy),
             'start_item' => 0,
             'page_size' => $pageSize,
-            'params' => $this->_getParams($storeId),
+            'params' => $this->_getParams($storeId, $fuzzy),
         ));
 
         Mage::dispatchEvent('integernet_solr_before_search_request', array('transport' => $transportObject));

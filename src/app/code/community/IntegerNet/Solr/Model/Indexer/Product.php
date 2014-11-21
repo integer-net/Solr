@@ -372,19 +372,23 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         if (!sizeof($categoryIds)) {
             return array();
         }
- 
-        $lookupCategoryIds = array_diff($categoryIds, array_keys($this->_pathCategoryIds));
-        $this->_lookupCategoryIdPaths($lookupCategoryIds, $product->getStoreId());
+
+        $storeId = $product->getStoreId();
+        if (!isset($this->_pathCategoryIds[$storeId])) {
+            $this->_pathCategoryIds[$storeId] = array();
+        }
+        $lookupCategoryIds = array_diff($categoryIds, array_keys($this->_pathCategoryIds[$storeId]));
+        $this->_lookupCategoryIdPaths($lookupCategoryIds, $storeId);
 
         $foundCategoryIds = array();
         foreach($categoryIds as $categoryId) {
-            $categoryPathIds = $this->_pathCategoryIds[$categoryId];
+            $categoryPathIds = $this->_pathCategoryIds[$storeId][$categoryId];
             $foundCategoryIds = array_merge($foundCategoryIds, $categoryPathIds);
         }
 
         $foundCategoryIds = array_unique($foundCategoryIds);
         
-        $foundCategoryIds = array_diff($foundCategoryIds, $this->_getExcludedCategoryIds($product->getStoreId()));
+        $foundCategoryIds = array_diff($foundCategoryIds, $this->_getExcludedCategoryIds($storeId));
 
         return $foundCategoryIds;
     }
@@ -409,19 +413,19 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         foreach ($categories as $category) {
             /** @var Mage_Catalog_Model_Category $categoryPathIds */
             if (!$category->getIsActive() || !$category->getIncludeInMenu()) {
-                $this->_pathCategoryIds[$category->getId()] = array();
+                $this->_pathCategoryIds[$storeId][$category->getId()] = array();
                 continue;
             }
             
             $categoryPathIds = explode('/', $category->getPath());
             if (!in_array(Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId(), $categoryPathIds)) {
-                $this->_pathCategoryIds[$category->getId()] = array();
+                $this->_pathCategoryIds[$storeId][$category->getId()] = array();
                 continue;
             }
 
             array_shift($categoryPathIds);
             array_shift($categoryPathIds);
-            $this->_pathCategoryIds[$category->getId()] = $categoryPathIds;
+            $this->_pathCategoryIds[$storeId][$category->getId()] = $categoryPathIds;
         }
     }
 
@@ -440,19 +444,12 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $this->_excludedCategoryIds[$storeId] = $excludedCategories->getAllIds();
 
-            // exclude other base categories than the one defined for current store
-            /** @var $excludedCategories Mage_Catalog_Model_Resource_Category_Collection */
-            $excludedBaseCategories = Mage::getResourceModel('catalog/category_collection')
-                ->addFieldToFilter('level', 1)
-                ->addFieldToFilter('entity_id', array('neq' => Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId()));
-            $excludePaths = $excludedBaseCategories->getColumnValues('path');
-
             // exclude children of categories which are configured as "children excluded"
             /** @var $categoriesWithChildrenExcluded Mage_Catalog_Model_Resource_Category_Collection */
             $categoriesWithChildrenExcluded = Mage::getResourceModel('catalog/category_collection')
                 ->setStoreId($storeId)
                 ->addFieldToFilter('solr_exclude_children', 1);
-            $excludePaths = array_merge($excludePaths, $categoriesWithChildrenExcluded->getColumnValues('path'));
+            $excludePaths = $categoriesWithChildrenExcluded->getColumnValues('path');
 
             /** @var $excludedChildrenCategories Mage_Catalog_Model_Resource_Category_Collection */
             $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection')

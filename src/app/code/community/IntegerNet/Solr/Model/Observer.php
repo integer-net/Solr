@@ -19,7 +19,7 @@ class IntegerNet_Solr_Model_Observer
         /* @var $fieldset Varien_Data_Form_Element_Fieldset */
         $fieldset = $observer->getForm()->getElement('front_fieldset');
 
-        $field = $fieldset->addField('solr_boost', 'number', array(
+        $field = $fieldset->addField('solr_boost', 'text', array(
             'name'      => 'solr_boost',
             'label'     => Mage::helper('integernet_solr')->__('Solr Priority'),
             'title'     => Mage::helper('integernet_solr')->__('Solr Priority'),

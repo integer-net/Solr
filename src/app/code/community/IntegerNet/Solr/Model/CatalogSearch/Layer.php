@@ -16,6 +16,10 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model
      */
     public function getProductCollection()
     {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return parent::getProductCollection();
+        }
+
         if (isset($this->_productCollections[$this->getCurrentCategory()->getId()])) {
             $collection = $this->_productCollections[$this->getCurrentCategory()->getId()];
         } else {
@@ -32,6 +36,10 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model
      */
     public function getFilterableAttributes()
     {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return parent::getFilterableAttributes();
+        }
+
         /** @var $collection Mage_Catalog_Model_Resource_Product_Attribute_Collection */
         $collection = Mage::getResourceModel('catalog/product_attribute_collection');
         $collection

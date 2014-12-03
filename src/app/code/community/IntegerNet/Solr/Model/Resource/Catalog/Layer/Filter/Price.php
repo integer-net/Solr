@@ -27,7 +27,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getMaxPrice($filter)
     {
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::getMaxPrice($filter);
         }
 
@@ -43,7 +43,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getCount($filter, $range)
     {
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::getCount($filter, $range);
         }
 

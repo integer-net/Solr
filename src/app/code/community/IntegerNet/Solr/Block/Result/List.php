@@ -16,6 +16,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _getProductCollection()
     {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return parent::_getProductCollection();
+        }
+
         if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
             return Mage::getSingleton('integernet_solr/result_collection');
         }
@@ -47,6 +51,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _beforeToHtml()
     {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return parent::_beforeToHtml();
+        }
+
         $toolbar = $this->getToolbarBlock();
 
         // called prepare sortable parameters

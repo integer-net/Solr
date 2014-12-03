@@ -85,7 +85,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
         
-        if ($order = $action->getRequest()->getParam('order')) {
+        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active') && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }

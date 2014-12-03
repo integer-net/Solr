@@ -3,14 +3,16 @@
 
     <default>
         <reference name="head">
-            <action method="addCss"><stylesheet>integernet/solr/css/autosuggest.css</stylesheet></action>
+            <action method="addCss" ifconfig="integernet_solr/general/is_active">
+                <stylesheet>integernet/solr/css/autosuggest.css</stylesheet>
+            </action>
         </reference>
     </default>
 
     <catalogsearch_result_index>
         <reference name="search.result">
-            <action method="unsetChild"><name>search_result_list</name></action>
-            <block type="integernet_solr/result_list" name="search_result_list" template="catalog/product/list.phtml">
+            <action ifconfig="integernet_solr/general/is_active" method="unsetChild"><name>search_result_list</name></action>
+            <block ifconfig="integernet_solr/general/is_active" type="integernet_solr/result_list" name="search_result_list" template="catalog/product/list.phtml">
                 <action method="setTemplate" ifconfig="integernet_solr/results/use_html_from_solr">
                     <template>integernet/solr/result.phtml</template>
                 </action>

@@ -153,6 +153,13 @@
                     </integernet_solr>
                 </observers>
             </controller_action_predispatch_catalogsearch_result_index>
+            <catalog_block_product_list_collection>
+                <observers>
+                    <review>
+                        <type>disabled</type>
+                    </review>
+                </observers>
+            </catalog_block_product_list_collection>
         </events>
     </frontend>
 

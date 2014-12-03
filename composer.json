@@ -4,6 +4,7 @@
    "description": "integer_net Solr Module",
    "homepage": "https://bitbucket.org/integer_net/solr",
    "require": {
-      "magento-hackathon/magento-composer-installer": "*"
+      "magento-hackathon/magento-composer-installer": "*",
+      "fbrnc/aoe_layoutconditions": "dev-master"
    }
 }

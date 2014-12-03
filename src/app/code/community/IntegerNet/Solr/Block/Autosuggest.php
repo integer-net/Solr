@@ -165,7 +165,9 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     public function getAttribute($attributeCode)
     {
         if (!isset($this->_attributes[$attributeCode])) {
-            $this->_attributes[$attributeCode] = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+            $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+            $attribute->setStoreId(Mage::app()->getStore()->getId());
+            $this->_attributes[$attributeCode] = $attribute;
         }
 
         return $this->_attributes[$attributeCode];

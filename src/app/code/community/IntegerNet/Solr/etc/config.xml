@@ -142,16 +142,8 @@
                 </integernet_solr>
             </updates>
         </layout>
-        
-        <events>
-            <catalog_block_product_list_collection>
-                <observers>
-                    <review>
-                        <type>disabled</type>
-                    </review>
-                </observers>
-            </catalog_block_product_list_collection>
 
+        <events>
             <controller_action_predispatch_catalogsearch_result_index>
                 <observers>
                     <integernet_solr>

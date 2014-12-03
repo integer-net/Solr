@@ -18,7 +18,8 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
      */
     public function setSolrResultCollection($solrResultCollection)
     {
-        $this->addIdFilter($solrResultCollection->getColumnValues('product_id'));
+        $productIds = $solrResultCollection->getColumnValues('product_id');
+        $this->addAttributeToFilter('entity_id', array('in' => $productIds));
         $this->_solrResultCollection = $solrResultCollection;
         return $this;
     }
@@ -54,7 +55,10 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
 
         $tempItems = array();
         foreach($this->getSolrResultCollection()->getColumnValues('product_id') as $itemId) {
-            $tempItems[$itemId] = $this->getItemById($itemId);
+            $item = $this->getItemById($itemId);
+            if (!is_null($item)) {
+                $tempItems[$itemId] = $item;
+            }
         }
         $this->_items = $tempItems;
         

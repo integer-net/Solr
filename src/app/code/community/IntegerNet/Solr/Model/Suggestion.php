@@ -62,23 +62,9 @@ class IntegerNet_Solr_Model_Suggestion
      */
     protected function _getParams($storeId)
     {
-        $params = array(
-            //'qf' => $this->_getSearchFieldCodes(),
-        );
+        $params = array();
 
         return $params;
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getSearchFieldCodes()
-    {
-        $codes = array('category');
-        foreach(Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
-            $codes[] = Mage::helper('integernet_solr')->getFieldName($attribute);
-        }
-        return $codes;
     }
 
     /**

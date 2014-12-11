@@ -9,7 +9,7 @@
  */
 class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
 {
-    const SUGGEST_SERVLET = 'terms';
+    const SUGGEST_SERVLET = 'suggest';
 
     /**
      * Constructed servlet full path URLs
@@ -64,9 +64,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         $params['wt'] = self::SOLR_WRITER;
         $params['json.nl'] = $this->_namedListTreatment;
 
-        $params['terms.fl'] = 'text';
-        $params['terms.regex'] = $query . '.*';
-        $params['terms.regex.flag'] = 'case_insensitive';
+        $params['q'] = $query;
         $params['start'] = $offset;
         $params['rows'] = $limit;
 

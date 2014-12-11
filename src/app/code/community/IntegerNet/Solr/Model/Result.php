@@ -17,7 +17,7 @@ class IntegerNet_Solr_Model_Result
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
     protected $_toolbarBlock = null;
-
+    
     protected $_filters = array();
 
     /**
@@ -34,7 +34,7 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * Call Solr server twice: Once without fuzzy search, once with (if configured)
-     *
+     * 
      * @param $storeId
      * @return Apache_Solr_Response
      */
@@ -179,7 +179,7 @@ class IntegerNet_Solr_Model_Result
             'facet.field' => $this->_getFacetFieldCodes(),
             'defType' => 'edismax',
         );
-
+        
         if (!$fuzzy) {
             $params['mm'] = '100%';
         }
@@ -205,17 +205,17 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * Merge facet counts of both results and store them into $result
-     *
+     * 
      * @param $result
      * @param $fuzzyResult
      */
     public function _mergeFacetFieldCounts($result, $fuzzyResult)
     {
         $facetFields = (array)$fuzzyResult->facet_counts->facet_fields;
-
+        
         foreach($facetFields as $facetName => $facetCounts) {
             $facetCounts = (array)$facetCounts;
-
+            
             foreach($facetCounts as $facetId => $facetCount) {
                 if (isset($result->facet_counts->facet_fields->$facetName->$facetId)) {
                     $result->facet_counts->facet_fields->$facetName->$facetId = max(
@@ -291,11 +291,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         $filterQuery = 'store_id:' . $storeId;
-
-        foreach($this->getFilters() as $attributeCode => $value) {
+        
+        foreach($this->getFilters() as $attributeCode => $value) { 
             $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
         }
-
+        
         return $filterQuery;
     }
 
@@ -303,7 +303,7 @@ class IntegerNet_Solr_Model_Result
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
      * @param int $value
      */
-    public function addAttributeFilter($attribute, $value)
+    public function addAttributeFilter($attribute, $value) 
     {
         $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
     }
@@ -311,7 +311,7 @@ class IntegerNet_Solr_Model_Result
     /**
      * @param Mage_Catalog_Model_Category $category
      */
-    public function addCategoryFilter($category)
+    public function addCategoryFilter($category) 
     {
         $this->_filters['category'] = $category->getId();
     }

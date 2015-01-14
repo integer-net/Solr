@@ -19,6 +19,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_excludedCategoryIds = array();
 
     protected $_currentStoreId = null;
+    
+    protected $_categoryNames = array();
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
@@ -94,10 +96,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _getProductData($product)
     {
+        $categoryIds = $this->_getCategoryIds($product);
         $productData = new Varien_Object(array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
-            'category' => $this->_getCategoryIds($product), // @todo get category ids from parent anchor categories as well
+            'category' => $categoryIds, // @todo get category ids from parent anchor categories as well
+            'category_name_s_mv' => $this->_getCategoryNames($categoryIds, $product->getStoreId()),
+            'category_name_s_mv_boost' => 2,
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
         ));
@@ -542,5 +547,25 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             return $storeId;
         }
         return $storeId;
+    }
+
+    /**
+     * @param $categoryIds
+     * @param $storeId
+     * @return array
+     */
+    protected function _getCategoryNames($categoryIds, $storeId)
+    {
+        $categoryNames = array();
+        
+        /** @var Mage_Catalog_Model_Resource_Category $categoryResource */
+        $categoryResource = Mage::getResourceModel('catalog/category');
+        foreach($categoryIds as $key => $categoryId) {
+            if (!isset($this->_categoryNames[$storeId][$categoryId])) {
+                $this->_categoryNames[$storeId][$categoryId] = $categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
+            }
+            $categoryNames[] = $this->_categoryNames[$storeId][$categoryId];
+        }
+        return $categoryNames;
     }
 }

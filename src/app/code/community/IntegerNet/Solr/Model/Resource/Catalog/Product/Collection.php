@@ -51,7 +51,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
      */
     protected function _afterLoad()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
             return parent::_afterLoad();
         }
 

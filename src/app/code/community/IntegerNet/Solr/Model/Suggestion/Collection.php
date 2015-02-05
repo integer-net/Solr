@@ -49,6 +49,10 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
     {
         $suggestions = (array)$this->_getSolrSuggestion()->spellcheck->suggestions;
 
+        if (!isset(current($suggestions)->suggestion)) {
+            return $this;
+        }
+        
         foreach (current($suggestions)->suggestion as $suggestion) {
             $this->_items[] = new Varien_Object(array(
                 'query_text' => $suggestion,

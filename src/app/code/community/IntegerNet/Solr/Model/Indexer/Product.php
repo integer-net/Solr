@@ -13,18 +13,18 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_itemBlocks = array();
 
     protected $_resourceName = 'integernet_solr/solr';
-    
+
     protected $_pathCategoryIds = array();
-    
+
     protected $_excludedCategoryIds = array();
 
     protected $_currentStoreId = null;
-    
+
     protected $_categoryNames = array();
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
-     * @param boolean $emptyIndex Whether to truncate the index before refilling it 
+     * @param boolean $emptyIndex Whether to truncate the index before refilling it
      */
     public function reindex($productIds = null, $emptyIndex = false)
     {
@@ -32,7 +32,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         if ($pageSize <= 0) {
             $pageSize = 100;
         }
-        
+
         foreach(Mage::app()->getStores() as $store) {
             /** @var Mage_Core_Model_Store $store */
 
@@ -49,14 +49,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $pageNumber = 1;
             do {
                 $productCollection = $this->_getProductCollection($storeId);
-    
+
                 if (is_array($productIds)) {
                     $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
                 }
-    
+
                 $productCollection->setPageSize($pageSize);
                 $productCollection->setCurPage($pageNumber++);
-    
+
                 $this->_indexProductCollection($emptyIndex, $productCollection);
 
             } while ($pageNumber <= $productCollection->getLastPageNumber());
@@ -90,7 +90,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * Generate single product data for Solr
-     * 
+     *
      * @param Mage_Catalog_Model_Product $product
      * @return array
      */
@@ -112,9 +112,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $this->_addFacetsToProductData($product, $productData);
 
         $this->_addSearchDataToProductData($product, $productData);
-        
+
         $this->_addResultHtmlToProductData($product, $productData);
-        
+
         Mage::dispatchEvent('integernet_solr_get_product_data', array('product' => $product, 'product_data' => $productData));
 
         return $productData->getData();
@@ -127,13 +127,13 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _canIndexProduct($product)
     {
         Mage::dispatchEvent('integernet_solr_can_index_product', array('product' => $product));
-        
+
         if ($product->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
             return false;
         }
         if (!in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds())) {
             return false;
-        } 
+        }
         if (!in_array($product->getStore()->getWebsiteId(), $product->getWebsiteIds())) {
             return false;
         }
@@ -167,9 +167,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
 
-/*        Mage::dispatchEvent('catalog_block_product_list_collection', array(
-            'collection' => $productCollection
-        ));*/
+        /*        Mage::dispatchEvent('catalog_block_product_list_collection', array(
+                    'collection' => $productCollection
+                ));*/
 
         $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
 
@@ -178,7 +178,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * Get unique identifier for Solr
-     * 
+     *
      * @param Mage_Catalog_Model_Product $product
      * @return string
      */
@@ -221,7 +221,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addSearchDataToProductData($product, $productData)
     {
-        $childProducts = $this->_getChildProductsCollection($product);
+        $hasChildProducts = true;
+        try {
+            $childProducts = $this->_getChildProductsCollection($product);
+        } catch (Exception $e) {
+            $hasChildProducts = false;
+        }
+
+        $productData->setData('price_f', 0.00);
 
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
 
@@ -235,7 +242,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if ($solrBoost != 1) {
                 $productData->setData($fieldName . '_boost', $solrBoost);
             }
-            
+
             if ($attribute->getAttributeCode() == 'price') {
                 $price = $product->getFinalPrice();
                 if ($price == 0) {
@@ -253,7 +260,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $productData->setData($fieldName, $value);
             }
 
-            if ($attribute->getBackendType() != 'decimal') {
+            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
+
                 foreach($childProducts as $childProduct) {
 
                     if ($childProduct->getData($attribute->getAttributeCode())
@@ -301,14 +309,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $block = $this->_getResultItemBlock();
 
         $block->setProduct($product);
-        
+
         $block->setTemplate('integernet/solr/result/autosuggest/item.phtml');
         $productData->setData('result_html_autosuggest_nonindex', $block->toHtml());
 
         if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
             $block->setTemplate('integernet/solr/result/list/item.phtml');
             $productData->setData('result_html_list_nonindex', $block->toHtml());
-            
+
             $block->setTemplate('integernet/solr/result/grid/item.phtml');
             $productData->setData('result_html_grid_nonindex', $block->toHtml());
         }
@@ -334,7 +342,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * Add custom price blocks for correct price display
-     * 
+     *
      * @param IntegerNet_Solr_Block_Indexer_Item $block
      */
     protected function _addPriceBlockTypes($block)
@@ -351,7 +359,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
             $block->addPriceBlockType('bundle', 'germansetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
         }
-        
+
         $priceBlockType = 'magesetup/catalog_product_price';
         if (@class_exists(Mage::getConfig()->getBlockClassName($priceBlockType)) && Mage::app()->getLayout()->createBlock($priceBlockType)) {
 
@@ -366,14 +374,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * Get category ids of assigned categories and all parents
-     * 
+     *
      * @param Mage_Catalog_Model_Product $product
      * @return int[]
      */
     protected function _getCategoryIds($product)
     {
         $categoryIds = $product->getCategoryIds();
-        
+
         if (!sizeof($categoryIds)) {
             return array();
         }
@@ -392,7 +400,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
 
         $foundCategoryIds = array_unique($foundCategoryIds);
-        
+
         $foundCategoryIds = array_diff($foundCategoryIds, $this->_getExcludedCategoryIds($storeId));
 
         return $foundCategoryIds;
@@ -400,7 +408,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * Lookup and store all parent category ids and its own id of given category ids
-     * 
+     *
      * @param int[] $categoryIds
      * @param int $storeId
      */
@@ -421,7 +429,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $this->_pathCategoryIds[$storeId][$category->getId()] = array();
                 continue;
             }
-            
+
             $categoryPathIds = explode('/', $category->getPath());
             if (!in_array(Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId(), $categoryPathIds)) {
                 $this->_pathCategoryIds[$storeId][$category->getId()] = array();
@@ -438,7 +446,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      * @param int $storeId
      * @return array
      */
-    protected function _getExcludedCategoryIds($storeId) 
+    protected function _getExcludedCategoryIds($storeId)
     {
         if (!isset($this->_excludedCategoryIds[$storeId])) {
 
@@ -459,7 +467,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             /** @var $excludedChildrenCategories Mage_Catalog_Model_Resource_Category_Collection */
             $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection')
                 ->setStoreId($storeId);
-            
+
             $excludePathConditions = array();
             foreach($excludePaths as $excludePath) {
                 $excludePathConditions[] = array('like' => $excludePath . '/%');
@@ -469,7 +477,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $this->_excludedCategoryIds[$storeId] = array_merge($this->_excludedCategoryIds[$storeId], $excludedChildrenCategories->getAllIds());
             }
         }
-        
+
         return $this->_excludedCategoryIds[$storeId];
     }
 
@@ -503,6 +511,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _getChildProductsCollection($product)
     {
         $childProductIds = $product->getTypeInstance(true)->getChildrenIds($product->getId());
+
+        if (sizeof($childProductIds) && is_array(current($childProductIds))) {
+            $childProductIds = current($childProductIds);
+        }
+
+        if (!sizeof($childProductIds)) {
+            Mage::throwException('Product ' . $product->getSku() . ' doesn\'t have any child products.');
+        }
 
         /** @var $childProductCollection Mage_Catalog_Model_Resource_Product_Collection */
         $childProductCollection = Mage::getResourceModel('catalog/product_collection')
@@ -557,7 +573,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _getCategoryNames($categoryIds, $storeId)
     {
         $categoryNames = array();
-        
+
         /** @var Mage_Catalog_Model_Resource_Category $categoryResource */
         $categoryResource = Mage::getResourceModel('catalog/category');
         foreach($categoryIds as $key => $categoryId) {

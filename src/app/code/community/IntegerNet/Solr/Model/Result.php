@@ -240,6 +240,37 @@ class IntegerNet_Solr_Model_Result
                 }
             }
         }
+
+        if (!isset($fuzzyResult->facet_counts->facet_ranges)) {
+            return;
+        }
+        $facetRanges = (array)$fuzzyResult->facet_counts->facet_ranges;
+
+        foreach($facetRanges as $facetName => $facetCounts) {
+            $facetCounts = (array)$facetCounts->counts;
+
+            if (!isset($result->facet_counts)) {
+                $result->facet_counts = new stdClass();
+            }
+            if (!isset($result->facet_counts->facet_ranges)) {
+                $result->facet_counts->facet_ranges = new stdClass();
+            }
+            if (!isset($result->facet_counts->facet_ranges->$facetName)) {
+                $result->facet_counts->facet_ranges->$facetName = new stdClass();
+                $result->facet_counts->facet_ranges->$facetName->counts = new stdClass();
+            }
+
+            foreach($facetCounts as $facetId => $facetCount) {
+                if (isset($result->facet_counts->facet_ranges->$facetName->counts->$facetId)) {
+                    $result->facet_counts->facet_ranges->$facetName->counts->$facetId = max(
+                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId,
+                        $facetCount
+                    );
+                } else {
+                    $result->facet_counts->facet_ranges->$facetName->counts->$facetId = $facetCount;
+                }
+            }
+        }
     }
 
     /**
@@ -363,6 +394,16 @@ class IntegerNet_Solr_Model_Result
     public function addCategoryFilter($category) 
     {
         $this->_filters['category'] = $category->getId();
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     */
+    public function addPriceRangeFilter($range, $index) 
+    {
+        $maxPrice = $index * $range;
+        $minPrice = $maxPrice - $range;
+        $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
     }
 
     /**

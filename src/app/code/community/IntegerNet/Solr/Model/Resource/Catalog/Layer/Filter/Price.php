@@ -23,7 +23,6 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      *
      * @param Mage_Catalog_Model_Layer_Filter_Price $filter
      * @return float
-     * @todo return correct value
      */
     public function getMaxPrice($filter)
     {
@@ -31,7 +30,13 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
             return parent::getMaxPrice($filter);
         }
 
-        return 200;
+        /** @var Apache_Solr_Response $result */
+        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
+        if (isset($result->stats->stats_fields->price_f->max)) {
+            return $result->stats->stats_fields->price_f->max;
+        }
+        
+        return 0;
     }
 
     /**
@@ -45,6 +50,20 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
     {
         if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::getCount($filter, $range);
+        }
+
+        /** @var Apache_Solr_Response $result */
+        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
+        if (isset($result->facet_counts->facet_ranges->price_f->counts)) {
+            $counts = array();
+            $stepSize = Mage::getStoreConfig('integernet_solr/results/price_step_size');
+            if ($stepSize <= 0) {
+                return array();
+            }
+            foreach($result->facet_counts->facet_ranges->price_f->counts as $lowerEndPrice => $qty) {
+                $counts[intval($lowerEndPrice / $stepSize) + 1] = $qty;
+            }
+            return $counts;
         }
 
         return array();

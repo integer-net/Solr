@@ -110,11 +110,21 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      * Retrieve maximal price
      *
      * @return float
-     * @todo return correct value
      */
     public function getMaxPrice()
     {
-        return 200;
+        /** @var Apache_Solr_Response $result */
+        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
+        if (isset($result->stats->stats_fields->price_f->max)) {
+            return $result->stats->stats_fields->price_f->max;
+        }
+
+        return 0;
+    }
+
+    public function addPriceData($customerGroupId = null, $websiteId = null)
+    {
+        return $this;
     }
 
     /**

@@ -50,3 +50,7 @@
 "cURL","cURL"
 "Exclude this Product from Solr Index","Dieses Produkt vom Solr-Index ausschließen"
 "Show complete category path","Kompletten Kategorie-Pfad anzeigen"
+"Size of Price Steps","Größe der Preis-Schritte"
+"i.e. 100","z.B. 100"
+"Upper Limit of Price Steps","Obergrenze der Preis-Schritte"
+"i.e. 1000","z.B. 1000"

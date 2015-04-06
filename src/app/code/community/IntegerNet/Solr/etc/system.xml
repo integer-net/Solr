@@ -159,6 +159,26 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </use_html_from_solr>
+                        <price_step_size translate="label,comment">
+                            <label>Size of Price Steps</label>
+                            <comment><![CDATA[i.e. 100]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </price_step_size>
+                        <max_price translate="label,comment">
+                            <label>Upper Limit of Price Steps</label>
+                            <comment><![CDATA[i.e. 1000]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </max_price>
                     </fields>
                 </results>
 

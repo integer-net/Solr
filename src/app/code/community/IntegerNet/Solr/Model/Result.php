@@ -88,6 +88,7 @@ class IntegerNet_Solr_Model_Result
                 }
 
                 $this->_mergeFacetFieldCounts($result, $fuzzyResult);
+                $this->_mergePriceData($result, $fuzzyResult);
             }
 
             if ($firstItemNumber > 0) {
@@ -177,8 +178,20 @@ class IntegerNet_Solr_Model_Result
             'facet.sort' => 'true',
             'facet.mincount' => '1',
             'facet.field' => $this->_getFacetFieldCodes(),
+            'facet.interval' => 'price_f',
+            'f.price_f.facet.interval.set' => '(0,*]',
             'defType' => 'edismax',
+            'stats' => 'true',
+            'stats.field' => 'price_f',
         );
+        
+        if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
+            && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+            $params['facet.range'] = 'price_f';
+            $params['f.price_f.facet.range.start'] = 0;
+            $params['f.price_f.facet.range.end'] = $maxPrice;
+            $params['f.price_f.facet.range.gap'] = $priceStepsize;
+        }
         
         if (!$fuzzy) {
             $params['mm'] = '100%';
@@ -225,6 +238,42 @@ class IntegerNet_Solr_Model_Result
                 } else {
                     $result->facet_counts->facet_fields->$facetName->$facetId = $facetCount;
                 }
+            }
+        }
+    }
+
+    /**
+     * Merge price information (min, max, intervals) of both results and store them into $result
+     * 
+     * @param $result
+     * @param $fuzzyResult
+     */
+    public function _mergePriceData($result, $fuzzyResult)
+    {
+        if (!isset($fuzzyResult->stats->stats_fields)) {
+            return;
+        }
+        
+        $statsFields = (array)$fuzzyResult->stats->stats_fields;
+        
+        foreach($statsFields as $fieldName => $fieldData) {
+
+            if (!isset($result->stats)) {
+                $result->stats = new stdClass();
+            }
+            if (!isset($result->stats->stats_fields)) {
+                $result->stats->stats_fields = new stdClass();
+            }
+            if (!isset($result->stats->stats_fields->$fieldName)) {
+                $result->stats->stats_fields->$fieldName = new stdClass();
+            }
+
+            $fieldData = (array)$fieldData;
+            if (isset($fieldData['min'])) {
+                $result->stats->stats_fields->$fieldName->min = $fieldData['min'];
+            }
+            if (isset($fieldData['max'])) {
+                $result->stats->stats_fields->$fieldName->max = $fieldData['max'];
             }
         }
     }
@@ -324,7 +373,11 @@ class IntegerNet_Solr_Model_Result
         return $this->_filters;
     }
 
-    protected function _logResult($result)
+    /**
+     * @param Apache_Solr_Response $result
+     * @param int $time in microseconds
+     */
+    protected function _logResult($result, $time)
     {
         $resultClone = unserialize(serialize($result));
         if (isset($resultClone->response->docs)) {
@@ -355,12 +408,13 @@ class IntegerNet_Solr_Model_Result
             }
         }
         Mage::log($resultClone, null, 'solr.log');
+        Mage::log('Elapsed time: ' . $time . 'ms', null, 'solr.log');
     }
 
     /**
-     * @param $storeId
-     * @param $pageSize
-     * @return mixed
+     * @param int $storeId
+     * @param int $pageSize
+     * @return Apache_Solr_Response
      */
     protected function _getResultFromRequest($storeId, $pageSize, $fuzzy = true)
     {
@@ -374,6 +428,9 @@ class IntegerNet_Solr_Model_Result
 
         Mage::dispatchEvent('integernet_solr_before_search_request', array('transport' => $transportObject));
 
+        $startTime = microtime(true);
+        
+        /** @var Apache_Solr_Response $result */
         $result = $this->_getResource()->search(
             $storeId,
             $transportObject->getQueryText(),
@@ -384,7 +441,7 @@ class IntegerNet_Solr_Model_Result
 
         if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
 
-            $this->_logResult($result);
+            $this->_logResult($result, microtime(true) - $startTime);
         }
 
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));

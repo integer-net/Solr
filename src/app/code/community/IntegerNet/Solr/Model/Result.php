@@ -475,6 +475,19 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
+     * @param float $minPrice
+     * @param float $maxPrice
+     */
+    public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = 0.0)
+    {
+        if ($maxPrice) {
+            $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+        } else {
+            $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
+        }
+    }
+
+    /**
      * @return array
      */
     public function getFilters()

@@ -153,7 +153,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $appEmulation = Mage::getSingleton('core/app_emulation');
         $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
 
-        Mage::app()->getStore()->setConfig('catalog/frontend/flat_catalog_product', 0);
+        Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
 
         /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = Mage::getResourceModel('catalog/product_collection')
@@ -166,7 +166,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
-
+        
         $event = new Varien_Event();
         $event->setCollection($productCollection);
         $observer = new Varien_Event_Observer();
@@ -233,8 +233,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         } catch (Exception $e) {
             $hasChildProducts = false;
         }
-
-        $productData->setData('price_f', 0.00);
+        
+        if (!$productData->getData('price_f')) {
+            $productData->setData('price_f', 0.00);
+        }
 
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
 

@@ -80,4 +80,32 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
 
         return array();
     }
+
+    /**
+     * Apply price range filter to product collection
+     *
+     * @param Mage_Catalog_Model_Layer_Filter_Price $filter
+     * @return Mage_Catalog_Model_Resource_Layer_Filter_Price
+     */
+    public function applyPriceRange($filter)
+    {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+            return parent::applyPriceRange($filter);
+        }
+
+        $interval = $filter->getInterval();
+        if (!$interval) {
+            return $this;
+        }
+
+        list($from, $to) = $interval;
+        if ($from === '' && $to === '') {
+            return $this;
+        }
+        
+        Mage::getSingleton('integernet_solr/result')->addPriceRangeFilterByMinMax($from, $to);
+
+        return $this;
+
+    }
 }

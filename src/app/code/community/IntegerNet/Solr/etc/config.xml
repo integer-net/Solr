@@ -188,6 +188,8 @@
                 <use_html_from_solr>0</use_html_from_solr>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>
+                <use_custom_price_intervals>0</use_custom_price_intervals>
+                <custom_price_intervals>10,20,50,100,200,300,400,500</custom_price_intervals>
             </results>
             <autosuggest>
                 <is_active>1</is_active>

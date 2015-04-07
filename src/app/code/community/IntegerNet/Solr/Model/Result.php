@@ -179,10 +179,9 @@ class IntegerNet_Solr_Model_Result
             'facet.mincount' => '1',
             'facet.field' => $this->_getFacetFieldCodes(),
             'facet.interval' => 'price_f',
-            'f.price_f.facet.interval.set' => '(0,*]',
-            'defType' => 'edismax',
             'stats' => 'true',
             'stats.field' => 'price_f',
+            'defType' => 'edismax',
         );
         
         if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
@@ -191,6 +190,26 @@ class IntegerNet_Solr_Model_Result
             $params['f.price_f.facet.range.start'] = 0;
             $params['f.price_f.facet.range.end'] = $maxPrice;
             $params['f.price_f.facet.range.gap'] = $priceStepsize;
+        }
+
+        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
+            && ($customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals'))) {
+            $params['f.price_f.facet.interval.set'] = array();
+            $lowerBorder = 0;
+            foreach(explode(',', $customPriceIntervals) as $upperBorder) {
+                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
+                $lowerBorder = $upperBorder;
+            }
+            $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
+        } else if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
+            && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+            $params['f.price_f.facet.interval.set'] = array();
+            $lowerBorder = 0;
+            for ($upperBorder = $priceStepsize; $upperBorder <= $maxPrice; $upperBorder += $priceStepsize) {
+                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
+                $lowerBorder = $upperBorder;
+            }
+            $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
         }
         
         if (!$fuzzy) {
@@ -241,33 +260,63 @@ class IntegerNet_Solr_Model_Result
             }
         }
 
-        if (!isset($fuzzyResult->facet_counts->facet_ranges)) {
-            return;
+        if (isset($fuzzyResult->facet_counts->facet_ranges)) {
+
+            $facetRanges = (array)$fuzzyResult->facet_counts->facet_ranges;
+
+            foreach ($facetRanges as $facetName => $facetCounts) {
+                $facetCounts = (array)$facetCounts->counts;
+
+                if (!isset($result->facet_counts)) {
+                    $result->facet_counts = new stdClass();
+                }
+                if (!isset($result->facet_counts->facet_ranges)) {
+                    $result->facet_counts->facet_ranges = new stdClass();
+                }
+                if (!isset($result->facet_counts->facet_ranges->$facetName)) {
+                    $result->facet_counts->facet_ranges->$facetName = new stdClass();
+                    $result->facet_counts->facet_ranges->$facetName->counts = new stdClass();
+                }
+
+                foreach ($facetCounts as $facetId => $facetCount) {
+                    if (isset($result->facet_counts->facet_ranges->$facetName->counts->$facetId)) {
+                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = max(
+                            $result->facet_counts->facet_ranges->$facetName->counts->$facetId,
+                            $facetCount
+                        );
+                    } else {
+                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = $facetCount;
+                    }
+                }
+            }
         }
-        $facetRanges = (array)$fuzzyResult->facet_counts->facet_ranges;
+        
+        if (isset($fuzzyResult->facet_counts->facet_intervals)) {
 
-        foreach($facetRanges as $facetName => $facetCounts) {
-            $facetCounts = (array)$facetCounts->counts;
+            $facetIntervals = (array)$fuzzyResult->facet_counts->facet_intervals;
 
-            if (!isset($result->facet_counts)) {
-                $result->facet_counts = new stdClass();
-            }
-            if (!isset($result->facet_counts->facet_ranges)) {
-                $result->facet_counts->facet_ranges = new stdClass();
-            }
-            if (!isset($result->facet_counts->facet_ranges->$facetName)) {
-                $result->facet_counts->facet_ranges->$facetName = new stdClass();
-                $result->facet_counts->facet_ranges->$facetName->counts = new stdClass();
-            }
+            foreach ($facetIntervals as $facetName => $facetCounts) {
+                $facetCounts = (array)$facetCounts;
 
-            foreach($facetCounts as $facetId => $facetCount) {
-                if (isset($result->facet_counts->facet_ranges->$facetName->counts->$facetId)) {
-                    $result->facet_counts->facet_ranges->$facetName->counts->$facetId = max(
-                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId,
-                        $facetCount
-                    );
-                } else {
-                    $result->facet_counts->facet_ranges->$facetName->counts->$facetId = $facetCount;
+                if (!isset($result->facet_counts)) {
+                    $result->facet_counts = new stdClass();
+                }
+                if (!isset($result->facet_counts->facet_intervals)) {
+                    $result->facet_counts->facet_intervals = new stdClass();
+                }
+                if (!isset($result->facet_counts->facet_intervals->$facetName)) {
+                    $result->facet_counts->facet_intervals->$facetName = new stdClass();
+                }
+
+                foreach ($facetCounts as $facetId => $facetCount) {
+                    if (isset($result->facet_counts->facet_intervals->$facetName->$facetId)) {
+                        $result->facet_counts->facet_intervals->$facetName->$facetId = max(
+                            $result->facet_counts->facet_intervals->$facetName->$facetId,
+                            $facetCount
+                        );
+                    } else {
+                        $result->facet_counts->facet_intervals->$facetName->$facetId = $facetCount;
+                    }
                 }
             }
         }
@@ -400,11 +449,24 @@ class IntegerNet_Solr_Model_Result
      * @param int $range
      * @param int $index
      */
-    public function addPriceRangeFilter($range, $index) 
+    public function addPriceRangeFilterByIndex($range, $index) 
     {
         $maxPrice = $index * $range;
         $minPrice = $maxPrice - $range;
         $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+    }
+
+    /**
+     * @param float $minPrice
+     * @param float $maxPrice
+     */
+    public function addPriceRangeFilterByMinMax($minPrice, $maxPrice) 
+    {
+        if ($maxPrice) {
+            $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+        } else {
+            $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
+        }
     }
 
     /**
@@ -450,7 +512,7 @@ class IntegerNet_Solr_Model_Result
             }
         }
         Mage::log($resultClone, null, 'solr.log');
-        Mage::log('Elapsed time: ' . $time . 'ms', null, 'solr.log');
+        Mage::log('Elapsed time: ' . $time . 's', null, 'solr.log');
     }
 
     /**

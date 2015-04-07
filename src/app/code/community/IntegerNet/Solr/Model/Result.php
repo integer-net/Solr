@@ -397,7 +397,8 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
-     * @param Mage_Catalog_Model_Category $category
+     * @param int $range
+     * @param int $index
      */
     public function addPriceRangeFilter($range, $index) 
     {

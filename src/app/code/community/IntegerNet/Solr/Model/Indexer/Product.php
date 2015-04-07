@@ -167,6 +167,12 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
 
+        $event = new Varien_Event();
+        $event->setCollection($productCollection);
+        $observer = new Varien_Event_Observer();
+        $observer->setEvent($event);
+        Mage::getModel('tax/observer')->addTaxPercentToProductCollection($observer);
+
         /*        Mage::dispatchEvent('catalog_block_product_list_collection', array(
                     'collection' => $productCollection
                 ));*/
@@ -286,6 +292,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 }
             }
         }
+
+        if (!$productData->getData('price_f')) {
+            $productData->setData('price_f', 0.00);
+        }
     }
 
     /**
@@ -303,6 +313,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $this->_currentStoreId = $storeId;
             $appEmulation = Mage::getSingleton('core/app_emulation');
             $appEmulation->startEnvironmentEmulation($storeId);
+            Mage::getDesign()->setStore($storeId);
+            Mage::getDesign()->setPackageName();
+            $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
+
+            Mage::getDesign()->setTheme($themeName);
         }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */

@@ -166,7 +166,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
-        
+
         $event = new Varien_Event();
         $event->setCollection($productCollection);
         $observer = new Varien_Event_Observer();
@@ -218,6 +218,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if (!$productData->hasData($fieldName)) {
                 $productData->setData($fieldName, trim(strip_tags($attribute->getFrontend()->getValue($product))));
             }
+
+            if ($attribute->getAttributeCode() == 'price') {
+                $price = $product->getFinalPrice();
+                if ($price == 0) {
+                    $price = $product->getMinimalPrice();
+                }
+                $productData->setData('price_f', floatval($price));
+            }
         }
     }
 
@@ -233,7 +241,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         } catch (Exception $e) {
             $hasChildProducts = false;
         }
-        
+
         if (!$productData->getData('price_f')) {
             $productData->setData('price_f', 0.00);
         }
@@ -249,15 +257,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $solrBoost = floatval($attribute->getSolrBoost());
             if ($solrBoost != 1) {
                 $productData->setData($fieldName . '_boost', $solrBoost);
-            }
-
-            if ($attribute->getAttributeCode() == 'price') {
-                $price = $product->getFinalPrice();
-                if ($price == 0) {
-                    $price = $product->getMinimalPrice();
-                }
-                $productData->setData('price_f', floatval($price));
-                continue;
             }
 
             $attribute->setStoreId($product->getStoreId());

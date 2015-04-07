@@ -54,6 +54,18 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
 
         /** @var Apache_Solr_Response $result */
         $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
+        if (isset($result->facet_counts->facet_intervals->price_f)) {
+            $counts = array();
+            $i = 1;
+            foreach($result->facet_counts->facet_intervals->price_f as $borders => $qty) {
+                if ($qty) {
+                    $counts[$i] = $qty;
+                }
+                $i++;
+            }
+            return $counts;
+        }
+
         if (isset($result->facet_counts->facet_ranges->price_f->counts)) {
             $counts = array();
             $stepSize = Mage::getStoreConfig('integernet_solr/results/price_step_size');

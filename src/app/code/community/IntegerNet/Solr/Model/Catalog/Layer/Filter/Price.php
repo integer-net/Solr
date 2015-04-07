@@ -8,59 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Model_Layer_Filter_Price 
-{
-    /**
-     * Get data for build price filter items
-     *
-     * @return array
-     */
-    protected function _getItemsData()
-    {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
-            return parent::_getItemsData();
-        }
-
-        /** @var Apache_Solr_Response $result */
-        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
-        if (!isset($result->facet_counts->facet_intervals->price_f)) {
-            return parent::_getItemsData();
-        }
-
-        $intervals = (array)$result->facet_counts->facet_intervals->price_f;
-        $data = array();
-        $store = Mage::app()->getStore();
-        
-        foreach($intervals as $borders => $count) {
-            if (!$count) {
-                continue;
-            }
-            
-            $commaPos = strpos($borders, ',');
-            if ($commaPos === false) {
-                continue;
-            }
-            
-            $fromPrice = floatval(substr($borders, 1, $commaPos - 1));
-            $toPrice = floatval(substr($borders, $commaPos + 1, -1));
-
-            if ($toPrice == 0) {
-                $data[] = array(
-                    'label' => Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice)),
-                    'value' => $fromPrice . '-',
-                    'count' => $count,
-                );
-            } else {
-                $data[] = array(
-                    'label' => Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice),  $store->formatPrice($toPrice)),
-                    'value' => $fromPrice . '-' . $toPrice,
-                    'count' => $count,
-                );
-            }
-        }
-        
-        return $data;
-    }
-    
+{    
     /**
      * Get price range for building filter steps
      *
@@ -76,33 +24,50 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
     }
 
     /**
-     * Apply price range filter to collection
+     * Prepare text of item label
      *
-     * @param Zend_Controller_Request_Abstract $request
-     * @param $filterBlock
-     *
-     * @return Mage_Catalog_Model_Layer_Filter_Price
+     * @param   int $range
+     * @param   float $value
+     * @return  string
      */
-    public function apply(Zend_Controller_Request_Abstract $request, $filterBlock)
+    protected function _renderItemLabel($range, $value)
     {
-        /**
-         * Filter must be string: $index,$range
-         */
-        $filter = $request->getParam($this->getRequestVar());
-        if (!$filter) {
-            return $this;
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+            return parent::_renderItemLabel($range, $value);
         }
 
-        $fromToFilter = explode('-', $filter);
-        if (count($fromToFilter) != 2) {
-            return parent::apply($request, $filterBlock);
+        /** @var Apache_Solr_Response $result */
+        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
+        if (isset($result->facet_counts->facet_intervals->price_f)) {
+
+            $intervals = (array)$result->facet_counts->facet_intervals->price_f;
+            $store = Mage::app()->getStore();
+
+            $i = 1;
+            foreach($intervals as $borders => $count) {
+                
+                if ($value != $i) {
+                    $i++;
+                    continue;
+                }
+
+                $commaPos = strpos($borders, ',');
+                if ($commaPos === false) {
+                    return parent::_renderItemLabel($range, $value);
+                }
+
+                $fromPrice = floatval(substr($borders, 1, $commaPos - 1));
+                $toPrice = floatval(substr($borders, $commaPos + 1, -1));
+
+                if ($toPrice == 0) {
+                    return Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                } else {
+                    return Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice),  $store->formatPrice($toPrice));
+                }
+            }
         }
-
-        list($minBorder, $maxBorder) = $fromToFilter;
-
-        Mage::getSingleton('integernet_solr/result')->addPriceRangeFilterByMinMax($minBorder, $maxBorder);
-
-        return $this;
+        
+        return parent::_renderItemLabel($range, $value);
     }
 
     /**

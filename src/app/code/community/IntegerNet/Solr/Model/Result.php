@@ -451,22 +451,27 @@ class IntegerNet_Solr_Model_Result
      */
     public function addPriceRangeFilterByIndex($range, $index) 
     {
-        $maxPrice = $index * $range;
-        $minPrice = $maxPrice - $range;
-        $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
-    }
+        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals') 
+            && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
+            $lowerBorder = 0;
+            $i = 1;
+            foreach(explode(',', $customPriceIntervals) as $upperBorder) {
+                if ($i == $index) {
+                    $this->_filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
+                    return;
+                }
+                $i++;
+                $lowerBorder = $upperBorder;
+                continue;
+            }
+            $this->_filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
+            return;
 
-    /**
-     * @param float $minPrice
-     * @param float $maxPrice
-     */
-    public function addPriceRangeFilterByMinMax($minPrice, $maxPrice) 
-    {
-        if ($maxPrice) {
-            $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
         } else {
-            $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
+            $maxPrice = $index * $range;
+            $minPrice = $maxPrice - $range;
         }
+        $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
     }
 
     /**

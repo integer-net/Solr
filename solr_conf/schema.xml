@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema name="integernet-solr" version="1.5">
 
-    <field name="_version_" type="long" indexed="true" stored="true"/>
-
     <types>
         <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="false"/>
         <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="false"/>
@@ -101,13 +99,12 @@
 
 
     <fields>
-
+        <field name="_version_" type="long" indexed="true" stored="true"/>
         <field name="id" type="string" indexed="true" stored="true" required="true" />
         <field name="category" type="int" indexed="true" stored="true" multiValued="true" omitNorms="true" />
         <field name="store_id" type="int" indexed="true" stored="true" required="true" />
         <field name="product_id" type="int" indexed="true" stored="true" required="true"/>
         <field name="content_type" type="string" indexed="true" stored="true" required="true"/>
-
 
         <!-- catchall field, containing all other searchable text fields (implemented
              via copyField further on in this schema  -->

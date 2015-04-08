@@ -42,6 +42,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
+            if (!$store->getIsActive()) {
+                continue;
+            }
+
             if ($emptyIndex) {
                 $this->getResource()->deleteAllDocuments($storeId);
             }
@@ -312,14 +316,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _addResultHtmlToProductData($product, $productData)
     {
         $storeId = $product->getStoreId();
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        $isEmulated = false;
+        $initialEnvironmentInfo = null;
         if ($this->_currentStoreId != $storeId) {
 
             $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
             Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
             Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
             $this->_currentStoreId = $storeId;
-            $appEmulation = Mage::getSingleton('core/app_emulation');
-            $appEmulation->startEnvironmentEmulation($storeId);
+            $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
+            $isEmulated = true;
             Mage::getDesign()->setStore($storeId);
             Mage::getDesign()->setPackageName();
             $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
@@ -341,6 +348,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $block->setTemplate('integernet/solr/result/grid/item.phtml');
             $productData->setData('result_html_grid_nonindex', $block->toHtml());
+        }
+
+        if ($isEmulated && $initialEnvironmentInfo) {
+            $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
         }
     }
 

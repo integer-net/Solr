@@ -4,7 +4,7 @@
  *
  * @category   IntegerNet
  * @package    IntegerNet_Solr
- * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
+ * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
@@ -48,11 +48,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $pageNumber = 1;
             do {
-                $productCollection = $this->_getProductCollection($storeId);
-
-                if (is_array($productIds)) {
-                    $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
-                }
+                $productCollection = $this->_getProductCollection($storeId, $productIds);
 
                 $productCollection->setPageSize($pageSize);
                 $productCollection->setCurPage($pageNumber++);
@@ -146,9 +142,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param int $storeId
+     * @param int[]|null $productIds
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    protected function _getProductCollection($storeId)
+    protected function _getProductCollection($storeId, $productIds = null)
     {
         $appEmulation = Mage::getSingleton('core/app_emulation');
         $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
@@ -166,6 +163,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
+
+        if (is_array($productIds)) {
+            $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
+        }
 
         Mage::dispatchEvent('integernet_solr_product_collection_load_before', array(
             'collection' => $productCollection

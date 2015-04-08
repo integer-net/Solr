@@ -80,6 +80,14 @@
             </analyzer>
         </fieldType>
 
+        <fieldType name="text_autocomplete" class="solr.TextField" positionIncrementGap="100">
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+                <filter class="solr.ShingleFilterFactory" maxShingleSize="3" outputUnigrams="true"/>
+            </analyzer>
+        </fieldType>
+
         <fieldtype name="payloads" stored="false" indexed="true" class="solr.TextField" >
             <analyzer>
                 <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -110,6 +118,7 @@
              via copyField further on in this schema  -->
         <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="text_plain" type="textgen" indexed="true" stored="false" multiValued="true"/>
+        <field name="text_autocomplete" type="text_autocomplete" indexed="true" stored="true" multiValued="true"/>
 
         <!-- catchall text field that indexes tokens both normally and in reverse for efficient
              leading wildcard queries. -->
@@ -157,5 +166,10 @@
     <copyField source="*_s" dest="text_plain"/>
     <copyField source="*_t_mv" dest="text_plain"/>
     <copyField source="*_s_mv" dest="text_plain"/>
+
+    <copyField source="*_t" dest="text_autocomplete"/>
+    <copyField source="*_s" dest="text_autocomplete"/>
+    <copyField source="*_t_mv" dest="text_autocomplete"/>
+    <copyField source="*_s_mv" dest="text_autocomplete"/>
 
 </schema>

@@ -9,8 +9,6 @@
  */
 class IntegerNet_Solr_Model_Suggestion
 {
-    const ITEMS_PER_PAGE = 5;
-
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
 
@@ -39,17 +37,20 @@ class IntegerNet_Solr_Model_Suggestion
             if (is_null($storeId)) {
                 $storeId = Mage::app()->getStore()->getId();
             }
-            $this->_solrSuggestion = $this->_getResource()->suggest(
+            
+            $startTime = microtime(true);
+            
+            $this->_solrSuggestion = $this->_getResource()->search(
                 $storeId,
-                $this->_getQueryText(),
+                '*',
                 0, // Start item
-                self::ITEMS_PER_PAGE, // Items per page
+                0, // Items per page
                 $this->_getParams($storeId)
             );
-
+            
             if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
 
-                $this->_logSuggestion();
+                $this->_logSuggestion($this->_solrSuggestion, microtime(true) - $startTime);
             }
         }
 
@@ -62,7 +63,15 @@ class IntegerNet_Solr_Model_Suggestion
      */
     protected function _getParams($storeId)
     {
-        $params = array();
+        $params = array(
+            'fq' => 'store_id:' . $storeId,
+            'df' => 'text_autocomplete',
+            'facet' => 'true',
+            'facet.field' => 'text_autocomplete',
+            'facet.sort' => 'count',
+            'facet.limit' => intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions')),
+            'f.text_autocomplete.facet.prefix' => $this->_getQueryText(),
+        );
 
         return $params;
     }
@@ -77,8 +86,10 @@ class IntegerNet_Solr_Model_Suggestion
         return $queryText;
     }
 
-    protected function _logSuggestion()
+    protected function _logSuggestion($result, $time)
     {
-        Mage::log($this->_solrSuggestion, null, 'solr_suggestions.log');
+        if (isset($result->response->docs)) {}
+        Mage::log($result, null, 'solr_suggestions.log');
+        Mage::log('Elapsed time: ' . $time . 's', null, 'solr_suggestions.log');
     }
 }

@@ -47,16 +47,16 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
      */
     public function loadData($printQuery = false, $logQuery = false)
     {
-        $suggestions = (array)$this->_getSolrSuggestion()->spellcheck->suggestions;
-
-        if (!isset(current($suggestions)->suggestion)) {
+        if (!isset($this->_getSolrSuggestion()->facet_counts->facet_fields->text_autocomplete)) {
             return $this;
         }
-        
-        foreach (current($suggestions)->suggestion as $suggestion) {
+
+        $suggestions = (array)$this->_getSolrSuggestion()->facet_counts->facet_fields->text_autocomplete;
+
+        foreach ($suggestions as $suggestion => $numResults) {
             $this->_items[] = new Varien_Object(array(
                 'query_text' => $suggestion,
-                'num_of_results' => '',
+                'num_of_results' => $numResults,
             ));
         }
 
@@ -71,10 +71,7 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
     public function getSize()
     {
         $this->load();
-        if (is_null($this->_totalRecords)) {
-            $this->_totalRecords = $this->_getSolrSuggestion()->spellcheck->suggestions->numFound;
-        }
-        return intval($this->_totalRecords);
+        return sizeof($this->_items);
     }
 
     /**

@@ -21,6 +21,12 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
      */
     public function getSearchwordSuggestions()
     {
+        $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
+
+        if (!$maxNumberSearchwordSuggestions) {
+            return array();
+        }
+        
         $collection = Mage::getModel('integernet_solr/suggestion_collection');
         $query = $this->getQuery();
         $counter = 1;
@@ -34,7 +40,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
                 'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
             )
         );
-        $maxNumberSearchwordSuggestions = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions'));
 
         $titles = array($title);
         foreach ($collection as $item) {
@@ -89,6 +94,11 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
 
     public function getCategorySuggestions()
     {
+        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
+        if (!$maxNumberCategories) {
+            return array();
+        }
+        
         $categoryIds = (array)Mage::getSingleton('integernet_solr/result')->getSolrResult()->facet_counts->facet_fields->category;
 
         $categories = Mage::getResourceModel('catalog/category_collection')
@@ -98,7 +108,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
 
         $categorySuggestions = array();
-        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
         $counter = 0;
         foreach($categoryIds as $categoryId => $numResults) {
             if ($category = $categories->getItemById($categoryId)) {

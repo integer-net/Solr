@@ -22,6 +22,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     protected $_categoryNames = array();
 
+    protected $_initialEnvironmentInfo = null;
+
+    protected $_isEmulated = false;
+
     /**
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean $emptyIndex Whether to truncate the index before refilling it
@@ -261,7 +265,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
         return $isInt;
     }
-    
+
     /**
      * @param Mage_Catalog_Model_Product $product
      * @param Varien_Object $productData
@@ -339,21 +343,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _addResultHtmlToProductData($product, $productData)
     {
         $storeId = $product->getStoreId();
-        $appEmulation = Mage::getSingleton('core/app_emulation');
-        $isEmulated = false;
-        $initialEnvironmentInfo = null;
         if ($this->_currentStoreId != $storeId) {
 
             $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
             Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
             Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
             $this->_currentStoreId = $storeId;
-            $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
-            $isEmulated = true;
+            $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
+            $this->_isEmulated = true;
             Mage::getDesign()->setStore($storeId);
             Mage::getDesign()->setPackageName();
             $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-
             Mage::getDesign()->setTheme($themeName);
         }
 
@@ -371,10 +371,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $block->setTemplate('integernet/solr/result/grid/item.phtml');
             $productData->setData('result_html_grid_nonindex', $block->toHtml());
-        }
-
-        if ($isEmulated && $initialEnvironmentInfo) {
-            $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
         }
     }
 
@@ -608,6 +604,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             } else {
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
+        }
+
+        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
+            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
 
         if (!$emptyIndex && sizeof($idsForDeletion)) {

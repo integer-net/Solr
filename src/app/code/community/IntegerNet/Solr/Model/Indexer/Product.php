@@ -213,12 +213,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             switch ($attribute->getFrontendInput()) {
                 case 'select':
-                    if ($rawValue = $product->getData($attribute->getAttributeCode())) {
+                    $rawValue = $product->getData($attribute->getAttributeCode());
+                    if ($rawValue && $this->_isInteger($rawValue)) {
                         $productData->setData($attribute->getAttributeCode() . '_facet', $rawValue);
                     }
                     break;
                 case 'multiselect':
-                    if ($rawValue = $product->getData($attribute->getAttributeCode())) {
+                    $rawValue = $product->getData($attribute->getAttributeCode());
+                    if ($rawValue && $this->_isInteger($rawValue)) {
                         $productData->setData($attribute->getAttributeCode() . '_facet', explode(',', $rawValue));
                     }
                     break;
@@ -239,6 +241,27 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
     }
 
+    /**
+     * The schema expect for facet attributes integer values
+     *
+     * @param $rawValue
+     * @return bool
+     */
+    protected function _isInteger($rawValue)
+    {
+        $rawValues = explode(',', $rawValue);
+
+        $isInt = true;
+        foreach ($rawValues as $value) {
+            if (!is_numeric($value)) {
+                $isInt = false;
+                break;
+            }
+        }
+
+        return $isInt;
+    }
+    
     /**
      * @param Mage_Catalog_Model_Product $product
      * @param Varien_Object $productData

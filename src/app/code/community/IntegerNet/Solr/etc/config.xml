@@ -75,6 +75,16 @@
                     </review>
                 </observers>
             </catalog_block_product_list_collection>
+
+            <catalog_product_delete_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>catalogProductDeleteAfter</method>
+                    </integernet_solr>
+                </observers>
+            </catalog_product_delete_after>
         </events>
 
         <resources>
@@ -179,6 +189,7 @@
             </server>
             <indexing>
                 <pagesize>1000</pagesize>
+                <delete_documents_before_indexing>1</delete_documents_before_indexing>
             </indexing>
             <fuzzy>
                 <is_active>1</is_active>

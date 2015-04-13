@@ -91,4 +91,16 @@ class IntegerNet_Solr_Model_Observer
             }
         }
     }
+
+    public function catalogProductDeleteAfter(Varien_Event_Observer $observer)
+    {
+        /** @var $indexer Mage_Index_Model_Process */
+        $indexer = Mage::getModel('index/process')->load('integernet_solr', 'indexer_code');
+        if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $product = $observer->getProduct();
+            Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex(array($product->getId()));
+        }
+        
+    }
 }

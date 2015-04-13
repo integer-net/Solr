@@ -59,3 +59,4 @@
 "Custom Price Intervals","Individuelle Preisintervalle"
 "Divide steps by comma, i.e. 10,20,50,100,200,300,400,500","Grenzen durch Komma getrennt, z.B. 10,20,50,100,200,300,400,500"
 "from %s","ab %s"
+"Delete all Solr Index Entries before Reindexing","Alle Solr-Indexeinträge vor Neuindizierung löschen"

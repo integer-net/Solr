@@ -50,7 +50,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            if ($emptyIndex) {
+            if ($emptyIndex && Mage::getStoreConfigFlag('integernet_solr/indexing/delete_documents_before_indexing', $storeId)) {
                 $this->getResource()->deleteAllDocuments($storeId);
             }
 

@@ -64,6 +64,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $this->_indexProductCollection($emptyIndex, $productCollection);
 
             } while ($pageNumber <= $productCollection->getLastPageNumber());
+
+        }
+
+        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
+            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
     }
 
@@ -604,10 +609,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             } else {
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
-        }
-
-        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
 
         if (!$emptyIndex && sizeof($idsForDeletion)) {

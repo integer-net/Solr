@@ -160,9 +160,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _getProductCollection($storeId, $productIds = null)
     {
-        $appEmulation = Mage::getSingleton('core/app_emulation');
-        $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
-
         Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
 
         /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
@@ -195,8 +192,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         Mage::dispatchEvent('integernet_solr_product_collection_load_after', array(
             'collection' => $productCollection
         ));
-
-        $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
 
         return $productCollection;
     }

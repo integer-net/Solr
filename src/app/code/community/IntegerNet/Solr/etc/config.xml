@@ -197,6 +197,7 @@
             </fuzzy>
             <results>
                 <use_html_from_solr>0</use_html_from_solr>
+                <search_operator>AND</search_operator>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>
                 <use_custom_price_intervals>0</use_custom_price_intervals>

@@ -171,6 +171,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getParams($storeId, $fuzzy = true)
     {
         $params = array(
+            'q.op' => Mage::getStoreConfig('integernet_solr/results/search_operator'),
             'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'sort' => $this->_getSortParam(),

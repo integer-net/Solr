@@ -49,47 +49,52 @@ class IntegerNet_Solr_Model_Result
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
-            $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
+            if ($this->_getCurrentSort() != 'position') {
+                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active'));
+            } else {
+                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
 
-            $numberResults = sizeof($result->response->docs);
-            $numberDuplicates = 0;
-            if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
+                $numberResults = sizeof($result->response->docs);
+                $numberDuplicates = 0;
+                if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
 
-                $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
+                    $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
 
-                if ($numberResults < $lastItemNumber) {
+                    if ($numberResults < $lastItemNumber) {
 
-                    $foundProductIds = array();
-                    foreach($result->response->docs as $nonFuzzyDoc) { /** @var Apache_Solr_Document $nonFuzzyDoc */
-                        $field = $nonFuzzyDoc->getField('product_id');
-                        $foundProductIds[] = $field['value'];
-                    }
-
-                    foreach($fuzzyResult->response->docs as $fuzzyDoc) { /** @var Apache_Solr_Document $fuzzyDoc */
-                        $field = $fuzzyDoc->getField('product_id');
-                        if (!in_array($field['value'], $foundProductIds)) {
-                            $result->response->docs[] = $fuzzyDoc;
-                            if (++$numberResults >= $lastItemNumber) {
-                                break;
-                            }
-                        } else {
-                            $numberDuplicates++;
+                        $foundProductIds = array();
+                        foreach($result->response->docs as $nonFuzzyDoc) { /** @var Apache_Solr_Document $nonFuzzyDoc */
+                            $field = $nonFuzzyDoc->getField('product_id');
+                            $foundProductIds[] = $field['value'];
                         }
+
+                        foreach($fuzzyResult->response->docs as $fuzzyDoc) { /** @var Apache_Solr_Document $fuzzyDoc */
+                            $field = $fuzzyDoc->getField('product_id');
+                            if (!in_array($field['value'], $foundProductIds)) {
+                                $result->response->docs[] = $fuzzyDoc;
+                                if (++$numberResults >= $lastItemNumber) {
+                                    break;
+                                }
+                            } else {
+                                $numberDuplicates++;
+                            }
+                        }
+
+                        $result->response->numFound = $result->response->numFound
+                            + $fuzzyResult->response->numFound
+                            - $numberDuplicates;
+                    } else {
+                        $result->response->numFound = max(
+                            $result->response->numFound,
+                            $fuzzyResult->response->numFound
+                        );
                     }
 
-                    $result->response->numFound = $result->response->numFound
-                        + $fuzzyResult->response->numFound
-                        - $numberDuplicates;
-                } else {
-                    $result->response->numFound = max(
-                        $result->response->numFound,
-                        $fuzzyResult->response->numFound
-                    );
+                    $this->_mergeFacetFieldCounts($result, $fuzzyResult);
+                    $this->_mergePriceData($result, $fuzzyResult);
                 }
-
-                $this->_mergeFacetFieldCounts($result, $fuzzyResult);
-                $this->_mergePriceData($result, $fuzzyResult);
             }
+
 
             if ($firstItemNumber > 0) {
                 $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);

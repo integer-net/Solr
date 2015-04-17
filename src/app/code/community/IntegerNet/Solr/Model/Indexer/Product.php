@@ -67,9 +67,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
         }
 
-        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
-        }
+        $this->_stopStoreEmulation();
     }
 
     /**
@@ -345,16 +343,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $storeId = $product->getStoreId();
         if ($this->_currentStoreId != $storeId) {
 
-            $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-            Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-            Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-            $this->_currentStoreId = $storeId;
-            $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-            $this->_isEmulated = true;
-            Mage::getDesign()->setStore($storeId);
-            Mage::getDesign()->setPackageName();
-            $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-            Mage::getDesign()->setTheme($themeName);
+            $this->_emulateStore($storeId);
         }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */
@@ -635,5 +624,30 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $categoryNames[] = $this->_categoryNames[$storeId][$categoryId];
         }
         return $categoryNames;
+    }
+
+    /**
+     * @param int $storeId
+     * @throws Mage_Core_Exception
+     */
+    protected function _emulateStore($storeId)
+    {
+        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
+        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
+        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+        $this->_currentStoreId = $storeId;
+        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
+        $this->_isEmulated = true;
+        Mage::getDesign()->setStore($storeId);
+        Mage::getDesign()->setPackageName();
+        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
+        Mage::getDesign()->setTheme($themeName);
+    }
+
+    protected function _stopStoreEmulation()
+    {
+        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
+            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
+        }
     }
 }

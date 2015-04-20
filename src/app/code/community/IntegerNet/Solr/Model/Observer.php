@@ -6,12 +6,12 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Model_Observer
 {
     /**
      * Add new field "solr_boost" to attribute form
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function adminhtmlCatalogProductAttributeEditPrepareForm(Varien_Event_Observer $observer)
@@ -26,20 +26,20 @@ class IntegerNet_Solr_Model_Observer
             'note'     => Mage::helper('integernet_solr')->__('1 is default, use higher numbers for higher priority.'),
             'class'     => 'validate-number',
         ));
-        
+
         // Set default value
         $field->setValue('1.0000');
     }
 
     /**
      * Add new column "solr_boost" to attribute grid
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function coreBlockAbstractToHtmlBefore(Varien_Event_Observer $observer)
     {
         $block = $observer->getBlock();
-        
+
         if ($block instanceof Mage_Adminhtml_Block_Catalog_Product_Attribute_Grid) {
 
             $block->addColumnAfter('solr_boost', array(
@@ -53,7 +53,7 @@ class IntegerNet_Solr_Model_Observer
 
     /**
      * Check Solr connection on config save
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
@@ -84,12 +84,14 @@ class IntegerNet_Solr_Model_Observer
     {
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
-        
+
         if (Mage::getStoreConfigFlag('integernet_solr/general/is_active') && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
         }
+
+        Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
     }
 
     public function catalogProductDeleteAfter(Varien_Event_Observer $observer)
@@ -101,6 +103,6 @@ class IntegerNet_Solr_Model_Observer
             $product = $observer->getProduct();
             Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex(array($product->getId()));
         }
-        
+
     }
 }

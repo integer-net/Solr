@@ -78,6 +78,8 @@ class IntegerNet_Solr_Model_Observer
         } else {
             Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('integernet_solr')->__('Solr Connection established.'));
         }
+
+        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
     }
 
     public function controllerActionPredispatchCatalogsearchResultIndex(Varien_Event_Observer $observer)

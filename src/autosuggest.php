@@ -7,6 +7,9 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+define('DS', DIRECTORY_SEPARATOR);
+
 class IntegerNet_Solr_Autosuggest
 {
     public function __construct()
@@ -16,11 +19,21 @@ class IntegerNet_Solr_Autosuggest
         }
 
         $storeId = intval($_GET['store_id']);
-        Mage::app()->setCurrentStore($storeId);
 
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
+        $config = $this->_getConfig($storeId);
+
+        if (!class_exists('Mage')) {
+            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Mage.php');
+            Mage::setConfig($config);
+        }
+
+        echo Mage::getStoreConfig('integernet_solr/server/port');
+
+
+        print_r($config);
+/*        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
         Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);*/
     }
     
     public function getHtml()
@@ -29,14 +42,23 @@ class IntegerNet_Solr_Autosuggest
             die('Query not given.');
         }
 
+        return '';
         $block = Mage::app()->getLayout()->createBlock('integernet_solr/autosuggest');
 
         return $block->toHtml();
     }
-}
 
-require_once 'app/Mage.php';
-umask(0);
+    /**
+     * @return IntegerNet_Solr_Autosuggest_Config
+     */
+    protected function _getConfig($storeId)
+    {
+        require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Config.php');
+        return new IntegerNet_Solr_Autosuggest_Config($storeId);
+    }
+
+
+}
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();
 

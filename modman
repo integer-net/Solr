@@ -5,6 +5,7 @@ src/app/design/frontend/rwd/default/template/integernet/*           app/design/f
 src/app/etc/modules/*                                               app/etc/modules/
 src/app/locale/de_DE/*                                              app/locale/de_DE/
 src/lib/Apache/Solr                                                 lib/Apache/Solr
+src/lib/IntegerNet/Solr                                             lib/IntegerNet/Solr
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/
 src/autosuggest.php                                                 autosuggest.php

@@ -26,6 +26,9 @@ class IntegerNet_Solr_Autosuggest
             require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Mage.php');
             class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
             Mage::setConfig($config);
+
+            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Empty.php');
+            class_alias('IntegerNet_Solr_Autosuggest_Empty', 'Mage_Core_Model_Resource_Abstract');
         }
 
         echo Mage::getStoreConfig('integernet_solr/server/port');
@@ -40,6 +43,11 @@ class IntegerNet_Solr_Autosuggest
         if (!isset($_GET['q'])) {
             die('Query not given.');
         }
+
+        require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Result.php');
+        $block = new IntegerNet_Solr_Autosuggest_Result();
+
+        return $block->getProductSuggestions();
 
         return '';
         $block = Mage::app()->getLayout()->createBlock('integernet_solr/autosuggest');
@@ -61,4 +69,4 @@ class IntegerNet_Solr_Autosuggest
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();
 
-echo $autosuggest->getHtml();
+print_r($autosuggest->getHtml());

@@ -164,7 +164,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getToolbarBlock()
     {
         if (is_null($this->_toolbarBlock)) {
-            $this->_toolbarBlock = Mage::app()->getLayout()->getBlock('product_list_toolbar');
+            if (!Mage::app()->getLayout()) {
+                $this->_toolbarBlock = false;
+            } else {
+                $this->_toolbarBlock = Mage::app()->getLayout()->getBlock('product_list_toolbar');
+            }
         }
         return $this->_toolbarBlock;
     }

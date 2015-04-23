@@ -18,9 +18,17 @@ class IntegerNet_Solr_Autosuggest_Config
         $this->_storeId = $storeId;
     }
 
+    public function getStoreId()
+    {
+        return $this->_storeId;
+    }
+
     public function getConfigData($path)
     {
-        $config = $this->_config;
+        if (!isset($this->_config[$this->_storeId])) {
+            throw new Exception('Config Data for store not found.');
+        }
+        $config = $this->_config[$this->_storeId];
         foreach(explode('/', $path) as $pathPart) {
             if (!isset($config[$pathPart])) {
                 return null;
@@ -31,22 +39,37 @@ class IntegerNet_Solr_Autosuggest_Config
         return $config;
     }
 
+    public function getModelClassname($identifier)
+    {
+        if (isset($this->_config['model'][$identifier])) {
+            return $this->_config['model'][$identifier];
+        }
+        return '';
+    }
+
+    public function getResourceModelClassname($identifier)
+    {
+        if (isset($this->_config['resource_model'][$identifier])) {
+            return $this->_config['resource_model'][$identifier];
+        }
+        return '';
+    }
+
     /**
      * @param $storeId
      * @return bool|mixed
      */
     public function getConfigAsArray($storeId)
     {
-        if (!($config = $this->_getConfigFromFile($storeId))) {
+        if (!($config = $this->_getConfigFromFile())) {
             $this->_createConfigFile($storeId);
-            $config = Mage::getStoreConfig('integernet_solr', $storeId);
+            $config = $this->_getConfigFromFile();
         }
-        $config = array('integernet_solr' => $config);
 
         return $config;
     }
 
-    protected function _getConfigFromFile($storeId)
+    protected function _getConfigFromFile()
     {
         $config = file_get_contents('var' . DS . 'integernet_solr' . DS . 'config.txt');
         if ($config === false) {
@@ -58,11 +81,12 @@ class IntegerNet_Solr_Autosuggest_Config
             return false;
         }
 
-        if (!isset($config[$storeId])) {
-            return false;
-        }
+        return $config;
+    }
 
-        return $config[$storeId];
+    protected function _getModelConfig()
+    {
+
     }
 
     /**

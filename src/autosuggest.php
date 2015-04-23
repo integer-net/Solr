@@ -24,13 +24,12 @@ class IntegerNet_Solr_Autosuggest
 
         if (!class_exists('Mage')) {
             require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Mage.php');
+            class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
             Mage::setConfig($config);
         }
 
         echo Mage::getStoreConfig('integernet_solr/server/port');
 
-
-        print_r($config);
 /*        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
         Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
         Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);*/

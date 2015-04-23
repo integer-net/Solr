@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-final class Mage
+final class IntegerNet_Solr_Autosuggest_Mage
 {
     /** @var IntegerNet_Solr_Autosuggest_Config $_config */
     static private $_config;

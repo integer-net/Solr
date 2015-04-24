@@ -28,9 +28,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
-     * @param boolean $emptyIndex Whether to truncate the index before refilling it
+     * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
+     * @param null|Mage_Core_Model_Store $restrictToStore
      */
-    public function reindex($productIds = null, $emptyIndex = false)
+    public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
         $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
         if ($pageSize <= 0) {
@@ -42,6 +43,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $storeId = $store->getId();
 
+            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+                continue;
+            }
+
             if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
                 continue;
             }
@@ -50,7 +55,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            if ($emptyIndex && Mage::getStoreConfigFlag('integernet_solr/indexing/delete_documents_before_indexing', $storeId)) {
+            if (
+                ($emptyIndex && Mage::getStoreConfigFlag('integernet_solr/indexing/delete_documents_before_indexing', $storeId))
+                || $emptyIndex === 'force'
+            ) {
                 $this->getResource()->deleteAllDocuments($storeId);
             }
 

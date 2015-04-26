@@ -55,8 +55,6 @@ class IntegerNet_Solr_Autosuggest
         require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Config.php');
         return new IntegerNet_Solr_Autosuggest_Config($storeId);
     }
-
-
 }
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();

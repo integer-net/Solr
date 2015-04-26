@@ -289,17 +289,13 @@ class IntegerNet_Solr_Autosuggest_Result
      *
      * @return string
      */
-    protected function _toHtml()
+    public function toHtml()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
-            return parent::_toHtml();
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return '';
         }
 
         $html = '';
-
-        if (!$this->_beforeToHtml()) {
-            return $html;
-        }
 
         $suggestData = $this->getSuggestData();
         if (!($count = count($suggestData))) {

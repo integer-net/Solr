@@ -8,7 +8,31 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-require_once ('lib' . DS . 'Varien' . DS . 'Object.php');
+define('PS', PATH_SEPARATOR);
+define('BP', dirname(dirname(__FILE__)) . DS . '..' . DS . '..' . DS . '..');
+
+if (defined('COMPILER_INCLUDE_PATH')) {
+    $appPath = COMPILER_INCLUDE_PATH;
+    set_include_path($appPath . PS . get_include_path());
+    include_once COMPILER_INCLUDE_PATH . DS . "Mage_Core_functions.php";
+    include_once COMPILER_INCLUDE_PATH . DS . "Varien_Autoload.php";
+} else {
+    /**
+     * Set include path
+     */
+    $paths = array();
+    $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'local';
+    $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'community';
+    $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'core';
+    $paths[] = BP . DS . 'lib';
+
+    $appPath = implode(PS, $paths);
+    set_include_path($appPath . PS . get_include_path());
+    include_once "Mage/Core/functions.php";
+    include_once "Varien/Autoload.php";
+}
+
+Varien_Autoload::register();
 
 /**
  * This class is a low weight replacement for the "Mage" class in autosuggest calls
@@ -79,24 +103,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
     public static function getModel($modelClass = '', $arguments = array())
     {
         $className = self::$_config->getModelClassname($modelClass);
-        if ($className) {
-            $filename = 'app' . DS . 'code' . DS . 'local' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-            $filename = 'app' . DS . 'code' . DS . 'community' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-            $filename = 'app' . DS . 'code' . DS . 'core' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-        }
-        return null;
+        return new $className;
     }
 
     /**
@@ -110,24 +117,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
     public static function getResourceModel($modelClass = '', $arguments = array())
     {
         $className = self::$_config->getResourceModelClassname($modelClass);
-        if ($className) {
-            $filename = 'app' . DS . 'code' . DS . 'local' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-            $filename = 'app' . DS . 'code' . DS . 'community' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-            $filename = 'app' . DS . 'code' . DS . 'core' . DS . implode(DS, explode('_', $className)) . '.php';
-            if (is_file($filename)) {
-                require_once($filename);
-                return new $className;
-            }
-        }
-        return null;
+        return new $className;
     }
 
         /**

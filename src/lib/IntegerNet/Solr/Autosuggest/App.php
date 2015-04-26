@@ -26,7 +26,6 @@ final class IntegerNet_Solr_Autosuggest_App
     public function getStore()
     {
         if (is_null($this->_store)) {
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Store.php');
             $this->_store = new IntegerNet_Solr_Autosuggest_Store($this->_storeId);
         }
 

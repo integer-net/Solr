@@ -20,7 +20,6 @@ final class IntegerNet_Solr_Autosuggest_Helper
     public function getQuery()
     {
         if (is_null($this->_query)) {
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Query.php');
             $this->_query = new IntegerNet_Solr_Autosuggest_Query();
         }
 

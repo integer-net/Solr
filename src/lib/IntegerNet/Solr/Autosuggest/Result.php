@@ -18,6 +18,7 @@ class IntegerNet_Solr_Autosuggest_Result
 
     /**
      * @return array
+     * @todo adjust urls
      */
     public function getSearchwordSuggestions()
     {
@@ -37,7 +38,8 @@ class IntegerNet_Solr_Autosuggest_Result
                 'title' => $title,
                 'row_class' => 'odd',
                 'num_of_results' => '',
-                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
+                'url' => 'test',
+                //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
             )
         );
 
@@ -60,7 +62,8 @@ class IntegerNet_Solr_Autosuggest_Result
                 'title' => $title,
                 'row_class' => $counter % 2 ? 'odd' : 'even',
                 'num_of_results' => $item->getNumResults(),
-                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($item->getQueryText()))))
+                'url' => 'test'
+                //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($item->getQueryText()))))
             );
 
             if ($counter == 1) {
@@ -94,6 +97,7 @@ class IntegerNet_Solr_Autosuggest_Result
 
     public function getCategorySuggestions()
     {
+        return array();
         $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
         if (!$maxNumberCategories) {
             return array();
@@ -130,9 +134,11 @@ class IntegerNet_Solr_Autosuggest_Result
 
     /**
      * @return array
+     * @todo adjust
      */
     public function getAttributeSuggestions()
     {
+        return array();
         $attributesConfig = @unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
 
         if (!$attributesConfig) {
@@ -214,7 +220,39 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     public function getQuery()
     {
-        return $this->escapeHtml($this->helper('catalogsearch')->getQueryText());
+        return $this->escapeHtml(Mage::helper('catalogsearch')->getQueryText());
+    }
+
+    /**
+     * Escape html entities
+     *
+     * @param   mixed $data
+     * @param   array $allowedTags
+     * @return  mixed
+     */
+    public function escapeHtml($data, $allowedTags = null)
+    {
+        if (is_array($data)) {
+            $result = array();
+            foreach ($data as $item) {
+                $result[] = $this->escapeHtml($item);
+            }
+        } else {
+            // process single item
+            if (strlen($data)) {
+                if (is_array($allowedTags) and !empty($allowedTags)) {
+                    $allowed = implode('|', $allowedTags);
+                    $result = preg_replace('/<([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)>/si', '##$1$2$3##', $data);
+                    $result = htmlspecialchars($result, ENT_COMPAT, 'UTF-8', false);
+                    $result = preg_replace('/##([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)##/si', '<$1$2$3>', $result);
+                } else {
+                    $result = htmlspecialchars($data, ENT_COMPAT, 'UTF-8', false);
+                }
+            } else {
+                $result = $data;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -289,45 +327,22 @@ class IntegerNet_Solr_Autosuggest_Result
      *
      * @return string
      */
-    public function toHtml()
+    public function printHtml()
     {
         if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
             return '';
         }
 
-        $html = '';
+        include(Mage::getStoreConfig('template_filename'));
 
-        $suggestData = $this->getSuggestData();
-        if (!($count = count($suggestData))) {
-            return $html;
-        }
-
-        $count--;
-
-        $html = '<ul><li style="display:none"></li>';
-        foreach ($suggestData as $index => $item) {
-            if ($index == 0) {
-                $item['row_class'] .= ' first';
-            }
-
-            if ($index == $count) {
-                $item['row_class'] .= ' last';
-            }
-
-            $html .=  '<li title="'.$this->escapeHtml($item['title']).'" class="'.$item['row_class'].'">'
-                . '<span class="amount">'.$item['num_of_results'].'</span>'.$this->escapeHtml($item['title']).'</li>';
-        }
-
-        $html.= '</ul>';
-
-        return $html;
+        return '';
     }
 
     public function getSuggestData()
     {
         if (!$this->_suggestData) {
-            $collection = $this->helper('catalogsearch')->getSuggestCollection();
-            $query = $this->helper('catalogsearch')->getQueryText();
+            $collection = Mage::helper('catalogsearch')->getSuggestCollection();
+            $query = Mage::helper('catalogsearch')->getQueryText();
             $counter = 0;
             $data = array();
             foreach ($collection as $item) {
@@ -347,5 +362,10 @@ class IntegerNet_Solr_Autosuggest_Result
             $this->_suggestData = $data;
         }
         return $this->_suggestData;
+    }
+
+    public function __($text)
+    {
+        return $text;
     }
 }

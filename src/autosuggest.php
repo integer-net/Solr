@@ -8,8 +8,6 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-define('DS', DIRECTORY_SEPARATOR);
-
 class IntegerNet_Solr_Autosuggest
 {
     public function __construct()
@@ -23,11 +21,11 @@ class IntegerNet_Solr_Autosuggest
         $config = $this->_getConfig($storeId);
 
         if (!class_exists('Mage')) {
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Mage.php');
+            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Mage.php');
             class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
             Mage::setConfig($config);
 
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Empty.php');
+            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Empty.php');
             class_alias('IntegerNet_Solr_Autosuggest_Empty', 'Mage_Core_Model_Resource_Abstract');
         }
 
@@ -36,7 +34,7 @@ class IntegerNet_Solr_Autosuggest
         Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);*/
     }
     
-    public function getHtml()
+    public function printHtml()
     {
         if (!isset($_GET['q'])) {
             die('Query not given.');
@@ -44,7 +42,7 @@ class IntegerNet_Solr_Autosuggest
 
         $block = new IntegerNet_Solr_Autosuggest_Result();
 
-        return $block->getProductSuggestions();
+        return $block->printHtml();
     }
 
     /**
@@ -52,11 +50,11 @@ class IntegerNet_Solr_Autosuggest
      */
     protected function _getConfig($storeId)
     {
-        require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Config.php');
+        require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Config.php');
         return new IntegerNet_Solr_Autosuggest_Config($storeId);
     }
 }
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();
 
-print_r($autosuggest->getHtml());
+$autosuggest->printHtml();

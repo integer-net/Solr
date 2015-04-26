@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
+define('DS', DIRECTORY_SEPARATOR);
 define('PS', PATH_SEPARATOR);
 define('BP', dirname(dirname(__FILE__)) . DS . '..' . DS . '..' . DS . '..');
 
@@ -103,6 +104,9 @@ final class IntegerNet_Solr_Autosuggest_Mage
     public static function getModel($modelClass = '', $arguments = array())
     {
         $className = self::$_config->getModelClassname($modelClass);
+        if (!$className) {
+            throw new Exception('Class for alias ' . $modelClass . ' not found');
+        }
         return new $className;
     }
 
@@ -117,6 +121,9 @@ final class IntegerNet_Solr_Autosuggest_Mage
     public static function getResourceModel($modelClass = '', $arguments = array())
     {
         $className = self::$_config->getResourceModelClassname($modelClass);
+        if (!$className) {
+            throw new Exception('Class for alias ' . $modelClass . ' not found');
+        }
         return new $className;
     }
 

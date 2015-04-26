@@ -71,7 +71,7 @@ final class IntegerNet_Solr_Autosuggest_Config
 
     protected function _getConfigFromFile()
     {
-        $config = file_get_contents('var' . DS . 'integernet_solr' . DS . 'config.txt');
+        $config = @file_get_contents('var' . DIRECTORY_SEPARATOR . 'integernet_solr' . DIRECTORY_SEPARATOR . 'config.txt');
         if ($config === false) {
             return false;
         }
@@ -94,7 +94,7 @@ final class IntegerNet_Solr_Autosuggest_Config
      */
     protected function _createConfigFile($storeId)
     {
-        require_once 'app' . DS . 'Mage.php';
+        require_once 'app' . DIRECTORY_SEPARATOR . 'Mage.php';
         umask(0);
         Mage::app()->setCurrentStore($storeId);
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();

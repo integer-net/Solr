@@ -25,36 +25,18 @@ final class IntegerNet_Solr_Autosuggest_Helper
 
         return $this->_query;
     }
-
+    
     /**
      * @return Mage_Catalog_Model_Entity_Attribute[]
-     * @todo adjust
      */
     public function getFilterableInSearchAttributes()
     {
-        return array();
-
-        /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-        return Mage::getResourceModel('catalog/product_attribute_collection')
-            ->addIsFilterableInSearchFilter()
-            ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC)
-            ;
-    }
-
-    /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
-     * @todo adjust
-     */
-    public function getSearchableAttributes()
-    {
-        return array();
-
-        /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-        return Mage::getResourceModel('catalog/product_attribute_collection')
-            ->addIsSearchableFilter()
-            ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
+        $attributes = array();
+        foreach(Mage::getStoreConfig('attribute') as $attributeCode => $attributeConfig) {
+            $attributes[$attributeCode] = new IntegerNet_Solr_Autosuggest_Attribute($attributeConfig);
+        }
+        
+        return $attributes;
     }
 
     /**

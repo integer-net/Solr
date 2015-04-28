@@ -36,8 +36,21 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         $config = array();
         foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
             $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr', $store);
-            $config[$store->getId()]['template_filename'] = $this->getTemplateFile($store->getId());
+            $templateFile = $this->getTemplateFile($store->getId());
+            $config[$store->getId()]['template_filename'] = $templateFile;
+            $store->setConfig('template_filename', $templateFile);
 
+            foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
+                $options = array();
+                foreach($attribute->getSource()->getAllOptions(false) as $option) {
+                    $options[$option['value']] = $option['label'];
+                }
+                $config[$store->getId()]['attribute'][$attribute->getAttributeCode()] = array(
+                    'attribute_code' => $attribute->getAttributeCode(),
+                    'label' => $attribute->getStoreLabel(),
+                    'options' => $options,
+                );
+            }
         }
 
         foreach($this->_modelIdentifiers as $identifier) {
@@ -47,7 +60,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         foreach($this->_resourceModelIdentifiers as $identifier) {
             $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
         }
-
+        
         $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'config.txt';
         file_put_contents($filename, serialize($config));
     }

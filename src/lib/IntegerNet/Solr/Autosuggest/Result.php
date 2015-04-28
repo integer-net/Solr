@@ -138,7 +138,6 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     public function getAttributeSuggestions()
     {
-        return array();
         $attributesConfig = @unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
 
         if (!$attributesConfig) {
@@ -161,7 +160,8 @@ class IntegerNet_Solr_Autosuggest_Result
                     'row_class' => '',
                     'option_id' => $optionId,
                     'num_of_results' => $numResults,
-                    'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
+                    'url' => 'Test',
+                    //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
                 );
 
                 if (++$counter >= $maxNumberAttributeValues && $maxNumberAttributeValues > 0) {
@@ -180,9 +180,8 @@ class IntegerNet_Solr_Autosuggest_Result
     public function getAttribute($attributeCode)
     {
         if (!isset($this->_attributes[$attributeCode])) {
-            $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
-            $attribute->setStoreId(Mage::app()->getStore()->getId());
-            $this->_attributes[$attributeCode] = $attribute;
+            $this->_attributes[$attributeCode] = 
+                new IntegerNet_Solr_Autosuggest_Attribute(Mage::getStoreConfig('attribute/' . $attributeCode));
         }
 
         return $this->_attributes[$attributeCode];
@@ -323,9 +322,6 @@ class IntegerNet_Solr_Autosuggest_Result
     protected $_suggestData = null;
 
     /**
-     * Fallback if solr is deactivated
-     *
-     * @return string
      */
     public function printHtml()
     {
@@ -334,8 +330,6 @@ class IntegerNet_Solr_Autosuggest_Result
         }
 
         include(Mage::getStoreConfig('template_filename'));
-
-        return '';
     }
 
     public function getSuggestData()

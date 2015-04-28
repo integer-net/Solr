@@ -369,23 +369,6 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
-     * @return array
-     */
-    protected function _getSearchFieldCodes()
-    {
-        $codes = array('category');
-        foreach(Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
-            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
-            $solrBoost = floatval($attribute->getSolrBoost());
-            if ($solrBoost != 1) {
-                $fieldName .= '^' . $solrBoost;
-            }
-            $codes[] = $fieldName;
-        }
-        return implode(' ', $codes);
-    }
-
-    /**
      * @return string
      */
     protected function _getQueryText($allowFuzzy = true)

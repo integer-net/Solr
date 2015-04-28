@@ -1,0 +1,37 @@
+<?php
+/**
+ * integer_net Magento Module
+ *
+ * @category   IntegerNet
+ * @package    IntegerNet_Solr
+ * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Andreas von Studnitz <avs@integer-net.de>
+ */
+class IntegerNet_Solr_Autosuggest_Attribute
+{
+    protected $_attributeConfig = null;
+    protected $_source = null;
+    
+    public function __construct($attributeConfig)
+    {
+        $this->_attributeConfig = $attributeConfig;
+    }
+    
+    public function getAttributeCode()
+    {
+        return $this->_attributeConfig['attribute_code'];
+    }
+    
+    public function getStoreLabel()
+    {
+        return $this->_attributeConfig['label'];
+    }
+    
+    public function getSource()
+    {
+        if (is_null($this->_source)) {
+            $this->_source = new IntegerNet_Solr_Autosuggest_Source($this->_attributeConfig['options']);
+        }
+        return $this->_source;
+    }
+}

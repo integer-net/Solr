@@ -17,8 +17,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     protected $_resourceModelIdentifiers = array(
         'integernet_solr/solr',
-        'catalog/category_collection',
-        'catalog/product_attribute_collection',
     );
 
     public function getTemplate()
@@ -35,22 +33,18 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     {
         $config = array();
         foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
-            $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr', $store);
+            
+            $this->_emulateStore($store->getId());
+            
+            $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr');
+            
             $templateFile = $this->getTemplateFile($store->getId());
             $config[$store->getId()]['template_filename'] = $templateFile;
             $store->setConfig('template_filename', $templateFile);
 
-            foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
-                $options = array();
-                foreach($attribute->getSource()->getAllOptions(false) as $option) {
-                    $options[$option['value']] = $option['label'];
-                }
-                $config[$store->getId()]['attribute'][$attribute->getAttributeCode()] = array(
-                    'attribute_code' => $attribute->getAttributeCode(),
-                    'label' => $attribute->getStoreLabel(),
-                    'options' => $options,
-                );
-            }
+            $this->_addAttributeData($config, $store);
+            
+            $this->_stopStoreEmulation();
         }
 
         foreach($this->_modelIdentifiers as $identifier) {
@@ -73,7 +67,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function getTemplateFile($storeId)
     {
-        $this->_emulateStore($storeId);
         $params = array(
             '_relative' => true,
             '_area' => 'frontend',
@@ -90,8 +83,38 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         $targetFilename = $targetDirname . DS . 'autosuggest.phtml';
         file_put_contents($targetFilename, $templateContents);
 
-        $this->_stopStoreEmulation();
         return $targetFilename;
+    }
+
+    /**
+     * @param array $config
+     * @param Mage_Core_Model_Store $store
+     * @return array
+     */
+    protected function _addAttributeData(&$config, $store)
+    {
+        $autosuggestAttributeConfig = unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
+        $allowedAttributeCodes = array();
+        foreach ($autosuggestAttributeConfig as $row) {
+            $allowedAttributeCodes[] = $row['attribute_code'];
+        }
+
+        foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
+            if (!in_array($attribute->getAttributeCode(), $allowedAttributeCodes)) {
+                continue;
+            }
+            $options = array();
+            foreach ($attribute->getSource()->getAllOptions(false) as $option) {
+                $options[$option['value']] = $option['label'];
+            }
+            $config[$store->getId()]['attribute'][$attribute->getAttributeCode()] = array(
+                'attribute_code' => $attribute->getAttributeCode(),
+                'label' => $attribute->getStoreLabel(),
+                'options' => $options,
+            );
+        }
+
+        $store->setConfig('attribute', $config[$store->getId()]['attribute']);
     }
 
     /**

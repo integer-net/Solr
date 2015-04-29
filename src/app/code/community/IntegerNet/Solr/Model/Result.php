@@ -49,14 +49,19 @@ class IntegerNet_Solr_Model_Result
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
+            if (Mage::registry('is_autosuggest')) {
+                $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+            } else {
+                $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+            }
             if ($this->_getCurrentSort() != 'position') {
-                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active'));
+                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
             } else {
                 $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
 
                 $numberResults = sizeof($result->response->docs);
                 $numberDuplicates = 0;
-                if (Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
+                if ($isFuzzyActive) {
 
                     $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
 
@@ -378,8 +383,15 @@ class IntegerNet_Solr_Model_Result
         if ($query->getSynonymFor()) {
             $queryText = $query->getSynonymFor();
         }
-        if ($allowFuzzy && Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active')) {
-            $queryText .= '~' . floatval(Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity'));
+        if (Mage::registry('is_autosuggest')) {
+            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
+        } else {
+            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+        }
+        if ($allowFuzzy && $isFuzzyActive) {
+            $queryText .= '~' . floatval($sensitivity);
         } else {
             $queryText = 'text_plain:' . $queryText;
         }

@@ -11,9 +11,9 @@ class IntegerNet_Solr_Autosuggest_Result
 {
     protected $_attributes = array();
 
-    protected function _construct()
+    public function __construct()
     {
-        $this->setTemplate('integernet/solr/autosuggest.phtml');
+        Mage::register('is_autosuggest', true);
     }
 
     /**

@@ -113,8 +113,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
                 'options' => $options,
             );
         }
-
-        $store->setConfig('attribute', $config[$store->getId()]['attribute']);
     }
 
     /**

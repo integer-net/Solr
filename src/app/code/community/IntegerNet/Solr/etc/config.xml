@@ -182,7 +182,7 @@
         <integernet_solr>
             <general>
                 <is_active>1</is_active>
-                <log>1</log>
+                <log>0</log>
             </general>
             <server>
                 <http_method>filegetcontents</http_method>
@@ -193,7 +193,9 @@
             </indexing>
             <fuzzy>
                 <is_active>1</is_active>
+                <is_active_autosuggest>1</is_active_autosuggest>
                 <sensitivity>0.7</sensitivity>
+                <sensitivity_autosuggest>0.7</sensitivity_autosuggest>
             </fuzzy>
             <results>
                 <use_html_from_solr>0</use_html_from_solr>

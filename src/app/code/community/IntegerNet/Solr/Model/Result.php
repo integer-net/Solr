@@ -49,7 +49,7 @@ class IntegerNet_Solr_Model_Result
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
-            if (Mage::registry('is_autosuggest')) {
+            if ($this->_isAutosuggest()) {
                 $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
             } else {
                 $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
@@ -187,44 +187,48 @@ class IntegerNet_Solr_Model_Result
         $params = array(
             'q.op' => Mage::getStoreConfig('integernet_solr/results/search_operator'),
             'fq' => $this->_getFilterQuery($storeId),
-            'fl' => 'result_html_list_nonindex,result_html_grid_nonindex,result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
+            'fl' => 'result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'sort' => $this->_getSortParam(),
             'facet' => 'true',
             'facet.sort' => 'true',
             'facet.mincount' => '1',
             'facet.field' => $this->_getFacetFieldCodes(),
-            'facet.interval' => 'price_f',
-            'stats' => 'true',
-            'stats.field' => 'price_f',
             'defType' => 'edismax',
         );
         
-        if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
-            && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
-            $params['facet.range'] = 'price_f';
-            $params['f.price_f.facet.range.start'] = 0;
-            $params['f.price_f.facet.range.end'] = $maxPrice;
-            $params['f.price_f.facet.range.gap'] = $priceStepsize;
-        }
+        if (!$this->_isAutosuggest()) {
+            $params['fl'] = 'result_html_list_nonindex,result_html_grid_nonindex,score,sku_s,name_s,product_id';
+            $params['facet.interval'] = 'price_f';
+            $params['stats'] = 'true';
+            $params['stats.field'] = 'price_f';
 
-        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
-            && ($customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals'))) {
-            $params['f.price_f.facet.interval.set'] = array();
-            $lowerBorder = 0;
-            foreach(explode(',', $customPriceIntervals) as $upperBorder) {
-                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
-                $lowerBorder = $upperBorder;
+            if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
+                && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+                $params['facet.range'] = 'price_f';
+                $params['f.price_f.facet.range.start'] = 0;
+                $params['f.price_f.facet.range.end'] = $maxPrice;
+                $params['f.price_f.facet.range.gap'] = $priceStepsize;
             }
-            $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
-        } else if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
-            && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
-            $params['f.price_f.facet.interval.set'] = array();
-            $lowerBorder = 0;
-            for ($upperBorder = $priceStepsize; $upperBorder <= $maxPrice; $upperBorder += $priceStepsize) {
-                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
-                $lowerBorder = $upperBorder;
+
+            if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
+                && ($customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals'))) {
+                $params['f.price_f.facet.interval.set'] = array();
+                $lowerBorder = 0;
+                foreach(explode(',', $customPriceIntervals) as $upperBorder) {
+                    $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
+                    $lowerBorder = $upperBorder;
+                }
+                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
+            } else if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
+                && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+                $params['f.price_f.facet.interval.set'] = array();
+                $lowerBorder = 0;
+                for ($upperBorder = $priceStepsize; $upperBorder <= $maxPrice; $upperBorder += $priceStepsize) {
+                    $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
+                    $lowerBorder = $upperBorder;
+                }
+                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
             }
-            $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
         }
         
         if (!$fuzzy) {
@@ -383,7 +387,7 @@ class IntegerNet_Solr_Model_Result
         if ($query->getSynonymFor()) {
             $queryText = $query->getSynonymFor();
         }
-        if (Mage::registry('is_autosuggest')) {
+        if ($this->_isAutosuggest()) {
             $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
             $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
         } else {
@@ -574,5 +578,13 @@ class IntegerNet_Solr_Model_Result
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));
 
         return $result;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function _isAutosuggest()
+    {
+        return Mage::registry('is_autosuggest');
     }
 }

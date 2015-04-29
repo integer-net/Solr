@@ -18,7 +18,6 @@ class IntegerNet_Solr_Autosuggest_Result
 
     /**
      * @return array
-     * @todo adjust urls
      */
     public function getSearchwordSuggestions()
     {
@@ -132,7 +131,6 @@ class IntegerNet_Solr_Autosuggest_Result
 
     /**
      * @return array
-     * @todo adjust
      */
     public function getAttributeSuggestions()
     {
@@ -177,8 +175,14 @@ class IntegerNet_Solr_Autosuggest_Result
     public function getAttribute($attributeCode)
     {
         if (!isset($this->_attributes[$attributeCode])) {
-            $this->_attributes[$attributeCode] = 
-                new IntegerNet_Solr_Autosuggest_Attribute(Mage::getStoreConfig('attribute/' . $attributeCode));
+            if (Mage::app() instanceof Mage_Core_Model_App) {
+                $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+                $attribute->setStoreId(Mage::app()->getStore()->getId());
+                $this->_attributes[$attributeCode] = $attribute;
+            } else {
+                $this->_attributes[$attributeCode] =
+                    new IntegerNet_Solr_Autosuggest_Attribute(Mage::getStoreConfig('attribute/' . $attributeCode));
+            }
         }
 
         return $this->_attributes[$attributeCode];

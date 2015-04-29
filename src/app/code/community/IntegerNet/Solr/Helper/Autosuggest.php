@@ -41,6 +41,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $templateFile = $this->getTemplateFile($store->getId());
             $config[$store->getId()]['template_filename'] = $templateFile;
             $store->setConfig('template_filename', $templateFile);
+            $config[$store->getId()]['base_url'] = Mage::getUrl();
 
             $this->_addAttributeData($config, $store);
             

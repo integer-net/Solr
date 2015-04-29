@@ -38,8 +38,7 @@ class IntegerNet_Solr_Autosuggest_Result
                 'title' => $title,
                 'row_class' => 'odd',
                 'num_of_results' => '',
-                'url' => 'test',
-                //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
+                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($query))))
             )
         );
 
@@ -62,8 +61,7 @@ class IntegerNet_Solr_Autosuggest_Result
                 'title' => $title,
                 'row_class' => $counter % 2 ? 'odd' : 'even',
                 'num_of_results' => $item->getNumResults(),
-                'url' => 'test'
-                //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($item->getQueryText()))))
+                'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($item->getQueryText()))))
             );
 
             if ($counter == 1) {
@@ -160,8 +158,7 @@ class IntegerNet_Solr_Autosuggest_Result
                     'row_class' => '',
                     'option_id' => $optionId,
                     'num_of_results' => $numResults,
-                    'url' => 'Test',
-                    //'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
+                    'url' => Mage::getUrl('catalogsearch/result', array('_query' => array('q' => $this->escapeHtml($this->getQuery()), $attributeCode => $optionId))),
                 );
 
                 if (++$counter >= $maxNumberAttributeValues && $maxNumberAttributeValues > 0) {

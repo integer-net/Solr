@@ -100,6 +100,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
      * @param   string $modelClass
      * @param   array|object $arguments
      * @return  Mage_Core_Model_Abstract|false
+     * @throws  Exception
      */
     public static function getModel($modelClass = '', $arguments = array())
     {
@@ -117,6 +118,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
      * @param   string $modelClass
      * @param   array|object $arguments
      * @return  Mage_Core_Model_Abstract|false
+     * @throws   Exception
      */
     public static function getResourceModel($modelClass = '', $arguments = array())
     {
@@ -149,7 +151,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
      * @param string $key
      * @param mixed $value
      * @param bool $graceful
-     * @throws Mage_Core_Exception
+     * @throws Exception
      */
     public static function register($key, $value, $graceful = false)
     {
@@ -157,7 +159,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
             if ($graceful) {
                 return;
             }
-            self::throwException('Mage registry key "'.$key.'" already exists');
+            throw new Exception('Mage registry key "'.$key.'" already exists');
         }
         self::$_registry[$key] = $value;
     }
@@ -236,19 +238,28 @@ final class IntegerNet_Solr_Autosuggest_Mage
         }
     }
 
+    /**
+     * Get lightweight app object for autosuggest
+     * 
+     * @return IntegerNet_Solr_Autosuggest_App
+     */
     public static function app()
     {
         if (is_null(self::$_app)) {
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'App.php');
             self::$_app = new IntegerNet_Solr_Autosuggest_App(self::$_config->getStoreId());
         }
         return self::$_app;
     }
 
+    /**
+     * Get lightweight general helper mock for autosuggest
+     * 
+     * @param string $identifier
+     * @return IntegerNet_Solr_Autosuggest_Helper
+     */
     public static function helper($identifier)
     {
         if (is_null(self::$_helper)) {
-            require_once('lib' . DS . 'IntegerNet' . DS . 'Solr' . DS . 'Autosuggest' . DS . 'Helper.php');
             self::$_helper = new IntegerNet_Solr_Autosuggest_Helper();
         }
         return self::$_helper;
@@ -257,9 +268,36 @@ final class IntegerNet_Solr_Autosuggest_Mage
     /**
      * @param string $name
      * @param array $data
-     * @return Mage_Core_Model_App
      */
     public static function dispatchEvent($name, array $data = array())
     {
+    }
+
+    /**
+     * Generate url by route and parameters
+     *
+     * @param   string $route
+     * @param   array $params
+     * @return  string
+     */
+    public static function getUrl($route = '', $params = array())
+    {
+        $url = self::getStoreConfig('base_url');
+        $url = str_replace('autosuggest.php', 'index.php', $url);
+        $url .= $route;
+        $isFirstParam = true;
+        if (isset($params['_query']) && is_array($params['_query'])) {
+            foreach($params['_query'] as $key => $value) {
+                if ($isFirstParam) {
+                    $url .= '?';
+                    $isFirstParam = false;
+                } else {
+                    $url .= '&';
+                }
+                $url .= $key . '=' . urlencode($value);
+            }
+        }
+        
+        return $url;
     }
 }

@@ -201,46 +201,36 @@ final class IntegerNet_Solr_Autosuggest_Mage
      */
     public static function log($message, $level = null, $file = '', $forceLog = false)
     {
-        try {
-            $logActive = self::getStoreConfig('dev/log/active');
-            if (empty($file)) {
-                $file = self::getStoreConfig('dev/log/file');
-            }
-        }
-        catch (Exception $e) {
-            $logActive = true;
-        }
-
-        if (!$logActive && !$forceLog) {
-            return;
-        }
-
+        $level  = is_null($level) ? Zend_Log::DEBUG : $level;
         $file = empty($file) ? 'system.log' : $file;
 
         try {
-            $logDir  = 'var' . DS . 'log';
-            $logFile = $logDir . DS . $file;
+            if (!isset($loggers[$file])) {
+                $logDir  = 'var' . DS . 'log';
+                $logFile = $logDir . DS . $file;
 
-            if (!is_dir($logDir)) {
-                mkdir($logDir);
-                chmod($logDir, 0777);
-            }
+                if (!is_dir($logDir)) {
+                    mkdir($logDir);
+                    chmod($logDir, 0777);
+                }
 
-            if (!file_exists($logFile)) {
-                file_put_contents($logFile, '');
-                chmod($logFile, 0777);
+                if (!file_exists($logFile)) {
+                    file_put_contents($logFile, '');
+                    chmod($logFile, 0777);
+                }
+
+                $format = '%timestamp% %priorityName% (%priority%): %message%' . PHP_EOL;
+                $formatter = new Zend_Log_Formatter_Simple($format);
+                $writer = new Zend_Log_Writer_Stream($logFile);
+                $writer->setFormatter($formatter);
+                $loggers[$file] = new Zend_Log($writer);
             }
 
             if (is_array($message) || is_object($message)) {
                 $message = print_r($message, true);
             }
 
-            $line = sprintf(
-                '%s: %s',
-                time(),
-                $message
-            );
-            file_put_contents($logFile, $line, FILE_APPEND);
+            $loggers[$file]->log($message, $level);
         }
         catch (Exception $e) {
         }

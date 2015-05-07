@@ -359,8 +359,10 @@ class IntegerNet_Solr_Autosuggest_Result
         return $this->_suggestData;
     }
 
-    public function __($text)
+    public function __()
     {
-        return $text;
+        $args = func_get_args();
+        $text = array_shift($args);
+        return vsprintf($text, $args);
     }
 }

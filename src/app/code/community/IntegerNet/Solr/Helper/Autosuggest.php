@@ -77,6 +77,8 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         $templateContents = file_get_contents($templateName);
 
+        $templateContents = $this->_getTranslatedTemplate($templateContents);
+
         $targetDirname = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
         if (!is_dir($targetDirname)) {
             mkdir($targetDirname, 0777, true);
@@ -139,5 +141,24 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         if ($this->_initialEnvironmentInfo) {
             Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
+    }
+
+    /**
+     * Translate all occurences of $this->__('...') with translated text
+     *
+     * @param string $templateContents
+     * @return string
+     */
+    protected function _getTranslatedTemplate($templateContents)
+    {
+        preg_match_all('$->__\(\'(.*)\'\)$', $templateContents, $results);
+
+        foreach($results[1] as $key => $search) {
+
+            $replace = Mage::helper('integernet_solr')->__($search);
+            $templateContents = str_replace($search, $replace, $templateContents);
+        }
+
+        return $templateContents;
     }
 }

@@ -44,7 +44,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $config[$store->getId()]['base_url'] = Mage::getUrl();
 
             $this->_addAttributeData($config, $store);
-            
+
+            $this->_addCategoriesData($config, $store);
+
             $this->_stopStoreEmulation();
         }
 
@@ -92,7 +94,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     /**
      * @param array $config
      * @param Mage_Core_Model_Store $store
-     * @return array
      */
     protected function _addAttributeData(&$config, $store)
     {
@@ -116,6 +117,76 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
                 'options' => $options,
             );
         }
+    }
+
+    /**
+     * @param array $config
+     * @param Mage_Core_Model_Store $store
+     */
+    protected function _addCategoriesData(&$config, $store)
+    {
+        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
+        if (!$maxNumberCategories) {
+            return;
+        }
+
+        $categories = Mage::getResourceModel('catalog/category_collection')
+            ->addAttributeToSelect(array('name', 'url_key'))
+            ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('include_in_menu', 1);
+
+        foreach($categories as $category) {
+            $config[$store->getId()]['categories'][$category->getId()] = array(
+                'id' => $category->getId(),
+                'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                'url' => $category->getUrl(),
+            );
+        }
+    }
+
+
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryUrl($category)
+    {
+        $linkType = Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type');
+        if (false && $linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+            return Mage::getUrl('catalogsearch/result', array(
+                '_query' => array(
+                    'q' => $this->escapeHtml($this->getQuery()),
+                    'cat' => $category->getId()
+                )
+            ));
+        }
+
+        return $category->getUrl();
+    }
+
+    /**
+     * Return category name or complete path, depending on what is configured
+     *
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryTitle($category)
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/autosuggest/show_complete_category_path')) {
+            $categoryPathIds = $category->getPathIds();
+            array_shift($categoryPathIds);
+            array_shift($categoryPathIds);
+            array_pop($categoryPathIds);
+
+            $categoryPathNames = array();
+            foreach($categoryPathIds as $categoryId) {
+                $categoryPathNames[] = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore()->getId());
+            }
+            $categoryPathNames[] = $category->getName();
+            return implode(' > ', $categoryPathNames);
+        }
+        return $category->getName();
     }
 
     /**

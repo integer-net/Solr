@@ -31,9 +31,10 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function storeSolrConfig()
     {
-        $config = array();
         foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
-            
+
+            $config = array();
+
             $this->_emulateStore($store->getId());
             
             $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr');
@@ -48,18 +49,18 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addCategoriesData($config, $store);
 
             $this->_stopStoreEmulation();
-        }
 
-        foreach($this->_modelIdentifiers as $identifier) {
-            $config['model'][$identifier] = get_class(Mage::getModel($identifier));
-        }
+            foreach($this->_modelIdentifiers as $identifier) {
+                $config['model'][$identifier] = get_class(Mage::getModel($identifier));
+            }
 
-        foreach($this->_resourceModelIdentifiers as $identifier) {
-            $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
+            foreach($this->_resourceModelIdentifiers as $identifier) {
+                $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
+            }
+
+            $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
+            file_put_contents($filename, serialize($config));
         }
-        
-        $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'config.txt';
-        file_put_contents($filename, serialize($config));
     }
 
     /**

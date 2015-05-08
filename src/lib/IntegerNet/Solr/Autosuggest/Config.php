@@ -14,8 +14,8 @@ final class IntegerNet_Solr_Autosuggest_Config
 
     public function __construct($storeId)
     {
-        $this->_config = $this->getConfigAsArray($storeId);
         $this->_storeId = $storeId;
+        $this->_config = $this->getConfigAsArray($storeId);
     }
 
     public function getStoreId()
@@ -71,7 +71,7 @@ final class IntegerNet_Solr_Autosuggest_Config
 
     protected function _getConfigFromFile()
     {
-        $config = @file_get_contents('var' . DIRECTORY_SEPARATOR . 'integernet_solr' . DIRECTORY_SEPARATOR . 'config.txt');
+        $config = @file_get_contents('var' . DIRECTORY_SEPARATOR . 'integernet_solr' . DIRECTORY_SEPARATOR . 'store_' . $this->_storeId . DIRECTORY_SEPARATOR . 'config.txt');
         if ($config === false) {
             return false;
         }

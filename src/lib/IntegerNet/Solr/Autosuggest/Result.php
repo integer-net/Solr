@@ -94,7 +94,6 @@ class IntegerNet_Solr_Autosuggest_Result
 
     public function getCategorySuggestions()
     {
-        return array();
         $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
         if (!$maxNumberCategories) {
             return array();
@@ -102,27 +101,20 @@ class IntegerNet_Solr_Autosuggest_Result
         
         $categoryIds = (array)Mage::getSingleton('integernet_solr/result')->getSolrResult()->facet_counts->facet_fields->category;
 
-        $categories = Mage::getResourceModel('catalog/category_collection')
-            ->addAttributeToSelect(array('name', 'url_key'))
-            ->addAttributeToFilter('is_active', 1)
-            ->addAttributeToFilter('include_in_menu', 1)
-            ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
-
         $categorySuggestions = array();
         $counter = 0;
         foreach($categoryIds as $categoryId => $numResults) {
-            if ($category = $categories->getItemById($categoryId)) {
+            if ($categoryData = Mage::getStoreConfig('categories/' . $categoryId)) {
                 if (++$counter > $maxNumberCategories) {
                     break;
                 }
 
                 $categorySuggestions[] = array(
-                    'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                    'title' => $categoryData['title'],
                     'row_class' => '',
                     'num_of_results' => $numResults,
-                    'url' => $this->_getCategoryUrl($category),
+                    'url' => $this->_getCategoryUrl($categoryData),
                 );
-
             }
         }
 
@@ -278,27 +270,27 @@ class IntegerNet_Solr_Autosuggest_Result
     }
 
     /**
-     * @param Mage_Catalog_Model_Category $category
+     * @param array $categoryData
      * @return string
      */
-    protected function _getCategoryUrl($category)
+    protected function _getCategoryUrl($categoryData)
     {
         $linkType = Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type');
         if ($linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
             return Mage::getUrl('catalogsearch/result', array(
                 '_query' => array(
                     'q' => $this->escapeHtml($this->getQuery()),
-                    'cat' => $category->getId()
+                    'cat' => $categoryData['id']
                 )
             ));
         }
 
-        return $category->getUrl();
+        return $categoryData['url'];
     }
 
     /**
      * Return category name or complete path, depending on what is configured
-     * 
+     *
      * @param Mage_Catalog_Model_Category $category
      * @return string
      */
@@ -309,7 +301,7 @@ class IntegerNet_Solr_Autosuggest_Result
             array_shift($categoryPathIds);
             array_shift($categoryPathIds);
             array_pop($categoryPathIds);
-            
+
             $categoryPathNames = array();
             foreach($categoryPathIds as $categoryId) {
                 $categoryPathNames[] = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore()->getId());
@@ -327,7 +319,7 @@ class IntegerNet_Solr_Autosuggest_Result
     public function printHtml()
     {
         if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
-            return '';
+            return;
         }
 
         include(Mage::getStoreConfig('template_filename'));
@@ -359,8 +351,15 @@ class IntegerNet_Solr_Autosuggest_Result
         return $this->_suggestData;
     }
 
-    public function __($text)
+    /**
+     * Replacement for original translation function
+     *
+     * @return string
+     */
+    public function __()
     {
-        return $text;
+        $args = func_get_args();
+        $text = array_shift($args);
+        return vsprintf($text, $args);
     }
 }

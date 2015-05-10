@@ -28,6 +28,7 @@
                     <layer>IntegerNet_Solr_Model_CatalogSearch_Layer</layer>
                 </rewrite>
             </catalogsearch>
+
             <catalog>
                 <rewrite>
                     <layer_filter_price>IntegerNet_Solr_Model_Catalog_Layer_Filter_Price</layer_filter_price>
@@ -39,6 +40,7 @@
             <integernet_solr>
                 <class>IntegerNet_Solr_Block</class>
             </integernet_solr>
+
             <catalogsearch>
                 <rewrite>
                     <autocomplete>IntegerNet_Solr_Block_Autosuggest</autocomplete>
@@ -85,6 +87,16 @@
                     </integernet_solr>
                 </observers>
             </catalog_product_delete_after>
+
+            <application_clean_cache>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>applicationCleanCache</method>
+                    </integernet_solr>
+                </observers>
+            </application_clean_cache>
         </events>
 
         <resources>

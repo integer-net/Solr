@@ -31,9 +31,10 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function storeSolrConfig()
     {
-        $config = array();
         foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
-            
+
+            $config = array();
+
             $this->_emulateStore($store->getId());
             
             $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr');
@@ -44,20 +45,22 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $config[$store->getId()]['base_url'] = Mage::getUrl();
 
             $this->_addAttributeData($config, $store);
-            
+
+            $this->_addCategoriesData($config, $store);
+
             $this->_stopStoreEmulation();
-        }
 
-        foreach($this->_modelIdentifiers as $identifier) {
-            $config['model'][$identifier] = get_class(Mage::getModel($identifier));
-        }
+            foreach($this->_modelIdentifiers as $identifier) {
+                $config['model'][$identifier] = get_class(Mage::getModel($identifier));
+            }
 
-        foreach($this->_resourceModelIdentifiers as $identifier) {
-            $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
+            foreach($this->_resourceModelIdentifiers as $identifier) {
+                $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
+            }
+
+            $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
+            file_put_contents($filename, serialize($config));
         }
-        
-        $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'config.txt';
-        file_put_contents($filename, serialize($config));
     }
 
     /**
@@ -77,6 +80,8 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         $templateContents = file_get_contents($templateName);
 
+        $templateContents = $this->_getTranslatedTemplate($templateContents);
+
         $targetDirname = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
         if (!is_dir($targetDirname)) {
             mkdir($targetDirname, 0777, true);
@@ -90,7 +95,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     /**
      * @param array $config
      * @param Mage_Core_Model_Store $store
-     * @return array
      */
     protected function _addAttributeData(&$config, $store)
     {
@@ -117,6 +121,76 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param array $config
+     * @param Mage_Core_Model_Store $store
+     */
+    protected function _addCategoriesData(&$config, $store)
+    {
+        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
+        if (!$maxNumberCategories) {
+            return;
+        }
+
+        $categories = Mage::getResourceModel('catalog/category_collection')
+            ->addAttributeToSelect(array('name', 'url_key'))
+            ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('include_in_menu', 1);
+
+        foreach($categories as $category) {
+            $config[$store->getId()]['categories'][$category->getId()] = array(
+                'id' => $category->getId(),
+                'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                'url' => $category->getUrl(),
+            );
+        }
+    }
+
+
+
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryUrl($category)
+    {
+        $linkType = Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type');
+        if (false && $linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+            return Mage::getUrl('catalogsearch/result', array(
+                '_query' => array(
+                    'q' => $this->escapeHtml($this->getQuery()),
+                    'cat' => $category->getId()
+                )
+            ));
+        }
+
+        return $category->getUrl();
+    }
+
+    /**
+     * Return category name or complete path, depending on what is configured
+     *
+     * @param Mage_Catalog_Model_Category $category
+     * @return string
+     */
+    protected function _getCategoryTitle($category)
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/autosuggest/show_complete_category_path')) {
+            $categoryPathIds = $category->getPathIds();
+            array_shift($categoryPathIds);
+            array_shift($categoryPathIds);
+            array_pop($categoryPathIds);
+
+            $categoryPathNames = array();
+            foreach($categoryPathIds as $categoryId) {
+                $categoryPathNames[] = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore()->getId());
+            }
+            $categoryPathNames[] = $category->getName();
+            return implode(' > ', $categoryPathNames);
+        }
+        return $category->getName();
+    }
+
+    /**
      * @param int $storeId
      * @throws Mage_Core_Exception
      */
@@ -139,5 +213,24 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         if ($this->_initialEnvironmentInfo) {
             Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
+    }
+
+    /**
+     * Translate all occurences of $this->__('...') with translated text
+     *
+     * @param string $templateContents
+     * @return string
+     */
+    protected function _getTranslatedTemplate($templateContents)
+    {
+        preg_match_all('$->__\(\'(.*)\'\)$', $templateContents, $results);
+
+        foreach($results[1] as $key => $search) {
+
+            $replace = Mage::helper('integernet_solr')->__($search);
+            $templateContents = str_replace($search, $replace, $templateContents);
+        }
+
+        return $templateContents;
     }
 }

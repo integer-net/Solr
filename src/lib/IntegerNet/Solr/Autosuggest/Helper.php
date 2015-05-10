@@ -75,4 +75,16 @@ final class IntegerNet_Solr_Autosuggest_Helper
     {
         return $_GET['q'];
     }
+
+    /**
+     * Replacement for original translation function
+     *
+     * @return string
+     */
+    public function __()
+    {
+        $args = func_get_args();
+        $text = array_shift($args);
+        return vsprintf($text, $args);
+    }
 }

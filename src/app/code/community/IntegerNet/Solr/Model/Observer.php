@@ -103,6 +103,10 @@ class IntegerNet_Solr_Model_Observer
             $product = $observer->getProduct();
             Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex(array($product->getId()));
         }
-        
+    }
+
+    public function applicationCleanCache(Varien_Event_Observer $observer)
+    {
+        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
     }
 }

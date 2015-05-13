@@ -11,6 +11,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
 {
     protected $_attributes = array();
     protected $_result = null;
+    protected $_customHelper;
 
     protected function _construct()
     {
@@ -106,5 +107,16 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         }
 
         return $this->_getResult()->toHtml();
+    }
+
+    /**
+     * @return IntegerNet_Solr_Autosuggest_Custom
+     */
+    public function getCustomHelper()
+    {
+        if (is_null($this->_customHelper)) {
+            $this->_customHelper = new IntegerNet_Solr_Autosuggest_Custom();
+        }
+        return $this->_customHelper;
     }
 }

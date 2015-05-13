@@ -58,6 +58,12 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
                 $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
             }
 
+            $transportObject = new Varien_Object(array('config' => $config));
+
+            Mage::dispatchEvent('integernet_solr_autosuggest_config', array('transport' => $transportObject, 'store' => $store));
+
+            $config = $transportObject->getConfig();
+
             $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
             file_put_contents($filename, serialize($config));
         }

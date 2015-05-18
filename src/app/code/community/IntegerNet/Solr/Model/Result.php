@@ -546,6 +546,7 @@ class IntegerNet_Solr_Model_Result
     /**
      * @param int $storeId
      * @param int $pageSize
+     * @param boolean $fuzzy
      * @return Apache_Solr_Response
      */
     protected function _getResultFromRequest($storeId, $pageSize, $fuzzy = true)

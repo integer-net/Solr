@@ -10,7 +10,7 @@
 
 define('DS', DIRECTORY_SEPARATOR);
 define('PS', PATH_SEPARATOR);
-define('BP', $_SERVER['DOCUMENT_ROOT']);
+define('BP', pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
 
 if (defined('COMPILER_INCLUDE_PATH')) {
     $appPath = COMPILER_INCLUDE_PATH;

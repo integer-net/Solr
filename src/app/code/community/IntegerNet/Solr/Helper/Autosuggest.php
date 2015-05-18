@@ -28,8 +28,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * Store Solr configuration in serialized text field so it can be accessed from autosuggest later
-     *
-     * @todo refactor to use original magento cache
      */
     public function storeSolrConfig()
     {
@@ -37,10 +35,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
 
             $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
-
-            if (file_exists($filename) && Mage::getDesign()->getArea() == 'frontend') {
-                return;
-            }
 
             $config = array();
 

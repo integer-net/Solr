@@ -105,8 +105,17 @@ class IntegerNet_Solr_Model_Observer
         }
     }
 
+    /**
+     * Regenerate config if all cache should be deleted.
+     * 
+     * @param Varien_Event_Observer $observer
+     */
     public function applicationCleanCache(Varien_Event_Observer $observer)
     {
+        $tags = $observer->getTags();
+        if (!is_array($tags) || sizeof($tags)) {
+            return;
+        }
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
     }
 }

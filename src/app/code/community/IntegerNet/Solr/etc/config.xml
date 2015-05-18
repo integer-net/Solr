@@ -119,7 +119,7 @@
                 </integernet_solr>
             </modules>
         </translate>
-        
+
         <events>
             <adminhtml_catalog_product_attribute_edit_prepare_form>
                 <observers>
@@ -189,6 +189,19 @@
             </catalog_block_product_list_collection>
         </events>
     </frontend>
+
+    <crontab>
+        <jobs>
+            <integernet_solr_rebuild_config>
+                <schedule>
+                    <cron_expr>0 3 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integernet_solr/autosuggest::storeSolrConfig</model>
+                </run>
+            </integernet_solr_rebuild_config>
+        </jobs>
+    </crontab>
 
     <default>
         <integernet_solr>

@@ -10,6 +10,7 @@
 class IntegerNet_Solr_Autosuggest_Result
 {
     protected $_attributes = array();
+    protected $_customHelper;
 
     public function __construct()
     {
@@ -361,5 +362,30 @@ class IntegerNet_Solr_Autosuggest_Result
         $args = func_get_args();
         $text = array_shift($args);
         return vsprintf($text, $args);
+    }
+
+    /**
+     * Wrapper for standart strip_tags() function with extra functionality for html entities
+     *
+     * @param string $data
+     * @param string $allowableTags
+     * @param bool $escape
+     * @return string
+     */
+    public function stripTags($data, $allowableTags = null, $escape = false)
+    {
+        $result = strip_tags($data, $allowableTags);
+        return $escape ? $this->escapeHtml($result, $allowableTags) : $result;
+    }
+
+    /**
+     * @return IntegerNet_Solr_Autosuggest_Custom
+     */
+    public function getCustomHelper()
+    {
+        if (is_null($this->_customHelper)) {
+            $this->_customHelper = new IntegerNet_Solr_Autosuggest_Custom();
+        }
+        return $this->_customHelper;
     }
 }

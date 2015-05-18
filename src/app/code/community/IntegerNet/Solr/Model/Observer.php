@@ -92,6 +92,8 @@ class IntegerNet_Solr_Model_Observer
                 $_GET['order'] = 'position';
             }
         }
+
+        Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
     }
 
     public function catalogProductDeleteAfter(Varien_Event_Observer $observer)

@@ -202,6 +202,7 @@ class IntegerNet_Solr_Model_Result
             $params['stats'] = 'true';
             $params['stats.field'] = 'price_f';
 
+
             if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
                 && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
                 $params['facet.range'] = 'price_f';
@@ -397,7 +398,7 @@ class IntegerNet_Solr_Model_Result
         if ($allowFuzzy && $isFuzzyActive) {
             $queryText .= '~' . floatval($sensitivity);
         } else {
-            $queryText = 'text_plain:' . $queryText;
+            $queryText = 'text_plain:"' . $queryText . '"~100';
         }
         return $queryText;
     }

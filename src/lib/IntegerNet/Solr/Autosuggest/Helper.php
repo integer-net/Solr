@@ -32,7 +32,7 @@ final class IntegerNet_Solr_Autosuggest_Helper
     public function getFilterableInSearchAttributes()
     {
         $attributes = array();
-        foreach(Mage::getStoreConfig('attribute') as $attributeCode => $attributeConfig) {
+        foreach((array)Mage::getStoreConfig('attribute') as $attributeCode => $attributeConfig) {
             $attributes[$attributeCode] = new IntegerNet_Solr_Autosuggest_Attribute($attributeConfig);
         }
         

@@ -64,10 +64,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $pageNumber = 1;
             do {
-                $productCollection = $this->_getProductCollection($storeId, $productIds);
-
-                $productCollection->setPageSize($pageSize);
-                $productCollection->setCurPage($pageNumber++);
+                $productCollection = $this->_getProductCollection($storeId, $productIds, $pageSize, $pageNumber++);
 
                 $this->_indexProductCollection($emptyIndex, $productCollection);
 
@@ -136,6 +133,57 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
+     * @param int $storeId
+     * @param int[]|null $productIds
+     * @param int $pageSize
+     * @param int $pageNumber
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    protected function _getProductCollection($storeId, $productIds = null, $pageSize = null, $pageNumber = 0)
+    {
+        Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
+
+        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
+        $productCollection = Mage::getResourceModel('catalog/product_collection')
+            ->setStoreId($storeId)
+            ->addMinimalPrice()
+            ->addFinalPrice()
+            ->addTaxPercents()
+            ->addUrlRewrite()
+            ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
+            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
+
+        if (is_array($productIds)) {
+            $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
+        }
+
+        if (!is_null($pageSize)) {
+            $productCollection->setPageSize($pageSize);
+            $productCollection->setCurPage($pageNumber);
+        }
+
+        Mage::dispatchEvent('integernet_solr_product_collection_load_before', array(
+            'collection' => $productCollection
+        ));
+
+        $event = new Varien_Event();
+        $event->setCollection($productCollection);
+        $observer = new Varien_Event_Observer();
+        $observer->setEvent($event);
+
+        Mage::getModel('tax/observer')->addTaxPercentToProductCollection($observer);
+
+        Mage::dispatchEvent('integernet_solr_product_collection_load_after', array(
+            'collection' => $productCollection
+        ));
+
+        return $productCollection;
+    }
+
+
+    /**
      * @param Mage_Catalog_Model_Product $product
      * @return boolean
      */
@@ -156,50 +204,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             return false;
         }
         return true;
-    }
-
-
-    /**
-     * @param int $storeId
-     * @param int[]|null $productIds
-     * @return Mage_Catalog_Model_Resource_Product_Collection
-     */
-    protected function _getProductCollection($storeId, $productIds = null)
-    {
-        Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
-
-        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $productCollection = Mage::getResourceModel('catalog/product_collection')
-            ->setStoreId($storeId)
-            ->addMinimalPrice()
-            ->addFinalPrice()
-            ->addTaxPercents()
-            ->addUrlRewrite()
-            ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
-            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
-
-        if (is_array($productIds)) {
-            $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
-        }
-
-        Mage::dispatchEvent('integernet_solr_product_collection_load_before', array(
-            'collection' => $productCollection
-        ));
-
-        $event = new Varien_Event();
-        $event->setCollection($productCollection);
-        $observer = new Varien_Event_Observer();
-        $observer->setEvent($event);
-
-        Mage::getModel('tax/observer')->addTaxPercentToProductCollection($observer);
-
-        Mage::dispatchEvent('integernet_solr_product_collection_load_after', array(
-            'collection' => $productCollection
-        ));
-
-        return $productCollection;
     }
 
     /**
@@ -581,9 +585,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * @param $emptyIndex
-     * @param $productCollection
-     * @return mixed
+     * @param boolean $emptyIndex
+     * @param Mage_Catalog_Model_Resource_Product_Collection $productCollection
+     * @return int
      */
     protected function _indexProductCollection($emptyIndex, $productCollection)
     {

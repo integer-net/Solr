@@ -37,6 +37,8 @@ error message about that.
  
 Technical workflow
 ------------------
+
+### Indexing
 For each product and store view combination, a Solr document is created on the Solr server. This happens through
 the Magento indexing mechanism which allows to react on every product change. You can either have a full reindex
 process which processes all products efficiently (in batch of 1000 products each, configurable) or a partial reindex.
@@ -44,6 +46,7 @@ A partial reindex will happen if any product is created, modified or deleted and
 documents in the Solr server for the affected products only so the Solr index is always up to date.
 
 The data which is stored on Solr contains the following information:
+
 - Product ID
 - Store ID
 - Category IDs
@@ -52,17 +55,67 @@ The data which is stored on Solr contains the following information:
 - If configured: Generated HTML for results page, once for grid mode and once for list mode
 - IDs of all options of filterable attributes for the layered navigation
 
+### Autosuggest
+When using the autosuggest functionality, there will be an AJAX call whenever a customer has typed the first few letters
+into the search field on the frontend. The AJAX response will be the HTML of the Autosuggest window, including product
+data, keyword suggestions, matching categories and/or attributes. The target of the AJAX call will differ depending on 
+the configuration setting `System -> Configuration -> Solr -> Autosuggest Box -> Method to retrieve autosuggest information`
+
+#### Magento Controller
+This is the basic method which uses Magento methods only, as does the MySQL default or the Solr functionality of the
+Magento Enterprise Edition. It's the slowest but the most flexible. It's intended as a fallback if the other methods
+shouldn't be working due to whatever reason.
+
+#### Magento with separate PHP file
+This will call a separate PHP file `autosuggest-mage.php` in the Magento root dir directly. It skips the routing
+process of Magento and thus will deliver the contents faster. Still, all Magento functionality should be working.
+We haven't found a disadvantage of this method yet, except its speed (see below).
+
+#### PHP without Magento instantiation
+This will call a different PHP file `autosuggest.php` in the Magento root dir directly. It doesn't use most of the 
+Magento functionality and is a lot faster in most environments. As it doesn't do any database calls, all the data
+which is needed for the autosuggest window will have to come either from Solr directly or from a text file. The 
+module automatically generates text files which contain the information used for the default autosuggest window:
+
+- The Solr configuration
+- Some additional configuration values
+- All category data (names, IDs and URLs)
+- All attribute data which is configured to be used in autosuggest (option names, IDs and URLs)
+- Some additional information like the Store Base URL or the filename of the template file (see below)
+- A copy of the `template/integernet/solr/result/autosuggest.phtml` file which is used in your theme. It has all the
+translation text already translated.
+
+The information is stored in `var/integernet_solr/store_x/config.txt` (as serialized array) and 
+`var/integernet_solr/store_x/autosuggest.phtml`. These files will be automatically recreated in any of the following 
+events:
+
+- AJAX call on the frontend occurs while the file `var/integernet_solr/store_x/config.txt` doesn't exist.
+- The configuration of the Solr module is changed.
+- Cache is cleared.
+
+So if you want to force recreating that information, trigger any of the above events.
+
+Note that you won't have all Magento functionality available if you are using this method. Please try to stick to
+those methods used in `app/design/frontend/base/default/template/integernet/solr/autosuggest.phtml`. For example, you 
+cannot include static blocks or other external information without further modification.
+
+Configuration
+-------------
+
+--- Will follow soon ---
+
 Template adjustments
 --------------------
 If you are using a non-standard template, probably some adjustments need to be made. The template of the autosuggest box
 and the results page is defined in `app/design/frontend/base/default/template/integernet/solr/` (PHTML files) and 
-`src/skin/frontend/base/default/integernet/solr/` for the CSS file which is included into every page. Copy the files
+`skin/frontend/base/default/integernet/solr/` for the CSS file which is included into every page. Copy the files
 to your own theme directory (same directory and file name) and adjust them there.
 
 ### Results page
 Most probably you already have a template for the search results page. Usually it can be found at 
 `template/catalog/product/list.phtml` in your theme directory. To generate the according content for the PHTML files
 of the IntegerNet_Solr module, you have to split the content of your file into three parts.
+
 - The parts inside `<li class="item...">` go to `template/integernet/solr/result/list/item.phtml` and   
 `template/integernet/solr/result/grid/item.phtml` respectively.
 - The remainder goes to `template/integernet/solr/result.phtml`. The previously cut out part must be replaced 

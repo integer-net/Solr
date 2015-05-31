@@ -12,6 +12,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     protected $_attributes = array();
     protected $_result = null;
     protected $_customHelper;
+    protected $_suggestData;
 
     protected function _construct()
     {
@@ -97,16 +98,37 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     protected function _toHtml()
     {
         if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
-            return parent::_toHtml();
+
+            return $this->_getFallbackHtml();
         }
 
-        $html = '';
+        return parent::_toHtml();
+    }
 
-        if (!$this->_beforeToHtml()) {
-            return $html;
+    public function getSuggestData()
+    {
+        if (!$this->_suggestData) {
+            $collection = Mage::helper('catalogsearch')->getSuggestCollection();
+            $query = Mage::helper('catalogsearch')->getQueryText();
+            $counter = 0;
+            $data = array();
+            foreach ($collection as $item) {
+                $_data = array(
+                    'title' => $item->getQueryText(),
+                    'row_class' => (++$counter)%2?'odd':'even',
+                    'num_of_results' => $item->getNumResults()
+                );
+
+                if ($item->getQueryText() == $query) {
+                    array_unshift($data, $_data);
+                }
+                else {
+                    $data[] = $_data;
+                }
+            }
+            $this->_suggestData = $data;
         }
-
-        return $this->_getResult()->toHtml();
+        return $this->_suggestData;
     }
 
     /**
@@ -118,5 +140,42 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
             $this->_customHelper = new IntegerNet_Solr_Autosuggest_Custom();
         }
         return $this->_customHelper;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getFallbackHtml()
+    {
+        $html = '';
+
+        if (!$this->_beforeToHtml()) {
+            return $html;
+        }
+
+        $suggestData = $this->getSuggestData();
+        if (!($count = count($suggestData))) {
+            return $html;
+        }
+
+        $count--;
+
+        $html = '<ul><li style="display:none"></li>';
+        foreach ($suggestData as $index => $item) {
+            if ($index == 0) {
+                $item['row_class'] .= ' first';
+            }
+
+            if ($index == $count) {
+                $item['row_class'] .= ' last';
+            }
+
+            $html .= '<li title="' . $this->escapeHtml($item['title']) . '" class="' . $item['row_class'] . '">'
+                . '<span class="amount">' . $item['num_of_results'] . '</span>' . $this->escapeHtml($item['title']) . '</li>';
+        }
+
+        $html .= '</ul>';
+
+        return $html;
     }
 }

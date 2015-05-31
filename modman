@@ -10,3 +10,4 @@ src/shell/integernet-solr.php                                       shell/intege
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/
 src/autosuggest.php                                                 autosuggest.php
+src/autosuggest-mage.php                                            autosuggest-mage.php

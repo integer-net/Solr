@@ -35,9 +35,10 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
     /**
      * @param int $storeId
+     * @param boolean $useSwapCore
      * @return IntegerNet_Solr_Model_Resource_Solr_Service
      */
-    public function getSolr($storeId)
+    public function getSolr($storeId, $useSwapCore = false)
     {
         if (!isset($this->_solr[$storeId])) {
 
@@ -45,6 +46,9 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
             $core = Mage::getStoreConfig('integernet_solr/server/core', $storeId);
+            if ($useSwapCore) {
+                $core = Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId);
+            }
             if ($core) {
                 $path .= $core . '/';
             }

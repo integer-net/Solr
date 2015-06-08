@@ -44,6 +44,10 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
+            $core = Mage::getStoreConfig('integernet_solr/server/core', $storeId);
+            if ($core) {
+                $path .= $core . '/';
+            }
             $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter(), new Apache_Solr_Compatibility_Solr4CompatibilityLayer());
         }
         return $this->_solr[$storeId];

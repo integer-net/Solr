@@ -12,6 +12,8 @@
 "Example: 8081","Beispiel: 8081"
 "Path","Pfad"
 "Example: /solr/","Beispiel: /solr/"
+"Core","Core"
+"Example: collection1, core0","Beispiel: collection1, core0"
 "Sensitivity for Search","Sensibilität für Suche"
 "Sensitivity for Autosuggest","Sensibilität für Suchvorschläge"
 "Value between 0 and 1. Smaller values mean more fuzzy search results.","Wert zwischen 0 und 1. Je kleiner, desto unschärfer."

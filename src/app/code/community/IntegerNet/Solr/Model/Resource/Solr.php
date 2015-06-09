@@ -185,7 +185,6 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
                     Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeIdToSwap)
                 );
         }
-        Mage::log('Swapping cores for stores ' . implode(', ', $storeIdsToSwap));
     }
 
     /**

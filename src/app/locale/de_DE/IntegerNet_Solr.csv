@@ -59,7 +59,7 @@
 "Exclude only Categories, not included Products","Nur Kategorien, nicht enthaltene Produkte"
 "HTTP Transport Method","HTTP-Übertragungsmethode"
 "Please change if you are getting communication errors","Bitte wechseln, falls Sie Übertragungsfehler erhalten"
-"file_get_contents (Default)","file_get_contents (Standard)"
+"file_get_contents","file_get_contents"
 "cURL","cURL"
 "Use HTTP Basic Authentication","HTTP Basis-Authentifizierung verwenden"
 "HTTP Basic Authentication: Username","HTTP Basis-Authentifizierung: Benutzername"

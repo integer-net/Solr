@@ -4,7 +4,7 @@ src/app/design/frontend/base/default/template/integernet/*          app/design/f
 src/app/design/frontend/rwd/default/template/integernet/*           app/design/frontend/rwd/default/template/integernet/
 src/app/etc/modules/*                                               app/etc/modules/
 src/app/locale/de_DE/*                                              app/locale/de_DE/
-src/lib/Apache/Solr                                                 lib/Apache/Solr
+src/app/code/community/Apache/Solr                                  app/code/community/Apache/Solr
 src/lib/IntegerNet/Solr                                             lib/IntegerNet/Solr
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/

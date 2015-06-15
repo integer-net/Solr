@@ -106,6 +106,9 @@ class Apache_Solr_Response
 	 */
 	public function getHttpStatus()
 	{
+        if (!($this->_response instanceof Apache_Solr_HttpTransport_Response)) {
+            Mage::log(debug_backtrace(0, 10), null, 'debug.log', true);
+        }
 		return $this->_response->getStatusCode();
 	}
 

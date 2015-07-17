@@ -197,7 +197,7 @@
                     <cron_expr>0 3 * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>integernet_solr/autosuggest::storeSolrConfig</model>
+                    <model>integernet_solr/observer::storeSolrConfig</model>
                 </run>
             </integernet_solr_rebuild_config>
         </jobs>

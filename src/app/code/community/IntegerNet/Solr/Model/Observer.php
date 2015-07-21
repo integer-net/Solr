@@ -58,42 +58,6 @@ class IntegerNet_Solr_Model_Observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
-        $storeId = null;
-        if ($storeCode = $observer->getStore()) {
-
-            $storeId = Mage::app()->getStore($storeCode)->getId();
-        }
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
-            return;
-        }
-
-        if (!Mage::getStoreConfig('integernet_solr/server/host', $storeId)) {
-            return;
-        }
-
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService($storeId);
-
-        if (!$solr->ping()) {
-            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('integernet_solr')->__('Solr Connection could not be established.'));
-        } else {
-            Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('integernet_solr')->__('Solr Connection established.'));
-        }
-
-        if (Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
-            if (!Mage::getStoreConfig('integernet_solr/server/core', $storeId) || !Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId)) {
-                Mage::getSingleton('adminhtml/session')->addError(Mage::helper('integernet_solr')->__('Please enter name of core and swap core.'));
-            } else {
-                $solr = Mage::getResourceModel('integernet_solr/solr')->setUseSwapIndex()->getSolrService($storeId);
-
-                if (!$solr->ping()) {
-                    Mage::getSingleton('adminhtml/session')->addError(Mage::helper('integernet_solr')->__('Solr Connection to swap core could not be established.'));
-                } else {
-                    Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('integernet_solr')->__('Solr Connection to swap core established.'));
-                }
-            }
-        }
-
-
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
     }
 

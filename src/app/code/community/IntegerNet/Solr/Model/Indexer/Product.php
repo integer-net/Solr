@@ -33,6 +33,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
+        if (is_null($productIds)) {
+            $this->getResource()->checkSwapCoresConfiguration($restrictToStore);
+        }
+        
         $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
         if ($pageSize <= 0) {
             $pageSize = 100;
@@ -55,6 +59,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
+            if (is_null($productIds) && Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
+                $this->getResource()->setUseSwapIndex();
+            }
+
             if (
                 ($emptyIndex && Mage::getStoreConfigFlag('integernet_solr/indexing/delete_documents_before_indexing', $storeId))
                 || $emptyIndex === 'force'
@@ -70,9 +78,19 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             } while ($pageNumber <= $productCollection->getLastPageNumber());
 
+            $this->getResource()->setUseSwapIndex(false);
         }
 
         $this->_stopStoreEmulation();
+
+        if (is_null($productIds)) {
+            $this->getResource()->swapCores($restrictToStore);
+        }
+    }
+    
+    protected function _swapCores()
+    {
+        
     }
 
     /**

@@ -17,7 +17,7 @@ class IntegerNet_Solr_Model_Result
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
     protected $_toolbarBlock = null;
-    
+
     protected $_filters = array();
 
     /**
@@ -34,7 +34,7 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * Call Solr server twice: Once without fuzzy search, once with (if configured)
-     * 
+     *
      * @param $storeId
      * @return Apache_Solr_Response
      */
@@ -195,7 +195,7 @@ class IntegerNet_Solr_Model_Result
             'facet.field' => $this->_getFacetFieldCodes(),
             'defType' => 'edismax',
         );
-        
+
         if (!$this->_isAutosuggest()) {
             $params['fl'] = 'result_html_list_nonindex,result_html_grid_nonindex,score,sku_s,name_s,product_id';
             $params['facet.interval'] = 'price_f';
@@ -231,7 +231,7 @@ class IntegerNet_Solr_Model_Result
                 $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
             }
         }
-        
+
         if (!$fuzzy) {
             $params['mm'] = '100%';
         }
@@ -257,17 +257,17 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * Merge facet counts of both results and store them into $result
-     * 
+     *
      * @param $result
      * @param $fuzzyResult
      */
     public function _mergeFacetFieldCounts($result, $fuzzyResult)
     {
         $facetFields = (array)$fuzzyResult->facet_counts->facet_fields;
-        
+
         foreach($facetFields as $facetName => $facetCounts) {
             $facetCounts = (array)$facetCounts;
-            
+
             foreach($facetCounts as $facetId => $facetCount) {
                 if (isset($result->facet_counts->facet_fields->$facetName->$facetId)) {
                     $result->facet_counts->facet_fields->$facetName->$facetId = max(
@@ -310,7 +310,7 @@ class IntegerNet_Solr_Model_Result
                 }
             }
         }
-        
+
         if (isset($fuzzyResult->facet_counts->facet_intervals)) {
 
             $facetIntervals = (array)$fuzzyResult->facet_counts->facet_intervals;
@@ -344,7 +344,7 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * Merge price information (min, max, intervals) of both results and store them into $result
-     * 
+     *
      * @param $result
      * @param $fuzzyResult
      */
@@ -353,9 +353,9 @@ class IntegerNet_Solr_Model_Result
         if (!isset($fuzzyResult->stats->stats_fields)) {
             return;
         }
-        
+
         $statsFields = (array)$fuzzyResult->stats->stats_fields;
-        
+
         foreach($statsFields as $fieldName => $fieldData) {
 
             if (!isset($result->stats)) {
@@ -388,6 +388,15 @@ class IntegerNet_Solr_Model_Result
         if ($query->getSynonymFor()) {
             $queryText = $query->getSynonymFor();
         }
+
+        $transportObject = new Varien_Object(array(
+            'query_text' => $queryText,
+        ));
+
+        Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
+
+        $queryText = $transportObject->getQueryText();
+
         if ($this->_isAutosuggest()) {
             $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
             $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
@@ -430,11 +439,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         $filterQuery = 'store_id:' . $storeId;
-        
-        foreach($this->getFilters() as $attributeCode => $value) { 
+
+        foreach($this->getFilters() as $attributeCode => $value) {
             $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
         }
-        
+
         return $filterQuery;
     }
 
@@ -442,7 +451,7 @@ class IntegerNet_Solr_Model_Result
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
      * @param int $value
      */
-    public function addAttributeFilter($attribute, $value) 
+    public function addAttributeFilter($attribute, $value)
     {
         $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
     }
@@ -450,7 +459,7 @@ class IntegerNet_Solr_Model_Result
     /**
      * @param Mage_Catalog_Model_Category $category
      */
-    public function addCategoryFilter($category) 
+    public function addCategoryFilter($category)
     {
         $this->_filters['category'] = $category->getId();
     }
@@ -459,9 +468,9 @@ class IntegerNet_Solr_Model_Result
      * @param int $range
      * @param int $index
      */
-    public function addPriceRangeFilterByIndex($range, $index) 
+    public function addPriceRangeFilterByIndex($range, $index)
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals') 
+        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
             && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
             $lowerBorder = 0;
             $i = 1;
@@ -562,7 +571,7 @@ class IntegerNet_Solr_Model_Result
         Mage::dispatchEvent('integernet_solr_before_search_request', array('transport' => $transportObject));
 
         $startTime = microtime(true);
-        
+
         /** @var Apache_Solr_Response $result */
         $result = $this->_getResource()->search(
             $storeId,

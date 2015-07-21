@@ -10,6 +10,7 @@
 class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
 {
     const SUGGEST_SERVLET = 'suggest';
+    const CORES_SERVLET = 'admin/cores';
 
     /**
      * Constructed servlet full path URLs
@@ -17,6 +18,21 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      * @var string
      */
     protected $_suggestUrl;
+    protected $_coresUrl;
+    
+    protected $_basePath;
+
+    /**
+     * @param string $basePath
+     * @return IntegerNet_Solr_Model_Resource_Solr_Service
+     * @throws Exception
+     */
+    public function setBasePath($basePath)
+    {
+        $this->_basePath = $basePath;
+        $this->_coresUrl = $this->_constructBaseUrl(self::CORES_SERVLET);
+        return $this;
+    }
 
     /**
      * Construct the Full URLs for the three servlets we reference
@@ -27,6 +43,41 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         $this->_suggestUrl = $this->_constructUrl(self::SUGGEST_SERVLET);
 
         parent::_initUrls();
+    }
+
+    /**
+     * Return a valid http URL given this server's host, port and path and a provided servlet name
+     * Exclude core name from 
+     *
+     * @param string $servlet
+     * @param array $params
+     * @return string
+     * @throws Exception
+     */
+    protected function _constructBaseUrl($servlet, $params = array())
+    {
+        if (count($params))
+        {
+            //escape all parameters appropriately for inclusion in the query string
+            $escapedParams = array();
+
+            foreach ($params as $key => $value)
+            {
+                $escapedParams[] = urlencode($key) . '=' . urlencode($value);
+            }
+
+            $queryString = $this->_queryDelimiter . implode($this->_queryStringDelimiter, $escapedParams);
+        }
+        else
+        {
+            $queryString = '';
+        }
+        
+        if (!$this->_basePath) {
+            throw new Exception('Please provide a base path');
+        }
+
+        return 'http://' . $this->_host . ':' . $this->_port . $this->_basePath . $servlet . $queryString;
     }
 
     /**
@@ -77,6 +128,47 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         else if ($method == self::METHOD_POST)
         {
             return $this->_sendRawPost($this->_suggestUrl, $queryString, FALSE, 'application/x-www-form-urlencoded; charset=UTF-8');
+        }
+        else
+        {
+            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_* constants");
+        }
+    }
+
+    /**
+     * Simple Suggest interface
+     *
+     * @param string $core
+     * @param string $otherCore
+     * @param string $method The HTTP method (IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_GET or IntegerNet_Solr_Model_Resource_Solr_Service::METHOD::POST)
+     * @return Apache_Solr_Response
+     *
+     * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+     * @throws Apache_Solr_InvalidArgumentException If an invalid HTTP method is used
+     * @throws Exception
+     */
+    public function swapCores($core, $otherCore, $method = self::METHOD_GET)
+    {
+        if (!$this->_coresUrl) {
+            throw new Exception('Please call "setBasePath" before.');
+        }
+
+        $params = array();
+
+        // construct our full parameters
+        $params['action'] = 'SWAP';
+        $params['core'] = $core;
+        $params['other'] = $otherCore;
+
+        $queryString = $this->_generateQueryString($params);
+
+        if ($method == self::METHOD_GET)
+        {
+            return $this->_sendRawGet($this->_coresUrl . $this->_queryDelimiter . $queryString);
+        }
+        else if ($method == self::METHOD_POST)
+        {
+            return $this->_sendRawPost($this->_coresUrl, $queryString, FALSE, 'application/x-www-form-urlencoded; charset=UTF-8');
         }
         else
         {

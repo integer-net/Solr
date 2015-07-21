@@ -23,7 +23,7 @@ class IntegerNet_Solr_Model_Source_HttpTransportMethod
         return array(
             array(
                 'value' => self::HTTP_TRANSPORT_METHOD_FILEGETCONTENTS,
-                'label' => Mage::helper('integernet_solr')->__('file_get_contents (Default)'),
+                'label' => Mage::helper('integernet_solr')->__('file_get_contents'),
             ),
             array(
                 'value' => self::HTTP_TRANSPORT_METHOD_CURL,

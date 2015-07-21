@@ -8,6 +8,34 @@ IntegerNet_Solr is a Magento 1.x module which creates a better search experience
 Its main features are an autosuggest window with product and keyword suggestions based on what is being entered in
 the search bar, plus better search results regarding quality and speed.
 
+Features
+--------
+#### General
+- Correction of spelling, fuzzy search
+- Displays exact search results first and results to similar search words after that
+- Supports multi store functionality of Magento completely
+- Can use one Solr core for several Magento store views or seperate cores 
+- Allows logging of all Solr requests
+
+#### Autosuggest window
+- Appears after the first letters have been typed into the search form
+- Displays product suggestions, category suggestions, attribute suggestions and keyword suggestions
+- Number of suggestions of each type is configurable in the Magento backend
+- Attributes to display can be defined in configuration
+- Can skip Magento instantiation and use PHP only for faster results
+
+#### Search results
+- Provides all features from Magento default, like sorting, pagination and filters
+- Takes search results from Solr for better speed and quality
+- Prerenders product HTML blocks for faster rendering
+- Allows to configure the price filter steps
+- Automatic update of Solr index on create/edit/delete of products
+
+#### Modification of search results
+- Modify "fuzzyness"
+- Allows boosting of products and attributes
+- Provides events for modifying indexing process and search requests
+
 Requirements
 ------------
 - **Magento Community Edition** 1.6 to 1.9 or **Magento Enterprise Edition** 1.11 to 1.14

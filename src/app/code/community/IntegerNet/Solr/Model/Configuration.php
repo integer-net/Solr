@@ -43,7 +43,7 @@ class IntegerNet_Solr_Model_Configuration
             );
         }
 
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolr($storeId);
+        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -54,6 +54,29 @@ class IntegerNet_Solr_Model_Configuration
             $this->_addSuccessMessage(
                 Mage::helper('integernet_solr')->__('Connection to Solr server estalished successfully.')
             );
+        }
+
+        if (Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
+            if (!Mage::getStoreConfig('integernet_solr/server/core', $storeId) || !Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId)) {
+                $this->_addErrorMessage(
+                    Mage::helper('integernet_solr')->__('Please enter name of core and swap core.')
+                );
+                return;
+            }
+
+            $solr = Mage::getResourceModel('integernet_solr/solr')->setUseSwapIndex()->getSolrService($storeId);
+
+            if (!$solr->ping()) {
+                $this->_addErrorMessage(
+                    Mage::helper('integernet_solr')->__('Solr Connection to swap core could not be established.')
+                );
+                return;
+            } else {
+                $this->_addSuccessMessage(
+                    Mage::helper('integernet_solr')->__('Solr Connection to swap core established successfully.')
+                );
+            }
+
         }
     }
 

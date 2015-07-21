@@ -58,27 +58,6 @@ class IntegerNet_Solr_Model_Observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
-        $storeId = null;
-        if ($storeCode = $observer->getStore()) {
-
-            $storeId = Mage::app()->getStore($storeCode)->getId();
-        }
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
-            return;
-        }
-
-        if (!Mage::getStoreConfig('integernet_solr/server/host', $storeId)) {
-            return;
-        }
-
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolr($storeId);
-
-        if (!$solr->ping()) {
-            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('integernet_solr')->__('Solr Connection could not be established.'));
-        } else {
-            Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('integernet_solr')->__('Solr Connection established.'));
-        }
-
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
     }
 

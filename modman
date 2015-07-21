@@ -1,4 +1,5 @@
 src/app/code/community/IntegerNet/*                                 app/code/community/IntegerNet/
+src/app/design/adminhtml/default/default/template/integernet/*      app/design/adminhtml/default/default/template/integernet/
 src/app/design/frontend/base/default/layout/integernet/*            app/design/frontend/base/default/layout/integernet/
 src/app/design/frontend/base/default/template/integernet/*          app/design/frontend/base/default/template/integernet/
 src/app/design/frontend/rwd/default/template/integernet/*           app/design/frontend/rwd/default/template/integernet/

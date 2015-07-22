@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>0.5.0</version>
+            <version>1.2.0</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -119,6 +119,14 @@
                 </integernet_solr>
             </modules>
         </translate>
+
+        <layout>
+            <updates>
+                <integernet_solr>
+                    <file>integernet/solr.xml</file>
+                </integernet_solr>
+            </updates>
+        </layout>
 
         <events>
             <adminhtml_catalog_product_attribute_edit_prepare_form>

@@ -14,7 +14,6 @@
 "Example: /solr/","Beispiel: /solr/"
 "Core","Core"
 "Example: collection1, core0","Beispiel: collection1, core0"
-"Example: collection1, core0","Beispiel: collection1, core0"ds
 "Sensitivity for Search","Sensibilität für Suche"
 "Sensitivity for Autosuggest","Sensibilität für Suchvorschläge"
 "Value between 0 and 1. Smaller values mean more fuzzy search results.","Wert zwischen 0 und 1. Je kleiner, desto unschärfer."
@@ -94,3 +93,6 @@
 "Test search request to swap core failed.","Test-Suchanfrage zum Austausch-Core des Solr-Servers fehlgeschlagen."
 "Maybe the configuration files are not installed correctly on the Solr swap core.","Möglicherweise sind die Konfigurationsdateien nicht korrekt auf dem Austausch-Core des Solr-Servers eingespielt."
 "You can get a meaningful error message from the tab ""Logging"" on the Solr Admin Interface.","Sie können eine aussagekräftige Fehlermeldung im Tab ""Logging"" der Solr-Adminoberfläche einsehen."
+"Module version: %s","Modul-Version: %s"
+"Magento edition: %s","Magento-Edition: %s"
+"Magento version: %s","Magento-Version: %s"

@@ -27,6 +27,8 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _checkConfiguration($storeId = null)
     {
+        $this->_createGeneralInfoMessages($storeId);
+        
         if (!$this->_isModuleActive($storeId)) {
             return;
         }
@@ -56,6 +58,25 @@ class IntegerNet_Solr_Model_Configuration
                 return;
             }
         }
+    }
+
+    /**
+     * @param int $storeId
+     * @return boolean
+     */
+    protected function _createGeneralInfoMessages($storeId)
+    {
+        $this->_addWarningMessage(
+            Mage::helper('integernet_solr')->__('Module version: %s', Mage::getConfig()->getModuleConfig('IntegerNet_Solr')->version)
+        );
+        if (function_exists('Mage::getEdition')) {
+            $this->_addWarningMessage(
+                Mage::helper('integernet_solr')->__('Magento edition: %s', Mage::getEdition())
+            );
+        }
+        $this->_addWarningMessage(
+            Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
+        );
     }
 
     /**

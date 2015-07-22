@@ -1,4 +1,5 @@
 src/app/code/community/IntegerNet/*                                 app/code/community/IntegerNet/
+src/app/design/adminhtml/default/default/layout/integernet/*        app/design/adminhtml/default/default/layout/integernet/
 src/app/design/adminhtml/default/default/template/integernet/*      app/design/adminhtml/default/default/template/integernet/
 src/app/design/frontend/base/default/layout/integernet/*            app/design/frontend/base/default/layout/integernet/
 src/app/design/frontend/base/default/template/integernet/*          app/design/frontend/base/default/template/integernet/
@@ -10,5 +11,6 @@ src/lib/IntegerNet/Solr                                             lib/IntegerN
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/
+src/skin/adminhtml/default/default/integernet/*                     skin/adminhtml/default/default/integernet/
 src/autosuggest.php                                                 autosuggest.php
 src/autosuggest-mage.php                                            autosuggest-mage.php

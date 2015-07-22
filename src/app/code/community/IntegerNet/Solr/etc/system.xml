@@ -4,6 +4,7 @@
         <integernet_solr translate="label" module="integernet_solr">
             <label>Solr</label>
             <tab>service</tab>
+            <class>integernet-solr-tab</class>
             <sort_order>28</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>

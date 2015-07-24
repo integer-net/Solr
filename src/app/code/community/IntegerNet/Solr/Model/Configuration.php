@@ -69,7 +69,7 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addWarningMessage(
             Mage::helper('integernet_solr')->__('Module version: %s', Mage::getConfig()->getModuleConfig('IntegerNet_Solr')->version)
         );
-        if (function_exists('Mage::getEdition')) {
+        if (method_exists('Mage', 'getEdition')) {
             $this->_addWarningMessage(
                 Mage::helper('integernet_solr')->__('Magento edition: %s', Mage::getEdition())
             );

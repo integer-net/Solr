@@ -71,12 +71,13 @@ class IntegerNet_Solr_Model_Configuration
         );
         if (method_exists('Mage', 'getEdition')) {
             $this->_addWarningMessage(
-                Mage::helper('integernet_solr')->__('Magento edition: %s', Mage::getEdition())
+                Mage::helper('integernet_solr')->__('Magento version: %s (%s Edition)', Mage::getVersion(), Mage::getEdition())
+            );
+        } else {
+            $this->_addWarningMessage(
+                Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
             );
         }
-        $this->_addWarningMessage(
-            Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
-        );
     }
 
     /**
@@ -138,6 +139,17 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addSuccessMessage(
             Mage::helper('integernet_solr')->__('Connection to Solr server established successfully.')
         );
+
+        $info = Mage::getResourceModel('integernet_solr/solr')->getInfo($storeId);
+        if ($info instanceof Apache_Solr_Response) {
+            if (isset($info->lucene->{'solr-spec-version'})) {
+                $solrVersion = $info->lucene->{'solr-spec-version'};
+                $this->_addWarningMessage(
+                    Mage::helper('integernet_solr')->__('Solr version: %s', $solrVersion)
+                );
+            }
+        }
+
         return true;
     }
 

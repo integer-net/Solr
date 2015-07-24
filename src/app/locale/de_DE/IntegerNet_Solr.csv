@@ -94,5 +94,6 @@
 "Maybe the configuration files are not installed correctly on the Solr swap core.","Möglicherweise sind die Konfigurationsdateien nicht korrekt auf dem Austausch-Core des Solr-Servers eingespielt."
 "You can get a meaningful error message from the tab ""Logging"" on the Solr Admin Interface.","Sie können eine aussagekräftige Fehlermeldung im Tab ""Logging"" der Solr-Adminoberfläche einsehen."
 "Module version: %s","Modul-Version: %s"
-"Magento edition: %s","Magento-Edition: %s"
 "Magento version: %s","Magento-Version: %s"
+"Magento version: %s (%s Edition)","Magento-Version: %s (%s Edition)"
+"Solr version: %s","Solr-Version: %s"

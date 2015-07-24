@@ -189,6 +189,24 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
     /**
      * @param int $storeId
+     * @return null|Apache_Solr_Response
+     */
+    public function getInfo($storeId)
+    {
+        if (!Mage::getStoreConfig('integernet_solr/server/core', $storeId)) {
+            return null;
+        }
+        try {
+            return $this->getSolrService($storeId)
+                ->setBasePath(Mage::getStoreConfig('integernet_solr/server/path', $storeId))
+                ->info();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param int $storeId
      * @param array $data
      * @return Apache_Solr_Response
      */

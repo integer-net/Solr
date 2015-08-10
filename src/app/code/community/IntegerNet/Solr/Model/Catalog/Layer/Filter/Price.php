@@ -16,7 +16,7 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     public function getPriceRange()
     {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::getPriceRange();
         }
 
@@ -32,7 +32,7 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     protected function _renderItemLabel($range, $value)
     {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::_renderItemLabel($range, $value);
         }
 
@@ -79,7 +79,7 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     protected function _applyToCollection($range, $index)
     {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active') || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
             return parent::_applyToCollection($range, $index);
         }
 

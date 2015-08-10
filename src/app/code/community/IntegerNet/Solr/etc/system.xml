@@ -37,6 +37,16 @@
                             <show_in_store>1</show_in_store>
                         </is_active>
 
+                        <license_key translate="label,comment">
+                            <label>License Key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[Example: AAAAA-BBBBB. Will be necessary two weeks after install.]]></comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </license_key>
+
                         <log translate="label,comment">
                             <label>Activate Logging</label>
                             <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>

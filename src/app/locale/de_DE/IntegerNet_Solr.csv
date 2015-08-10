@@ -97,3 +97,8 @@
 "Magento version: %s","Magento-Version: %s"
 "Magento version: %s (%s Edition)","Magento-Version: %s (%s Edition)"
 "Solr version: %s","Solr-Version: %s"
+"License Key","Lizenzschlüssel"
+"Example: AAAAA-BBBBB. Will be necessary two weeks after install.","Beispiel: AAAAA-BBBBB. Ist spätestens zwei Wochen nach Installation notwendig."
+"Your license key is valid.","Der eingetragene Lizenzschlüssel ist gültig."
+"The license key you have entered is incorrect.","Der eingetragene Lizenzschlüssel ist ungültig."
+"You haven't entered your license key yet.","Sie haben noch keinen Lizenzschlüssel eingetragen."

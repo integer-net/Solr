@@ -33,6 +33,10 @@ class IntegerNet_Solr_Model_Configuration
             return;
         }
 
+        if (!$this->_isModuleLicensed()) {
+            return;
+        }
+
         if (!$this->_isServerConfigurationComplete($storeId)) {
             return;
         }
@@ -96,6 +100,61 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addSuccessMessage(
             Mage::helper('integernet_solr')->__('Solr Module is activated.')
         );
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function _isModuleLicensed()
+    {
+        if (!trim(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+
+            if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
+
+                $diff = time() - $installTimestamp;
+                if (($diff < 0) || ($diff > 2419200)) {
+
+                    $this->_addErrorMessage(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key yet.')
+                    );
+                    return false;
+
+                } else {
+
+                    $this->_addNoticeMessage(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key yet.')
+                    );
+                }
+            }
+
+        } else {
+            if (!Mage::helper('integernet_solr')->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+    
+                if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
+
+                    $diff = time() - $installTimestamp;
+                    if (($diff < 0) || ($diff > 2419200)) {
+
+                        $this->_addErrorMessage(
+                            Mage::helper('integernet_solr')->__('The license key you have entered is incorrect.')
+                        );
+                        return false;
+
+                    } else {
+
+                        $this->_addNoticeMessage(
+                            Mage::helper('integernet_solr')->__('The license key you have entered is incorrect.')
+                        );
+                    }
+                }
+            } else {
+                $this->_addSuccessMessage(
+                    Mage::helper('integernet_solr')->__('Your license key is valid.')
+                );
+            }
+        }
+
         return true;
     }
 

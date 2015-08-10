@@ -97,7 +97,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
      */
     protected function _toHtml()
     {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+        if (!Mage::helper('integernet_solr')->isActive()) {
 
             return $this->_getFallbackHtml();
         }

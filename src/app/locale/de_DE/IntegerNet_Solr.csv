@@ -102,3 +102,5 @@
 "Your license key is valid.","Der eingetragene Lizenzschlüssel ist gültig."
 "The license key you have entered is incorrect.","Der eingetragene Lizenzschlüssel ist ungültig."
 "You haven't entered your license key yet.","Sie haben noch keinen Lizenzschlüssel eingetragen."
+"You haven't entered your license key for the IntegerNet_Solr module yet. The module has been disabled automatically.","Sie haben noch keinen Lizenzschlüssel für das IntegerNet_Solr-Modul eingetragen. Das Modul wurde automatisch deaktiviert."
+"You haven't entered your license key for the IntegerNet_Solr module yet. The module will stop working four weeks after installation.","Sie haben noch keinen Lizenzschlüssel für das IntegerNet_Solr-Modul eingetragen. Das Modul wird vier Wochen nach Installation automatisch deaktiviert."

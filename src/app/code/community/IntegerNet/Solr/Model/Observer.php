@@ -66,7 +66,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active') && $order = $action->getRequest()->getParam('order')) {
+        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
@@ -106,5 +106,36 @@ class IntegerNet_Solr_Model_Observer
     public function storeSolrConfig()
     {
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+    }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     */
+    public function adminSessionUserLoginSuccess($observer)
+    {
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            return;
+        }
+
+        if (!trim(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+
+            if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
+
+                $diff = time() - $installTimestamp;
+                if (($diff < 0) || ($diff > 2419200)) {
+
+                    Mage::getSingleton('adminhtml/session')->addError(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module has been disabled automatically.')
+                    );
+
+                } else {
+
+                    Mage::getSingleton('adminhtml/session')->addWarning(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module will stop working four weeks after installation.')
+                    );
+                }
+            }
+
+        }
     }
 }

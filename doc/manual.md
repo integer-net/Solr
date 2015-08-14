@@ -17,6 +17,7 @@ Features
 - Can use one Solr core for several Magento store views or seperate cores 
 - Can use separate Solr cores for indexing only and swap cores after that
 - Allows logging of all Solr requests
+- Checks connection and configuration of solr server
 
 #### Autosuggest window
 - Appears after the first letters have been typed into the search form
@@ -60,9 +61,9 @@ independant of the IntegerNet_Solr module)
 error message about that.
 11. If you are using the Magento Enterprise Edition, you have to switch off the integrated Solr engine by switching 
 `System -> Configuration -> Catalog -> Catalog Search -> Search Engine` to `MySql Fulltext`.
-11. Reindex the integernet_solr index. We recommend doing this via shell. Go to the `shell` dir and call
+12. Reindex the integernet_solr index. We recommend doing this via shell. Go to the `shell` dir and call
 `php -f indexer.php -- --reindex integernet_solr`
-12. Try typing a few letters in the search box on the frontend. A box with product and keyword suggestions should appear.
+13. Try typing a few letters in the search box on the frontend. A box with product and keyword suggestions should appear.
  
 Technical workflow
 ------------------
@@ -139,6 +140,7 @@ Configuration
 
 Template adjustments
 --------------------
+
 If you are using a non-standard template, probably some adjustments need to be made. The template of the autosuggest box
 and the results page is defined in `app/design/frontend/base/default/template/integernet/solr/` (PHTML files) and 
 `skin/frontend/base/default/integernet/solr/` for the CSS file which is included into every page. Copy the files
@@ -168,7 +170,7 @@ a list or grid template file.
 ### Autosuggest page
 You can copy and modify the `template/integernet/solr/autosuggest.phtml` and `template/integernet/solr/autosuggest/item.phtml`
 files to modify the appearance of the autosuggest window. Attention: as the generated HTML for each product is stored
-in the Solr index, you'll have to reindex after you made changed to the `template/integernet/solr/autosuggest/item.phtml`
+in the Solr index, you'll have to reindex after you made changes to the `template/integernet/solr/autosuggest/item.phtml`
 file.
 
 Pay attention: as the autosuggest functionality isn't delivered by Magento but by a raw PHP version in order to 

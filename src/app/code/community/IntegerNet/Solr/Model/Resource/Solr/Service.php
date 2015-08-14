@@ -11,6 +11,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
 {
     const SUGGEST_SERVLET = 'suggest';
     const CORES_SERVLET = 'admin/cores';
+    const INFO_SERVLET = 'admin/info/system';
 
     /**
      * Constructed servlet full path URLs
@@ -19,7 +20,8 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      */
     protected $_suggestUrl;
     protected $_coresUrl;
-    
+    protected $_infoUrl;
+
     protected $_basePath;
 
     /**
@@ -31,6 +33,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
     {
         $this->_basePath = $basePath;
         $this->_coresUrl = $this->_constructBaseUrl(self::CORES_SERVLET);
+        $this->_infoUrl = $this->_constructBaseUrl(self::INFO_SERVLET);
         return $this;
     }
 
@@ -136,7 +139,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
     }
 
     /**
-     * Simple Suggest interface
+     * core swap interface
      *
      * @param string $core
      * @param string $otherCore
@@ -169,6 +172,43 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         else if ($method == self::METHOD_POST)
         {
             return $this->_sendRawPost($this->_coresUrl, $queryString, FALSE, 'application/x-www-form-urlencoded; charset=UTF-8');
+        }
+        else
+        {
+            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_* constants");
+        }
+    }
+
+    /**
+     * admin info interface
+     *
+     * @param string $method The HTTP method (IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_GET or IntegerNet_Solr_Model_Resource_Solr_Service::METHOD::POST)
+     * @return Apache_Solr_Response
+     *
+     * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+     * @throws Apache_Solr_InvalidArgumentException If an invalid HTTP method is used
+     * @throws Exception
+     */
+    public function info($method = self::METHOD_GET)
+    {
+        if (!$this->_infoUrl) {
+            throw new Exception('Please call "setBasePath" before.');
+        }
+
+        $params = array();
+
+        // construct our full parameters
+        $params['wt'] = 'json';
+
+        $queryString = $this->_generateQueryString($params);
+
+        if ($method == self::METHOD_GET)
+        {
+            return $this->_sendRawGet($this->_infoUrl . $this->_queryDelimiter . $queryString);
+        }
+        else if ($method == self::METHOD_POST)
+        {
+            return $this->_sendRawPost($this->_infoUrl, $queryString, FALSE, 'application/x-www-form-urlencoded; charset=UTF-8');
         }
         else
         {

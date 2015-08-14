@@ -16,7 +16,7 @@ class IntegerNet_Solr_Helper_CatalogSearch_Data extends Mage_CatalogSearch_Helpe
      */
     public function getSuggestUrl()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+        if (Mage::helper('integernet_solr')->isActive()) {
             switch (Mage::getStoreConfig('integernet_solr/autosuggest/use_php_file_in_home_dir')) {
                 case IntegerNet_Solr_Model_Source_AutosuggestMethod::AUTOSUGGEST_METHOD_PHP:
                     return Mage::getStoreConfig('web/unsecure/base_url') . 'autosuggest.php?store_id=' . Mage::app()->getStore()->getId();

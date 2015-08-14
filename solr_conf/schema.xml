@@ -25,8 +25,8 @@
         <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
             <analyzer type="index">
                 <tokenizer class="solr.StandardTokenizerFactory"/>
-                <filter class="solr.ShingleFilterFactory" minShingleSize="2" maxShingleSize="3"
-                        outputUnigrams="true" outputUnigramsIfNoShingles="false" tokenSeparator=""/>
+      			<filter class="solr.ShingleFilterFactory" minShingleSize="2" maxShingleSize="3"
+         			outputUnigrams="true" outputUnigramsIfNoShingles="false" tokenSeparator=""/>
                 <filter class="solr.NGramFilterFactory" maxGramSize="25" minGramSize="2"/>
                 <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="1" splitOnCaseChange="1" splitOnNumerics="0" />
                 <filter class="solr.LowerCaseFilterFactory"/>
@@ -34,8 +34,8 @@
             </analyzer>
             <analyzer type="query">
                 <tokenizer class="solr.StandardTokenizerFactory"/>
-                <filter class="solr.ShingleFilterFactory" minShingleSize="2" maxShingleSize="3"
-                        outputUnigrams="true" outputUnigramsIfNoShingles="false" tokenSeparator=""/>
+      			<filter class="solr.ShingleFilterFactory" minShingleSize="2" maxShingleSize="3"
+         			outputUnigrams="true" outputUnigramsIfNoShingles="false" tokenSeparator=""/>
                 <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
                 <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="1" splitOnCaseChange="1" splitOnNumerics="0" />
                 <filter class="solr.LowerCaseFilterFactory"/>

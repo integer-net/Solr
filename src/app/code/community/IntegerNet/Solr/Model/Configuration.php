@@ -33,6 +33,10 @@ class IntegerNet_Solr_Model_Configuration
             return;
         }
 
+        if (!$this->_isModuleLicensed()) {
+            return;
+        }
+
         if (!$this->_isServerConfigurationComplete($storeId)) {
             return;
         }
@@ -69,14 +73,15 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addWarningMessage(
             Mage::helper('integernet_solr')->__('Module version: %s', Mage::getConfig()->getModuleConfig('IntegerNet_Solr')->version)
         );
-        if (function_exists('Mage::getEdition')) {
+        if (method_exists('Mage', 'getEdition')) {
             $this->_addWarningMessage(
-                Mage::helper('integernet_solr')->__('Magento edition: %s', Mage::getEdition())
+                Mage::helper('integernet_solr')->__('Magento version: %s (%s Edition)', Mage::getVersion(), Mage::getEdition())
+            );
+        } else {
+            $this->_addWarningMessage(
+                Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
             );
         }
-        $this->_addWarningMessage(
-            Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
-        );
     }
 
     /**
@@ -95,6 +100,61 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addSuccessMessage(
             Mage::helper('integernet_solr')->__('Solr Module is activated.')
         );
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function _isModuleLicensed()
+    {
+        if (!trim(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+
+            if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
+
+                $diff = time() - $installTimestamp;
+                if (($diff < 0) || ($diff > 2419200)) {
+
+                    $this->_addErrorMessage(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key yet.')
+                    );
+                    return false;
+
+                } else {
+
+                    $this->_addNoticeMessage(
+                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key yet.')
+                    );
+                }
+            }
+
+        } else {
+            if (!Mage::helper('integernet_solr')->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+    
+                if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
+
+                    $diff = time() - $installTimestamp;
+                    if (($diff < 0) || ($diff > 2419200)) {
+
+                        $this->_addErrorMessage(
+                            Mage::helper('integernet_solr')->__('The license key you have entered is incorrect.')
+                        );
+                        return false;
+
+                    } else {
+
+                        $this->_addNoticeMessage(
+                            Mage::helper('integernet_solr')->__('The license key you have entered is incorrect.')
+                        );
+                    }
+                }
+            } else {
+                $this->_addSuccessMessage(
+                    Mage::helper('integernet_solr')->__('Your license key is valid.')
+                );
+            }
+        }
+
         return true;
     }
 
@@ -138,6 +198,17 @@ class IntegerNet_Solr_Model_Configuration
         $this->_addSuccessMessage(
             Mage::helper('integernet_solr')->__('Connection to Solr server established successfully.')
         );
+
+        $info = Mage::getResourceModel('integernet_solr/solr')->getInfo($storeId);
+        if ($info instanceof Apache_Solr_Response) {
+            if (isset($info->lucene->{'solr-spec-version'})) {
+                $solrVersion = $info->lucene->{'solr-spec-version'};
+                $this->_addWarningMessage(
+                    Mage::helper('integernet_solr')->__('Solr version: %s', $solrVersion)
+                );
+            }
+        }
+
         return true;
     }
 

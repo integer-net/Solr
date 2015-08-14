@@ -11,6 +11,7 @@ src/lib/IntegerNet/Solr                                             lib/IntegerN
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/
+src/skin/frontend/rwd/default/integernet/*                          skin/frontend/rwd/default/integernet/
 src/skin/adminhtml/default/default/integernet/*                     skin/adminhtml/default/default/integernet/
 src/autosuggest.php                                                 autosuggest.php
 src/autosuggest-mage.php                                            autosuggest-mage.php

@@ -207,3 +207,53 @@
     margin: 0;
 }
 
+@media only screen and (max-width: 990px) {
+
+    #header-search {
+        position: relative;
+    }
+
+    #search_autocomplete {
+        width: 458px !important;
+    }
+
+    #search_autocomplete .products-box {
+        border-right: 1px solid #dbdbdb;
+        border-bottom: 1px solid #dbdbdb;
+        background: #ffffff;
+        width: 240px;
+    }
+
+    #search_autocomplete ul.products li {
+        width: 200px;
+        margin-left: 0;
+        border: 0;
+    }
+
+    #search_autocomplete .additional-box {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 770px) {
+
+    #search_autocomplete {
+        right: 20px !important;
+        top: 59px !important;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+
+    #search_autocomplete {
+        width: 240px !important;
+    }
+
+    #search_autocomplete ul.searchwords {
+        float: none;
+        width: 238px;
+        border: 0;
+        padding: 15px;
+    }
+}
+

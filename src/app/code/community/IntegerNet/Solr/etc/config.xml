@@ -184,6 +184,9 @@
                 <integernet_solr>
                     <file>integernet/solr.xml</file>
                 </integernet_solr>
+                <integernet_solr_filter>
+                    <file>integernet/solr/filter.xml</file>
+                </integernet_solr_filter>
             </updates>
         </layout>
 

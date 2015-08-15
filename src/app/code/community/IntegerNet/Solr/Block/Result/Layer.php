@@ -55,14 +55,6 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Template
     }
 
     /**
-     * @return Apache_Solr_Response
-     */
-    protected function _getSolrResult()
-    {
-        return Mage::getSingleton('integernet_solr/result')->getSolrResult();
-    }
-
-    /**
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
      * @param int[] $attributeFacets
      * @return Varien_Object
@@ -76,5 +68,13 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Template
             $this->getChild('filter')->setData('attribute', $attribute)->toHtml()
         );
         return $filter;
+    }
+
+    /**
+     * @return Apache_Solr_Response
+     */
+    protected function _getSolrResult()
+    {
+        return Mage::getSingleton('integernet_solr/result')->getSolrResult();
     }
 }

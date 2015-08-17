@@ -43,7 +43,7 @@ Systemvoraussetzungen
 ------------
 - **Magento Community Edition** 1.6 bis 1.9 oder **Magento Enterprise Edition** 1.11 bis 1.14
 - **Solr** 4.x oder 5.x
-- **PHP** 5.3 bis 5.5 (5.5 empfohlen)
+- **PHP** 5.3 bis 5.5 (5.5 empfohlen), voraussichtlich kompatibel zu PHP 5.6 und 7.0 (noch nicht getestet)
 
 Installation
 ------------
@@ -358,13 +358,55 @@ Hier geht es um den Link, der hinter den angezeigten Kategorien steht. Die Optio
 Hier können Sie beliebig viele Attribute eintragen, die in der Suchvorschau mit den am häufigsten vorkommenden 
 Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die Anzahl der angezeigten Optionen 
 definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei
-"Sortierung" wird zu oberst angezeigt.
+"Sortierung" wird zuoberst angezeigt.
 Es stehten nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
 
 Modifikation der Reihenfolge der Suchergebnisse
 -------------
 
---- Folgt ---
+Die Suchergebnisse werden bereits mit den Basiseinstellungen in eine Reihenfolge gebracht, die hauptsächlich von 
+der Häufigkeit und der Position der Vorkommen der Suchbegriffe in den Produkteigenschaften abhängt. Erfahrungsgemäß 
+werden damit bereits gute Ergebnisse erzielt - deutlich bessere als mit der Standardsuche von Magento.
+
+Es gibt allerdings weitere Möglichkeiten der Anpassung:
+
+### Boosting von Attributen
+
+Wenn Suchbegriffe im Namen oder der Artikelnummer eines Artikels vorkommen, sollte dies höher gewertet werden als wenn
+der gleiche Suchbegriff nur im Beschreibungstext vorkommt. Daher werden bereits im Standard manche Attribute höher
+priorisiert als andere.
+
+Die Priorisierung erfolgt anhand des Wertes "Suchpriorität", die man jedem Produktattribut zuweisen kann. Diese neue
+Eigenschaft kann man in der Auflistung der Attribute (unter *Katalog -> Attribute -> Attribute verwalten*) bereits
+sehen:
+
+![Attribut-Tabelle](http://www.integer-net.de/download/solr/integernet-solr-attribute-grid-de.png)
+
+Die Tabelle ist hier bereits nach dem neuen Wert "Solr-Priorität" sortiert.
+Den Wert können Sie in den Attributeigenschaften auch setzen:
+ 
+![Attribut-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-attribute-view-de.png)
+ 
+Mit diesem Wert wird die errechnete Priorität des Suchbegriffes für das Produkt multipliziert, wenn der gesuchte Begriff
+in dem Attribut gefunden wird. Daher entspricht *1.0* dem Standard - hier findet keine Modifikation statt. Somit können
+Sie die Priorität von einzelnen Attributen erhöhen oder senken. Wir empfehlen Werte zwischen 0.5 und höchstens 10.
+
+Beachten Sie, dass Sie nach der Anpassung der Suchpriorität den Solr-Index neu aufbauen müssen.
+
+### Boosting von Produkten
+
+Es kommt immer mal wieder vor, dass einzelne Produkte hervorgehoben werden sollen, sei es, weil sie die Topseller sind,
+sei es, weil sie abverkauft werden sollen. Hierfür gibt es die Möglichkeit, die Priorität einzelner Produkt hoch- oder
+herabzusetzen. 
+
+Dafür gibt es das neue Produktattribut "Solr-Priorität" im Tab "Solr" der Produktansicht im Backend.
+
+![Produkt-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-product-boost-de.png)
+
+Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchergebnissen passt, weiter oben oder weiter unten
+zu platzieren als seine Standard-Funktion. Wir empfehlen hier Werte zwischen 0.5 und höchstens 10. Der Mechanismus ist 
+der gleiche wie beim Boosting von Attributen. Eine Neuindizierung ist nach der Anpassung nicht erforderlich, sofern
+die Index-Aktualisierung aktiviert ist.
 
 Template-Anpassungen
 --------------------

@@ -43,7 +43,7 @@ Requirements
 ------------
 - **Magento Community Edition** 1.6 to 1.9 or **Magento Enterprise Edition** 1.11 to 1.14
 - **Solr** 4.x or 5.x
-- **PHP** 5.3 to 5.5 (5.5 recommended)
+- **PHP** 5.3 to 5.5 (5.5 recommended), probably compatible to PHP 5.6 and 7.0 as well (not tested yet)
 
 Installation
 ------------

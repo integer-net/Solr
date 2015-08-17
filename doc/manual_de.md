@@ -149,7 +149,217 @@ keine Statischen Blocks oder andere externen Informationen ohne zusätzliche Erw
 Konfiguration
 -------------
 
---- Folgt ---
+Die Konfiguration befindet sich im Administrationsbereich von Magento unter System -> Konfiguration -> Solr:
+
+![Konfigurations-Menü](http://www.integer-net.de/download/solr/integernet-solr-config-menu-de.png)
+
+Im Folgenden werden die Konfigurationsoptionen aufgelistet und beschrieben
+
+### Allgemein
+
+![Allgemein](http://www.integer-net.de/download/solr/integernet-solr-config-general-de.png)
+
+Im oberen Bereich werden Erfolgs-, Fehler-, Warn- und Informationsmeldungen ausgegeben. So wird automatisch geprüft, ob
+das Modul aktiviert ist, Zugangsdaten zum Solr-Server eingetragen sind und ob diese auch korrekt funktionieren.
+
+#### Ist aktiv
+
+Wenn dieser Schalter auf "Nein" steht, wird das Suchmodul im Frontend nicht genutzt werden. Stattdessen greift dann
+die Standardsuche von Magento. Sie haben die Möglichkeit, diesen Schalter für einzelne Websites oder StoreViews zu
+setzen.
+
+#### Lizenzschlüssel
+
+Damit das Modul korrekt funktioniert, benötigen Sie einen funktionierenden Lizenzschlüssel. Sie erhalten diesen nach 
+Kauf und Bezahlung des Moduls von uns. Kontaktieren Sie uns unter solr@integer-net.de, wenn Sie Probleme mit Ihrem
+Lizenzschlüssel haben sollten.
+Sie können das Modul zwei Wochen auch ohne Lizenzschlüssel testen. Erst anschließend ist der Lizenzschlüssel für
+das Funktionieren des Moduls notwendig.
+Ein Lizenzschlüssel gilt jeweils für eine Live-Instanz und beliebig viele zugehörige Entwicklungs-, Test- und Staging-
+Systeme.
+
+#### Logging aktivieren
+
+Wenn dieser Schalter aktiv ist, werden alle Anfragen zum Solr-Server gespeichert. Das betrifft sowohl die Suchvorschau
+als auch die eigentliche Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis /var/log/ mit den Dateinamen 
+solr.log bzw. solr_suggestions.log.
+Die Logdateien werden ausschließlich zur Fehlersuche bzw. zur Optimierung der Suchergebnisse genutzt. Da die 
+Datenmengen bei einer häufig genutzten Datenmenge erheblich sein können, empfehlen wir, das Logging auf 
+Produktivsystemen üblicherweise zu deaktivieren.
+
+### Server
+
+![Server](http://www.integer-net.de/download/solr/integernet-solr-config-server-de.png)
+
+In diesem Bereich werden die Zugangsdaten zum Solr-Server eingetragen. Wenn die Daten korrekt sind, erscheinen im
+oberen Bereich der Konfigurationsseite entsprechende Erfolgsmeldungen, andernfalls Fehlermeldungen.
+Sollten Sie die Zugangsdaten nicht kennen, erhalten Sie diese von Ihrem Administrator bzw. Hoster, der den Solr-Server 
+eingerichtet hat.
+Wenn Sie Zugang zum Admin-Bereich des Solr-Servers haben, können Sie die Zugangsdaten wie folgt selbst herausfinden:
+
+1. Wählen Sie links unten im Core-Selector den zu verwendenden Core aus:  
+ ![Solr-Admin 1](http://www.integer-net.de/download/solr/solr-admin-1.png)  
+2. Wählen Sie unterhalt des Core-Selectors "Query"  
+ ![Solr-Admin 2](http://www.integer-net.de/download/solr/solr-admin-2.png)  
+3. Klicken Sie "Execute Query"  
+ ![Solr-Admin 3](http://www.integer-net.de/download/solr/solr-admin-3.png)  
+4. Im oberen Bereich auf der rechten Seite sehen Sie jetzt die für Ihren Beispiel-Request verwendeten URL:  
+ ![Solr-Admin 4](http://www.integer-net.de/download/solr/solr-admin-4.png)  
+
+Die URL wird wie folgt in die einzelnen Teile aufgeteilt:
+
+![Solr-Admin-URL](http://www.integer-net.de/download/solr/solr-config-server.png)
+
+Die einzelnen Teile werden dann wie folgt in die Konfiguration eingetragen:
+
+![Solr Server-Konfiguration](http://www.integer-net.de/download/solr/solr-server-config-de.png)
+
+Achten Sie darauf, dass der Bereich *Kern* keine Schrägstriche enthält, der Bereich *Path* aber mindestens je einen 
+Schrägstrich am Anfang und am Ende.
+
+#### HTTP-Übertragungsmethode
+
+Bleiben Sie hier bei der Standardmethode *cURL*, wenn Sie keine Fehlermeldung erhalten. Andernfalls können Sie auf
+die Methode *file_get_contents* wechseln. Die Verfügbarkeit der Methoden hängt von den Server-Einstellungen des
+Magento-Servers ab.
+
+#### HTTP Basis-Authentifizierung
+
+Tragen Sie hier Benutzername und Passwort ein, wenn diese für den Zugriff von Magento auf den Solr-Server notwendig
+sein sollten.
+
+### Indizierung 
+
+![Indizierung](http://www.integer-net.de/download/solr/integernet-solr-config-indexing-de.png)
+
+#### Anzahl Produkte pro Durchlauf
+
+Die hier eingetragene Anzahl Produkte wird bei der Indizierung (s.o.) gleichzeitig verarbeitet, entsprechend viele
+Produktdaten werden in einen einzigen Request zum Solr-Server aufgenommen. Von dieser Einstellung ist die Performance
+der Indizierung stark abhängig. Reduzieren Sie den Wert testweise, falls sie Fehler bei der Indizierung erhalten.
+
+#### Alle Solr-Indexeinträge vor Neuindizierung löschen
+
+Diese Einstellung sollten Sie nur deaktivieren, wenn Sie nächtlich den Index komplett neu aufbauen, aber keinen 
+SWAP-Kern (s.u.) nutzen. Wenn diese Einstellung aktiv ist, wird der Solr-Index zu Beginn einer vollständigen
+Neuindizierung komplett geleert und anschließend neu erstellt.
+
+#### Cores tauschen nach vollständiger Neuindizierung
+
+Wenn Sie regelmäßig den Index neu aufbauen (z.B. nächtlich), ist es sinnvoll, die Funktion zum Tauschen der Kerne 
+einzusetzen und einen zweiten Kern zu verwenden. Aktivieren Sie in dem Fall diese Option und tragen Sie im Feld 
+*Name des Cores, mit dem der aktive Core getauscht werden soll* den Namen des zweiten Kerns ein.
+
+### Unscharfe Suche 
+
+![Unscharfe Suche](http://www.integer-net.de/download/solr/integernet-solr-config-fuzzy-de.png)
+
+#### Ist aktiv für Suche
+
+Wenn diese Einstellung ausgeschaltet ist, werden nur exakte Suchtreffer registriert. Eine Fehlerkorrektur findet dann
+nicht mehr statt. Dafür ist die Suche schneller, wenn diese Einstellung deaktiviert ist.
+
+#### Sensibilität für Suche
+
+Hier können Sie eintragen, wie empfindlich die unscharfe Suche sein soll. Der Wert muss zwischen 0 und 1 liegen, mit dem 
+Punkt (.) als Dezimaltrennzeichen, also z.B. *0.75*. Je niedriger der Wert, desto mehr Treffer werden Sie erhalten, da
+Schreibfehler großzügiger korrigiert werden und z.B. für die Eingabe "rot" auch der Wert "rosa" akzeptiert wird, der 
+von den Buchstaben her relativ ähnlich ist. Testen Sie hier einen möglichst guten Wert für Ihren Shop aus. Wir empfehlen
+Werte zwischen 0.6 und 0.9.
+
+#### Ist aktiv für Suchvorschläge
+
+Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar. Es kann interessant sein, diese 
+Funktion nur für die Suchvorschläge aus Performancegründen auszuschalten.
+
+#### Sensibilität für Suchvorschläge
+
+Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar.
+
+### Suchergebnisse
+
+![Suchergebnisse](http://www.integer-net.de/download/solr/integernet-solr-config-results-de.png)
+
+#### HTML vom Solr-Index verwenden
+
+Wenn diese Eigenschaft aktiviert ist, wird der HTML-Code, der bei den Suchergebnissen ein Produkt darstellt, bereits
+bei der Indizierung erzeugt. Diese dauert dadurch natürlich etwas länger, dafür erfolgt die Ausgabe bei den Suchergebnissen
+schneller, da dieser Teil nicht mehr (mehrfach, da für mehrere Produkte) berechnet werden muss.
+Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, wenn die Daten in den Suchergebnissen
+benutzer- oder benutzergruppenabhängig dargestellt werden müssen, also wenn z.B. die Preise je nach Kundengruppe
+unterschiedlich sind. In diesem Fall deaktivieren Sie diese Einstellung bitte.
+
+#### Such-Operator
+
+Hier haben Sie die Wahl zwischen *UND* und *ODER*. Der Such-Operator wird eingesetzt, wenn es mehr als einen Suchbegriff
+in der Anfrage gibt, z.B. "rotes Shirt". Bei *UND* werden nur Ergebnisse ausgegeben, die auf beide (bzw. alle) 
+Suchbegriffe passen, bei *ODER* werden dafür auch Ergebnisse ausgegeben, die nur auf einen der Suchbegriffe passen. In 
+den meisten Fällen ist *UND* die bessere Einstellung.
+
+#### Größe der Preis-Schritte
+
+Diese Einstellung ist für den Preisfilter wichtig. Hier kann man einstellen, in welchen Schritten die einzelnen 
+Intervalle definiert sein sollen. So führt z.B. *10* zu den Intervallen *0,00-10,00*, *10,00-20,00*, *20,00-30,00* usw.
+ 
+#### Obergrenze der Preis-Schritte
+
+Auch diese Einstellung ist für die Steuerung des Preisindex gedacht. Hierüber wird das oberste Intervall definiert.
+Beim Werte *200* wäre das also *ab 200,00*. In diesem Intervall werden alle Produkte zusammen gefasst, die mehr als 
+200,00 kosten.
+
+#### Individuelle Preisintervalle verwenden
+Wenn Sie keine lineare Einteilung der Intervalle wünschen und mindestens Solr 4.10 einsetzen, können Sie hier die 
+gewünschten Intervallgrenzen für den Preisfilter individuell einstellen. Beim Beispiel *10,20,50,100,200,300,400,500* 
+wären das die Schritte *0,00-10,00*, *10,00-20,00*, *20,00-50,00* usw. bis *400,00-500,00* und *ab 500,00*. 
+
+### Suchvorschlags-Box
+
+Die Suchvorschlags-Box wird auch als "Suchvorschau" oder "Autosuggest" bezeichnet.
+
+![Suchvorschlags-Box](http://www.integer-net.de/download/solr/integernet-solr-config-autosuggest-de.png)
+
+#### Ist aktiv
+
+Bei Deaktivieren dieser Einstellung wird kein Suchvorschaufenster angezeigt.
+
+#### Methode zum Ermitteln von Suchvorschlags-Informationen
+
+Diese Einstellung wurde bereits oben im Kapitel "Technischer Ablauf" umfassend beschrieben.
+
+#### Maximale Anzahl Suchwort-Vorschläge
+
+Die Anzahl der Suchwort-Vorschläge in der Suchvorschlags-Box. Abhängig von Ihren Produkten wird der eingegebene
+Suchbegriff um sinnvolle Varianten ergänzt. Bei Eingabe von "re" im Demo-Shop erscheinen z.B. die folgenden
+Vorschläge: *regular…*, *resistant…*, *refined…*, *red…*.
+ 
+#### Maximale Anzahl Produkt-Vorschläge
+
+Die Anzahl der in der Suchvorschau angezeigten Produkte.
+
+#### Maximale Anzahl Kategorie-Vorschläge
+
+Die Anzahl der in der Suchvorschau angezeigten Kategorien. Dies sind die Kategorien, die am besten zu den gefundenen
+Produkten passen.
+
+#### Kompletten Kategorie-Pfad anzeigen
+
+Ist diese Einstellung aktiv, werden nicht nur die Kategorienamen angezeigt, sondern auch deren Elternkategorien als
+Pfad, beispielsweise "Electronics > Cameras > Accessories" statt nur "Accessoires".
+
+#### Typ von Kategorie-Links
+
+Hier geht es um den Link, der hinter den angezeigten Kategorien steht. Die Optionen sind:
+
+- Suchergebnisseite mit gesetztem Kategoriefilter
+- Kategorieseite
+
+#### Attributfilter-Vorschläge
+
+Hier können Sie beliebig viele Attribute eintragen, die in der Suchvorschau mit den am häufigsten vorkommenden 
+Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die Anzahl der angezeigten Optionen 
+definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei
+"Sortierung" wird zu oberst angezeigt.
+Es stehten nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
 
 Modifikation der Reihenfolge der Suchergebnisse
 -------------

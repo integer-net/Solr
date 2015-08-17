@@ -14,6 +14,7 @@ Features
 - Correction of spelling, fuzzy search
 - Displays exact search results first and results to similar search words after that
 - Supports multi store functionality of Magento completely
+- Compatible to default, modern and rwd themes of Magento
 - Can use one Solr core for several Magento store views or seperate cores 
 - Can use separate Solr cores for indexing only and swap cores after that
 - Allows logging of all Solr requests

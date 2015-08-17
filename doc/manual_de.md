@@ -14,6 +14,7 @@ Features
 - Rechtschreibkorrektur, unscharfe Suche
 - Zeigt zuerst exakte Suchergebnisse an und anschließend Suchergebnisse zu ähnlichen Suchbegriffen
 - Vollständige Unterstützung der Multistore-Funktionalität von Magento
+- Kompatibel zu den Magento-Standard-Themes default, modern und rwd
 - Nutzung eines einzigen Solr-Kerns für mehrere Magento-Storeviews oder mehrerer Kerne
 - Nutzung eines separaten Solr-Kerns nur für die Indizierung mit anschließendem Tausch der Kerne "on the fly" ("Swap")
 - Erlaubt Logging aller Solr-Requests

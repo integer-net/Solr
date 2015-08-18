@@ -149,7 +149,7 @@ keine Statischen Blocks oder andere externen Informationen ohne zusätzliche Erw
 Konfiguration
 -------------
 
-Die Konfiguration befindet sich im Administrationsbereich von Magento unter System -> Konfiguration -> Solr:
+Die Konfiguration befindet sich im Administrationsbereich von Magento unter *System -> Konfiguration -> Solr*:
 
 ![Konfigurations-Menü](http://www.integer-net.de/download/solr/integernet-solr-config-menu-de.png)
 
@@ -173,18 +173,24 @@ setzen.
 Damit das Modul korrekt funktioniert, benötigen Sie einen funktionierenden Lizenzschlüssel. Sie erhalten diesen nach 
 Kauf und Bezahlung des Moduls von uns. Kontaktieren Sie uns unter solr@integer-net.de, wenn Sie Probleme mit Ihrem
 Lizenzschlüssel haben sollten.
+
 Sie können das Modul zwei Wochen auch ohne Lizenzschlüssel testen. Erst anschließend ist der Lizenzschlüssel für
 das Funktionieren des Moduls notwendig.
+
 Ein Lizenzschlüssel gilt jeweils für eine Live-Instanz und beliebig viele zugehörige Entwicklungs-, Test- und Staging-
 Systeme.
+
+Achtung: Es wird keine Verbindung zu einem Lizenzserver o.ä. aufgebaut. Sobald der Lizenzschlüssel eingetragen ist,
+funktioniert das Modul autark. 
 
 #### Logging aktivieren
 
 Wenn dieser Schalter aktiv ist, werden alle Anfragen zum Solr-Server gespeichert. Das betrifft sowohl die Suchvorschau
-als auch die eigentliche Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis /var/log/ mit den Dateinamen 
-solr.log bzw. solr_suggestions.log.
+als auch die eigentliche Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis `/var/log/` mit den Dateinamen 
+`solr.log` bzw. `solr_suggestions.log`.
+
 Die Logdateien werden ausschließlich zur Fehlersuche bzw. zur Optimierung der Suchergebnisse genutzt. Da die 
-Datenmengen bei einer häufig genutzten Datenmenge erheblich sein können, empfehlen wir, das Logging auf 
+Datenmengen bei einer häufig genutzten Suchfunktion erheblich sein können, empfehlen wir, das Logging auf 
 Produktivsystemen üblicherweise zu deaktivieren.
 
 ### Server
@@ -195,11 +201,12 @@ In diesem Bereich werden die Zugangsdaten zum Solr-Server eingetragen. Wenn die 
 oberen Bereich der Konfigurationsseite entsprechende Erfolgsmeldungen, andernfalls Fehlermeldungen.
 Sollten Sie die Zugangsdaten nicht kennen, erhalten Sie diese von Ihrem Administrator bzw. Hoster, der den Solr-Server 
 eingerichtet hat.
+
 Wenn Sie Zugang zum Admin-Bereich des Solr-Servers haben, können Sie die Zugangsdaten wie folgt selbst herausfinden:
 
 1. Wählen Sie links unten im Core-Selector den zu verwendenden Core aus:  
  ![Solr-Admin 1](http://www.integer-net.de/download/solr/solr-admin-1.png)  
-2. Wählen Sie unterhalt des Core-Selectors "Query"  
+2. Wählen Sie unterhalb des Core-Selectors "Query"  
  ![Solr-Admin 2](http://www.integer-net.de/download/solr/solr-admin-2.png)  
 3. Klicken Sie "Execute Query"  
  ![Solr-Admin 3](http://www.integer-net.de/download/solr/solr-admin-3.png)  
@@ -214,7 +221,7 @@ Die einzelnen Teile werden dann wie folgt in die Konfiguration eingetragen:
 
 ![Solr Server-Konfiguration](http://www.integer-net.de/download/solr/solr-server-config-de.png)
 
-Achten Sie darauf, dass der Bereich *Kern* keine Schrägstriche enthält, der Bereich *Path* aber mindestens je einen 
+Achten Sie darauf, dass das Feld *Kern* keine Schrägstriche enthält, das Feld *Path* aber mindestens je einen 
 Schrägstrich am Anfang und am Ende.
 
 #### HTTP-Übertragungsmethode
@@ -285,6 +292,7 @@ Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar
 Wenn diese Eigenschaft aktiviert ist, wird der HTML-Code, der bei den Suchergebnissen ein Produkt darstellt, bereits
 bei der Indizierung erzeugt. Diese dauert dadurch natürlich etwas länger, dafür erfolgt die Ausgabe bei den Suchergebnissen
 schneller, da dieser Teil nicht mehr (mehrfach, da für mehrere Produkte) berechnet werden muss.
+
 Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, wenn die Daten in den Suchergebnissen
 benutzer- oder benutzergruppenabhängig dargestellt werden müssen, also wenn z.B. die Preise je nach Kundengruppe
 unterschiedlich sind. In diesem Fall deaktivieren Sie diese Einstellung bitte.
@@ -303,8 +311,8 @@ Intervalle definiert sein sollen. So führt z.B. *10* zu den Intervallen *0,00-1
  
 #### Obergrenze der Preis-Schritte
 
-Auch diese Einstellung ist für die Steuerung des Preisindex gedacht. Hierüber wird das oberste Intervall definiert.
-Beim Werte *200* wäre das also *ab 200,00*. In diesem Intervall werden alle Produkte zusammen gefasst, die mehr als 
+Auch diese Einstellung ist für die Steuerung des Preisfilters gedacht. Hierüber wird das oberste Intervall definiert.
+Beim Wert *200* wäre das also *ab 200,00*. In diesem Intervall werden alle Produkte zusammen gefasst, die mehr als 
 200,00 kosten.
 
 #### Individuelle Preisintervalle verwenden
@@ -350,7 +358,7 @@ Pfad, beispielsweise "Electronics > Cameras > Accessories" statt nur "Accessoire
 
 Hier geht es um den Link, der hinter den angezeigten Kategorien steht. Die Optionen sind:
 
-- Suchergebnisseite mit gesetztem Kategoriefilter
+- Suchergebnisseite mit gesetztem Kategoriefilter, sodass nur Produkte in der gewählten Kategorie angezeigt werden
 - Kategorieseite
 
 #### Attributfilter-Vorschläge
@@ -359,6 +367,7 @@ Hier können Sie beliebig viele Attribute eintragen, die in der Suchvorschau mit
 Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die Anzahl der angezeigten Optionen 
 definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei
 "Sortierung" wird zuoberst angezeigt.
+
 Es stehten nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
 
 Modifikation der Reihenfolge der Suchergebnisse
@@ -376,7 +385,7 @@ Wenn Suchbegriffe im Namen oder der Artikelnummer eines Artikels vorkommen, soll
 der gleiche Suchbegriff nur im Beschreibungstext vorkommt. Daher werden bereits im Standard manche Attribute höher
 priorisiert als andere.
 
-Die Priorisierung erfolgt anhand des Wertes "Suchpriorität", die man jedem Produktattribut zuweisen kann. Diese neue
+Die Priorisierung erfolgt anhand des Wertes "Solr-Priorität", die man jedem Produktattribut zuweisen kann. Diese neue
 Eigenschaft kann man in der Auflistung der Attribute (unter *Katalog -> Attribute -> Attribute verwalten*) bereits
 sehen:
 
@@ -403,8 +412,8 @@ Dafür gibt es das neue Produktattribut "Solr-Priorität" im Tab "Solr" der Prod
 
 ![Produkt-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-product-boost-de.png)
 
-Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchergebnissen passt, weiter oben oder weiter unten
-zu platzieren als seine Standard-Funktion. Wir empfehlen hier Werte zwischen 0.5 und höchstens 10. Der Mechanismus ist 
+Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchbegriffen passt, weiter oben oder weiter unten
+zu platzieren als seine Standard-Position. Wir empfehlen hier Werte zwischen 0.5 und höchstens 10. Der Mechanismus ist 
 der gleiche wie beim Boosting von Attributen. Eine Neuindizierung ist nach der Anpassung nicht erforderlich, sofern
 die Index-Aktualisierung aktiviert ist.
 

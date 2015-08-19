@@ -238,6 +238,8 @@
                 <is_active_autosuggest>1</is_active_autosuggest>
                 <sensitivity>0.7</sensitivity>
                 <sensitivity_autosuggest>0.7</sensitivity_autosuggest>
+                <minimum_results>1</minimum_results>
+                <minimum_results_autosuggest>1</minimum_results_autosuggest>
             </fuzzy>
             <results>
                 <use_html_from_solr>0</use_html_from_solr>

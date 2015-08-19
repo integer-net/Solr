@@ -233,6 +233,17 @@
                             <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
                             <depends><is_active>1</is_active></depends>
                         </sensitivity>
+                        <minimum_results translate="label">
+                            <label>Minimum results, if smaller active fuzzy</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+                            <depends><is_active>1</is_active></depends>
+                        </minimum_results>
                         <is_active_autosuggest translate="label">
                             <label>Is active for Autosuggest</label>
                             <frontend_type>select</frontend_type>
@@ -253,6 +264,17 @@
                             <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
                             <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
                         </sensitivity_autosuggest>
+                        <minimum_results_autosuggest translate="label">
+                            <label>Minimum results for Autosuggest, if smaller active fuzzy</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+                            <depends><is_active>1</is_active></depends>
+                        </minimum_results_autosuggest>
                     </fields>
                 </fuzzy>
 

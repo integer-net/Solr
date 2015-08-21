@@ -17,6 +17,8 @@
 "Sensitivity for Search","Sensibilität für Suche"
 "Sensitivity for Autosuggest","Sensibilität für Suchvorschläge"
 "Value between 0 and 1. Smaller values mean more fuzzy search results.","Wert zwischen 0 und 1. Je kleiner, desto unschärfer."
+"Minimum results, if smaller active fuzzy", "Minimum Ergebnisse, wenn kleiner dann Fuzzy aktivieren"
+"Minimum results for Autosuggest, if smaller active fuzzy", "Minimum Ergebnisse for Suchvörschläge, wenn kleiner dann Fuzzy aktivieren"
 "Fuzzy Search","Unscharfe Suche"
 "Solr Boost","Solr Boost"
 "Solr Priority","Solr-Priorität"

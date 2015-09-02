@@ -443,7 +443,17 @@ class IntegerNet_Solr_Model_Result
         $filterQuery = 'store_id:' . $storeId;
 
         foreach($this->getFilters() as $attributeCode => $value) {
-            $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
+            if (is_array($value)) {
+                $filterQuery .= ' AND (';
+                $filterQueryParts = array();
+                foreach($value as $singleValue) {
+                    $filterQueryParts[] = $attributeCode . ':' . $singleValue;
+                }
+                $filterQuery .= implode(' OR ', $filterQueryParts);
+                $filterQuery .= ')';
+            } else {
+                $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
+            }
         }
 
         return $filterQuery;

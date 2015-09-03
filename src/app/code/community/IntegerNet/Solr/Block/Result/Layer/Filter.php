@@ -23,6 +23,11 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         return $this->getData('attribute');
     }
 
+    public function isCategory()
+    {
+        return (boolean)$this->getData('is_category');
+    }
+
     /**
      * @return Varien_Object[]
      * @throws Mage_Core_Exception
@@ -30,6 +35,23 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     public function getItems()
     {
         $items = array();
+
+        if ($this->isCategory()) {
+            $facetName = 'category';
+            if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
+
+                $categoryFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
+
+                foreach($categoryFacets as $optionId => $optionCount) {
+                    $item = new Varien_Object();
+                    $item->setCount($optionCount);
+                    $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                    $item->setUrl($this->_getUrl($optionId));
+                    $items[] = $item;
+                }
+            }
+            return $items;
+        }
         
         $attributeCodeFacetName = $this->getAttribute()->getAttributeCode() . '_facet';
         if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
@@ -56,10 +78,17 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getUrl($optionId)
     {
-        $query = array(
-            $this->getAttribute()->getAttributeCode() => $optionId,
-            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-        );
+        if ($this->isCategory()) {
+            $query = array(
+                'cat' => $optionId,
+                Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
+            );
+        } else {
+            $query = array(
+                $this->getAttribute()->getAttributeCode() => $optionId,
+                Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
+            );
+        }
         return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
     }
 

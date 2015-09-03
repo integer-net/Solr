@@ -16,6 +16,16 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
         if (is_null($this->_activeFilters)) {
             $this->_activeFilters = array();
 
+            if ($categoryId = Mage::app()->getRequest()->getParam('cat')) {
+                $optionLabel = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore());
+                $filter = new Varien_Object();
+                $filter->setIsCategory(true);
+                $filter->setName(Mage::helper('catalog')->__('Category'));
+                $filter->setLabel($optionLabel);
+                $filter->setRemoveUrl($this->_getRemoveUrl('cat'));
+                $this->_activeFilters[] = $filter;
+            }
+
             foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 

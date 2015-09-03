@@ -28,6 +28,11 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         return (boolean)$this->getData('is_category');
     }
 
+    public function isRange()
+    {
+        return (boolean)$this->getData('is_range');
+    }
+
     /**
      * @return Varien_Object[]
      * @throws Mage_Core_Exception
@@ -52,7 +57,29 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             }
             return $items;
         }
-        
+
+        if ($this->isRange()) {
+            $store = Mage::app()->getStore();
+            $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
+            if (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
+
+                $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
+
+                foreach($attributeFacetData['counts'] as $rangeStart => $rangeCount) {
+                    $item = new Varien_Object();
+                    $item->setCount($rangeCount);
+                    $rangeEnd = $rangeStart + $attributeFacetData['gap'];
+                    $item->setLabel(Mage::helper('catalog')->__(
+                        '%s - %s',
+                        $store->formatPrice($rangeStart),
+                        $store->formatPrice($rangeEnd - 0.01)
+                    ));
+                    $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
+                    $items[] = $item;
+                }
+            }
+        }
+
         $attributeCodeFacetName = $this->getAttribute()->getAttributeCode() . '_facet';
         if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
 
@@ -89,6 +116,22 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
             );
         }
+        return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
+    }
+
+    /**
+     * Get filter item url
+     *
+     * @param int $rangeStart
+     * @param int $rangeEnd
+     * @return string
+     */
+    protected function _getRangeUrl($rangeStart, $rangeEnd)
+    {
+        $query = array(
+            $this->getAttribute()->getAttributeCode() => floatval($rangeStart) . '-' . floatval($rangeEnd),
+            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
+        );
         return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
     }
 

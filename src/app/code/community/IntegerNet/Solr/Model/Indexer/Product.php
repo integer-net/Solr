@@ -274,24 +274,22 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * The schema expect for facet attributes integer values
+     * The schema expected for facet attributes integer values
      *
-     * @param $rawValue
+     * @param string $rawValue
      * @return bool
      */
     protected function _isInteger($rawValue)
     {
         $rawValues = explode(',', $rawValue);
 
-        $isInt = true;
         foreach ($rawValues as $value) {
             if (!is_numeric($value)) {
-                $isInt = false;
-                break;
+                return false;
             }
         }
 
-        return $isInt;
+        return true;
     }
 
     /**

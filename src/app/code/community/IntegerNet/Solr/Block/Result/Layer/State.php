@@ -14,6 +14,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
     public function getActiveFilters()
     {
         if (is_null($this->_activeFilters)) {
+            $store = Mage::app()->getStore();
             $this->_activeFilters = array();
 
             if ($categoryId = Mage::app()->getRequest()->getParam('cat')) {
@@ -30,7 +31,17 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 if ($optionId = Mage::app()->getRequest()->getParam($attribute->getAttributeCode())) {
-                    $optionLabel = $attribute->getSource()->getOptionText($optionId);
+                    if ($attribute->getFrontendInput() == 'price') {
+                        list($fromPrice,$toPrice) = explode('-', $optionId);
+                        $toPrice -= 0.01;
+                        if ($toPrice == 0) {
+                            $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                        } else {
+                            $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice),  $store->formatPrice($toPrice));
+                        }
+                    } else {
+                        $optionLabel = $attribute->getSource()->getOptionText($optionId);
+                    }
                     $filter = new Varien_Object();
                     $filter->setAttribute($attribute);
                     $filter->setName($attribute->getStoreLabel());

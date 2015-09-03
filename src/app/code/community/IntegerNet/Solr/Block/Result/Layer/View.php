@@ -77,4 +77,12 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     {
         return Mage::getSingleton('integernet_solr/result')->getSolrResult();
     }
+
+    /**
+     * @return IntegerNet_Solr_Block_Result_Layer
+     */
+    public function getLayer()
+    {
+        return $this->getLayout()->createBlock('integernet_solr/result_layer');
+    }
 }

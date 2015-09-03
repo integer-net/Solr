@@ -10,6 +10,12 @@
 class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
 {
     /**
+     * Whether to display product count for layer navigation items
+     * @var bool
+     */
+    protected $_displayProductCount = null;
+
+    /**
      * @return Mage_Catalog_Model_Entity_Attribute
      */
     public function getAttribute()
@@ -63,5 +69,17 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getSolrResult()
     {
         return Mage::getSingleton('integernet_solr/result')->getSolrResult();
+    }
+
+    /**
+     * Getter for $_displayProductCount
+     * @return bool
+     */
+    public function shouldDisplayProductCount()
+    {
+        if ($this->_displayProductCount === null) {
+            $this->_displayProductCount = Mage::helper('catalog')->shouldDisplayProductCountOnLayer();
+        }
+        return $this->_displayProductCount;
     }
 }

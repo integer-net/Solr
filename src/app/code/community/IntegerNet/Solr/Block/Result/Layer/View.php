@@ -56,7 +56,11 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                     $this->_filters[] = $this->_getFilter($attribute, $attributeFacets);
                 }
                 $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($attribute);
-                if (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
+                if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
+
+                    $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
+                    $this->_filters[] = $this->_getIntervalFilter($attribute, $attributeFacetData);
+                } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
 
                     $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
                     $this->_filters[] = $this->_getRangeFilter($attribute, $attributeFacetData);
@@ -80,6 +84,26 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
             $this->getChild('filter')
                 ->setData('is_category', false)
                 ->setData('is_range', false)
+                ->setData('attribute', $attribute)
+                ->toHtml()
+        );
+        return $filter;
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param array $attributeFacetData
+     * @return Varien_Object
+     */
+    protected function _getIntervalFilter($attribute, $attributeFacetData)
+    {
+        $filter = new Varien_Object();
+        $filter->setName($attribute->getStoreLabel());
+        $filter->setItemsCount(sizeof($attributeFacetData));
+        $filter->setHtml(
+            $this->getChild('filter')
+                ->setData('is_category', false)
+                ->setData('is_range', true)
                 ->setData('attribute', $attribute)
                 ->toHtml()
         );

@@ -30,14 +30,40 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
             foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
+                $optionLabel = '';
                 if ($optionId = Mage::app()->getRequest()->getParam($attribute->getAttributeCode())) {
                     if ($attribute->getFrontendInput() == 'price') {
-                        list($fromPrice,$toPrice) = explode('-', $optionId);
-                        $toPrice -= 0.01;
-                        if ($toPrice == 0) {
-                            $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                        if (strpos($optionId, '-') !== false) {
+                            list($fromPrice, $toPrice) = explode('-', $optionId);
+                            $toPrice -= 0.01;
+                            if ($toPrice == 0) {
+                                $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                            } else {
+                                $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice), $store->formatPrice($toPrice));
+                            }
                         } else {
-                            $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice),  $store->formatPrice($toPrice));
+                            list($index, $stepSize) = explode(',', $optionId);
+                            if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
+                                && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
+                                $lowerBorder = 0;
+                                $i = 1;
+                                foreach (explode(',', $customPriceIntervals) as $upperBorder) {
+                                    if ($i == $index) {
+                                        $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                                        break;
+                                    }
+
+                                    $i++;
+                                    $lowerBorder = $upperBorder;
+                                }
+                                if (!$optionLabel) {
+                                    $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($lowerBorder));
+                                }
+                            } else {
+                                $lowerBorder = ($index - 1) * $stepSize;
+                                $upperBorder = ($index) * $stepSize;
+                                $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));                                
+                            }
                         }
                     } else {
                         $optionLabel = $attribute->getSource()->getOptionText($optionId);

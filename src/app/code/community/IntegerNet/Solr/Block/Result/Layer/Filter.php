@@ -61,7 +61,34 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         if ($this->isRange()) {
             $store = Mage::app()->getStore();
             $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
-            if (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
+            if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
+
+                $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
+
+                $i = 0;
+                foreach($attributeFacetData as $range => $rangeCount) {
+                    $i++;
+                    if (!$rangeCount) {
+                        continue;
+                    }
+                    
+                    $item = new Varien_Object();
+                    $item->setCount($rangeCount);
+
+                    $commaPos = strpos($range, ',');
+                    $rangeStart = floatval(substr($range, 1, $commaPos - 1));
+                    $rangeEnd = floatval(substr($range, $commaPos + 1, -1));
+                    if ($rangeEnd == 0) {
+                        $label = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($rangeStart));
+                    } else {
+                        $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart),  $store->formatPrice($rangeEnd - 0.01));
+                    }
+
+                    $item->setLabel($label);
+                    $item->setUrl($this->_getIntervalUrl($i));
+                    $items[] = $item;
+                }
+            } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
 
                 $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
 
@@ -130,6 +157,22 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     {
         $query = array(
             $this->getAttribute()->getAttributeCode() => floatval($rangeStart) . '-' . floatval($rangeEnd),
+            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
+        );
+        return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
+    }
+
+    /**
+     * Get filter item url
+     *
+     * @param int $rangeStart
+     * @param int $rangeEnd
+     * @return string
+     */
+    protected function _getIntervalUrl($index)
+    {
+        $query = array(
+            $this->getAttribute()->getAttributeCode() => $index . ',100',
             Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
         );
         return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));

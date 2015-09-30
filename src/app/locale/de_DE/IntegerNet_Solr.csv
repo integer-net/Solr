@@ -120,3 +120,5 @@
 "Email Recipient(s)","E-Mail-Empfänger"
 "Divide email addresses by comma","E-Mail-Adressen durch Komma getrennt"
 "Solr Connection Check Notification","Solr Verbindungsprüfung Benachrichtigung"
+"Errors for Store """%s"":","Fehler für Store ""%s"":"
+"Connection to Solr Server has been restored.","Die Verbindung zum Solr-Server wurde wiederhergestellt."

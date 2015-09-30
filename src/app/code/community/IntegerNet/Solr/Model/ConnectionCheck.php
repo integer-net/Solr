@@ -28,22 +28,20 @@ class IntegerNet_Solr_Model_ConnectionCheck
             }
         }
 
-        if (!$this->_getErrorFlag()->getFlagData()) {
-            if (sizeof($errors)) {
-                /** @var $flag Mage_Core_Model_Flag */
-                $flag = $this->_getErrorFlag();
-                $errorCount = intval($flag->getFlagData()) + 1;
-                $flag->setFlagData($errorCount)->save();
+        $minErrorCount = intval(Mage::getStoreConfig('integernet_solr/connection_check/send_email_on_nth_failure'));
+        $currentErrorCount = intval($this->_getErrorFlag()->getFlagData());
+        if (sizeof($errors)) {
+            $currentErrorCount++;
+            if ($currentErrorCount == $minErrorCount) {
                 $this->_sendErrorEmail($errors);
             }
+            $this->_getErrorFlag()->setFlagData($currentErrorCount)->save();
         } else {
-            if (!sizeof($errors)) {
-                Mage::log('Back to normal', null, 'solr-errors.log');
-                /** @var $flag Mage_Core_Model_Flag */
-                $flag = $this->_getErrorFlag();
-                $flag->setFlagData(0)->save();
-            } else {
-                Mage::log('Errors already found, skipping', null, 'solr-errors.log');
+            if ($currentErrorCount >= $minErrorCount) {
+                $this->_sendRestoredEmail();
+            }
+            if ($currentErrorCount > 0) {
+                $this->_getErrorFlag()->setFlagData(0)->save();
             }
         }
     }
@@ -60,7 +58,7 @@ class IntegerNet_Solr_Model_ConnectionCheck
     }
 
     /**
-     * @param $errors
+     * @param array $errors
      */
     protected function _sendErrorEmail($errors)
     {
@@ -77,10 +75,62 @@ class IntegerNet_Solr_Model_ConnectionCheck
                     trim($recipient),
                     '',
                     array(
-                        'notification_text' => print_r($errors, true),
+                        'notification_text' => $this->_getErrorNotificationText($errors),
+                        'base_url' => Mage::getStoreConfig('web/unsecure/base_url'),
                     )
                 );
         }
-        Mage::log($errors, null, 'solr-errors.log');
+    }
+
+    /**
+     * @param array $errors
+     * @return string
+     */
+    protected function _getErrorNotificationText($errors)
+    {
+        $text = '';
+        foreach ($errors as $storeId => $storeErrorMessages) {
+            $headline = Mage::helper('integernet_solr')->__('Errors for Store "%s":', Mage::app()->getStore($storeId)->getName());
+            $text .= $headline . PHP_EOL;
+            $text .= str_repeat('=', strlen($headline)) . PHP_EOL;
+            foreach($storeErrorMessages as $message) {
+                $text .= '- ' . $message . PHP_EOL;
+            }
+            $text .= PHP_EOL;
+        }
+
+        return $text;
+    }
+
+    /**
+     */
+    protected function _sendRestoredEmail()
+    {
+        $templateId = Mage::getStoreConfig('integernet_solr/connection_check/email_template');
+        $sender = Mage::getStoreConfig('integernet_solr/connection_check/identity');
+        $recipients = Mage::getStoreConfig('integernet_solr/connection_check/recipient_emails');
+
+        foreach(explode(',', $recipients) as $recipient) {
+
+            Mage::getModel('core/email_template')
+                ->sendTransactional(
+                    $templateId,
+                    $sender,
+                    trim($recipient),
+                    '',
+                    array(
+                        'notification_text' => $this->_getRestoredNotificationText(),
+                        'base_url' => Mage::getStoreConfig('web/unsecure/base_url'),
+                    )
+                );
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getRestoredNotificationText()
+    {
+        return Mage::helper('integernet_solr')->__('Connection to Solr Server has been restored.');
     }
 }

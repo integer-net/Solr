@@ -137,7 +137,8 @@ der folgenden Fälle neu erzeugt:
 
 - AJAX-Aufruf im Frontend, während die Datei `var/integernet_solr/store_x/config.txt` nicht existiert.
 - Die Konfiguration des Solr-Moduls wird gespeichert
-- Der Cache wird geleert.
+- Der Cache wird vollständig geleert.
+- Der Button "Solr Suchvorschlagscache neu aufbauen" auf der Magento-Backend-Seite "Cache-Verwaltung" wird betätigt.
 
 Wenn Sie also die gespeicherten Informationen erneuern lassen wollen, lösen Sie einen der drei obigen Fälle aus.
 

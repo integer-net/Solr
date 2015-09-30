@@ -126,7 +126,8 @@ events:
 
 - AJAX call on the frontend occurs while the file `var/integernet_solr/store_x/config.txt` doesn't exist.
 - The configuration of the Solr module is changed.
-- Cache is cleared.
+- All Cache is cleared.
+- Button "Rebuild Solr Autosuggest Cache" on the Magento admin cache management page is used.
 
 So if you want to force recreating that information, trigger any of the above events.
 
@@ -316,7 +317,7 @@ This settings is described in the chapter *Technical Workflow* in detail.
 #### Maximum number of searchword suggestions
 
 Depending on your products, the given search word(s) will be expanded to meaningful variants. For example: if the text 
-"re" is entered, the following suggestions will appear: *regular…*, *resistant…*, *refined…*, *red…*.
+"re" is entered, the following suggestions will appear: *regularï¿½*, *resistantï¿½*, *refinedï¿½*, *redï¿½*.
  
 #### Maximum number of product suggestions
 

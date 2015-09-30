@@ -17,4 +17,9 @@ class IntegerNet_Solr_Adminhtml_SolrController extends Mage_Adminhtml_Controller
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
         $this->_redirectReferer();
     }
+
+    protected function _isAllowed()
+    {
+        return true;
+    }
 }

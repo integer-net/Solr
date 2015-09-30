@@ -106,3 +106,6 @@
 "You haven't entered your license key yet.","Sie haben noch keinen Lizenzschlüssel eingetragen."
 "You haven't entered your license key for the IntegerNet_Solr module yet. The module has been disabled automatically.","Sie haben noch keinen Lizenzschlüssel für das IntegerNet_Solr-Modul eingetragen. Das Modul wurde automatisch deaktiviert."
 "You haven't entered your license key for the IntegerNet_Solr module yet. The module will stop working four weeks after installation.","Sie haben noch keinen Lizenzschlüssel für das IntegerNet_Solr-Modul eingetragen. Das Modul wird vier Wochen nach Installation automatisch deaktiviert."
+"Rebuild Solr Autosuggest Cache","Solr Suchvorschlagscache neu aufbauen"
+"Cache for Solr autosuggest function. Contains configuration and template of autosuggest box.","Cache für die Solr-Suchvorschlagsfunktion. Beinhaltet Konfiguration und Template der Suchvorschlags-Box."
+"The Solr Autosuggest Cache has been flushed and rebuilt successfully.","Der Solr-Suchvorschlags-Cache wurde erfolgreich geleert und neu aufgebaut."

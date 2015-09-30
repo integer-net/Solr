@@ -51,8 +51,10 @@ class IntegerNet_Solr_Model_Result
 
             if ($this->_isAutosuggest()) {
                 $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+                $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results_autosuggest');
             } else {
                 $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+                $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results');
             }
             if ($this->_getCurrentSort() != 'position') {
                 $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
@@ -61,7 +63,7 @@ class IntegerNet_Solr_Model_Result
 
                 $numberResults = sizeof($result->response->docs);
                 $numberDuplicates = 0;
-                if ($isFuzzyActive) {
+                if ($isFuzzyActive && $numberResults < $minimumResults) {
 
                     $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
 
@@ -441,7 +443,17 @@ class IntegerNet_Solr_Model_Result
         $filterQuery = 'store_id:' . $storeId;
 
         foreach($this->getFilters() as $attributeCode => $value) {
-            $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
+            if (is_array($value)) {
+                $filterQuery .= ' AND (';
+                $filterQueryParts = array();
+                foreach($value as $singleValue) {
+                    $filterQueryParts[] = $attributeCode . ':' . $singleValue;
+                }
+                $filterQuery .= implode(' OR ', $filterQueryParts);
+                $filterQuery .= ')';
+            } else {
+                $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
+            }
         }
 
         return $filterQuery;

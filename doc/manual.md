@@ -14,6 +14,7 @@ Features
 - Correction of spelling, fuzzy search
 - Displays exact search results first and results to similar search words after that
 - Supports multi store functionality of Magento completely
+- Compatible to default, modern and rwd themes of Magento
 - Can use one Solr core for several Magento store views or seperate cores 
 - Can use separate Solr cores for indexing only and swap cores after that
 - Allows logging of all Solr requests
@@ -42,7 +43,7 @@ Requirements
 ------------
 - **Magento Community Edition** 1.6 to 1.9 or **Magento Enterprise Edition** 1.11 to 1.14
 - **Solr** 4.x or 5.x
-- **PHP** 5.3 to 5.5 (5.5 recommended)
+- **PHP** 5.3 to 5.5 (5.5 recommended), probably compatible to PHP 5.6 and 7.0 as well (not tested yet)
 
 Installation
 ------------
@@ -136,7 +137,259 @@ cannot include static blocks or other external information without further modif
 Configuration
 -------------
 
---- Will follow soon ---
+You will find the configuration in the admin area of Magento at *System -> Konfiguration -> Solr*:
+
+![Configuration Menu](http://www.integer-net.com/download/solr/integernet-solr-config-menu-en.png)
+
+The configuration option are listet and described here:
+
+### General
+
+![General](http://www.integer-net.com/download/solr/integernet-solr-config-general-en.png)
+
+In the upper area, success messages, error messages, warnings and information messages are display. For example there
+is an automated check if the module is activated, if access data to the Solr server is filles in and if the connection
+ is working correctly.
+
+#### Is active
+
+If this switch is set to "No", the search module cannot be used on the frontend. Instead, the default search of Magento 
+will be used. You can set the options for single websites and store views seperately.
+
+#### License Key
+
+The module needs a correct license key in order to work correctly. You will get it from us after purchase and payment 
+of the module. Please contact solr@integer-net.com if you are having problems with your license key.
+
+You can test the module for two weeks without any license key. Only after this period, the license key will be 
+neccessary for the module to work.
+
+A license key is valid for one live instance and an arbitrary number of according development, test and staging instances.
+
+Attention: there will be no internet connection to a license server. As soon as avalid license key is entered, the 
+module will work on its own without any external dependencies (except the Solr server of course).
+
+#### Activate Logging
+
+If this switch is activated, alle requests to the Solr server will be saved in a log file. This affects the autosuggest
+function and the search results. You can find the logs in the directory `/var/log` with the filenames `solr.log`
+respectively `solr_suggestions.log`.
+
+The log files are used for bug tracing and for optimization of search results only. As the files can get pretty large 
+with a frequently used search function, we usually recommend switching off logging on live environments.
+
+### Server
+
+![Server](http://www.integer-net.com/download/solr/integernet-solr-config-server-en.png)
+
+You can enter the connection and access data to your Solr server here. If the data is correct, you will see according
+success messages on the upper part of the configuration page - error messages otherwise.
+In case you don't know the access data, you can get them from your administrator or hosting company which has
+installed the Solr server.
+
+If you have access to the admin area of the Solr server, you can find the access data as follows:
+
+1. Select your core in the Core Selector on the lower left part of the page:
+ ![Solr Admin 1](http://www.integer-net.com/download/solr/solr-admin-1.png)  
+2. Select "Query" below the Core Selector  
+ ![Solr Admin 2](http://www.integer-net.com/download/solr/solr-admin-2.png)  
+3. Click "Execute Query"  
+ ![Solr Admin 3](http://www.integer-net.com/download/solr/solr-admin-3.png)  
+4. In the upper part on the right you will now find the URL which was used for your sample request:  
+ ![Solr Admin 4](http://www.integer-net.com/download/solr/solr-admin-4.png)  
+
+The URL can be divided into the single parts as follows:
+
+![Solr Admin URL](http://www.integer-net.com/download/solr/solr-config-server.png)
+
+The single parts can then be entered into the configuration:
+
+![Solr Server Configuration](http://www.integer-net.com/download/solr/solr-server-config-en.png)
+
+Please take care that the field *Core* doesn't contain any slashes, while the field *Path* must contain at least
+one slash at the front and at the end each.
+
+#### HTTP Transport Method
+
+If you don't get an error message after entering your credentials for the Solr server, you should stick to the default
+method *cURL*. Otherwise you can try switching to *file_get_contents*. The availability ob both methods depends on 
+server settings of the Magento server.
+
+#### HTTP Basic Authentication
+
+Please enter username and password here if those are needed for the access from Magento to the Solr server.
+
+### Indexing 
+
+![Indexing](http://www.integer-net.com/download/solr/integernet-solr-config-indexing-en.png)
+
+#### Number of Products per Bunch
+
+The number entered here is the number of products which is processed by the indexer (see above) at the same time. That's
+also how many product data sets are transferred to the Solr server in a single request. The performance of the indexing
+process depends heavily on this setting. You can reduce this value if you are getting errors during indexing.
+
+#### Delete all Solr Index Entries before Reindexing
+
+You should only deactivate this setting if yourecreate the index completely (i.e. during each night) but can't use a
+*Swap* core. If this setting is active the Solr index will be emptied completely at the start of every reindexing process
+before rebuilding it.
+
+#### Swap Cores after Full Reindex
+
+If you rebuild the Solr index regularily (i.e. nightly) we recommend to use the functionality to swap cores. You need
+a second core for that. In this case, you should activate this setting and enter the name of the second core into
+the field *Name of Core to swap active Core with* below.
+
+### Fuzzy Search
+
+![Fuzzy Search](http://www.integer-net.com/download/solr/integernet-solr-config-fuzzy-en.png)
+
+#### Is active for Search
+
+If this setting is deactivated only exact search matches will be registered. A spelling error correction won't happen 
+then. On the other hand, search is fast if this setting is deactivated.
+
+#### Sensitivity for Search
+
+Here you can enter how sensitive the fuzzy search should be. The value must be between 0 and 1, i.e. *0.75*. The lowe
+the value the more matches you will get as spelling mistakes will be corrected more generously. You should test different
+values to get the optimal value for your shop. We recommend settings between 0.6 and 0.9.
+
+#### Is active for Autosuggest
+
+Like above, but individually adjustable for the autosuggest box. It can be interesting to deactivate this function for
+the autosuggest only due to performance reasons.
+
+#### Sensitivity for Autosuggest
+
+Like above, but individually adjustable for the autosuggest functionality.
+
+### Search Results
+
+![Search Results](http://www.integer-net.com/download/solr/integernet-solr-config-results-en.png)
+
+#### Use HTML from Solr Index
+
+If this setting is activated, the HTML code which displays a single product in the search results will be generated 
+during indexing already. Of course, this will take a bit longer, but on the other hand, the output will be faster
+in the search results. This is because this part won't have to be generated on the fly for every product.
+
+Thus, we recommend to activate this setting. There is an exception if the product data in the search results should be 
+displayed customer dependant or customer group dependant, i.e. if the prices differ for the different customer groups.
+Please deactivate this setting in that case.
+
+#### Search Operator
+
+You can choose between *AND* and *OR*. The search operator is used if there is more than one search word in the request, 
+i.e. "red shirt". When using *AND*, only search results will be displayed which match both (or all) search words. 
+When using *OR*, results which match only one of the search words will be displayed.
+In most cases, *AND* is the better setting.
+
+#### Size of Price Steps
+
+This setting is used by the price filter. You can set the steps which are used for the single intervals. I.e. *10*
+leads to the intervals *0.00-10.00*, *10.00-20.00*, *20.00-30.00* and so on.
+ 
+#### Upper Limit of Price Steps
+
+This setting is used for the price filter as well. This value defines the topmost interval. If setting *200*, this would 
+be *from 200.00*. All products which cost more than 200.00 will be combined in this interval.
+
+#### Use Custom Price Intervals
+If you don't want to have a linear arrangement of intervals and you are using Solr 4.10 or above, you can set the 
+desired interval borders for the price filter individually here. In the example *10,20,50,100,200,300,400,500* 
+this would be the intervals *0.00-10.00*, *10.00-20.00*, *20.00-50.00* and so on until *400.00-500.00* and *from 500.00*. 
+
+### Autosuggest Box
+
+![Autosuggest Box](http://www.integer-net.com/download/solr/integernet-solr-config-autosuggest-en.png)
+
+#### Is active
+
+If you deactivate this setting, no autosuggest window will be displayed.
+
+#### Method to retrieve autosuggest information
+
+This settings is described in the chapter *Technical Workflow* in detail.
+
+#### Maximum number of searchword suggestions
+
+Depending on your products, the given search word(s) will be expanded to meaningful variants. For example: if the text 
+"re" is entered, the following suggestions will appear: *regular…*, *resistant…*, *refined…*, *red…*.
+ 
+#### Maximum number of product suggestions
+
+The number of products which will be displayed in the autosuggest window.
+
+#### Maximum number of category suggestions
+
+The number of categories which will be displayed in the autosuggest window. Those are the categories which appear most
+in the found products.
+
+#### Show complete category path
+
+If this setting is active, not only the category names will be displayed, but their parent categories as a path as well.
+For example, this will be "Electronics > Cameras > Accessories" instead of "Accessoires".
+
+#### Type of Category Links
+
+The link which is behind the displayed categories. It can be:
+- Search results page while the category filter is set to show only products of the selected category
+- Category page
+
+#### Attribute Filter Suggestions
+
+You can enter an arbitrary number of attributes here which will be displayed in the autosuggest window, including
+the options which are contained in the found products most. For every row you can select the attribute and the
+number of displayed options. Additionally you can define the sorting of the attributes - the attribute with the 
+lowest value in the "Sorting" field will be shown first.
+
+Only attributes with the property "Use In Search Results Layered Navigation" will be selectable.
+
+Modifying the sequence of search results
+----------------------------------------------
+
+Even with the default settings of this module, the search results will be put in a sequence which depends on the frequancy
+of the occurances of the search words in the product attributes. This already leads to good results - much better than
+with the default search of Magento.
+
+Still, there are some possibilities to adjust the sequence of search results:
+
+### Boosting of Attributes
+
+If search words occur in the name or the SKU of a product, it should be valued higher than an occurance in the product
+description. Already in default, some attributes are valued higher than others.
+
+The prioritization follows the value "Solr Priority" which you can set for every product attribute. This new property
+can be seen in the attribute grid (*Catalog -> Attributes -> Manage Attributes*):
+
+![Attribute Grid](http://www.integer-net.com/download/solr/integernet-solr-attribute-grid-en.png)
+
+In this case, the grid is sorted by the value "Solr Priority". You can set this value in the attribute properties:
+ 
+![Attribute View](http://www.integer-net.com/download/solr/integernet-solr-attribute-view-en.png)
+
+The calculated priority of the search word(s) for the product will be multiplied with this value if the search word
+occurs in the attribute. Thus, *1.0* is the default - no multiplication happens here. You can increase or decrease
+the value of individual attributes. We recommend values between 0.5 and 10 (maximum).
+
+Please note that you have to rebuild the Solr index after adjusting the Solr priority of one or more attributes.
+
+### Boosting of Products
+
+From time to time, products should be emphasized, either because they are topsellers or because they should be sold out.
+This module makes it possible to increase or decrease the priority of individual products.
+
+Therefore, the new product attribute "Solr priority" is used. You can see it in the tab "Solr" on the product view
+page in the Magento backend.
+
+![Product View](http://www.integer-net.com/download/solr/integernet-solr-product-boost-en.png)
+
+With that, you have the prossibility to position a product, as far as it matches the search word(s), further up or down, 
+relative to its default position. We recommend using values between 0.5 and 10 (maximum). The mechanism is the same
+as with the boosting of attributes. Though, a reindexing isn't necessary after you have adjusted this value for one or
+more product(s), as far as automatic index updates are activated.
 
 Template adjustments
 --------------------

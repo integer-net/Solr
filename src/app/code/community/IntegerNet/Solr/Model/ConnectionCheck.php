@@ -15,22 +15,32 @@ class IntegerNet_Solr_Model_ConnectionCheck
     public function checkConnection()
     {
         $errors = array();
+        $hasCheckedAStore = false;
         foreach (Mage::app()->getStores() as $store) {
             if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $store->getId())) {
                 continue;
             }
-            if (!Mage::getStoreConfigFlag('integernet_solr/server/check_connection', $store->getId())) {
+            if (!Mage::getStoreConfigFlag('integernet_solr/connection_check/is_active', $store->getId())) {
                 continue;
             }
+            $hasCheckedAStore = true;
             $checkMessages = Mage::getModel('integernet_solr/configuration')->getMessages($store->getId());
             if (isset($checkMessages['error']) && sizeof($checkMessages['error'])) {
                 $errors[$store->getId()] = $checkMessages['error'];
             }
         }
 
+        if (!$hasCheckedAStore) {
+            return;
+        }
+        
         $minErrorCount = intval(Mage::getStoreConfig('integernet_solr/connection_check/send_email_on_nth_failure'));
+        $flagExists = !is_null($this->_getErrorFlag()->getFlagData());
         $currentErrorCount = intval($this->_getErrorFlag()->getFlagData());
         if (sizeof($errors)) {
+            if (!$flagExists) {
+                return; // don't do anything on errors if check wasn't successful once
+            }
             $currentErrorCount++;
             if ($currentErrorCount == $minErrorCount) {
                 $this->_sendErrorEmail($errors);
@@ -40,7 +50,7 @@ class IntegerNet_Solr_Model_ConnectionCheck
             if ($currentErrorCount >= $minErrorCount) {
                 $this->_sendRestoredEmail();
             }
-            if ($currentErrorCount > 0) {
+            if ($currentErrorCount > 0 || !$flagExists) {
                 $this->_getErrorFlag()->setFlagData(0)->save();
             }
         }

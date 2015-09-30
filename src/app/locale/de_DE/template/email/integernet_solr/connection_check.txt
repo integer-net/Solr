@@ -1,0 +1,4 @@
+<!--@subject IntegerNet_Solr Verbindungsprüfung @-->
+
+Email-Inhalt
+{{var notification_text}}

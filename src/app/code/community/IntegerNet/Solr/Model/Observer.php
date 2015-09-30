@@ -138,4 +138,9 @@ class IntegerNet_Solr_Model_Observer
 
         }
     }
+
+    public function checkSolrServerConnection()
+    {
+        Mage::getSingleton('integernet_solr/connectionCheck')->checkConnection();
+    }
 }

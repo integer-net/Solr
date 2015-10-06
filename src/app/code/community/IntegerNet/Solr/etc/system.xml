@@ -309,8 +309,8 @@
                             <depends><is_active>1</is_active></depends>
                         </sensitivity>
                         <minimum_results translate="label">
-                            <label>Deactivate fuzzy search if number of direct results is at least this number</label>
-                            <comment>0 = off</comment>
+                            <label>Number of Sufficient Direct Search Results</label>
+                            <comment>If there are at least this many search results, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
                             <sort_order>25</sort_order>
@@ -342,8 +342,8 @@
                             <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
                         </sensitivity_autosuggest>
                         <minimum_results_autosuggest translate="label">
-                            <label>Deactivate fuzzy search for autosuggest if number of direct results is at least this number</label>
-                            <comment>0 = off</comment>
+                            <label>Number of Sufficient Direct Search Results for Autosuggest</label>
+                            <comment>If there are at least this many search results for autosuggest, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
                             <sort_order>45</sort_order>

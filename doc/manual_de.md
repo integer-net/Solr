@@ -68,7 +68,7 @@ Setzen Sie `System -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine`
 in das Verzeichnis `shell` und rufen Sie den Befehl `php -f indexer.php -- --reindex integernet_solr` auf.
 13. Versuchen Sie, ein paar Buchstaben in das Suchfeld im Frontend einzutippen. Ein Fenster mit Produkt- und Suchwortvorschlägen sollte erscheinen.
  
-Technischer Ablauf
+<a name="technischer-ablauf">Technischer Ablauf</a>
 ------------------
 
 ### Indizierung
@@ -235,6 +235,33 @@ Magento-Servers ab.
 Tragen Sie hier Benutzername und Passwort ein, wenn diese für den Zugriff von Magento auf den Solr-Server notwendig
 sein sollten.
 
+### Erreichbarkeitsprüfung
+
+![Erreichbarkeitsprüfung](http://www.integer-net.de/download/solr/integernet-solr-config-connection-check-de.png)
+
+Um sicherzustellen, dass der Solr-Server nicht unbemerkt ausfällt, kann das Modul automatisch in regelmäßigen Abständen die Verbindung überprüfen.
+
+#### Erreichbarkeit des Solr-Servers automatisch prüfen
+
+Wird der Wert "Ja" gewählt, erfolgt die automatische Erreichbarkeitsprüfung alle 5 Minuten.
+
+#### E-Mail-Benachrichtigung nach der X-ten fehlgeschlagenen Prüfung hintereinander senden
+
+Wollen Sie bei jeder fehlgeschlagenen Verbindungsprüfung benachrichtigt werden, tragen Sie den Wert 1 ein.
+
+#### E-Mail-Empfänger
+ 
+Die Benachrichtigungen über die Erreichbarkeitsprüfung werden per E-Mail an die hier eingetragenen Adressen verschickt.
+
+#### E-Mail-Vorlage
+
+Sie haben die Möglichkeit, eine eigene E-Mail-Vorlage für die Erreichbarkeitsprüfung anzulegen. Diese wird im Magento Backend in `System -> Transaktions-E-Mails`  hinterlegt.
+Falls Sie eine eigene Vorlage angelegt haben, stellen Sie bitte sicher, dass die angelegte E-Mail-Vorlage mit der ausgewählten Vorlage in der Konfiguration des Solr-Moduls übereinstimmt.
+
+#### E-Mail-Absender
+
+Für den Versand der Benachrichtigung können Sie den E-Mail-Absender auswählen.
+
 ### Indizierung 
 
 ![Indizierung](http://www.integer-net.de/download/solr/integernet-solr-config-indexing-de.png)
@@ -274,7 +301,7 @@ Schreibfehler großzügiger korrigiert werden und z.B. für die Eingabe "rot" au
 von den Buchstaben her relativ ähnlich ist. Testen Sie hier einen möglichst guten Wert für Ihren Shop aus. Wir empfehlen
 Werte zwischen 0.6 und 0.9.
 
-#### Aktivierung der unscharfen Suche bei zu wenig direkten Suchtreffern
+#### Anzahl ausreichender direkter Suchergebnisse
 
 Die direkten Suchergebnisse werden bei aktivierter unscharfen Suche automatisch um unscharfe Suchergebnisse ergänzt.
 Sie können diese Funktion einschränken, indem Sie die Anzahl ausreichender direkter Suchergebnisse festlegen. Werden mindestens so viele direkte Suchergebnisse gefunden, wird keine unscharfe Suche durchgeführt.
@@ -289,12 +316,11 @@ Funktion nur für die Suchvorschläge aus Performancegründen auszuschalten.
 
 Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar.
 
-#### Aktivierung der unscharfen Suche für Suchvorschläge bei zu wenig direkten Suchtreffern
+#### Anzahl ausreichender direkter Suchergebnisse für Suchvorschläge
 
-Analog zur Suche haben Sie auch bei den Suchvorschlägen die 
-Die direkten Suchergebnisse werden bei aktivierter unscharfen Suche automatisch um unscharfe Suchergebnisse ergänzt.
-Sie können diese Funktion einschränken, indem Sie die Anzahl ausreichender direkter Suchergebnisse festlegen. Werden mindestens so viele direkte Suchergebnisse gefunden, wird keine unscharfe Suche durchgeführt.
-Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche immer ausgeführt.
+Analog zur Suche haben Sie auch bei den Suchvorschlägen die Möglichkeit, die unscharfe Suche nicht durchführen zu lassen, wenn bereits ausreichend direkte Treffer für Suchvorschläge vorhanden sind.
+Werden mindestens so viele direkte Suchergebnisse gefunden wie eingetragen, wird keine unscharfe Suche durchgeführt.
+Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche für Suchvorschläge immer ausgeführt.
 
 
 ### Suchergebnisse
@@ -346,7 +372,7 @@ Bei Deaktivieren dieser Einstellung wird kein Suchvorschaufenster angezeigt.
 
 #### Methode zum Ermitteln von Suchvorschlags-Informationen
 
-Diese Einstellung wurde bereits oben im Kapitel "Technischer Ablauf" umfassend beschrieben.
+Diese Einstellung wurde bereits oben im Kapitel ["Technischer Ablauf"](#technischer-ablauf) umfassend beschrieben.
 
 #### Maximale Anzahl Suchwort-Vorschläge
 
@@ -434,6 +460,8 @@ die Index-Aktualisierung aktiviert ist.
 ### Ausschließen von Kategorien
 
 Bei Bedarf gibt es die Option, Kategorien von der Solr-Suche auszuschließen. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen Kategorie im Tab "Solr".
+
+![Kategorie-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-de.png)
 
 Es können entweder einzelne Kategorien oder Kategorien samt ihrer untergeordneten Kindkategorien aus der Suche ausgeschlossen werden. 
 In den Suchvorschlägen werden die auf diese Art ausgeschlossenen Kategorien nicht mehr angeboten. Die Produkte dieser Kategorien werden jedoch weiterhin als Suchergebnisse angezeigt. 

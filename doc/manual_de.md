@@ -51,12 +51,12 @@ Installation
 2. Kopieren Sie die Dateien vom Verzeichnis `solr_conf` des Modul-Pakets in das Verzeichnis `conf` des Solr-Kerns / der 
 Solr-Kerne.
 3. Laden Sie den Solr-Kern neu (oder Solr komplett)
-4. (Falls aktiviert: Deaktivieren Sie die Magento-Komilierung (Compiler).)
+4. (Falls aktiviert: Deaktivieren Sie die Magento-Kompilierung (Compiler).)
 5. Kopieren Sie die Dateien und Verzeichnisse des `src`-Verzeichnisses des Modul-Pakets in Ihre Magento-Installation. 
 Falls Sie **modman** und/oder **composer** nutzen, können Sie die Dateien `modman` bzw. `composer.json` im Hauptverzeichnis 
 nutzen.
 6. Leeren Sie den Magento-Cache.
-7. (Starten Sie den Komplilierungsprozess und reaktivieren Sie die Magento-Kompilierung - wir empfehlen, die 
+7. (Starten Sie den Kompilierungsprozess und reaktivieren Sie die Magento-Kompilierung - wir empfehlen, die 
 Kompilierungsfunktion von Magento nicht zu nutzen, unabhängig von diesem Modul.)
 8. Gehen Sie in den Administrationsbereich von Magento zu `System -> Konfiguration -> Solr` (weit unten).
 9. Geben Sie die Solr-Zugangsdaten ein und konfigurieren Sie das Modul (siehe unten).
@@ -66,8 +66,7 @@ entsprechende Erfolgs- und/oder Fehlermeldungen.
 Setzen Sie `System -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine` auf `MySql Fulltext`.
 12. Reindizieren Sie den Index von IntegerNet_Solr. Wir empfehlen, dies über die Kommandozeile zu machen. Gehen Sie
 in das Verzeichnis `shell` und rufen Sie den Befehl `php -f indexer.php -- --reindex integernet_solr` auf.
-13. Versuchen Sie, ein paar Buchstaben in das Suchfeld im Frontend einzutippen. Ein Fenster mit Produkt- und Suchwort-
-vorschlägen sollte erscheinen.
+13. Versuchen Sie, ein paar Buchstaben in das Suchfeld im Frontend einzutippen. Ein Fenster mit Produkt- und Suchwortvorschlägen sollte erscheinen.
  
 Technischer Ablauf
 ------------------
@@ -100,7 +99,7 @@ Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).
 ### Suchvorschläge
 Wenn Sie die Suchvorschlags-Funktionalität nutzen, gibt es jedes Mal, wenn ein Kunde die ersten Buchstaben ins Suchfeld
 im Frontend eingetippt hat, einen AJAX-Aufruf. Die Antwort davon beinhaltet den HTML-Code des Suchvorschau-Fensters,
-das Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. Die Ziel-URL des AJAX-Aufrufs 
+welches Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. Die Ziel-URL des AJAX-Aufrufs 
 ist unterschiedlich je nach der Konfigurationseinstellung unter `System -> Konfiguration -> Solr -> Suchvorschlags-Box 
 -> Methode zum Ermitteln von Suchvorschlags-Informationen`:
 
@@ -113,12 +112,12 @@ nicht eingesetzt werden können.
 #### Magento mit separater PHP-Datei
 Hierdurch wird per AJAX die separate PHP-Datei `autosuggest-mage.php` im Magento-Hauptverzeichnis direkt aufgerufen.
 Dadurch wird der Routing-Prozess von Magento übergangen, die Inhalte werden schneller ausgeliefert. Dennoch sollten
-alle Magento-Funktionen funktionieren. Außer der Geschwindigkeit (siehe unten) haben wir bisher keine Nachteile dieser
+alle Magento-Funktionen nutzbar sein. Außer der Geschwindigkeit (siehe unten) haben wir bisher keine Nachteile dieser
 Methode gefunden, sie kann also bedenkenlos eingesetzt werden.
 
 #### PHP ohne Magento-Instanziierung
 Mit dieser Methode wird eine andere PHP-Datei `autosuggest.php` im Magento-Hauptverzeichnis per AJAX direkt aufgerufen.
-Ein Großteil der Magento-Funktionalität wird dabei nicht verwendet, wodurch sie in den meisten Umgebunden deutlich
+Ein Großteil der Magento-Funktionalität wird dabei nicht verwendet, wodurch sie in den meisten Umgebungen deutlich
 schneller ist. Da dabei keine Datenbank-Abfragen ausgeführt werden, müssen alle Daten, die für das Suchvorschaufenster
 benötigt werden, entweder direkt vom Solr-Server oder aus einer Textdatei kommen. Das Modul generiert automatisch
 Textdateien, die die Informationen enthalten, die von der Suchvorschaufunktion benötigt werden:
@@ -142,10 +141,10 @@ der folgenden Fälle neu erzeugt:
 
 Wenn Sie also die gespeicherten Informationen erneuern lassen wollen, lösen Sie einen der drei obigen Fälle aus.
 
-Beachten sie, dass Sie nicht alle Magento-Funktionen zur Verfügung haben werden, wenn Sie diese Methode verwenden. 
+Beachten Sie, dass Sie nicht alle Magento-Funktionen zur Verfügung haben werden, wenn Sie diese Methode verwenden. 
 Versuchen Sie, sich an die Methoden zu halten, die in 
 `app/design/frontend/base/default/template/integernet/solr/autosuggest.phtml` verwendet werden. Z.B. können Sie 
-keine Statischen Blocks oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
+keine statischen Blöcke oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
 
 Konfiguration
 -------------
@@ -154,7 +153,7 @@ Die Konfiguration befindet sich im Administrationsbereich von Magento unter *Sys
 
 ![Konfigurations-Menü](http://www.integer-net.de/download/solr/integernet-solr-config-menu-de.png)
 
-Im Folgenden werden die Konfigurationsoptionen aufgelistet und beschrieben
+Im Folgenden werden die Konfigurationsoptionen aufgelistet und beschrieben.
 
 ### Allgemein
 
@@ -187,7 +186,7 @@ funktioniert das Modul autark.
 #### Logging aktivieren
 
 Wenn dieser Schalter aktiv ist, werden alle Anfragen zum Solr-Server gespeichert. Das betrifft sowohl die Suchvorschau
-als auch die eigentliche Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis `/var/log/` mit den Dateinamen 
+als auch die eigentlichen Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis `/var/log/` mit den Dateinamen 
 `solr.log` bzw. `solr_suggestions.log`.
 
 Die Logdateien werden ausschließlich zur Fehlersuche bzw. zur Optimierung der Suchergebnisse genutzt. Da die 
@@ -211,7 +210,7 @@ Wenn Sie Zugang zum Admin-Bereich des Solr-Servers haben, können Sie die Zugang
  ![Solr-Admin 2](http://www.integer-net.de/download/solr/solr-admin-2.png)  
 3. Klicken Sie "Execute Query"  
  ![Solr-Admin 3](http://www.integer-net.de/download/solr/solr-admin-3.png)  
-4. Im oberen Bereich auf der rechten Seite sehen Sie jetzt die für Ihren Beispiel-Request verwendeten URL:  
+4. Im oberen Bereich auf der rechten Seite sehen Sie jetzt die für Ihren Beispiel-Request verwendete URL:  
  ![Solr-Admin 4](http://www.integer-net.de/download/solr/solr-admin-4.png)  
 
 Die URL wird wie folgt in die einzelnen Teile aufgeteilt:
@@ -244,7 +243,7 @@ sein sollten.
 
 Die hier eingetragene Anzahl Produkte wird bei der Indizierung (s.o.) gleichzeitig verarbeitet, entsprechend viele
 Produktdaten werden in einen einzigen Request zum Solr-Server aufgenommen. Von dieser Einstellung ist die Performance
-der Indizierung stark abhängig. Reduzieren Sie den Wert testweise, falls sie Fehler bei der Indizierung erhalten.
+der Indizierung stark abhängig. Reduzieren Sie den Wert testweise, falls Sie Fehler bei der Indizierung erhalten.
 
 #### Alle Solr-Indexeinträge vor Neuindizierung löschen
 
@@ -275,6 +274,12 @@ Schreibfehler großzügiger korrigiert werden und z.B. für die Eingabe "rot" au
 von den Buchstaben her relativ ähnlich ist. Testen Sie hier einen möglichst guten Wert für Ihren Shop aus. Wir empfehlen
 Werte zwischen 0.6 und 0.9.
 
+#### Aktivierung der unscharfen Suche bei zu wenig direkten Suchtreffern
+
+Die direkten Suchergebnisse werden bei aktivierter unscharfen Suche automatisch um unscharfe Suchergebnisse ergänzt.
+Sie können diese Funktion einschränken, indem Sie die Anzahl ausreichender direkter Suchergebnisse festlegen. Werden mindestens so viele direkte Suchergebnisse gefunden, wird keine unscharfe Suche durchgeführt.
+Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche immer ausgeführt.
+
 #### Ist aktiv für Suchvorschläge
 
 Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar. Es kann interessant sein, diese 
@@ -283,6 +288,14 @@ Funktion nur für die Suchvorschläge aus Performancegründen auszuschalten.
 #### Sensibilität für Suchvorschläge
 
 Wie oben, aber für die Suchvorschlags-Box (Autosuggest) individuell einstellbar.
+
+#### Aktivierung der unscharfen Suche für Suchvorschläge bei zu wenig direkten Suchtreffern
+
+Analog zur Suche haben Sie auch bei den Suchvorschlägen die 
+Die direkten Suchergebnisse werden bei aktivierter unscharfen Suche automatisch um unscharfe Suchergebnisse ergänzt.
+Sie können diese Funktion einschränken, indem Sie die Anzahl ausreichender direkter Suchergebnisse festlegen. Werden mindestens so viele direkte Suchergebnisse gefunden, wird keine unscharfe Suche durchgeführt.
+Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche immer ausgeführt.
+
 
 ### Suchergebnisse
 
@@ -369,7 +382,7 @@ Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die
 definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei
 "Sortierung" wird zuoberst angezeigt.
 
-Es stehten nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
+Es stehen nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
 
 Modifikation der Reihenfolge der Suchergebnisse
 -------------
@@ -418,6 +431,13 @@ zu platzieren als seine Standard-Position. Wir empfehlen hier Werte zwischen 0.5
 der gleiche wie beim Boosting von Attributen. Eine Neuindizierung ist nach der Anpassung nicht erforderlich, sofern
 die Index-Aktualisierung aktiviert ist.
 
+### Ausschließen von Kategorien
+
+Bei Bedarf gibt es die Option, Kategorien von der Solr-Suche auszuschließen. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen Kategorie im Tab "Solr".
+
+Es können entweder einzelne Kategorien oder Kategorien samt ihrer untergeordneten Kindkategorien aus der Suche ausgeschlossen werden. 
+In den Suchvorschlägen werden die auf diese Art ausgeschlossenen Kategorien nicht mehr angeboten. Die Produkte dieser Kategorien werden jedoch weiterhin als Suchergebnisse angezeigt. 
+
 Template-Anpassungen
 --------------------
 
@@ -444,7 +464,7 @@ folgenden Code ersetzt werden:
         ->toHtml() ?>
 
 Ersetzen Sie entsprechend `list` durch `grid`, abhängig davon, welchen Teil Sie ersetzen.
-Während Sie die Template-Dateien anpassen, sollten sie die Konfigurationsoption `Suchergebnisse -> HTML vom Solr-Index 
+Während Sie die Template-Dateien anpassen, sollten Sie die Konfigurationsoption `Suchergebnisse -> HTML vom Solr-Index 
 verwenden` ausschalten. Wenn Sie die Option aktiviert haben, benötigen Sie eine komplette Neuindizierung nach jeder
 Änderung einer Template-Datei. Aktivieren Sie die Option nach Fertigstellung der Anpassungen wieder und führen
 Sie eine Neuindizierung durch.
@@ -478,7 +498,7 @@ Mögliche Probleme und Lösungsansätze
     des `integernet_solr`-Index auf "manuell" zu stellen und jede Nacht eine komplette Reindizierung per Cronjob
     vorzunehmen, wenn möglich.
     
-3. **Die Produktdaten auf der Suchergebnis-Seite solltes für verschiedene Kundengruppen unterschiedlich aussehen, sehen
+3. **Die Produktdaten auf der Suchergebnis-Seite sollten für verschiedene Kundengruppen unterschiedlich aussehen, sehen
     aber überall gleich aus**
     Schalten Sie `Suchergebnisse -> HTML vom Solr-Index verwenden` in der Konfiguration aus. Dadurch wird der HTML-Code
     bei jedem Aufruf neu generiert. Beachten Sie bitte, dass das die Performance der Suchergebnisseite beeinflusst.

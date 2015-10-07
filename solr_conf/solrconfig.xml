@@ -142,6 +142,8 @@
         </lst>
     </initParams>
 
+    <requestHandler name="/update" class="solr.UpdateRequestHandler" />
+
     <requestHandler name="/update/extract"
                     startup="lazy"
                     class="solr.extraction.ExtractingRequestHandler">

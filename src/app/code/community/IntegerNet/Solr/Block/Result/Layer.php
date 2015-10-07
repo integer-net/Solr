@@ -14,6 +14,10 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Abstract
      */
     public function getState()
     {
-        return $this->getLayout()->getBlock('catalogsearch.layer.state');
+        if ($block = $this->getLayout()->getBlock('catalogsearch.layer.state')) {
+            return $block;
+        }
+
+        return $block = $this->getLayout()->getBlock('catalog.layer.state');
     }
 }

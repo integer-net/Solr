@@ -87,4 +87,9 @@ final class IntegerNet_Solr_Autosuggest_Helper
         $text = array_shift($args);
         return vsprintf($text, $args);
     }
+
+    public function isCategoryPage()
+    {
+        return false;
+    }
 }

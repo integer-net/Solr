@@ -454,6 +454,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         $filterQuery = 'store_id:' . $storeId;
+        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+            $filterQuery .= ' AND is_visible_in_catalog_i:1';
+        } else {
+            $filterQuery .= ' AND is_visible_in_search_i:1';
+        }
 
         foreach($this->getFilters() as $attributeCode => $value) {
             if (is_array($value)) {

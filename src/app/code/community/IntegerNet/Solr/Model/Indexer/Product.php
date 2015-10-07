@@ -135,6 +135,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             'category_name_s_mv_boost' => 2,
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
+            'is_visible_in_catalog_i' => intval(in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInCatalogIds())),
+            'is_visible_in_search_i' => intval(in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds())),
         ));
 
         $this->_addBoostToProductData($product, $productData);
@@ -173,7 +175,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'));
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'))
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInCatalogAttributes()->getColumnValues('attribute_code'));
 
         if (is_array($productIds)) {
             $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
@@ -214,7 +217,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         if ($product->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
             return false;
         }
-        if (!in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds())) {
+        if (!in_array($product->getVisibility(), Mage::getSingleton('catalog/product_visibility')->getVisibleInSiteIds())) {
             return false;
         }
         if (!in_array($product->getStore()->getWebsiteId(), $product->getWebsiteIds())) {

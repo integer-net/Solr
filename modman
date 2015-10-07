@@ -3,9 +3,12 @@ src/app/design/adminhtml/default/default/layout/integernet/*        app/design/a
 src/app/design/adminhtml/default/default/template/integernet/*      app/design/adminhtml/default/default/template/integernet/
 src/app/design/frontend/base/default/layout/integernet/*            app/design/frontend/base/default/layout/integernet/
 src/app/design/frontend/base/default/template/integernet/*          app/design/frontend/base/default/template/integernet/
+src/app/design/frontend/rwd/default/layout/integernet/*             app/design/frontend/base/default/layout/integernet/
 src/app/design/frontend/rwd/default/template/integernet/*           app/design/frontend/rwd/default/template/integernet/
 src/app/etc/modules/*                                               app/etc/modules/
-src/app/locale/de_DE/*                                              app/locale/de_DE/
+src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/de_DE/IntegerNet_Solr.csv
+src/app/locale/de_DE/template/email/*                               app/locale/de_DE/template/email/
+src/app/locale/en_US/template/email/*                               app/locale/en_US/template/email/
 src/app/code/community/Apache/Solr                                  app/code/community/Apache/Solr
 src/lib/IntegerNet/Solr                                             lib/IntegerNet/Solr
 src/shell/integernet-solr.php                                       shell/integernet-solr.php

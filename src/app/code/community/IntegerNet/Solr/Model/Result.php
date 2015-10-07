@@ -63,7 +63,7 @@ class IntegerNet_Solr_Model_Result
 
                 $numberResults = sizeof($result->response->docs);
                 $numberDuplicates = 0;
-                if ($isFuzzyActive && $numberResults < $minimumResults) {
+                if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
                     $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
 

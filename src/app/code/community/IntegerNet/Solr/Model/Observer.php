@@ -75,6 +75,10 @@ class IntegerNet_Solr_Model_Observer
 
     public function controllerActionPredispatchCatalogsearchResultIndex(Varien_Event_Observer $observer)
     {
+        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active') && !$this->_getPingResult()) {
+            Mage::app()->getStore()->setConfig('integernet_solr/general/is_active', 0);
+        }
+
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
@@ -85,6 +89,15 @@ class IntegerNet_Solr_Model_Observer
         }
 
         Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _getPingResult()
+    {
+        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService(Mage::app()->getStore()->getId());
+        return (boolean)$solr->ping();
     }
 
     public function catalogProductDeleteAfter(Varien_Event_Observer $observer)

@@ -70,7 +70,7 @@ class IntegerNet_Solr_Model_Suggestion
             'facet.field' => 'text_autocomplete',
             'facet.sort' => 'count',
             'facet.limit' => intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_searchword_suggestions')),
-            'f.text_autocomplete.facet.prefix' => $this->_getQueryText(),
+            'f.text_autocomplete.facet.prefix' => strtolower($this->_getQueryText()),
         );
 
         return $params;

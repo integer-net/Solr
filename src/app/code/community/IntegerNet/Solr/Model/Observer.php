@@ -52,13 +52,25 @@ class IntegerNet_Solr_Model_Observer
     }
 
     /**
-     * Check Solr connection on config save
+     * Rebuilt Solr Cache on config save
+     * Check if cronjobs are active
      *
      * @param Varien_Event_Observer $observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
         Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+
+        if (!Mage::getStoreConfigFlag('integernet_solr/connection_check/is_active')) {
+            return;
+        }
+        $cronCollection = Mage::getResourceModel('cron/schedule_collection')
+            ->addFieldToFilter('created_at', array('gt' => Zend_Date::now()->subDay(2)->get(Zend_Date::ISO_8601)));
+        if (!$cronCollection->getSize()) {
+            Mage::getSingleton('adminhtml/session')->addWarning(Mage::helper('integernet_solr')->__(
+                'It seems you have no cronjobs running. They are needed for doing regular connection checks. We strongly suggest you setup cronjobs. See <a href="http://www.magentocommerce.com/wiki/1_-_installation_and_configuration/how_to_setup_a_cron_job" target="_blank">here</a> for details.'
+            ));
+        }
     }
 
     public function controllerActionPredispatchCatalogsearchResultIndex(Varien_Event_Observer $observer)
@@ -137,5 +149,10 @@ class IntegerNet_Solr_Model_Observer
             }
 
         }
+    }
+
+    public function checkSolrServerConnection()
+    {
+        Mage::getSingleton('integernet_solr/connectionCheck')->checkConnection();
     }
 }

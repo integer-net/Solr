@@ -150,11 +150,13 @@ class IntegerNet_Solr_Model_Result
             return 'desc';
         }
         if ($this->_getCurrentSort() == 'position') {
-            switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
-                case 'desc':
-                    return 'asc';
-                default:
-                    return 'desc';
+            if (!Mage::helper('integernet_solr')->isCategoryPage()) {
+                switch (strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
+                    case 'desc':
+                        return 'asc';
+                    default:
+                        return 'desc';
+                }
             }
         }
         return $this->_getToolbarBlock()->getCurrentDirection();
@@ -425,9 +427,14 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getSortParam()
     {
+        Mage::log($this->_getCurrentSort());
         switch ($this->_getCurrentSort()) {
             case 'position':
-                $param = 'score';
+                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                    $param = 'category_' . Mage::registry('current_category')->getId() . '_position_i';
+                } else {
+                    $param = 'score';
+                }
                 break;
             case 'price':
                 $param = 'price_f';
@@ -616,10 +623,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCategoryResultFromRequest($storeId, $pageSize)
     {
-        $this->addCategoryFilter(Mage::registry('current_category'));
         $transportObject = new Varien_Object(array(
             'store_id' => $storeId,
-            'query_text' => '*',
+            'query_text' => 'category_' . Mage::registry('current_category')->getId() . '_position_i:*',
             'start_item' => 0,
             'page_size' => $pageSize,
             'params' => $this->_getParams($storeId),

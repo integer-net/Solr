@@ -145,6 +145,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
         $this->_addResultHtmlToProductData($product, $productData);
 
+        $this->_addCategoryProductPositionsToProductData($product, $productData);
+
         Mage::dispatchEvent('integernet_solr_get_product_data', array('product' => $product, 'product_data' => $productData));
 
         return $productData->getData();
@@ -548,6 +550,37 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
 
         return $this->_excludedCategoryIds[$storeId];
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Product $product
+     * @param Varien_Object $productData
+     */
+    protected function _addCategoryProductPositionsToProductData($product, $productData)
+    {
+        foreach($this->getCategoryPositions($product) as $positionRow) {
+            $productData['category_' . $positionRow['category_id'] . '_position_i'] = $positionRow['position'];
+        }
+    }
+
+    /**
+     * Retrieve product category identifiers
+     *
+     * @param Mage_Catalog_Model_Product $product
+     * @return array
+     */
+    public function getCategoryPositions($product)
+    {
+        /** @var $setup Mage_Catalog_Model_Resource_Setup */
+        $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
+        $adapter = Mage::getSingleton('core/resource')->getConnection('catalog_read');
+
+        $select = $adapter->select()
+            ->from($setup->getTable('catalog/category_product_index'), array('category_id', 'position'))
+            ->where('product_id = ?', (int)$product->getId())
+            ->where('store_id = ?', $product->getStoreId());
+
+        return $adapter->fetchAll($select);
     }
 
     /**

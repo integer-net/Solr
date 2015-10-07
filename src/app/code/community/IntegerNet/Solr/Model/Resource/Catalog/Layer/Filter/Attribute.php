@@ -40,7 +40,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
     public function getCount($filter)
     {
         if (!Mage::helper('integernet_solr')->isActive()) {
-            return getCount($filter);
+            return parent::getCount($filter);
         }
 
         if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {

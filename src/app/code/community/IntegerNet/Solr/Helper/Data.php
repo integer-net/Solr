@@ -126,9 +126,21 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function isCategoryPage()
     {
         return !is_null(Mage::registry('current_category'));
+    }
+
+    /**
+     * @return bool
+     * @todo configure
+     */
+    public function isCategoryDisplayActive()
+    {
+        return true;
     }
 
     /**

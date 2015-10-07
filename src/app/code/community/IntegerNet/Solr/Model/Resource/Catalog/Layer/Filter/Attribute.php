@@ -1,4 +1,5 @@
 <?php
+
 /**
  * integer_net Magento Module
  *
@@ -6,7 +7,7 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage_Catalog_Model_Resource_Layer_Filter_Attribute
 {
     /**
@@ -18,14 +19,18 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function applyFilterToCollection($filter, $value)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
             return parent::applyFilterToCollection($filter, $value);
-        } 
-        
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+            return parent::applyFilterToCollection($filter, $value);
+        }
+
         Mage::getSingleton('integernet_solr/result')->addAttributeFilter($filter->getAttributeModel(), $value);
         return $this;
     }
-    
+
     /**
      * Retrieve array with products counts per attribute option
      *
@@ -34,18 +39,22 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function getCount($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return getCount($filter);
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::getCount($filter);
         }
-        
+
         /** @var $solrResult StdClass */
         $solrResult = Mage::getSingleton('integernet_solr/result')->getSolrResult();
 
-        $attribute  = $filter->getAttributeModel();
+        $attribute = $filter->getAttributeModel();
 
         $count = array();
         if (isset($solrResult->facet_counts->facet_fields->{$attribute->getAttributeCode() . '_facet'})) {
-            foreach((array)$solrResult->facet_counts->facet_fields->{$attribute->getAttributeCode() . '_facet'} as $key => $value) {
+            foreach ((array)$solrResult->facet_counts->facet_fields->{$attribute->getAttributeCode() . '_facet'} as $key => $value) {
                 $count[intval($key)] = $value;
             }
             return $count;

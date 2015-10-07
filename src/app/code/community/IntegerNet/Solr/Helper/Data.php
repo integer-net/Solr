@@ -119,7 +119,11 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        return $this->isLicensed();
+        if (!$this->isLicensed()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

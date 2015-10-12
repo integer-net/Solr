@@ -23,7 +23,31 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
     protected $_infoUrl;
 
     protected $_basePath;
+    protected $_useHttps;
 
+    /**
+     * Constructor. All parameters are optional and will take on default values
+     * if not specified.
+     *
+     * @param string $host
+     * @param string $port
+     * @param string $path
+     * @param Apache_Solr_HttpTransport_Interface $httpTransport
+     * @param Apache_Solr_Compatibility_CompatibilityLayer $compatibilityLayer
+     * @param bool $useHttps
+     */
+    public function __construct(
+        $host = 'localhost',
+        $port = 8180,
+        $path = '/solr/',
+        $httpTransport = false,
+        $compatibilityLayer = false,
+        $useHttps = false
+    ) {
+        $this->setUseHttps($useHttps);
+        parent::__construct($host, $port, $path, $httpTransport, $compatibilityLayer);
+    }
+    
     /**
      * @param string $basePath
      * @return IntegerNet_Solr_Model_Resource_Solr_Service
@@ -35,6 +59,13 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         $this->_coresUrl = $this->_constructBaseUrl(self::CORES_SERVLET);
         $this->_infoUrl = $this->_constructBaseUrl(self::INFO_SERVLET);
         return $this;
+    }
+
+    /**
+     * @param bool $useHttps
+     */
+    public function setUseHttps($useHttps) {
+        $this->_useHttps = $useHttps;
     }
 
     /**
@@ -80,9 +111,45 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
             throw new Exception('Please provide a base path');
         }
 
-        return 'http://' . $this->_host . ':' . $this->_port . $this->_basePath . $servlet . $queryString;
+        $protocol = 'http://';
+        if ($this->_useHttps) {
+            $protocol = 'https://';
+        }
+        return $protocol . $this->_host . ':' . $this->_port . $this->_basePath . $servlet . $queryString;
     }
 
+    /**
+     * Return a valid http URL given this server's host, port and path and a provided servlet name
+     *
+     * @param string $servlet
+     * @return string
+     */
+    protected function _constructUrl($servlet, $params = array())
+    {
+        if (count($params))
+        {
+            //escape all parameters appropriately for inclusion in the query string
+            $escapedParams = array();
+
+            foreach ($params as $key => $value)
+            {
+                $escapedParams[] = urlencode($key) . '=' . urlencode($value);
+            }
+
+            $queryString = $this->_queryDelimiter . implode($this->_queryStringDelimiter, $escapedParams);
+        }
+        else
+        {
+            $queryString = '';
+        }
+
+        $protocol = 'http://';
+        if ($this->_useHttps) {
+            $protocol = 'https://';
+        }
+        return $protocol . $this->_host . ':' . $this->_port . $this->_path . $servlet . $queryString;
+    }
+    
     /**
      * Simple Suggest interface
      *

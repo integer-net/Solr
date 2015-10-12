@@ -54,13 +54,14 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
             $core = Mage::getStoreConfig('integernet_solr/server/core', $storeId);
+            $useHttps = Mage::getStoreConfigFlag('integernet_solr/server/use_https', $storeId);
             if ($this->_useSwapIndex) {
                 $core = Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId);
             }
             if ($core) {
                 $path .= $core . '/';
             }
-            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId));
+            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
         }
         return $this->_solr[$storeId];
     }

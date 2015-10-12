@@ -50,6 +50,10 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
     {
         if (!isset($this->_solr[$storeId])) {
 
+            if (intval(ini_get('default_socket_timeout')) < 300) {
+                ini_set('default_socket_timeout', 300);
+            }
+                
             $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
             $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
             $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);

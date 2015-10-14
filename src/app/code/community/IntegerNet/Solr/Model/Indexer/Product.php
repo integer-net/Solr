@@ -329,6 +329,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if ($product->getData($attribute->getAttributeCode())
                 && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
             ) {
+                if ($attribute->getFrontendInput() == 'multiselect') {
+                    $value = array_map('trim', explode(",", $value));
+                }
                 $productData->setData($fieldName, $value);
             }
 

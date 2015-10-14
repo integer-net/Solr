@@ -255,6 +255,7 @@
             <general>
                 <is_active>1</is_active>
                 <log>0</log>
+                <debug>0</debug>
             </general>
             <server>
                 <http_method>curl</http_method>
@@ -283,10 +284,16 @@
                 <max_price>200</max_price>
                 <use_custom_price_intervals>0</use_custom_price_intervals>
                 <custom_price_intervals>10,20,50,100,200,300,400,500</custom_price_intervals>
+                <search_fields>0</search_fields>
+                <search_summary_field_name>text_plain</search_summary_field_name>
+                <spellchecker_active>0</spellchecker_active>
+                <spellchecker_count>5</spellchecker_count>
+                <second_query>0</second_query>
             </results>
             <autosuggest>
                 <is_active>1</is_active>
                 <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
+                <search_summary_field_name>text_autocomplete</search_summary_field_name>
                 <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
                 <max_number_product_suggestions>3</max_number_product_suggestions>
                 <max_number_category_suggestions>8</max_number_category_suggestions>

@@ -21,6 +21,12 @@ class IntegerNet_Solr_Model_Result
     protected $_filters = array();
 
     /**
+     * Second run to Solr, when the first search hasn't found anything!
+     * @var bool
+     */
+    private $_foundNoResults = false;
+
+    /**
      * @return IntegerNet_Solr_Model_Resource_Solr
      */
     protected function _getResource()
@@ -99,6 +105,12 @@ class IntegerNet_Solr_Model_Result
 
                     $this->_mergeFacetFieldCounts($result, $fuzzyResult);
                     $this->_mergePriceData($result, $fuzzyResult);
+                }
+
+                if (Mage::getStoreConfigFlag('integernet_solr/results/second_query') && sizeof($result->response->docs) == 0) {
+                    $this->_foundNoResults = true;
+                    $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
+                    $this->_foundNoResults = false;
                 }
             }
 
@@ -186,6 +198,8 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getParams($storeId, $fuzzy = true)
     {
+        $searchFields = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
+
         $params = array(
             'q.op' => Mage::getStoreConfig('integernet_solr/results/search_operator'),
             'fq' => $this->_getFilterQuery($storeId),
@@ -235,7 +249,11 @@ class IntegerNet_Solr_Model_Result
         }
 
         if (!$fuzzy) {
-            $params['mm'] = '100%';
+            if ($searchFields) {
+                $params['mm'] = '0%';
+            } else {
+                $params['mm'] = '100%';
+            }
         }
 
         if (!$this->_getToolbarBlock()) {
@@ -397,20 +415,75 @@ class IntegerNet_Solr_Model_Result
 
         Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
 
-        $queryText = $transportObject->getQueryText();
+        $queryText          = $transportObject->getQueryText();
+        $searchAllFields    = false;
 
         if ($this->_isAutosuggest()) {
-            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
-            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
+            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
+            $searchFieldName    = Mage::getStoreConfig('integernet_solr/autosuggest/search_summary_field_name');
         } else {
-            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
-            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+            $searchAllFields    = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
+            $searchFieldName    = Mage::getStoreConfig('integernet_solr/results/search_summary_field_name');
         }
+
         if ($allowFuzzy && $isFuzzyActive) {
-            $queryText .= '~' . floatval($sensitivity);
+            $queryText  .= '~' . floatval($sensitivity);
+
         } else {
-            $queryText = 'text_plain:"' . $queryText . '"~100';
+
+            $searchValue = ($this -> _foundNoResults) ? explode(" ", $queryText) : $queryText;
+            $queryText = '';
+
+            if ($searchAllFields) {
+
+                $attributes = Mage::helper('integernet_solr')->getSearchableAttributes();
+                $boost      = "";
+                $spacer     = 0;
+
+                foreach ($attributes as $attribute) {
+
+                    $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+
+                    if (strstr($fieldName, '_f') == false) {
+
+                        if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+                            $boost = "^" . floatval($attribute->getSolrBoost());
+                        }
+
+                        if ($this -> _foundNoResults) {
+
+                            foreach ($searchValue AS $value) {
+                                $queryText .= ($spacer != 0) ? " " : "";
+                                $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
+                                $spacer++;
+                            }
+
+                        } else {
+                            $queryText .= ($spacer != 0) ? " " : "";
+                            $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
+                            $spacer++;
+                        }
+                    }
+                }
+
+            } else {
+
+                if ($this -> _foundNoResults) {
+
+                    foreach ($searchValue AS $key => $value) {
+                        $queryText .= ($key != 0) ? " " : "";
+                        $queryText .= $searchFieldName . ':"' . trim($value) . '"~100';
+                    }
+
+                } else {
+                    $queryText .= $searchFieldName . ':"' . trim($searchValue) . '"~100';
+                }
+            }
         }
+
         return $queryText;
     }
 
@@ -593,8 +666,7 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
-
+        if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
             $this->_logResult($result, microtime(true) - $startTime);
         }
 

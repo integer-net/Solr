@@ -14,6 +14,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      * @var bool
      */
     protected $_displayProductCount = null;
+    
+    protected $_categoryFilterItems = null;
 
     /**
      * @return Mage_Catalog_Model_Entity_Attribute
@@ -39,110 +41,15 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     public function getItems()
     {
-        $items = array();
-
         if ($this->isCategory()) {
-            $facetName = 'category';
-            if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
-
-                $categoryFacets = $this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
-                
-                if (Mage::helper('integernet_solr')->isCategoryPage()) {
-
-                    $childrenCategories = $this->_getCurrentChildrenCategories();
-                    
-                    foreach($childrenCategories as $childCategory) {
-                        $childCategoryId = $childCategory->getId();
-                        if (isset($categoryFacets->{$childCategoryId})) {
-                            $item = new Varien_Object();
-                            $item->setCount($categoryFacets->{$childCategoryId});
-                            $item->setLabel($childCategory->getName());
-                            $item->setUrl($this->_getUrl($childCategoryId));
-                            $items[] = $item;
-                        }
-                    }
-
-                } else {
-                    
-                    foreach((array)$categoryFacets as $optionId => $optionCount) {
-                        $item = new Varien_Object();
-                        $item->setCount($optionCount);
-                        $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
-                        $item->setUrl($this->_getUrl($optionId));
-                        $items[] = $item;
-                    }
-                }
-            }
-            return $items;
+            return $this->_getCategoryFilterItems();
         }
 
         if ($this->isRange()) {
-            $store = Mage::app()->getStore();
-            $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
-            if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
-
-                $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
-
-                $i = 0;
-                foreach($attributeFacetData as $range => $rangeCount) {
-                    $i++;
-                    if (!$rangeCount) {
-                        continue;
-                    }
-                    
-                    $item = new Varien_Object();
-                    $item->setCount($rangeCount);
-
-                    $commaPos = strpos($range, ',');
-                    $rangeStart = floatval(substr($range, 1, $commaPos - 1));
-                    $rangeEnd = floatval(substr($range, $commaPos + 1, -1));
-                    if ($rangeEnd == 0) {
-                        $label = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($rangeStart));
-                    } else {
-                        $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart),  $store->formatPrice($rangeEnd - 0.01));
-                    }
-
-                    $item->setLabel($label);
-                    $item->setUrl($this->_getIntervalUrl($i));
-                    $items[] = $item;
-                }
-            } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
-
-                $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
-
-                foreach($attributeFacetData['counts'] as $rangeStart => $rangeCount) {
-                    $item = new Varien_Object();
-                    $item->setCount($rangeCount);
-                    $rangeEnd = $rangeStart + $attributeFacetData['gap'];
-                    $item->setLabel(Mage::helper('catalog')->__(
-                        '%s - %s',
-                        $store->formatPrice($rangeStart),
-                        $store->formatPrice($rangeEnd - 0.01)
-                    ));
-                    $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
-                    $items[] = $item;
-                }
-            }
+            return $this->_getRangeFilterItems();
         }
 
-        $attributeCodeFacetName = $this->getAttribute()->getAttributeCode() . '_facet';
-        if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
-
-            $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
-
-            foreach($attributeFacets as $optionId => $optionCount) {
-                if (!$optionCount) {
-                    continue;
-                }
-                $item = new Varien_Object();
-                $item->setCount($optionCount);
-                $item->setLabel($this->getAttribute()->getSource()->getOptionText($optionId));
-                $item->setUrl($this->_getUrl($optionId));
-                $items[] = $item;
-            }
-        }
-        
-        return $items;
+        return $this->_getAttributeFilterItems();
     }
 
     /**
@@ -186,8 +93,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     /**
      * Get filter item url
      *
-     * @param int $rangeStart
-     * @param int $rangeEnd
+     * @param int $index
      * @return string
      */
     protected function _getIntervalUrl($index)
@@ -241,5 +147,131 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             ->setOrder('position', 'asc');
         
         return $childrenCategories;
+    }
+
+    /**
+     * @return Varien_Object[]
+     */
+    protected function _getCategoryFilterItems()
+    {
+        if (is_null($this->_categoryFilterItems)) {
+
+            $facetName = 'category';
+            if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
+
+                $categoryFacets = $this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
+
+                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+
+                    $childrenCategories = $this->_getCurrentChildrenCategories();
+
+                    foreach ($childrenCategories as $childCategory) {
+                        $childCategoryId = $childCategory->getId();
+                        if (isset($categoryFacets->{$childCategoryId})) {
+                            $item = new Varien_Object();
+                            $item->setCount($categoryFacets->{$childCategoryId});
+                            $item->setLabel($childCategory->getName());
+                            $item->setUrl($this->_getUrl($childCategoryId));
+                            $this->_categoryFilterItems[] = $item;
+                        }
+                    }
+
+                } else {
+
+                    foreach ((array)$categoryFacets as $optionId => $optionCount) {
+                        $item = new Varien_Object();
+                        $item->setCount($optionCount);
+                        $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                        $item->setUrl($this->_getUrl($optionId));
+                        $this->_categoryFilterItems[] = $item;
+                    }
+                }
+            }
+        }
+        
+        return $this->_categoryFilterItems;
+    }
+
+    /**
+     * @return Varien_Object[]
+     */
+    protected function _getRangeFilterItems()
+    {
+        $items = array();
+
+        $store = Mage::app()->getStore();
+        $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
+        if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
+
+            $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
+
+            $i = 0;
+            foreach ($attributeFacetData as $range => $rangeCount) {
+                $i++;
+                if (!$rangeCount) {
+                    continue;
+                }
+
+                $item = new Varien_Object();
+                $item->setCount($rangeCount);
+
+                $commaPos = strpos($range, ',');
+                $rangeStart = floatval(substr($range, 1, $commaPos - 1));
+                $rangeEnd = floatval(substr($range, $commaPos + 1, -1));
+                if ($rangeEnd == 0) {
+                    $label = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($rangeStart));
+                } else {
+                    $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd - 0.01));
+                }
+
+                $item->setLabel($label);
+                $item->setUrl($this->_getIntervalUrl($i));
+                $items[] = $item;
+            }
+        } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
+
+            $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
+
+            foreach ($attributeFacetData['counts'] as $rangeStart => $rangeCount) {
+                $item = new Varien_Object();
+                $item->setCount($rangeCount);
+                $rangeEnd = $rangeStart + $attributeFacetData['gap'];
+                $item->setLabel(Mage::helper('catalog')->__(
+                    '%s - %s',
+                    $store->formatPrice($rangeStart),
+                    $store->formatPrice($rangeEnd - 0.01)
+                ));
+                $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * @return Varien_Object[]
+     * @throws Mage_Core_Exception
+     */
+    protected function _getAttributeFilterItems()
+    {
+        $items = array();
+        $attributeCodeFacetName = $this->getAttribute()->getAttributeCode() . '_facet';
+        if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
+
+            $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
+
+            foreach ($attributeFacets as $optionId => $optionCount) {
+                if (!$optionCount) {
+                    continue;
+                }
+                $item = new Varien_Object();
+                $item->setCount($optionCount);
+                $item->setLabel($this->getAttribute()->getSource()->getOptionText($optionId));
+                $item->setUrl($this->_getUrl($optionId));
+                $items[] = $item;
+            }
+        }
+
+        return $items;
     }
 }

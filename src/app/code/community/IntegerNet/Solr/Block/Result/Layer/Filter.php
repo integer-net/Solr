@@ -45,14 +45,32 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $facetName = 'category';
             if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
 
-                $categoryFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
+                $categoryFacets = $this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
+                
+                if (Mage::helper('integernet_solr')->isCategoryPage()) {
 
-                foreach($categoryFacets as $optionId => $optionCount) {
-                    $item = new Varien_Object();
-                    $item->setCount($optionCount);
-                    $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
-                    $item->setUrl($this->_getUrl($optionId));
-                    $items[] = $item;
+                    $childrenCategories = $this->_getCurrentChildrenCategories();
+                    
+                    foreach($childrenCategories as $childCategory) {
+                        $childCategoryId = $childCategory->getId();
+                        if (isset($categoryFacets->{$childCategoryId})) {
+                            $item = new Varien_Object();
+                            $item->setCount($categoryFacets->{$childCategoryId});
+                            $item->setLabel($childCategory->getName());
+                            $item->setUrl($this->_getUrl($childCategoryId));
+                            $items[] = $item;
+                        }
+                    }
+
+                } else {
+                    
+                    foreach((array)$categoryFacets as $optionId => $optionCount) {
+                        $item = new Varien_Object();
+                        $item->setCount($optionCount);
+                        $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                        $item->setUrl($this->_getUrl($optionId));
+                        $items[] = $item;
+                    }
                 }
             }
             return $items;
@@ -199,5 +217,29 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $this->_displayProductCount = Mage::helper('catalog')->shouldDisplayProductCountOnLayer();
         }
         return $this->_displayProductCount;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Resource_Category_Collection
+     * @throws Mage_Core_Exception
+     */
+    protected function _getCurrentChildrenCategories()
+    {
+        if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
+            /** @var Mage_Catalog_Model_Category $currentCategory */
+            $currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
+        } else {
+            /** @var Mage_Catalog_Model_Category $currentCategory */
+            $currentCategory = Mage::registry('current_category');
+        }
+        
+        $childrenCategories = Mage::getResourceModel('catalog/category_collection')
+            ->setStore(Mage::app()->getStore())
+            ->addAttributeToSelect('name')
+            ->addAttributeToFilter('level', $currentCategory->getLevel() + 1)
+            ->addAttributeToFilter('path', array('like' => $currentCategory->getPath() . '_%'))
+            ->setOrder('position', 'asc');
+        
+        return $childrenCategories;
     }
 }

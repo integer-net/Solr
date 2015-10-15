@@ -44,7 +44,10 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
             if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
 
                 $categoryFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
-                $this->_filters[] = $this->_getCategoryFilter($categoryFacets);
+                $categoryFilter = $this->_getCategoryFilter($categoryFacets);
+                if ($categoryFilter->getHtml()) {
+                    $this->_filters[] = $categoryFilter;
+                }
             }
             foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
@@ -139,11 +142,17 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
         $filter = new Varien_Object();
         $filter->setName(Mage::helper('catalog')->__('Category'));
         $filter->setItemsCount(sizeof($categoryFacets));
-        $filter->setHtml(
-            $this->getChild('filter')
-                ->setData('is_category', true)
-                ->toHtml()
-        );
+        
+        /** @var IntegerNet_Solr_Block_Result_Layer_Filter $filterBlock */
+        $filterBlock = $this->getChild('filter')
+            ->setData('is_category', true);
+        if (sizeof($filterBlock->getItems())) {
+            $filter->setHtml(
+                $filterBlock->toHtml()
+            );
+        } else {
+            $filter->setHtml('');
+        }
         return $filter;
     }
 

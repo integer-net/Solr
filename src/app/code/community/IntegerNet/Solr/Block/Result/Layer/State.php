@@ -113,6 +113,10 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
     {
         $filterState = array();
         foreach ($this->getActiveFilters() as $item) {
+            if ($item->getIsCategory()) {
+                $filterState['cat'] = null;
+                continue;
+            }
             $filterState[$item->getAttribute()->getAttributeCode()] = null;
         }
         $params['_current']     = true;

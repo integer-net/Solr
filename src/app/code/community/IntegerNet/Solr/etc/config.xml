@@ -72,7 +72,7 @@
             <catalog_block_product_list_collection>
                 <observers>
                     <review>
-                        <type>model</type>
+                        <type>disabled</type>
                         <class>review/observer</class>
                         <method>catalogBlockProductCollectionBeforeToHtml</method>
                     </review>

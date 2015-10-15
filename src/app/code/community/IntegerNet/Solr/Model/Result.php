@@ -427,7 +427,6 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getSortParam()
     {
-        Mage::log($this->_getCurrentSort());
         switch ($this->_getCurrentSort()) {
             case 'position':
                 if (Mage::helper('integernet_solr')->isCategoryPage()) {

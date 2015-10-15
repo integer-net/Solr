@@ -113,6 +113,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
 
             foreach($attributeFacets as $optionId => $optionCount) {
+                if (!$optionCount) {
+                    continue;
+                }
                 $item = new Varien_Object();
                 $item->setCount($optionCount);
                 $item->setLabel($this->getAttribute()->getSource()->getOptionText($optionId));

@@ -152,6 +152,10 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$this->isLicensed()) {
             return false;
         }
+        
+        if ($this->isCategoryPage() && !$this->isCategoryDisplayActive()) {
+            return false;
+        }
 
         return true;
     }
@@ -161,16 +165,16 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCategoryPage()
     {
-        return !is_null(Mage::registry('current_category'));
+        return Mage::app()->getRequest()->getModuleName() == 'catalog'
+            && Mage::app()->getRequest()->getControllerName() == 'category';
     }
 
     /**
      * @return bool
-     * @todo configure
      */
     public function isCategoryDisplayActive()
     {
-        return true;
+        return Mage::getStoreConfigFlag('integernet_solr/category/is_active');
     }
 
     /**

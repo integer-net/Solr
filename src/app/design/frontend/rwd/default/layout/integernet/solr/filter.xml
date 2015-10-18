@@ -19,10 +19,10 @@
 
     <catalog_category_layered>
         <reference name="left_first">
-            <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
+            <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
                 <name>catalog.leftnav</name>
             </action>
-            <block ifconfig="integernet_solr/general/is_active" type="integernet_solr/result_layer_view" name="catalog.leftnav" after="currency" template="catalog/layer/view.phtml">
+            <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_layer_view" name="catalog.leftnav" after="currency" template="catalog/layer/view.phtml">
                 <action method="setModuleName">
                     <name>Mage_Catalog</name>
                 </action>

@@ -127,3 +127,5 @@
 "Connection to Solr Server has been restored.","Die Verbindung zum Solr-Server wurde wiederhergestellt."
 "It seems you have no cronjobs running. They are needed for doing regular connection checks. We strongly suggest you setup cronjobs. See <a href=""http://www.magentocommerce.com/wiki/1_-_installation_and_configuration/how_to_setup_a_cron_job"" target=""_blank"">here</a> for details.","Anscheinend sind in Ihrem Shop keine Cronjobs aktiviert. Diese werden benötigt, um die reglmäßige Erreichbarkeitsprüfung durchzuführen. Wir empfehlen Ihnen dringend, Cronjobs aufzusetzen. Klicken Sie <a href=""http://www.magentocommerce.com/wiki/1_-_installation_and_configuration/how_to_setup_a_cron_job"" target=""_blank"">hier</a> für Details."
 "Use HTTPS","HTTPS verwenden"
+"Use Solr to display products on category pages","Solr für die Darstellung von Produkten auf Kategorieseiten verwenden"
+"Category Pages","Kategorieseiten"

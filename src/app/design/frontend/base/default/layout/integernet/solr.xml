@@ -59,9 +59,9 @@
     <catalog_category_layered>
         <reference name="category.products">
             <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
-                <name>category.products</name>
+                <name>product_list</name>
             </action>
-            <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_list" name="category.products" template="catalog/product/list.phtml">
+            <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_list" name="product_list" template="catalog/product/list.phtml">
                 <action method="setTemplate" ifconfig="integernet_solr/results/use_html_from_solr">
                     <template>integernet/solr/result.phtml</template>
                 </action>

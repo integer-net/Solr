@@ -15,9 +15,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      * @param Mage_Core_Model_Resource_Abstract $resource
      */
     public function __construct($resource = null)
-    {
-        ;
-    }
+    {}
 
     /**
      * Load data

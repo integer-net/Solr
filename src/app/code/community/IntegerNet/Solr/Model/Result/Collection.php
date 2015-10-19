@@ -134,4 +134,6 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     {
         return Mage::getSingleton('integernet_solr/result')->getSolrResult();
     }
+
+    public function getLoadedIds () {}
 }

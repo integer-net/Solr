@@ -46,6 +46,11 @@
                     <autocomplete>IntegerNet_Solr_Block_Autosuggest</autocomplete>
                 </rewrite>
             </catalogsearch>
+            <enterprise_search>
+                <rewrite>
+                    <catalogsearch_layer>IntegerNet_Solr_Block_Search_Catalogsearch_Layer</catalogsearch_layer>
+                </rewrite>
+            </enterprise_search>
         </blocks>
 
         <helpers>

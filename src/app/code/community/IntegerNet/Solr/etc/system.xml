@@ -37,6 +37,16 @@
                             <show_in_store>1</show_in_store>
                         </is_active>
 
+                        <license_key translate="label,comment">
+                            <label>License Key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[Example: AAAAA-BBBBB. Will be necessary two weeks after install.]]></comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </license_key>
+
                         <log translate="label,comment">
                             <label>Activate Logging</label>
                             <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>
@@ -141,8 +151,83 @@
                                 <use_http_basic_auth>1</use_http_basic_auth>
                             </depends>
                         </http_basic_auth_password>
+
                     </fields>
                 </server>
+
+                <connection_check translate="label">
+                    <label>Connection Check</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>25</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+
+                        <is_active translate="label,comment">
+                            <label>Check Solr Server Connectivity automatically</label>
+                            <comment>A test request will be sent to the server every 5 minutes.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </is_active>
+
+                        <send_email_on_nth_failure translate="label">
+                            <label>Send Notification Email after X Failures in a Row</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-digits validate-greater-than-zero</validate>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <is_active>1</is_active>
+                            </depends>
+                        </send_email_on_nth_failure>
+
+                        <recipient_emails translate="label">
+                            <label>Email Recipient(s)</label>
+                            <comment>Divide email addresses by comma</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <is_active>1</is_active>
+                            </depends>
+                        </recipient_emails>
+
+                        <email_template translate="label">
+                            <label>Email Template</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <is_active>1</is_active>
+                            </depends>
+                        </email_template>
+
+                        <identity translate="label">
+                            <label>Email Sender</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_identity</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <is_active>1</is_active>
+                            </depends>
+                        </identity>
+                    </fields>
+                </connection_check>
 
                 <indexing translate="label">
                     <label>Indexing</label>
@@ -212,7 +297,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </is_active>
-                        <sensitivity translate="label">
+                        <sensitivity translate="label,comment">
                             <label>Sensitivity for Search</label>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
@@ -223,6 +308,19 @@
                             <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
                             <depends><is_active>1</is_active></depends>
                         </sensitivity>
+                        <minimum_results translate="label">
+                            <label>Number of Sufficient Direct Search Results</label>
+                            <comment>If there are at least this many search results, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <is_active>1</is_active>
+                            </depends>
+                        </minimum_results>
                         <is_active_autosuggest translate="label">
                             <label>Is active for Autosuggest</label>
                             <frontend_type>select</frontend_type>
@@ -243,6 +341,17 @@
                             <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
                             <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
                         </sensitivity_autosuggest>
+                        <minimum_results_autosuggest translate="label">
+                            <label>Number of Sufficient Direct Search Results for Autosuggest</label>
+                            <comment>If there are at least this many search results for autosuggest, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
+                        </minimum_results_autosuggest>
                     </fields>
                 </fuzzy>
 

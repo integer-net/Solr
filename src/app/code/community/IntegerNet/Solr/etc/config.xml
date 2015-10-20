@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.2.0</version>
+            <version>1.2.4</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -107,6 +107,16 @@
                 </setup>
             </integernet_solr_setup>
         </resources>
+
+        <template>
+            <email>
+                <integernet_solr_connection_check_email_template translate="label" module="integernet_solr">
+                    <label>Solr Connection Check Notification</label>
+                    <file>integernet_solr/connection_check.txt</file>
+                    <type>text</type>
+                </integernet_solr_connection_check_email_template>
+            </email>
+        </template>
     </global>
 
     <adminhtml>
@@ -156,8 +166,29 @@
                     </integernet_solr>
                 </observers>
             </admin_system_config_changed_section_integernet_solr>
+            <admin_session_user_login_success>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>adminSessionUserLoginSuccess</method>
+                    </integernet_solr>
+                </observers>
+            </admin_session_user_login_success>
         </events>
     </adminhtml>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <IntegerNet_Solr after="Mage_Adminhtml">IntegerNet_Solr_Adminhtml</IntegerNet_Solr>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 
     <frontend>
         <translate>
@@ -208,6 +239,14 @@
                     <model>integernet_solr/observer::storeSolrConfig</model>
                 </run>
             </integernet_solr_rebuild_config>
+            <integernet_solr_check_server_connection>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integernet_solr/observer::checkSolrServerConnection</model>
+                </run>
+            </integernet_solr_check_server_connection>
         </jobs>
     </crontab>
 
@@ -220,6 +259,11 @@
             <server>
                 <http_method>curl</http_method>
             </server>
+            <connection_check>
+                <check_connection>0</check_connection>
+                <send_email_on_nth_failure>1</send_email_on_nth_failure>
+                <email_template>integernet_solr_connection_check_email_template</email_template>
+            </connection_check>
             <indexing>
                 <pagesize>1000</pagesize>
                 <delete_documents_before_indexing>1</delete_documents_before_indexing>
@@ -229,6 +273,8 @@
                 <is_active_autosuggest>1</is_active_autosuggest>
                 <sensitivity>0.7</sensitivity>
                 <sensitivity_autosuggest>0.7</sensitivity_autosuggest>
+                <minimum_results>0</minimum_results>
+                <minimum_results_autosuggest>0</minimum_results_autosuggest>
             </fuzzy>
             <results>
                 <use_html_from_solr>0</use_html_from_solr>

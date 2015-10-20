@@ -22,7 +22,7 @@
 -->
 <config>
     <luceneMatchVersion>LUCENE_42</luceneMatchVersion>
-
+<!--
     <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-.*\.jar" />
 
     <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar" />
@@ -36,7 +36,7 @@
 
     <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
     <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
-
+-->
     <dataDir>${solr.data.dir:}</dataDir>
 
     <directoryFactory name="DirectoryFactory"

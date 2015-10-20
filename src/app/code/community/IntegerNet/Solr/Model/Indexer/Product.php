@@ -561,6 +561,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         if ($boost = $product->getSolrBoost()) {
             if ($boost > 0) {
                 $productData->setData('_boost', $boost);
+            } else {
+                $productData->setData('_boost', 1);
             }
         }
     }

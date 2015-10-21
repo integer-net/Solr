@@ -109,7 +109,10 @@ class IntegerNet_Solr_Model_Result
 
                 if (Mage::getStoreConfigFlag('integernet_solr/results/second_query') && sizeof($result->response->docs) == 0) {
                     $this->_foundNoResults = true;
-                    $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
+                    $check = explode(" ", Mage::helper('catalogsearch')->getQuery()->getQueryText());
+                    if (count($check) > 1) {
+                        $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
+                    }
                     $this->_foundNoResults = false;
                 }
             }
@@ -445,26 +448,30 @@ class IntegerNet_Solr_Model_Result
 
                 foreach ($attributes as $attribute) {
 
-                    $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+                    $data  = $attribute->getData();
+                    if ($data['is_visible_in_advanced_search'] == 1) {
 
-                    if (strstr($fieldName, '_f') == false) {
+                        $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
 
-                        if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                            $boost = "^" . floatval($attribute->getSolrBoost());
-                        }
+                        if (strstr($fieldName, '_f') == false) {
 
-                        if ($this -> _foundNoResults) {
-
-                            foreach ($searchValue AS $value) {
-                                $queryText .= ($spacer != 0) ? " " : "";
-                                $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
-                                $spacer++;
+                            if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+                                $boost = "^" . floatval($attribute->getSolrBoost());
                             }
 
-                        } else {
-                            $queryText .= ($spacer != 0) ? " " : "";
-                            $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
-                            $spacer++;
+                            if ($this -> _foundNoResults) {
+
+                                foreach ($searchValue AS $value) {
+                                    $queryText .= ($spacer != 0) ? " " : "";
+                                    $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
+                                    $spacer++;
+                                }
+
+                            } else {
+                                $queryText .= ($spacer != 0) ? " " : "";
+                                $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
+                                $spacer++;
+                            }
                         }
                     }
                 }

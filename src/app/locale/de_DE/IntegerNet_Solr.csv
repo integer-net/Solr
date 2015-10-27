@@ -38,6 +38,7 @@
 "Did you mean?","Meinten Sie?"
 "Spellcheck suggest number","Rechtschreibprüfung Vorschlags-Anzahl"
 "Rebuild Query by zero results and ask Solr Server again","Bei Null Ergenisse die Solr Query umbauen und erneut suchen"
+"Default search result limit","Standard Suchtreffer Anzahl"
 "Advantages: faster search<br />Disadvantages: slower indexing, no user dependant results","Vorteile: schnellere Suche<br />Nachteile: Langsamere Indizierung, keine benutzerabhängigen Suchergebnisse"
 "Autosuggest Box","Suchvorschlags-Box"
 "Maximum number of searchword suggestions","Maximale Anzahl Suchwort-Vorschläge"

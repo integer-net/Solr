@@ -573,9 +573,9 @@ class IntegerNet_Solr_Model_Result
                 if ($countGroup > 0) {
 
                     $j = 0;
-                    $filterQuery .= ($i != 0) ? ' AND ( ' : ' ( ';
+                    $filterQuery .= ($i != 0) ? ' OR ( ' : ' ( ';
                     foreach ($filterGroup AS $facetName => $value) {
-                        $filterQuery .= ($j != 0) ? ' OR ' : '';
+                        $filterQuery .= ($j != 0) ? ' AND ' : '';
                         $filterQuery .= $facetName . ':' . $value;
                         $j++;
                     }
@@ -704,6 +704,14 @@ class IntegerNet_Solr_Model_Result
     public function getLastQueryText()
     {
         return $this->_lastQueryText;
+    }
+
+    public function resetSearch()
+    {
+        $this->_solrResult = null;
+        $this->_filters = array();
+        $this->_filterGroups = array();
+        $this->_filterQuery = null;
     }
 
     /**

@@ -163,7 +163,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSort()
     {
         if (!$this->_getToolbarBlock()) {
-            if (Mage::app()->getRequest()->getParam('order')) {
+            if (!$this->_isAutosuggest() && Mage::app()->getRequest()->getParam('order')) {
                 return Mage::app()->getRequest()->getParam('order');
             } else {
                 return 'position';
@@ -178,7 +178,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSortDirection()
     {
         if (!$this->_getToolbarBlock()) {
-            if (Mage::App()->getRequest()->getParam('dir')) {
+            if (!$this->_isAutosuggest() && Mage::App()->getRequest()->getParam('dir')) {
                 return Mage::App()->getRequest()->getParam('dir');
             } else {
                 return 'asc'; // @ToDo: should be ASC than DESC, because this the default sorting setting?

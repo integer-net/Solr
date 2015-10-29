@@ -491,11 +491,11 @@ Possible Problems and their solutions
     This may happen if you have many store views. We recommend switching the indexing mode of the `integernet_solr` index
     to "Manually" and do a full reindex at night via cronjob if possible.
 
-3. **Product information on the results page should be different for different customer groups, but it's the same for all**    
+3. **Product information on the results page should be different for different customer groups, but is the same for all**    
     Turn off `Search Results -> Use HTML from Solr Index` in this case so the product HTML will be regenerated at every call. 
     Please not that this will affect the performance of the search result page. 
     
-4. **Product information on the autosuggest window should be different for different customer groups, but it's the same for all**
+4. **Product information on the autosuggest window should be different for different customer groups, but is the same for all**
     As the product HTML will always be stored in the Solr index, this is impossible. Try to modify the HTML in 
-    `template/integernet/solr/autosuggest/item.phtml` so it doesn't contain customer specific information anymore 
+    `template/integernet/solr/autosuggest/item.phtml` so it doesn't contain customer specific information any more 
     (e.g. prices).

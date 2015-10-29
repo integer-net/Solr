@@ -47,10 +47,25 @@ class IntegerNet_Solr_Model_Suggestion
                 0, // Items per page
                 $this->_getParams($storeId)
             );
-            
-            if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
 
+            if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
                 $this->_logSuggestion($this->_solrSuggestion, microtime(true) - $startTime);
+            }
+
+
+            /**
+             * Fallback if the User type something that can't be found, then ask the spellchecker
+             */
+            if (Mage::getStoreConfigFlag('integernet_solr/results/spellchecker_active')
+                && count((array) $this->_solrSuggestion->facet_counts->facet_fields->text_autocomplete) == 0) {
+
+                $startTime = microtime(true);
+                $spellchecker = new IntegerNet_Solr_Model_Spellchecker();
+                $this->_solrSuggestion = $spellchecker->getSolrSpellchecker();
+
+                if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+                    $this->_logSuggestion($this->_solrSuggestion, microtime(true) - $startTime);
+                }
             }
         }
 

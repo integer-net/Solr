@@ -260,7 +260,20 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
             if (!$productData->hasData($fieldName)) {
-                $productData->setData($fieldName, trim(strip_tags($attribute->getFrontend()->getValue($product))));
+                $value = trim(strip_tags($attribute->getFrontend()->getValue($product)));
+                if (!empty($value)) {
+                    if ($attribute->getFrontendInput() == 'multiselect') {
+                        $value = array_map('trim', explode(",", $value));
+                    }
+                    $productData->setData($fieldName, $value);
+
+                    if (strstr($fieldName, '_s') == true && Mage::getStoreConfigFlag('integernet_solr/results/search_fields') && $attribute->getUsedForSortBy()) {
+                        $productData->setData(
+                            Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                            $value
+                        );
+                    }
+                }
             }
 
             if ($attribute->getAttributeCode() == 'price') {
@@ -329,7 +342,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if ($product->getData($attribute->getAttributeCode())
                 && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
             ) {
+                if ($attribute->getFrontendInput() == 'multiselect') {
+                    $value = array_map('trim', explode(",", $value));
+                }
                 $productData->setData($fieldName, $value);
+
+                if (strstr($fieldName, '_s') == true && Mage::getStoreConfigFlag('integernet_solr/results/search_fields') && $attribute->getUsedForSortBy()) {
+                    $productData->setData(
+                        Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                        $value
+                    );
+                }
             }
 
             if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {

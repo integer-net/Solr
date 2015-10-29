@@ -117,6 +117,9 @@
             <int name="rows">10</int>
             <str name="df">text</str>
         </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
     </requestHandler>
 
     <requestHandler name="/query" class="solr.SearchHandler">
@@ -205,7 +208,7 @@
 
         <lst name="spellchecker">
             <str name="name">default</str>
-            <str name="field">name</str>
+            <str name="field">text</str>
             <str name="classname">solr.DirectSolrSpellChecker</str>
             <str name="distanceMeasure">internal</str>
             <float name="accuracy">0.5</float>
@@ -216,14 +219,14 @@
             <float name="maxQueryFrequency">0.01</float>
         </lst>
 
-        <lst name="spellchecker">
+        <!--<lst name="spellchecker">
             <str name="name">wordbreak</str>
             <str name="classname">solr.WordBreakSolrSpellChecker</str>
             <str name="field">name</str>
             <str name="combineWords">true</str>
             <str name="breakWords">true</str>
             <int name="maxChanges">10</int>
-        </lst>
+        </lst>-->
 
         <lst name="spellchecker">
             <str name="name">suggest</str>

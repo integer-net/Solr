@@ -136,7 +136,7 @@
         <field name="price_f" type="float" indexed="true" stored="true" docValues="true" default="0" />
 
         <dynamicField name="*_i"  type="int"    indexed="true"  stored="true" />
-        <dynamicField name="*_s"  type="string"  indexed="true"  stored="true" />
+        <dynamicField name="*_s"  type="text"  indexed="true"  stored="true" />
         <dynamicField name="*_l"  type="long"   indexed="true"  stored="true" />
         <dynamicField name="*_t"  type="text"    indexed="true"  stored="true" />
         <dynamicField name="*_b"  type="boolean" indexed="true"  stored="true" />
@@ -144,14 +144,14 @@
         <dynamicField name="*_d"  type="double" indexed="true"  stored="true" />
         <dynamicField name="*_dt" type="date"    indexed="true"  stored="true" />
         <dynamicField name="*_i_mv"  type="int"    indexed="true"  stored="true" multiValued="true" />
-        <dynamicField name="*_s_mv"  type="string"  indexed="true"  stored="true" multiValued="true" />
+        <dynamicField name="*_s_mv"  type="text"  indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_l_mv"  type="long"   indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_t_mv"  type="text"    indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_b_mv"  type="boolean" indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_f_mv"  type="float"  indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_d_mv"  type="double" indexed="true"  stored="true" multiValued="true" />
         <dynamicField name="*_dt_mv" type="date"    indexed="true"  stored="true" multiValued="true" />
-        <dynamicField name="*_nonindex" type="text"    indexed="false"  stored="true"/>
+        <dynamicField name="*_nonindex" type="string"    indexed="false"  stored="true"/>
 
         <dynamicField name="ignored_*" type="ignored" multiValued="true"/>
         <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>

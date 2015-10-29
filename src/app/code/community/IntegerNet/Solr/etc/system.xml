@@ -57,6 +57,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </log>
+                        <debug>
+                            <label>Activate Debug</label>
+                            <comment>Priority for the Solr fields, will be fetched from db and the logging is activated.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </debug>
                     </fields>
                 </general>
 
@@ -432,6 +442,64 @@
                             <show_in_store>1</show_in_store>
                             <depends><use_custom_price_intervals>1</use_custom_price_intervals></depends>
                         </custom_price_intervals>
+                        <search_fields translate="label">
+                            <label>Search Fields over all fields</label>
+                            <comment><![CDATA[Search all the attributes that have been set to Searchable are]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </search_fields>
+                        <search_summary_field_name translate="label">
+                            <label>Name of summary field to search in it</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>integernet_solr/source_searchField</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </search_summary_field_name>
+                        <spellchecker_active>
+                            <label>Activate Spellcheck</label>
+                            <comment><![CDATA[Did you mean?]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </spellchecker_active>
+                        <spellchecker_count>
+                            <label>Spellcheck suggest number</label>
+                            <comment><![CDATA[i.e. 2]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><spellchecker_active>1</spellchecker_active></depends>
+                        </spellchecker_count>
+                        <second_query>
+                            <label>Rebuild Query by zero results and ask Solr Server again</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </second_query>
+                        <default_search_limit>
+                            <label>Default search result limit</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </default_search_limit>
                     </fields>
                 </results>
 
@@ -465,6 +533,16 @@
                                 <is_active>1</is_active>
                             </depends>
                         </use_php_file_in_home_dir>
+                        <search_summary_field_name translate="label">
+                            <label>Name of summary field to search in it</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>integernet_solr/source_searchField</source_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_active>1</is_active></depends>
+                        </search_summary_field_name>
                         <max_number_searchword_suggestions translate="label">
                             <label>Maximum number of searchword suggestions</label>
                             <frontend_type>text</frontend_type>

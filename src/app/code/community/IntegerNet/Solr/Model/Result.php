@@ -21,6 +21,30 @@ class IntegerNet_Solr_Model_Result
     protected $_filters = array();
 
     /**
+     * Filter Groups
+     * @var array
+     */
+    protected $_filterGroups = array();
+
+    /**
+     * Filter Query string
+     * @var null|string
+     */
+    protected $_filterQuery = null;
+
+    /**
+     * last executed search query
+     * @var string
+     */
+    protected $_lastQueryText = "";
+
+    /**
+     * Second run to Solr, when the first search hasn't found anything!
+     * @var bool
+     */
+    private $_foundNoResults = false;
+
+    /**
      * @return IntegerNet_Solr_Model_Resource_Solr
      */
     protected function _getResource()
@@ -100,6 +124,15 @@ class IntegerNet_Solr_Model_Result
                     $this->_mergeFacetFieldCounts($result, $fuzzyResult);
                     $this->_mergePriceData($result, $fuzzyResult);
                 }
+
+                if (Mage::getStoreConfigFlag('integernet_solr/results/second_query') && sizeof($result->response->docs) == 0) {
+                    $this->_foundNoResults = true;
+                    $check = explode(" ", Mage::helper('catalogsearch')->getQuery()->getQueryText());
+                    if (count($check) > 1) {
+                        $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
+                    }
+                    $this->_foundNoResults = false;
+                }
             }
 
 
@@ -130,7 +163,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSort()
     {
         if (!$this->_getToolbarBlock()) {
-            return 'position';
+            if (!$this->_isAutosuggest() && Mage::app()->getRequest()->getParam('order')) {
+                return Mage::app()->getRequest()->getParam('order');
+            } else {
+                return 'position';
+            }
         }
         return $this->_getToolbarBlock()->getCurrentOrder();
     }
@@ -141,7 +178,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSortDirection()
     {
         if (!$this->_getToolbarBlock()) {
-            return 'desc';
+            if (!$this->_isAutosuggest() && Mage::App()->getRequest()->getParam('dir')) {
+                return Mage::App()->getRequest()->getParam('dir');
+            } else {
+                return 'asc'; // @ToDo: should be ASC than DESC, because this the default sorting setting?
+            }
         }
         if ($this->_getCurrentSort() == 'position') {
             switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
@@ -159,10 +200,15 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getPageSize()
     {
-        if (!$this->_getToolbarBlock()) {
+        if ($this->_isAutosuggest()) {
             return intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
+        } else {
+            if (Mage::app()->getRequest()->getParam('limit')) {
+                return intval(Mage::app()->getRequest()->getParam('limit'));
+            } else {
+                return intval(Mage::getStoreConfig('integernet_solr/results/default_search_limit'));
+            }
         }
-        return $this->_getToolbarBlock()->getLimit();
     }
 
     /**
@@ -186,6 +232,8 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getParams($storeId, $fuzzy = true)
     {
+        $searchFields = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
+
         $params = array(
             'q.op' => Mage::getStoreConfig('integernet_solr/results/search_operator'),
             'fq' => $this->_getFilterQuery($storeId),
@@ -235,7 +283,11 @@ class IntegerNet_Solr_Model_Result
         }
 
         if (!$fuzzy) {
-            $params['mm'] = '100%';
+            if ($searchFields) {
+                $params['mm'] = '0%';
+            } else {
+                $params['mm'] = '100%';
+            }
         }
 
         if (!$this->_getToolbarBlock()) {
@@ -397,20 +449,80 @@ class IntegerNet_Solr_Model_Result
 
         Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
 
-        $queryText = $transportObject->getQueryText();
+        $queryText          = $transportObject->getQueryText();
+        $searchAllFields    = false;
 
         if ($this->_isAutosuggest()) {
-            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
-            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
+            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
+            $searchFieldName    = Mage::getStoreConfig('integernet_solr/autosuggest/search_summary_field_name');
         } else {
-            $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
-            $sensitivity = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
+            $searchAllFields    = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
+            $searchFieldName    = Mage::getStoreConfig('integernet_solr/results/search_summary_field_name');
         }
+
         if ($allowFuzzy && $isFuzzyActive) {
-            $queryText .= '~' . floatval($sensitivity);
+            $queryText  .= '~' . floatval($sensitivity);
+
         } else {
-            $queryText = 'text_plain:"' . $queryText . '"~100';
+
+            $searchValue = ($this -> _foundNoResults) ? explode(" ", $queryText) : $queryText;
+            $queryText = '';
+
+            if ($searchAllFields) {
+
+                $attributes = Mage::helper('integernet_solr')->getSearchableAttributes();
+                $boost      = "";
+                $spacer     = 0;
+
+                foreach ($attributes as $attribute) {
+
+                    $data  = $attribute->getData();
+                    if ($data['is_visible_in_advanced_search'] == 1) {
+
+                        $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+
+                        if (strstr($fieldName, '_f') == false) {
+
+                            if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+                                $boost = "^" . floatval($attribute->getSolrBoost());
+                            }
+
+                            if ($this -> _foundNoResults) {
+
+                                foreach ($searchValue AS $value) {
+                                    $queryText .= ($spacer != 0) ? " " : "";
+                                    $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
+                                    $spacer++;
+                                }
+
+                            } else {
+                                $queryText .= ($spacer != 0) ? " " : "";
+                                $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
+                                $spacer++;
+                            }
+                        }
+                    }
+                }
+
+            } else {
+
+                if ($this -> _foundNoResults) {
+
+                    foreach ($searchValue AS $key => $value) {
+                        $queryText .= ($key != 0) ? " " : "";
+                        $queryText .= $searchFieldName . ':"' . trim($value) . '"~100';
+                    }
+
+                } else {
+                    $queryText .= $searchFieldName . ':"' . trim($searchValue) . '"~100';
+                }
+            }
         }
+
+        $this->_lastQueryText = $queryText;
         return $queryText;
     }
 
@@ -419,7 +531,8 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getSortParam()
     {
-        switch ($this->_getCurrentSort()) {
+        $sortField = $this->_getCurrentSort();
+        switch ($sortField) {
             case 'position':
                 $param = 'score';
                 break;
@@ -427,7 +540,7 @@ class IntegerNet_Solr_Model_Result
                 $param = 'price_f';
                 break;
             default:
-                $param = $this->_getCurrentSort() . '_s';
+                $param = $sortField . ((Mage::getStoreConfigFlag('integernet_solr/results/search_fields')) ? '_sort' : '_s');
         }
 
         $param .= ' ' . $this->_getCurrentSortDirection();
@@ -440,23 +553,50 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getFilterQuery($storeId)
     {
-        $filterQuery = 'store_id:' . $storeId;
+        if ($this->_filterQuery == null) {
 
-        foreach($this->getFilters() as $attributeCode => $value) {
-            if (is_array($value)) {
-                $filterQuery .= ' AND (';
-                $filterQueryParts = array();
-                foreach($value as $singleValue) {
-                    $filterQueryParts[] = $attributeCode . ':' . $singleValue;
+            $filterQuery = 'store_id:' . $storeId;
+
+            foreach($this->getFilters() as $attributeCode => $value) {
+                if (is_array($value)) {
+                    $filterQuery .= ' AND (';
+                    $filterQueryParts = array();
+                    foreach($value as $singleValue) {
+                        $filterQueryParts[] = $attributeCode . ':' . $singleValue;
+                    }
+                    $filterQuery .= implode(' OR ', $filterQueryParts);
+                    $filterQuery .= ')';
+                } else {
+                    $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
                 }
-                $filterQuery .= implode(' OR ', $filterQueryParts);
-                $filterQuery .= ')';
-            } else {
-                $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
             }
-        }
 
-        return $filterQuery;
+
+            $filterGroups = $this->getFilterGroups();
+            $countGroups = count($filterGroups);
+            $i = 0;
+            $filterQuery .= ($countGroups > 0) ? ' AND (' : '';
+            foreach ($filterGroups AS $groupKey => $filterGroup) {
+
+                $countGroup = count($filterGroup);
+                if ($countGroup > 0) {
+
+                    $j = 0;
+                    $filterQuery .= ($i != 0) ? ' OR ( ' : ' ( ';
+                    foreach ($filterGroup AS $facetName => $value) {
+                        $filterQuery .= ($j != 0) ? ' AND ' : '';
+                        $filterQuery .= $facetName . ':' . $value;
+                        $j++;
+                    }
+                    $filterQuery .= ' ) ';
+                    $i++;
+                }
+            }
+            $filterQuery .= ($countGroups > 0) ? ' )' : '';
+
+            $this->_filterQuery = $filterQuery;
+        }
+        return $this->_filterQuery;
     }
 
     /**
@@ -474,6 +614,20 @@ class IntegerNet_Solr_Model_Result
     public function addCategoryFilter($category)
     {
         $this->_filters['category'] = $category->getId();
+    }
+
+    /**
+     * @param array $array
+     */
+    public function addAttributeFilterGroup($array)
+    {
+        $index = ($this->_filterGroups == null) ? 0 : count($this->_filterGroups) - 1;
+        foreach ($array AS $key => $group) {
+            foreach ($group AS $value) {
+                $this->_filterGroups[$index][$value['attribute']->getAttributeCode() . '_facet'] = $value['value'];
+            }
+            $index++;
+        }
     }
 
     /**
@@ -519,11 +673,54 @@ class IntegerNet_Solr_Model_Result
     }
 
     /**
+     * Init all filters for search
+     */
+    public function initFilterableAttributes()
+    {
+        $layer = Mage::getSingleton('integernet_solr/catalogSearch_layer');
+        foreach ($layer->getFilterableAttributes() AS $attribute) {
+            if (Mage::app()->getRequest()->getParam($attribute->getName())) {
+                $this->addAttributeFilter(
+                    $attribute,
+                    Mage::app()->getRequest()->getParam($attribute->getName())
+                );
+            }
+        }
+        if (Mage::app()->getRequest()->getParam('cat')) {
+            $this->_filters['category'] = intval(Mage::app()->getRequest()->getParam('cat'));
+        }
+    }
+
+    /**
      * @return array
      */
     public function getFilters()
     {
         return $this->_filters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilterGroups ()
+    {
+        return $this->_filterGroups;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastQueryText()
+    {
+        return $this->_lastQueryText;
+    }
+
+    public function resetSearch()
+    {
+        $this->_solrResult = null;
+        $this->_filters = array();
+        $this->_filterGroups = array();
+        $this->_filterQuery = null;
     }
 
     /**
@@ -593,9 +790,16 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
-
+        if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
             $this->_logResult($result, microtime(true) - $startTime);
+
+            if (Mage::getStoreConfigFlag('integernet_solr/results/search_fields') && Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+                Mage::log((($fuzzy) ? "Fuzzy Search" : "Normal Search"), null, 'solr.log');
+                Mage::log('Query over all searchable fields:', null, 'solr.log');
+                Mage::log($this->_lastQueryText, null, 'solr.log');
+                Mage::log('Filter Query:', null, 'solr.log');
+                Mage::log($this->_filterQuery, null, 'solr.log');
+            }
         }
 
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));

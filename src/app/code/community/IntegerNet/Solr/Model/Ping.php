@@ -12,38 +12,37 @@ class IntegerNet_Solr_Model_Ping
     /**
      * @var null|bool
      */
-    protected $_testPing = null;
-
-    /**
-     * @var IntegerNet_Solr_Model_Ping|null
-     */
-    protected static $_instance = null;
+    private static $_testPing = null;
 
     public function __construct()
     {
-        if (self::$_instance == null) {
+        if (self::$_testPing == null) {
             $this->setPing();
-            self::$_instance = $this;
         }
-        return self::$_instance;
     }
 
     protected function setPing()
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService(
-            Mage::app()->getStore()->getId()
-        );
-        $this->_testPing = boolval($solr->ping());
+        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active', Mage::app()->getStore()->getId())) {
+
+            $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService(
+                Mage::app()->getStore()->getId()
+            );
+            self::$_testPing = boolval($solr->ping());
+
+        } else {
+            self::$_testPing = false;
+        }
     }
 
     /**
-     * @return bool|float|null
+     * @return bool
      */
     public function getPing()
     {
-        if ($this->_testPing == null) {
+        if (self::$_testPing == null) {
             $this->setPing();
         }
-        return $this->_testPing;
+        return self::$_testPing;
     }
 }

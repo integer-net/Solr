@@ -73,9 +73,10 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param bool $sort
      * @return string
      */
-    public function getFieldName($attribute)
+    public function getFieldName($attribute, $sort = false)
     {
         if ($attribute->getUsedForSortBy()) {
             switch ($attribute->getBackendType()) {
@@ -86,7 +87,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
                     return $attribute->getAttributeCode() . '_t';
 
                 default:
-                    return $attribute->getAttributeCode() . '_s';
+                    return ($sort) ? $attribute->getAttributeCode() . '_sort' : $attribute->getAttributeCode() . '_s';
             }
         } else {
             switch ($attribute->getBackendType()) {

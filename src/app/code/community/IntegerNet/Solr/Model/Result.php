@@ -163,7 +163,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSort()
     {
         if (!$this->_getToolbarBlock()) {
-            return 'position';
+            if (Mage::app()->getRequest()->getParam('order')) {
+                return Mage::app()->getRequest()->getParam('order');
+            } else {
+                return 'position';
+            }
         }
         return $this->_getToolbarBlock()->getCurrentOrder();
     }
@@ -174,7 +178,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getCurrentSortDirection()
     {
         if (!$this->_getToolbarBlock()) {
-            return 'desc';
+            if (Mage::App()->getRequest()->getParam('dir')) {
+                return Mage::App()->getRequest()->getParam('dir');
+            } else {
+                return 'asc'; // @ToDo: should be ASC than DESC, because this the default sorting setting?
+            }
         }
         if ($this->_getCurrentSort() == 'position') {
             switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
@@ -523,7 +531,8 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getSortParam()
     {
-        switch ($this->_getCurrentSort()) {
+        $sortField = $this->_getCurrentSort();
+        switch ($sortField) {
             case 'position':
                 $param = 'score';
                 break;
@@ -531,7 +540,7 @@ class IntegerNet_Solr_Model_Result
                 $param = 'price_f';
                 break;
             default:
-                $param = $this->_getCurrentSort() . '_s';
+                $param = $sortField . ((Mage::getStoreConfigFlag('integernet_solr/results/search_fields')) ? '_sort' : '_s');
         }
 
         $param .= ' ' . $this->_getCurrentSortDirection();

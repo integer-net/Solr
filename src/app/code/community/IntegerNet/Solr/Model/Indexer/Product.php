@@ -273,6 +273,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 if ($price == 0) {
                     $price = $product->getMinimalPrice();
                 }
+                $price = Mage::helper('tax')->getPrice($product, $price, null, null, null, null, $product->getStoreId());
                 $productData->setData('price_f', floatval($price));
             }
         }
@@ -317,6 +318,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
 
             if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
+                continue;
+            }
+
+            if (($attribute->getAttributeCode() == 'price') && ($productData->getData('price_f') > 0)) {
                 continue;
             }
 

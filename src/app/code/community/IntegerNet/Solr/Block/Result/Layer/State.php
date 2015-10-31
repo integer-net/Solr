@@ -36,7 +36,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                         if (strpos($optionId, '-') !== false) {
                             list($fromPrice, $toPrice) = explode('-', $optionId);
                             $toPrice -= 0.01;
-                            if ($toPrice == 0) {
+                            if ($toPrice <= 0) {
                                 $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
                             } else {
                                 $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice), $store->formatPrice($toPrice));

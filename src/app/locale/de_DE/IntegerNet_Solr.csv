@@ -72,6 +72,7 @@
 "i.e. 1000","z.B. 1000"
 "Use Custom Price Intervals","Individuelle Preisintervalle verwenden"
 "Needs Solr 4.10+","Benötigt Solr 4.10+"
+"Needs Solr 4.10+ and Magento CE 1.7+ / Magento EE 1.12+","Benötigt Solr 4.10+ und Magento CE 1.7+ / Magento EE 1.12+"
 "Custom Price Intervals","Individuelle Preisintervalle"
 "Divide steps by comma, i.e. 10,20,50,100,200,300,400,500","Grenzen durch Komma getrennt, z.B. 10,20,50,100,200,300,400,500"
 "from %s","ab %s"

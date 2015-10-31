@@ -99,7 +99,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getIntervalUrl($index)
     {
         $query = array(
-            $this->getAttribute()->getAttributeCode() => $index . ',100',
+            $this->getAttribute()->getAttributeCode() => $index . ',' . Mage::getStoreConfig('integernet_solr/results/price_step_size'),
             Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
         );
         return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
@@ -225,7 +225,11 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 }
 
                 $item->setLabel($label);
-                $item->setUrl($this->_getIntervalUrl($i));
+                if (version_compare(Mage::getVersion(), '1.7.0.0') >= 0) {
+                    $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
+                } else {
+                    $item->setUrl($this->_getIntervalUrl($i));
+                }
                 $items[] = $item;
             }
         } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {

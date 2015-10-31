@@ -26,7 +26,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getMaxPrice($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return parent::getMaxPrice($filter);
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::getMaxPrice($filter);
         }
 
@@ -48,7 +52,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getCount($filter, $range)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return parent::getCount($filter, $range);
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::getCount($filter, $range);
         }
 
@@ -89,7 +97,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function applyPriceRange($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return parent::applyPriceRange($filter);
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::applyPriceRange($filter);
         }
 

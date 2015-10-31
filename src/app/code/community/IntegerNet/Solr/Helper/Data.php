@@ -16,6 +16,9 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     protected $_filterableInSearchAttributes = null;
 
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    protected $_filterableInCatalogAttributes = null;
+
+    /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
 
     /**
@@ -53,9 +56,10 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
-    public function getFilterableInSearchAttributes()
+    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
         if (is_null($this->_filterableInSearchAttributes)) {
 
@@ -63,11 +67,45 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             $this->_filterableInSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addIsFilterableInSearchFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-                ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC)
             ;
+            
+            if ($useAlphabeticalSearch) {
+                $this->_filterableInSearchAttributes
+                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            } else {
+                $this->_filterableInSearchAttributes
+                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            }
         }
 
         return $this->_filterableInSearchAttributes;
+    }
+
+
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
+    {
+        if (is_null($this->_filterableInCatalogAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_filterableInCatalogAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addIsFilterableFilter()
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
+
+            if ($useAlphabeticalSearch) {
+                $this->_filterableInCatalogAttributes
+                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            } else {
+                $this->_filterableInCatalogAttributes
+                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            }
+        }
+
+        return $this->_filterableInCatalogAttributes;
     }
 
 
@@ -114,8 +152,29 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$this->isLicensed()) {
             return false;
         }
+        
+        if ($this->isCategoryPage() && !$this->isCategoryDisplayActive()) {
+            return false;
+        }
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCategoryPage()
+    {
+        return Mage::app()->getRequest()->getModuleName() == 'catalog'
+            && Mage::app()->getRequest()->getControllerName() == 'category';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCategoryDisplayActive()
+    {
+        return Mage::getStoreConfigFlag('integernet_solr/category/is_active');
     }
 
     /**

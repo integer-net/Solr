@@ -128,10 +128,12 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
     }
 
     /**
-     * @return stdClass
+     * @return Apache_Solr_Response
      */
     protected function _getSolrResult()
     {
         return Mage::getSingleton('integernet_solr/result')->getSolrResult();
     }
+
+    public function getLoadedIds () {}
 }

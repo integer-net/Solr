@@ -49,59 +49,65 @@ class IntegerNet_Solr_Model_Result
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
-            if ($this->_isAutosuggest()) {
-                $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
-                $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results_autosuggest');
+            if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                $result = $this->_getCategoryResultFromRequest($storeId, $lastItemNumber);
             } else {
-                $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
-                $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results');
-            }
-            if ($this->_getCurrentSort() != 'position') {
-                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
-            } else {
-                $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
 
-                $numberResults = sizeof($result->response->docs);
-                $numberDuplicates = 0;
-                if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
+                if ($this->_isAutosuggest()) {
+                    $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
+                    $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results_autosuggest');
+                } else {
+                    $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
+                    $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results');
+                }
+                if ($this->_getCurrentSort() != 'position') {
+                    $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
+                } else {
+                    $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
 
-                    $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
+                    $numberResults = sizeof($result->response->docs);
+                    $numberDuplicates = 0;
+                    if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                    if ($numberResults < $lastItemNumber) {
+                        $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
 
-                        $foundProductIds = array();
-                        foreach($result->response->docs as $nonFuzzyDoc) { /** @var Apache_Solr_Document $nonFuzzyDoc */
-                            $field = $nonFuzzyDoc->getField('product_id');
-                            $foundProductIds[] = $field['value'];
-                        }
+                        if ($numberResults < $lastItemNumber) {
 
-                        foreach($fuzzyResult->response->docs as $fuzzyDoc) { /** @var Apache_Solr_Document $fuzzyDoc */
-                            $field = $fuzzyDoc->getField('product_id');
-                            if (!in_array($field['value'], $foundProductIds)) {
-                                $result->response->docs[] = $fuzzyDoc;
-                                if (++$numberResults >= $lastItemNumber) {
-                                    break;
-                                }
-                            } else {
-                                $numberDuplicates++;
+                            $foundProductIds = array();
+                            foreach ($result->response->docs as $nonFuzzyDoc) {
+                                /** @var Apache_Solr_Document $nonFuzzyDoc */
+                                $field = $nonFuzzyDoc->getField('product_id');
+                                $foundProductIds[] = $field['value'];
                             }
+
+                            foreach ($fuzzyResult->response->docs as $fuzzyDoc) {
+                                /** @var Apache_Solr_Document $fuzzyDoc */
+                                $field = $fuzzyDoc->getField('product_id');
+                                if (!in_array($field['value'], $foundProductIds)) {
+                                    $result->response->docs[] = $fuzzyDoc;
+                                    if (++$numberResults >= $lastItemNumber) {
+                                        break;
+                                    }
+                                } else {
+                                    $numberDuplicates++;
+                                }
+                            }
+
+                            $result->response->numFound = $result->response->numFound
+                                + $fuzzyResult->response->numFound
+                                - $numberDuplicates;
+                        } else {
+                            $result->response->numFound = max(
+                                $result->response->numFound,
+                                $fuzzyResult->response->numFound
+                            );
                         }
 
-                        $result->response->numFound = $result->response->numFound
-                            + $fuzzyResult->response->numFound
-                            - $numberDuplicates;
-                    } else {
-                        $result->response->numFound = max(
-                            $result->response->numFound,
-                            $fuzzyResult->response->numFound
-                        );
+                        $this->_mergeFacetFieldCounts($result, $fuzzyResult);
+                        $this->_mergePriceData($result, $fuzzyResult);
                     }
-
-                    $this->_mergeFacetFieldCounts($result, $fuzzyResult);
-                    $this->_mergePriceData($result, $fuzzyResult);
                 }
             }
-
 
             if ($firstItemNumber > 0) {
                 $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
@@ -144,11 +150,13 @@ class IntegerNet_Solr_Model_Result
             return 'desc';
         }
         if ($this->_getCurrentSort() == 'position') {
-            switch(strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
-                case 'desc':
-                    return 'asc';
-                default:
-                    return 'desc';
+            if (!Mage::helper('integernet_solr')->isCategoryPage()) {
+                switch (strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
+                    case 'desc':
+                        return 'asc';
+                    default:
+                        return 'desc';
+                }
             }
         }
         return $this->_getToolbarBlock()->getCurrentDirection();
@@ -421,7 +429,11 @@ class IntegerNet_Solr_Model_Result
     {
         switch ($this->_getCurrentSort()) {
             case 'position':
-                $param = 'score';
+                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                    $param = 'category_' . Mage::registry('current_category')->getId() . '_position_i';
+                } else {
+                    $param = 'score';
+                }
                 break;
             case 'price':
                 $param = 'price_f';
@@ -441,6 +453,11 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         $filterQuery = 'store_id:' . $storeId;
+        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+            $filterQuery .= ' AND is_visible_in_catalog_i:1';
+        } else {
+            $filterQuery .= ' AND is_visible_in_search_i:1';
+        }
 
         foreach($this->getFilters() as $attributeCode => $value) {
             if (is_array($value)) {
@@ -599,6 +616,44 @@ class IntegerNet_Solr_Model_Result
         }
 
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));
+
+        return $result;
+    }
+
+    /**
+     * @param int $storeId
+     * @param int $pageSize
+     * @return Apache_Solr_Response
+     */
+    protected function _getCategoryResultFromRequest($storeId, $pageSize)
+    {
+        $transportObject = new Varien_Object(array(
+            'store_id' => $storeId,
+            'query_text' => 'category_' . Mage::registry('current_category')->getId() . '_position_i:*',
+            'start_item' => 0,
+            'page_size' => $pageSize,
+            'params' => $this->_getParams($storeId),
+        ));
+
+        Mage::dispatchEvent('integernet_solr_before_category_request', array('transport' => $transportObject));
+
+        $startTime = microtime(true);
+
+        /** @var Apache_Solr_Response $result */
+        $result = $this->_getResource()->search(
+            $storeId,
+            $transportObject->getQueryText(),
+            $transportObject->getStartItem(), // Start item
+            $transportObject->getPageSize(), // Items per page
+            $transportObject->getParams()
+        );
+
+        if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
+
+            $this->_logResult($result, microtime(true) - $startTime);
+        }
+
+        Mage::dispatchEvent('integernet_solr_after_category_request', array('result' => $result));
 
         return $result;
     }

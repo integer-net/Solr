@@ -91,6 +91,30 @@ class IntegerNet_Solr_Model_Observer
         Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
     }
 
+    public function controllerActionPredispatchCatalogCategoryView(Varien_Event_Observer $observer)
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/general/is_active') 
+            && Mage::getStoreConfigFlag('integernet_solr/category/is_active') 
+            && !$this->_getPingResult()) {
+            Mage::app()->getStore()->setConfig('integernet_solr/general/is_active', 0);
+        }
+        
+        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
+            Mage::app()->getStore()->setConfig('integernet_solr/category/is_active', 0);
+        }
+
+        /** @var Mage_Core_Controller_Varien_Action $action */
+        $action = $observer->getControllerAction();
+
+        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
+            if ($order === 'relevance') {
+                $_GET['order'] = 'position';
+            }
+        }
+
+        Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
+    }
+
     /**
      * @return bool
      */

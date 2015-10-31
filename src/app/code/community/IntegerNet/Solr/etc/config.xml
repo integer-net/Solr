@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.2.4</version>
+            <version>1.3.0</version>
         </IntegerNet_Solr>
     </modules>
     <global>

@@ -19,6 +19,9 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     protected $_filterableInCatalogAttributes = null;
 
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    protected $_filterableInCatalogOrSearchAttributes = null;
+
+    /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
 
     /**
@@ -55,6 +58,19 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_sortableAttributes;
     }
 
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getFilterableAttributes($useAlphabeticalSearch = true)
+    {
+        if ($this->isCategoryPage()) {
+            return $this->getFilterableInCatalogAttributes($useAlphabeticalSearch);
+        } else {
+            return $this->getFilterableInSearchAttributes($useAlphabeticalSearch);
+        }
+    }
+    
     /**
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
@@ -106,6 +122,41 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $this->_filterableInCatalogAttributes;
+    }
+    
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
+    {
+        if (is_null($this->_filterableInCatalogOrSearchAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addFieldToFilter(
+                    array(
+                        'additional_table.is_filterable', 
+                        'additional_table.is_filterable_in_search'
+                    ), 
+                    array(
+                        array('gt' => 0),
+                        array('gt' => 0),
+                    )
+                )
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
+
+            if ($useAlphabeticalSearch) {
+                $this->_filterableInCatalogOrSearchAttributes
+                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            } else {
+                $this->_filterableInCatalogOrSearchAttributes
+                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            }
+        }
+
+        return $this->_filterableInCatalogOrSearchAttributes;
     }
 
 

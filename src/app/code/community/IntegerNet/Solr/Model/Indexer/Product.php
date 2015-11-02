@@ -175,9 +175,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInSearchAttributes()->getColumnValues('attribute_code'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInCatalogAttributes()->getColumnValues('attribute_code'));
-
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes()->getColumnValues('attribute_code'));
+            
         if (is_array($productIds)) {
             $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
         }
@@ -246,7 +245,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addFacetsToProductData($product, $productData)
     {
-        foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
+        foreach (Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes() as $attribute) {
 
             switch ($attribute->getFrontendInput()) {
                 case 'select':

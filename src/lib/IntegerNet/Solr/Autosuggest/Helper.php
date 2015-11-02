@@ -29,6 +29,14 @@ final class IntegerNet_Solr_Autosuggest_Helper
     /**
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
+    public function getFilterableAttributes()
+    {
+        return $this->getFilterableInSearchAttributes();
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
     public function getFilterableInSearchAttributes()
     {
         $attributes = array();

@@ -259,7 +259,8 @@ class IntegerNet_Solr_Model_Result
     protected function _getFacetFieldCodes()
     {
         $codes = array('category');
-        foreach(Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
+
+        foreach(Mage::helper('integernet_solr')->getFilterableAttributes() as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
         return $codes;

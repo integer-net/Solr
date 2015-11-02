@@ -49,7 +49,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                     $this->_filters[] = $categoryFilter;
                 }
             }
-            foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes(false) as $attribute) {
+            foreach (Mage::helper('integernet_solr')->getFilterableAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 $attributeCodeFacetName = $attribute->getAttributeCode() . '_facet';

@@ -75,7 +75,13 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
      */
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
-        $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params);
+        $response = $this->getSolrService($storeId)->search(
+            $query,
+            $offset,
+            $limit,
+            $params,
+            Mage::getStoreConfig('integernet_solr/server/http_response')
+        );
         return $response;
     }
 
@@ -89,7 +95,13 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
      */
     public function suggest($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
-        $response = $this->getSolrService($storeId)->suggest($query, $offset, $limit, $params);
+        $response = $this->getSolrService($storeId)->suggest(
+            $query,
+            $offset,
+            $limit,
+            $params,
+            Mage::getStoreConfig('integernet_solr/server/http_response')
+        );
         return $response;
     }
 

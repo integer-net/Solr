@@ -264,6 +264,7 @@
             </general>
             <server>
                 <http_method>curl</http_method>
+                <http_response>GET</http_response>
             </server>
             <connection_check>
                 <check_connection>0</check_connection>

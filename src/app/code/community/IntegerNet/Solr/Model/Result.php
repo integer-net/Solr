@@ -463,6 +463,8 @@ class IntegerNet_Solr_Model_Result
             $searchFieldName    = Mage::getStoreConfig('integernet_solr/results/search_summary_field_name');
         }
 
+        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
+
         if ($allowFuzzy && $isFuzzyActive) {
             $queryText  .= '~' . floatval($sensitivity);
 

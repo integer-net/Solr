@@ -89,7 +89,7 @@ class IntegerNet_Solr_Model_Spellchecker
     protected function _getQueryText()
     {
         $queryText = Mage::helper('catalogsearch')->getQuery()->getQueryText();
-
+        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
         return $queryText;
     }
 

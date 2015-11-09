@@ -116,7 +116,7 @@ Note that you won't have all Magento functionality available if you are using th
 Configuration
 -------------
 
-You will find the configuration in the admin area of Magento at *System -> Konfiguration -> Solr*:
+You will find the configuration in the admin area of Magento at *System -> Configuration -> Solr*:
 
 ![Configuration Menu](http://www.integer-net.com/download/solr/integernet-solr-config-menu-en.png)
 

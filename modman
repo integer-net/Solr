@@ -3,7 +3,7 @@ src/app/design/adminhtml/default/default/layout/integernet/*        app/design/a
 src/app/design/adminhtml/default/default/template/integernet/*      app/design/adminhtml/default/default/template/integernet/
 src/app/design/frontend/base/default/layout/integernet/*            app/design/frontend/base/default/layout/integernet/
 src/app/design/frontend/base/default/template/integernet/*          app/design/frontend/base/default/template/integernet/
-src/app/design/frontend/rwd/default/layout/integernet/*             app/design/frontend/base/default/layout/integernet/
+src/app/design/frontend/rwd/default/layout/integernet/*             app/design/frontend/rwd/default/layout/integernet/
 src/app/design/frontend/rwd/default/template/integernet/*           app/design/frontend/rwd/default/template/integernet/
 src/app/etc/modules/*                                               app/etc/modules/
 src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/de_DE/IntegerNet_Solr.csv

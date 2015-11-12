@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <catalogsearch_result_index>
+        <reference name="left_first">
+            <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
+                <name>catalogsearch.leftnav</name>
+            </action>
+            <block ifconfig="integernet_solr/general/is_active" type="integernet_solr/result_layer_view" name="catalogsearch.leftnav" after="currency" template="catalog/layer/view.phtml">
+                <action method="setModuleName">
+                    <name>Mage_CatalogSearch</name>
+                </action>
+                <block type="integernet_solr/result_layer_state" name="catalogsearch.layer.state" as="state" template="catalog/layer/state.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalogsearch.layer.filter" as="filter" template="catalog/layer/filter.phtml"/>
+                <block type="integernet_solr/result_layer_renderers" name="catalogsearch.layer.renderers" as="state_renderers"/>
+            </block>
+        </reference>
+    </catalogsearch_result_index>
+
+    <catalog_category_layered>
+        <reference name="left_first">
+            <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
+                <name>catalog.leftnav</name>
+            </action>
+            <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_layer_view" name="catalog.leftnav" after="currency" template="catalog/layer/view.phtml">
+                <action method="setModuleName">
+                    <name>Mage_Catalog</name>
+                </action>
+                <block type="integernet_solr/result_layer_state" name="catalog.layer.state" as="state" template="catalog/layer/state.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalog.layer.filter" as="filter" template="catalog/layer/filter.phtml"/>
+                <block type="integernet_solr/result_layer_renderers" name="catalog.layer.renderers" as="state_renderers"/>
+            </block>
+        </reference>
+    </catalog_category_layered>
+</layout>

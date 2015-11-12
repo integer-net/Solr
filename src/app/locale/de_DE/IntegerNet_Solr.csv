@@ -72,6 +72,7 @@
 "i.e. 1000","z.B. 1000"
 "Use Custom Price Intervals","Individuelle Preisintervalle verwenden"
 "Needs Solr 4.10+","Benötigt Solr 4.10+"
+"Needs Solr 4.10+ and Magento CE 1.7+ / Magento EE 1.12+","Benötigt Solr 4.10+ und Magento CE 1.7+ / Magento EE 1.12+"
 "Custom Price Intervals","Individuelle Preisintervalle"
 "Divide steps by comma, i.e. 10,20,50,100,200,300,400,500","Grenzen durch Komma getrennt, z.B. 10,20,50,100,200,300,400,500"
 "from %s","ab %s"
@@ -127,3 +128,5 @@
 "Connection to Solr Server has been restored.","Die Verbindung zum Solr-Server wurde wiederhergestellt."
 "It seems you have no cronjobs running. They are needed for doing regular connection checks. We strongly suggest you setup cronjobs. See <a href=""http://www.magentocommerce.com/wiki/1_-_installation_and_configuration/how_to_setup_a_cron_job"" target=""_blank"">here</a> for details.","Anscheinend sind in Ihrem Shop keine Cronjobs aktiviert. Diese werden benötigt, um die reglmäßige Erreichbarkeitsprüfung durchzuführen. Wir empfehlen Ihnen dringend, Cronjobs aufzusetzen. Klicken Sie <a href=""http://www.magentocommerce.com/wiki/1_-_installation_and_configuration/how_to_setup_a_cron_job"" target=""_blank"">hier</a> für Details."
 "Use HTTPS","HTTPS verwenden"
+"Use Solr to display products on category pages","Solr für die Darstellung von Produkten auf Kategorieseiten verwenden"
+"Category Pages","Kategorieseiten"

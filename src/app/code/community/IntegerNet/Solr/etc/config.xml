@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.2.4</version>
+            <version>1.3.0</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -31,6 +31,7 @@
 
             <catalog>
                 <rewrite>
+                    <layer>IntegerNet_Solr_Model_Catalog_Layer</layer>
                     <layer_filter_price>IntegerNet_Solr_Model_Catalog_Layer_Filter_Price</layer_filter_price>
                 </rewrite>
             </catalog>
@@ -71,7 +72,7 @@
             <catalog_block_product_list_collection>
                 <observers>
                     <review>
-                        <type>model</type>
+                        <type>disabled</type>
                         <class>review/observer</class>
                         <method>catalogBlockProductCollectionBeforeToHtml</method>
                     </review>
@@ -206,6 +207,9 @@
                 <integernet_solr>
                     <file>integernet/solr.xml</file>
                 </integernet_solr>
+                <integernet_solr_filter>
+                    <file>integernet/solr/filter.xml</file>
+                </integernet_solr_filter>
             </updates>
         </layout>
 
@@ -219,6 +223,15 @@
                     </integernet_solr>
                 </observers>
             </controller_action_predispatch_catalogsearch_result_index>
+            <controller_action_predispatch_catalog_category_view>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>controllerActionPredispatchCatalogCategoryView</method>
+                    </integernet_solr>
+                </observers>
+            </controller_action_predispatch_catalog_category_view>
             <catalog_block_product_list_collection>
                 <observers>
                     <review>
@@ -285,6 +298,9 @@
                 <use_custom_price_intervals>0</use_custom_price_intervals>
                 <custom_price_intervals>10,20,50,100,200,300,400,500</custom_price_intervals>
             </results>
+            <category>
+                <is_active>0</is_active>
+            </category>
             <autosuggest>
                 <is_active>1</is_active>
                 <use_php_file_in_home_dir>1</use_php_file_in_home_dir>

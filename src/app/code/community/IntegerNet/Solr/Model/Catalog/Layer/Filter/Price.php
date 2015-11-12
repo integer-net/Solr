@@ -8,7 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Model_Layer_Filter_Price 
-{    
+{
     /**
      * Get price range for building filter steps
      *
@@ -16,7 +16,11 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     public function getPriceRange()
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return parent::getPriceRange();
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::getPriceRange();
         }
 
@@ -32,41 +36,32 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     protected function _renderItemLabel($range, $value)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
             return parent::_renderItemLabel($range, $value);
         }
 
-        /** @var Apache_Solr_Response $result */
-        $result = Mage::getSingleton('integernet_solr/result')->getSolrResult();
-        if (isset($result->facet_counts->facet_intervals->price_f)) {
-
-            $intervals = (array)$result->facet_counts->facet_intervals->price_f;
-            $store = Mage::app()->getStore();
-
-            $i = 1;
-            foreach($intervals as $borders => $count) {
-                
-                if ($value != $i) {
-                    $i++;
-                    continue;
-                }
-
-                $commaPos = strpos($borders, ',');
-                if ($commaPos === false) {
-                    return parent::_renderItemLabel($range, $value);
-                }
-
-                $fromPrice = floatval(substr($borders, 1, $commaPos - 1));
-                $toPrice = floatval(substr($borders, $commaPos + 1, -1));
-
-                if ($toPrice == 0) {
-                    return Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
-                } else {
-                    return Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice),  $store->formatPrice($toPrice));
-                }
-            }
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+            return parent::_renderItemLabel($range, $value);
         }
+
+        $store = Mage::app()->getStore();
         
+        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
+            && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
+            $lowerBorder = 0;
+            $i = 1;
+            foreach (explode(',', $customPriceIntervals) as $upperBorder) {
+                if ($i == $value) {
+                    return Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                    break;
+                }
+
+                $i++;
+                $lowerBorder = $upperBorder;
+            }
+            return Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($lowerBorder));
+        }
+
         return parent::_renderItemLabel($range, $value);
     }
 
@@ -79,7 +74,11 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
      */
     protected function _applyToCollection($range, $index)
     {
-        if (!Mage::helper('integernet_solr')->isActive() || Mage::app()->getRequest()->getModuleName() != 'catalogsearch') {
+        if (!Mage::helper('integernet_solr')->isActive()) {
+            return parent::_applyToCollection($range, $index);
+        }
+
+        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
             return parent::_applyToCollection($range, $index);
         }
 

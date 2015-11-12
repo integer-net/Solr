@@ -255,6 +255,7 @@
             <general>
                 <is_active>1</is_active>
                 <log>0</log>
+                <debug>0</debug>
             </general>
             <server>
                 <http_method>curl</http_method>

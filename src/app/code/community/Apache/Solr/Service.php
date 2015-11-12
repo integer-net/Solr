@@ -379,8 +379,6 @@ class Apache_Solr_Service
 		if ($solrResponse->getHttpStatus() != 200 && $solrResponse->getHttpStatus() != 0)
 		{
 			throw new Apache_Solr_HttpTransportException($solrResponse);
-		} else if ($solrResponse->getHttpStatus() == 0) {
-			Mage::log($rawPost, null, 'solr_index_status_0.log');
 		}
 
 		return $solrResponse;
@@ -680,7 +678,6 @@ class Apache_Solr_Service
 		
 		$httpTransport = $this->getHttpTransport();
 
-		Mage::log($this->_pingUrl);
 		$httpResponse = $httpTransport->performHeadRequest($this->_pingUrl, $timeout);
 		$solrResponse = new Apache_Solr_Response($httpResponse, $this->_createDocuments, $this->_collapseSingleValueArrays);
 

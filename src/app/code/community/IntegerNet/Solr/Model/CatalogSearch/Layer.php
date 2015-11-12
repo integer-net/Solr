@@ -45,6 +45,7 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model
         $collection
             ->setItemObjectClass('catalog/resource_eav_attribute')
             ->addStoreLabel(Mage::app()->getStore()->getId())
+            ->addIsFilterableInSearchFilter()
             ->setOrder('position', 'ASC');
         $collection = $this->_prepareAttributeCollection($collection);
         $collection->load();

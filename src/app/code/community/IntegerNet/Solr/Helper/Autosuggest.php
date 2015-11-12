@@ -128,6 +128,14 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
                 'options' => $options,
             );
         }
+
+        foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
+            $config[$store->getId()]['searchable_attribute'][$attribute->getAttributeCode()] = array(
+                'attribute_code' => $attribute->getAttributeCode(),
+                'label' => $attribute->getStoreLabel(),
+                'solr_boost' => $attribute->getSolrBoost(),
+            );
+        }
     }
 
     /**

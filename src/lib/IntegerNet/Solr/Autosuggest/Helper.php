@@ -77,6 +77,16 @@ final class IntegerNet_Solr_Autosuggest_Helper
     }
 
     /**
+     * @param string $queryText
+     * @return string
+     */
+    public function escape($queryText)
+    {
+        $query = new IntegerNet_Solr_Helper_Query();
+        return $query->escape($queryText);
+    }
+
+    /**
      * Replacement for original translation function
      *
      * @return string

@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
+class IntegerNet_Solr_Service extends Apache_Solr_Service
 {
     const SUGGEST_SERVLET = 'suggest';
     const CORES_SERVLET = 'admin/cores';
@@ -30,11 +30,12 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      * if not specified.
      *
      * @param string $host
-     * @param string $port
+     * @param int|string $port
      * @param string $path
-     * @param Apache_Solr_HttpTransport_Interface $httpTransport
-     * @param Apache_Solr_Compatibility_CompatibilityLayer $compatibilityLayer
+     * @param Apache_Solr_HttpTransport_Interface|bool $httpTransport
+     * @param Apache_Solr_Compatibility_CompatibilityLayer|bool $compatibilityLayer
      * @param bool $useHttps
+     * @throws Apache_Solr_InvalidArgumentException
      */
     public function __construct(
         $host = 'localhost',
@@ -50,7 +51,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
     
     /**
      * @param string $basePath
-     * @return IntegerNet_Solr_Model_Resource_Solr_Service
+     * @return IntegerNet_Solr_Service
      * @throws Exception
      */
     public function setBasePath($basePath)
@@ -122,6 +123,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      * Return a valid http URL given this server's host, port and path and a provided servlet name
      *
      * @param string $servlet
+     * @param array $params
      * @return string
      */
     protected function _constructUrl($servlet, $params = array())
@@ -157,7 +159,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      * @param int $offset The starting offset for result documents
      * @param int $limit The maximum number of result documents to return
      * @param array $params key / value pairs for other query parameters (see Solr documentation), use arrays for parameter keys used more than once (e.g. facet.field)
-     * @param string $method The HTTP method (IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_GET or IntegerNet_Solr_Model_Resource_Solr_Service::METHOD::POST)
+     * @param string $method The HTTP method (IntegerNet_Solr_Service::METHOD_GET or IntegerNet_Solr_Service::METHOD::POST)
      * @return Apache_Solr_Response
      *
      * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
@@ -201,7 +203,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         }
         else
         {
-            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_* constants");
+            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Service::METHOD_* constants");
         }
     }
 
@@ -210,7 +212,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
      *
      * @param string $core
      * @param string $otherCore
-     * @param string $method The HTTP method (IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_GET or IntegerNet_Solr_Model_Resource_Solr_Service::METHOD::POST)
+     * @param string $method The HTTP method (IntegerNet_Solr_Service::METHOD_GET or IntegerNet_Solr_Service::METHOD::POST)
      * @return Apache_Solr_Response
      *
      * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
@@ -242,14 +244,14 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         }
         else
         {
-            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_* constants");
+            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Service::METHOD_* constants");
         }
     }
 
     /**
      * admin info interface
      *
-     * @param string $method The HTTP method (IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_GET or IntegerNet_Solr_Model_Resource_Solr_Service::METHOD::POST)
+     * @param string $method The HTTP method (IntegerNet_Solr_Service::METHOD_GET or IntegerNet_Solr_Service::METHOD::POST)
      * @return Apache_Solr_Response
      *
      * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
@@ -279,7 +281,7 @@ class IntegerNet_Solr_Model_Resource_Solr_Service extends Apache_Solr_Service
         }
         else
         {
-            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Model_Resource_Solr_Service::METHOD_* constants");
+            throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the IntegerNet_Solr_Service::METHOD_* constants");
         }
     }
 }

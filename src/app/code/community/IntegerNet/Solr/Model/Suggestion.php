@@ -12,7 +12,7 @@ class IntegerNet_Solr_Model_Suggestion
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
 
-    /** @var null|IntegerNet_Solr_Model_Resource_Solr_Service */
+    /** @var null|IntegerNet_Solr_Service */
     protected $_solrSuggestion = null;
 
     /**

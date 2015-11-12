@@ -7,34 +7,13 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstract
+class IntegerNet_Solr_Model_Resource_Solr
 {
-    /** @var IntegerNet_Solr_Model_Resource_Solr_Service[] */
+    /** @var IntegerNet_Solr_Service[] */
     protected $_solr;
     
     /** @var bool */
     protected $_useSwapIndex = false;
-    
-    protected function _construct()
-    {
-
-    }
-
-    /**
-     * Retrieve connection for read data
-     */
-    protected function _getReadAdapter() 
-    {
-        
-    }
-
-    /**
-     * Retrieve connection for write data
-     */
-    protected function _getWriteAdapter()
-    {
-        
-    }
     
     public function setUseSwapIndex($useSwapIndex = true)
     {
@@ -44,7 +23,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
     /**
      * @param int $storeId
-     * @return IntegerNet_Solr_Model_Resource_Solr_Service
+     * @return IntegerNet_Solr_Service
      */
     public function getSolrService($storeId)
     {
@@ -65,7 +44,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
             if ($core) {
                 $path .= $core . '/';
             }
-            $this->_solr[$storeId] = new IntegerNet_Solr_Model_Resource_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
+            $this->_solr[$storeId] = new IntegerNet_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
         }
         return $this->_solr[$storeId];
     }
@@ -100,6 +79,7 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
 
     /**
      * @param null|Mage_Core_Model_Store $restrictToStore
+     * @throws IntegerNet_Solr_Exception
      */
     public function checkSwapCoresConfiguration($restrictToStore = null) 
     {
@@ -138,12 +118,12 @@ class IntegerNet_Solr_Model_Resource_Solr extends Mage_Core_Model_Resource_Abstr
         }
 
         if (sizeof(array_intersect($coresToSwap, $coresNotToSwap))) {
-            Mage::throwException('Configuration Error: Activate Core Swapping for all Store Views using the same Solr Core.');
+            throw new IntegerNet_Solr_Exception('Configuration Error: Activate Core Swapping for all Store Views using the same Solr Core.');
         }
 
         foreach($swapCoreNames as $swapCoreNamesByCore) {
             if (sizeof(array_unique($swapCoreNamesByCore)) > 1) {
-                Mage::throwException('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
+                throw new IntegerNet_Solr_Exception('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
             }
         }
     }

@@ -12,7 +12,7 @@ class IntegerNet_Solr_Model_Result
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
 
-    /** @var null|IntegerNet_Solr_Model_Resource_Solr_Service */
+    /** @var null|IntegerNet_Solr_Service */
     protected $_solrResult = null;
 
     /** @var null|Mage_Catalog_Block_Product_List_Toolbar */

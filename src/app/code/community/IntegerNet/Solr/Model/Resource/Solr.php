@@ -7,14 +7,54 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+/**
+ * Solr resource, interface between Magento and solr service
+ *
+ * @todo use factory helper to instantiate this instead of getResourceModel
+ * @todo use $this->_config instead of Mage class
+ * @todo extract to /lib
+ */
 class IntegerNet_Solr_Model_Resource_Solr
 {
-    /** @var IntegerNet_Solr_Service[] */
+    /**
+     * Configuration reader, by store id
+     *
+     * @var  IntegerNet_Solr_Config_Interface[]
+     */
+    protected $_config;
+
+    /**
+     * Solr service, by store id
+     *
+     * @var IntegerNet_Solr_Service[]
+     */
     protected $_solr;
     
     /** @var bool */
     protected $_useSwapIndex = false;
-    
+
+    /**
+     * @param IntegerNet_Solr_Config_Interface[] $storeConfig
+     */
+    public function __construct(array $storeConfig = [])
+    {
+        $this->_config = $storeConfig;
+    }
+
+    /**
+     * @param $storeId
+     * @return IntegerNet_Solr_Config_Interface
+     * @throws IntegerNet_Solr_Exception
+     */
+    public function getStoreConfig($storeId)
+    {
+        if (!isset($this->_config[$storeId])) {
+            throw new IntegerNet_Solr_Exception("Store with ID {$storeId} not found.");
+        }
+        return $this->_config[$storeId];
+    }
+
     public function setUseSwapIndex($useSwapIndex = true)
     {
         $this->_useSwapIndex = $useSwapIndex;

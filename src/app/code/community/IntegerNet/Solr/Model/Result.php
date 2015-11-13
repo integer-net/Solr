@@ -44,7 +44,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getResource()
     {
         if (is_null($this->_resource)) {
-            $this->_resource = Mage::getResourceModel('integernet_solr/solr');
+            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         }
 
         return $this->_resource;

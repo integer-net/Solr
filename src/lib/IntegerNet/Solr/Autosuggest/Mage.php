@@ -51,6 +51,9 @@ final class IntegerNet_Solr_Autosuggest_Mage
     /** @var IntegerNet_Solr_Autosuggest_Helper */
     static private $_helper;
 
+    /** @var  IntegerNet_Solr_Autosuggest_Factory */
+    static private $_factory;
+
     /** @var array */
     static private $_registry = array();
 
@@ -259,6 +262,12 @@ final class IntegerNet_Solr_Autosuggest_Mage
      */
     public static function helper($identifier)
     {
+        if ($identifier === 'integernet_solr/factory') {
+            if (is_null(self::$_factory)) {
+                self::$_factory = new IntegerNet_Solr_Autosuggest_Factory();
+            }
+            return self::$_factory;
+        }
         if (is_null(self::$_helper)) {
             self::$_helper = new IntegerNet_Solr_Autosuggest_Helper();
         }

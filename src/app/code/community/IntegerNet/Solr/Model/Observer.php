@@ -120,7 +120,7 @@ class IntegerNet_Solr_Model_Observer
      */
     protected function _getPingResult()
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService(Mage::app()->getStore()->getId());
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
         return (boolean)$solr->ping();
     }
 

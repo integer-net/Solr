@@ -16,7 +16,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     );
 
     protected $_resourceModelIdentifiers = array(
-        'integernet_solr/solr',
     );
 
     public function getTemplate()

@@ -79,7 +79,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
 
         $this->setChild('toolbar', $toolbar);
 
-        $this->_getProductCollection()->load();
+        if (!Mage::getStoreConfigFlag('integernet_solr/results/use_html_from_solr')) {
+            $collection->setCurPage(1);
+        }
+        $collection->load();
 
         return $this;
     }

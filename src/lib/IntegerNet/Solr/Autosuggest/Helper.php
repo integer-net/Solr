@@ -48,34 +48,34 @@ final class IntegerNet_Solr_Autosuggest_Helper
     }
 
     /**
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getSearchableAttributes()
+    {
+        $attributes = array();
+        foreach((array)Mage::getStoreConfig('searchable_attribute') as $attributeCode => $attributeConfig) {
+            $attributes[$attributeCode] = new IntegerNet_Solr_Autosuggest_Attribute($attributeConfig);
+        }
+
+        return $attributes;
+    }
+
+    /**
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
      * @return string
      * @todo adjust
      */
     public function getFieldName($attribute)
     {
-        if ($attribute->getUsedForSortBy()) {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f';
+        switch ($attribute->getBackendType()) {
+            case 'decimal':
+                return $attribute->getAttributeCode() . '_f';
 
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t';
+            case 'text':
+                return $attribute->getAttributeCode() . '_t';
 
-                default:
-                    return $attribute->getAttributeCode() . '_s';
-            }
-        } else {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f_mv';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t_mv';
-
-                default:
-                    return $attribute->getAttributeCode() . '_s_mv';
-            }
+            default:
+                return $attribute->getAttributeCode() . '_t';
         }
     }
 
@@ -99,5 +99,66 @@ final class IntegerNet_Solr_Autosuggest_Helper
     public function isCategoryPage()
     {
         return false;
+    }
+
+    /**
+     * Quote and escape search strings
+     *
+     * @param string $string String to escape
+     * @return string The escaped/quoted string
+     */
+    public function escape ($string)
+    {
+        if (!is_numeric($string)) {
+            if (preg_match('/\W/', $string) == 1) {
+                // multiple words
+
+                $stringLength = strlen($string);
+                if ($string{0} == '"' && $string{$stringLength - 1} == '"') {
+                    // phrase
+                    $string = trim($string, '"');
+                    $string = $this->escapePhrase($string);
+                } else {
+                    $string = $this->escapeSpecialCharacters($string);
+                }
+            } else {
+                $string = $this->escapeSpecialCharacters($string);
+            }
+        }
+
+        return $string;
+    }
+
+    /**
+     * Escapes characters with special meanings in Lucene query syntax.
+     *
+     * @param string $value Unescaped - "dirty" - string
+     * @return string Escaped - "clean" - string
+     */
+    public function escapeSpecialCharacters ($value)
+    {
+        // list taken from http://lucene.apache.org/core/4_4_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description
+        // which mentions: + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+        // of which we escape: ( ) { } [ ] ^ " ~ : \ /
+        // and explicitly don't escape: + - && || ! * ?
+        $pattern = '/(\\(|\\)|\\{|\\}|\\[|\\]|\\^|"|~|\:|\\\\|\\/)/';
+        $replace = '\\\$1';
+
+        return preg_replace($pattern, $replace, $value);
+    }
+
+    /**
+     * Escapes a value meant to be contained in a phrase with characters with
+     * special meanings in Lucene query syntax.
+     *
+     * @param string $value Unescaped - "dirty" - string
+     * @return string Escaped - "clean" - string
+     */
+    public function escapePhrase ($value)
+    {
+        $pattern = '/("|\\\)/';
+        $replace = '\\\$1';
+
+        return '"' . preg_replace($pattern, $replace, $value) . '"';
     }
 }

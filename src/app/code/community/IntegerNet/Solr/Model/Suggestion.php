@@ -47,9 +47,8 @@ class IntegerNet_Solr_Model_Suggestion
                 0, // Items per page
                 $this->_getParams($storeId)
             );
-            
-            if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
 
+            if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
                 $this->_logSuggestion($this->_solrSuggestion, microtime(true) - $startTime);
             }
         }
@@ -82,7 +81,7 @@ class IntegerNet_Solr_Model_Suggestion
     protected function _getQueryText()
     {
         $queryText = Mage::helper('catalogsearch')->getQuery()->getQueryText();
-
+        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
         return $queryText;
     }
 

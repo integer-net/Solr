@@ -27,11 +27,26 @@ class IntegerNet_Solr_Autosuggest_Attribute
         return $this->_attributeConfig['label'];
     }
     
+    public function getSolrBoost()
+    {
+        return $this->_attributeConfig['solr_boost'];
+    }
+
     public function getSource()
     {
         if (is_null($this->_source)) {
             $this->_source = new IntegerNet_Solr_Autosuggest_Source($this->_attributeConfig['options']);
         }
         return $this->_source;
+    }
+
+    public function getIsSearchable()
+    {
+        return true;
+    }
+
+    public function getBackendType()
+    {
+        return 'varchar';
     }
 }

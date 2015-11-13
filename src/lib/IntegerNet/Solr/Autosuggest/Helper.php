@@ -67,15 +67,28 @@ final class IntegerNet_Solr_Autosuggest_Helper
      */
     public function getFieldName($attribute)
     {
-        switch ($attribute->getBackendType()) {
-            case 'decimal':
-                return $attribute->getAttributeCode() . '_f';
+        if ($attribute->getUsedForSortBy()) {
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    return $attribute->getAttributeCode() . '_f';
 
-            case 'text':
-                return $attribute->getAttributeCode() . '_t';
+                case 'text':
+                    return $attribute->getAttributeCode() . '_t';
 
-            default:
-                return $attribute->getAttributeCode() . '_t';
+                default:
+                    return $attribute->getAttributeCode() . '_t';
+            }
+        } else {
+            switch ($attribute->getBackendType()) {
+                case 'decimal':
+                    return $attribute->getAttributeCode() . '_f_mv';
+
+                case 'text':
+                    return $attribute->getAttributeCode() . '_t_mv';
+
+                default:
+                    return $attribute->getAttributeCode() . '_t_mv';
+            }
         }
     }
 

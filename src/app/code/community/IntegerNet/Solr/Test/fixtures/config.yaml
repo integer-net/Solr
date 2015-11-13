@@ -1,11 +1,11 @@
 config:
-  dev/template/allow_symlink: 1
-  integernet_solr/general/is_active: 1
-  integernet_solr/server/host: localhost
-  integernet_solr/server/port: 8983
-  integernet_solr/server/path: /solr/
-  integernet_solr/server/core: core0
-  integernet_solr/server/http_method: curl
-  integernet_solr/server/use_https: 0
-  integernet_solr/server/use_http_basic_auth: 0
-  integernet_solr/connection_check/is_active: 1
+  default/dev/template/allow_symlink: 1
+  default/integernet_solr/general/is_active: 1
+  default/integernet_solr/server/host: localhost
+  default/integernet_solr/server/port: 8983
+  default/integernet_solr/server/path: /solr/
+  default/integernet_solr/server/core: core0
+  default/integernet_solr/server/http_method: curl
+  default/integernet_solr/server/use_https: 0
+  default/integernet_solr/server/use_http_basic_auth: 0
+  default/integernet_solr/connection_check/is_active: 1

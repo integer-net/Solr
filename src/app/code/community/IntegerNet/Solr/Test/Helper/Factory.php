@@ -16,10 +16,16 @@ class IntegerNet_Solr_Test_Helper_Factory extends EcomDev_PHPUnit_Test_Case
     {
         $resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->assertInstanceOf(IntegerNet_Solr_Model_Resource_Solr::class, $resource);
-        $defaultStoreConfig = $resource->getStoreConfig(1);
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Interface::class, $defaultStoreConfig);
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $defaultStoreConfig->getIndexingConfig());
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $defaultStoreConfig->getServerConfig());
+        $storeConfigs = [
+            $resource->getStoreConfig(1),   // default store view
+            $resource->getStoreConfig(0),   // admin store view
+            $resource->getStoreConfig(null) // admin store view
+        ];
+        foreach ($storeConfigs as $storeConfig) {
+            $this->assertInstanceOf(IntegerNet_Solr_Config_Interface::class, $storeConfig);
+            $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $storeConfig->getIndexingConfig());
+            $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $storeConfig->getServerConfig());
+        }
 
         $this->setExpectedException(IntegerNet_Solr_Exception::class, "Store with ID -1 not found.");
         $resource->getStoreConfig(-1);

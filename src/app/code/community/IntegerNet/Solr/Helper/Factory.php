@@ -17,7 +17,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     public function getSolrResource()
     {
         $storeConfig = [];
-        foreach (Mage::app()->getStores() as $store) {
+        foreach (Mage::app()->getStores(true) as $store) {
             /** @var Mage_Core_Model_Store $store */
             if ($store->getIsActive()) {
                 $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());

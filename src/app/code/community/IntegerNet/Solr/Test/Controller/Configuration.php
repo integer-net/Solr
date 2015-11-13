@@ -30,7 +30,11 @@ class IntegerNet_Solr_Test_Controller_Configuration extends EcomDev_PHPUnit_Test
             'You haven\'t entered your license key yet.'
         ];
         foreach ($expectedMessages as $message) {
-            $this->assertLayoutBlockRenderedContent('integernet_solr_config_status', $this->contains($message));
+            /*
+             * would use assertLayoutBlockRenderedContent() but it evaluates the constraint and discards the result
+             * without actually failing.
+             */
+            $this->assertResponseBodyContains($message);
         }
     }
 }

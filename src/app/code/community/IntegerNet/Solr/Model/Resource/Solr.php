@@ -49,6 +49,7 @@ class IntegerNet_Solr_Model_Resource_Solr
      */
     public function getStoreConfig($storeId)
     {
+        $storeId = (int) $storeId;
         if (!isset($this->_config[$storeId])) {
             throw new IntegerNet_Solr_Exception("Store with ID {$storeId} not found.");
         }
@@ -72,12 +73,13 @@ class IntegerNet_Solr_Model_Resource_Solr
             if (intval(ini_get('default_socket_timeout')) < 300) {
                 ini_set('default_socket_timeout', 300);
             }
-                
-            $host = Mage::getStoreConfig('integernet_solr/server/host', $storeId);
-            $port = Mage::getStoreConfig('integernet_solr/server/port', $storeId);
-            $path = Mage::getStoreConfig('integernet_solr/server/path', $storeId);
-            $core = Mage::getStoreConfig('integernet_solr/server/core', $storeId);
-            $useHttps = Mage::getStoreConfigFlag('integernet_solr/server/use_https', $storeId);
+
+            $serverConfig = $this->getStoreConfig($storeId)->getServerConfig();
+            $host = $serverConfig->getHost();
+            $port = $serverConfig->getPort();
+            $path = $serverConfig->getPath();
+            $core = $serverConfig->getCore();
+            $useHttps = $serverConfig->isUseHttps();
             if ($this->_useSwapIndex) {
                 $core = Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId);
             }

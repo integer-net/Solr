@@ -274,7 +274,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     }
                     $productData->setData($fieldName, $value);
 
-                    if (strstr($fieldName, '_s') == true && $attribute->getUsedForSortBy()) {
+                    if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
                         $productData->setData(
                             Mage::helper('integernet_solr')->getFieldName($attribute, true),
                             $value
@@ -357,7 +357,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 }
                 $productData->setData($fieldName, $value);
 
-                if (strstr($fieldName, '_s') == true && $attribute->getUsedForSortBy()) {
+                if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
                     $productData->setData(
                         Mage::helper('integernet_solr')->getFieldName($attribute, true),
                         $value

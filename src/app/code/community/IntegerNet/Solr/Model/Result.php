@@ -465,9 +465,7 @@ class IntegerNet_Solr_Model_Result
 
                     if (strstr($fieldName, '_f') == false) {
 
-                        if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                            $boost = '^' . floatval($attribute->getSolrBoost());
-                        }
+                        $boost = '^' . floatval($attribute->getSolrBoost());
 
                         if ($this->_foundNoResults) {
 
@@ -700,16 +698,15 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+        if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
             $this->_logResult($result, microtime(true) - $startTime);
 
-            if (Mage::getStoreConfigFlag('integernet_solr/results/search_fields') && Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');
-                Mage::log('Query over all searchable fields:', null, 'solr.log');
-                Mage::log($this->_lastQueryText, null, 'solr.log');
-                Mage::log('Filter Query:', null, 'solr.log');
-                Mage::log($this->_filterQuery, null, 'solr.log');
-            }
+            Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');
+            Mage::log('Query over all searchable fields:', null, 'solr.log');
+            Mage::log($this->_lastQueryText, null, 'solr.log');
+            Mage::log('Filter Query:', null, 'solr.log');
+            Mage::log($this->_filterQuery, null, 'solr.log');
+            Mage::log('----------------------------------', null, 'solr.log');
         }
 
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));

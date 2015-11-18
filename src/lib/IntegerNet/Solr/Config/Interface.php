@@ -14,6 +14,12 @@
 interface IntegerNet_Solr_Config_Interface
 {
     /**
+     * Returns general Solr module configuration
+     *
+     * @return IntegerNet_Solr_Config_General
+     */
+    public function getGeneralConfig();
+    /**
      * Returns Solr server configuration
      *
      * @return IntegerNet_Solr_Config_Server

@@ -23,6 +23,7 @@ class IntegerNet_Solr_Test_Controller_Configuration extends EcomDev_PHPUnit_Test
         $this->assertLayoutBlockRendered('integernet_solr_config_status');
 
         $expectedMessages = [
+            'Solr version:',
             'Solr Module is activated.',
             'Solr server configuration is complete.',
             'Connection to Solr server established successfully.',
@@ -36,5 +37,15 @@ class IntegerNet_Solr_Test_Controller_Configuration extends EcomDev_PHPUnit_Test
              */
             $this->assertResponseBodyContains($message);
         }
+    }
+
+    /**
+     * @test
+     * @dataProvider dataProvider
+     * @dataProviderFile invalid-config.yaml
+     */
+    public function invalidConfigurationShouldShowError(array $config)
+    {
+        $this->markTestSkipped('Currently swap configuration is checked only on reindex');
     }
 }

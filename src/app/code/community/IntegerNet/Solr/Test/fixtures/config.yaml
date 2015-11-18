@@ -1,3 +1,11 @@
+scope:
+  store:
+    - store_id: 2
+      website_id: 1
+      group_id: 1
+      code: store2
+      name: Alternate Store View
+      is_active: 1
 config:
   default/dev/template/allow_symlink: 1
   default/integernet_solr/general/is_active: 1

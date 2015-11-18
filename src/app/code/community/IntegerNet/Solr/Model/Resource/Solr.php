@@ -11,7 +11,6 @@
 /**
  * Solr resource, interface between Magento and solr service
  *
- * @todo use factory helper to instantiate this instead of getResourceModel
  * @todo use $this->_config instead of Mage class
  * @todo extract to /lib
  */
@@ -75,13 +74,14 @@ class IntegerNet_Solr_Model_Resource_Solr
             }
 
             $serverConfig = $this->getStoreConfig($storeId)->getServerConfig();
+            $indexingConfig = $this->getStoreConfig($storeId)->getIndexingConfig();
             $host = $serverConfig->getHost();
             $port = $serverConfig->getPort();
             $path = $serverConfig->getPath();
             $core = $serverConfig->getCore();
             $useHttps = $serverConfig->isUseHttps();
             if ($this->_useSwapIndex) {
-                $core = Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId);
+                $core = $indexingConfig->getSwapCore();
             }
             if ($core) {
                 $path .= $core . '/';
@@ -89,6 +89,15 @@ class IntegerNet_Solr_Model_Resource_Solr
             $this->_solr[$storeId] = new IntegerNet_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
         }
         return $this->_solr[$storeId];
+    }
+
+    /**
+     * @param $storeId
+     * @internal used for testing
+     */
+    public function setSolrService($storeId, $service)
+    {
+        $this->_solr[$storeId] = $service;
     }
 
     /**
@@ -177,39 +186,29 @@ class IntegerNet_Solr_Model_Resource_Solr
     {
         $storeIdsToSwap = array();
         
-        foreach(Mage::app()->getStores() as $store) {
-            /** @var Mage_Core_Model_Store $store */
-
-            $storeId = $store->getId();
-
-            $solrServerInfo = Mage::getStoreConfig('integernet_solr/server/host', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/port', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/path', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/core', $storeId);
+        foreach($this->_config as $storeId => $storeConfig) {
+            /** @var IntegerNet_Solr_Config_Interface $storeConfig */
+            $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
                 continue;
             }
 
-            if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
+            if (! $storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
 
-            if (!$store->getIsActive()) {
-                continue;
-            }
-
-            if (Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
+            if ($storeConfig->getIndexingConfig()->isSwapCores()) {
                 $storeIdsToSwap[$solrServerInfo] = $storeId;
             }
         }
         
         foreach($storeIdsToSwap as $storeIdToSwap) {
             $this->getSolrService($storeIdToSwap)
-                ->setBasePath(Mage::getStoreConfig('integernet_solr/server/path', $storeIdToSwap))
+                ->setBasePath($this->getStoreConfig($storeIdToSwap)->getServerConfig()->getPath())
                 ->swapCores(
-                    Mage::getStoreConfig('integernet_solr/server/core', $storeIdToSwap), 
-                    Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeIdToSwap)
+                    $this->getStoreConfig($storeIdToSwap)->getServerConfig()->getCore(),
+                    $this->getStoreConfig($storeIdToSwap)->getIndexingConfig()->getSwapCore()
                 );
         }
     }
@@ -220,12 +219,12 @@ class IntegerNet_Solr_Model_Resource_Solr
      */
     public function getInfo($storeId)
     {
-        if (!Mage::getStoreConfig('integernet_solr/server/core', $storeId)) {
+        if (! $this->getStoreConfig($storeId)->getServerConfig()->getCore()) {
             return null;
         }
         try {
             return $this->getSolrService($storeId)
-                ->setBasePath(Mage::getStoreConfig('integernet_solr/server/path', $storeId))
+                ->setBasePath($this->getStoreConfig($storeId)->getServerConfig()->getPath())
                 ->info();
         } catch (Exception $e) {
             return null;
@@ -321,7 +320,7 @@ class IntegerNet_Solr_Model_Resource_Solr
      */
     protected function _getHttpTransportAdapter($storeId)
     {
-        switch (Mage::getStoreConfig('integernet_solr/server/http_method', $storeId)) {
+        switch ($this->getStoreConfig($storeId)->getServerConfig()->getHttpTransportMethod()) {
             case IntegerNet_Solr_Model_Source_HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL:
                 $adapter = new Apache_Solr_HttpTransport_Curl();
                 break;
@@ -329,10 +328,10 @@ class IntegerNet_Solr_Model_Resource_Solr
                 $adapter = new Apache_Solr_HttpTransport_FileGetContents();
         }
         
-        if (Mage::getStoreConfigFlag('integernet_solr/server/use_http_basic_auth', $storeId)) {
+        if ($this->getStoreConfig($storeId)->getServerConfig()->isUseHttpBasicAuth()) {
             $adapter->setAuthenticationCredentials(
-                Mage::getStoreConfig('integernet_solr/server/http_basic_auth_username', $storeId),
-                Mage::getStoreConfig('integernet_solr/server/http_basic_auth_password', $storeId)
+                $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthUsername(),
+                $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthPassword()
             );
         }
         

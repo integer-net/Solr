@@ -12,8 +12,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /** @var IntegerNet_Solr_Block_Indexer_Item[] */
     protected $_itemBlocks = array();
 
-    protected $_resourceName = 'integernet_solr/solr';
-
     protected $_pathCategoryIds = array();
 
     protected $_excludedCategoryIds = array();
@@ -36,7 +34,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         if (is_null($productIds)) {
             $this->getResource()->checkSwapCoresConfiguration($restrictToStore);
         }
-        
+
         $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
         if ($pageSize <= 0) {
             $pageSize = 100;
@@ -639,6 +637,18 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     public function getResource()
     {
         return $this->_getResource();
+    }
+    /**
+     * Retrieve model resource
+     *
+     * @return IntegerNet_Solr_Model_Resource_Solr
+     */
+    protected function _getResource()
+    {
+        if ($this->_resource === null) {
+            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        }
+        return $this->_resource;
     }
 
     /**

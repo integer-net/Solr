@@ -18,6 +18,10 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
      */
     protected $_storeId;
     /**
+     * @var IntegerNet_Solr_Config_General
+     */
+    protected $_general;
+    /**
      * @var IntegerNet_Solr_Config_Server
      */
     protected $_server;
@@ -32,6 +36,25 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
     public function __construct($_storeId)
     {
         $this->_storeId = $_storeId;
+    }
+
+    /**
+     * Returns general Solr module configuration
+     *
+     * @return IntegerNet_Solr_Config_General
+     */
+    public function getGeneralConfig()
+    {
+        if ($this->_general === null) {
+            $prefix = 'integernet_solr/general';
+            $this->_general = new IntegerNet_Solr_Config_General(
+                $this->_getConfig($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'license_key'),
+                $this->_getConfig($prefix . 'log'),
+                $this->_getConfig($prefix . 'debug')
+            );
+        }
+        return $this->_general;
     }
 
 

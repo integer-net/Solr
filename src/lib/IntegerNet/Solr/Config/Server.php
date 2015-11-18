@@ -32,7 +32,7 @@ final class IntegerNet_Solr_Config_Server
     /**
      * @var string
      */
-    private $httpMethod;
+    private $httpTransportMethod;
     /**
      * @var bool
      */
@@ -64,7 +64,7 @@ final class IntegerNet_Solr_Config_Server
         $this->path = $path;
         $this->core = $core;
         $this->useHttps = $useHttps;
-        $this->httpMethod = $httpMethod;
+        $this->httpTransportMethod = $httpMethod;
         $this->useHttpBasicAuth = $useHttpBasicAuth;
         $this->httpBasicAuthUsername = $httpBasicAuthUsername;
         $this->httpBasicAuthPassword = $httpBasicAuthPassword;
@@ -103,6 +103,16 @@ final class IntegerNet_Solr_Config_Server
     }
 
     /**
+     * Return unique resource identifier for solr core
+     *
+     * @return string
+     */
+    public function getServerInfo()
+    {
+        return sprintf('%s:%s%s%s', $this->host, $this->port, $this->path, $this->core);
+    }
+
+    /**
      * @return boolean
      */
     public function isUseHttps()
@@ -113,9 +123,9 @@ final class IntegerNet_Solr_Config_Server
     /**
      * @return string
      */
-    public function getHttpMethod()
+    public function getHttpTransportMethod()
     {
-        return $this->httpMethod;
+        return $this->httpTransportMethod;
     }
 
     /**

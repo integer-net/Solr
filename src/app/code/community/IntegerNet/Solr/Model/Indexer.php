@@ -23,8 +23,6 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         ),
     );
 
-    protected $_resourceName = 'integernet_solr/solr';
-
     public function getName()
     {
         return Mage::helper('integernet_solr')->__('Solr Search Index');
@@ -41,6 +39,28 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     public function reindexAll()
     {
         $this->_reindexProducts(null, true);
+    }
+
+    /**
+     * Retrieve model resource
+     *
+     * @return IntegerNet_Solr_Model_Resource_Solr
+     */
+    public function getResource()
+    {
+        return $this->_getResource();
+    }
+    /**
+     * Retrieve model resource
+     *
+     * @return IntegerNet_Solr_Model_Resource_Solr
+     */
+    protected function _getResource()
+    {
+        if ($this->_resource === null) {
+            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        }
+        return $this->_resource;
     }
 
     /**

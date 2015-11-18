@@ -145,6 +145,32 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
     }
+
+    /**
+     * @test
+     * @helper integernet_solr/factory
+     * @helper catalogsearch
+     * @singleton integernet_solr/result
+     */
+    public function shouldBroadenMultiwordSearchIfNoResults()
+    {
+        $storeId = 1;
+        $query = 'blue tshirt';
+
+        $this->app()->getLayout()->unsetBlock('product_list_toolbar');
+        $searchHelperStub = $this->mockHelper('catalogsearch', ['getQueryText']);
+        $searchHelperStub->expects($this->any())
+            ->method('getQueryText')
+            ->willReturn($query);
+        $this->replaceByMock('helper', 'catalogsearch', $searchHelperStub);
+
+        $this->_resourceMock->expects($this->exactly(2))
+            ->method('search')
+            ->willReturn($this->_getDummyResponse());
+        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $this->setCurrentStore($storeId);
+        $result->getSolrResult();
+    }
     /**
      * @return Apache_Solr_Response
      */

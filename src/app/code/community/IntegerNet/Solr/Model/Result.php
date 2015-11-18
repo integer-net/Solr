@@ -27,6 +27,10 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_isCategoryPage;
     /**
+     * @var IntegerNet_Solr_Model_Query
+     */
+    protected $_query;
+    /**
      * @var IntegerNet_Solr_Implementor_Pagination
      */
     protected $_pagination;
@@ -65,6 +69,7 @@ class IntegerNet_Solr_Model_Result
         $this->_isAutosuggest = Mage::registry('is_autosuggest');
         $this->_storeId = Mage::app()->getStore()->getId();
         $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
+        $this->_query = Mage::getModel('integernet_solr/query', $this->_isAutosuggest);
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
@@ -157,7 +162,7 @@ class IntegerNet_Solr_Model_Result
 
                     if (sizeof($result->response->docs) == 0) {
                         $this->_foundNoResults = true;
-                        $check = explode(' ', Mage::helper('catalogsearch')->getQuery()->getQueryText());
+                        $check = explode(' ', $this->_query->getUserQueryText());
                         if (count($check) > 1) {
                             $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
                         }
@@ -427,75 +432,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getQueryText($allowFuzzy = true)
     {
-        $query = Mage::helper('catalogsearch')->getQuery();
-        $queryText = $query->getQueryText();
-        if ($query->getSynonymFor()) {
-            $queryText = $query->getSynonymFor();
-        }
-
-        $transportObject = new Varien_Object(array(
-            'query_text' => $queryText,
-        ));
-
-        Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
-
-        $queryText          = $transportObject->getQueryText();
-        $searchAllFields    = false;
-
-        if ($this->_isAutosuggest()) {
-            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
-            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
-            $searchFieldName    = 'text_autocomplete';
-        } else {
-            $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
-            $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
-            $searchAllFields    = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
-            $searchFieldName    = 'text_plain';
-        }
-
-        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
-
-        if ($allowFuzzy && $isFuzzyActive) {
-            $queryText .= '~' . floatval($sensitivity);
-        } else {
-
-            $searchValue = ($this->_foundNoResults) ? explode(' ', $queryText) : $queryText;
-            $queryText = '';
-
-            $attributes = Mage::helper('integernet_solr')->getSearchableAttributes();
-            $boost      = '';
-            $isFirst    = true;
-
-            foreach ($attributes as $attribute) {
-
-                if ($attribute->getIsSearchable() == 1) {
-
-                    $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
-
-                    if (strstr($fieldName, '_f') == false) {
-
-                        if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                            $boost = '^' . floatval($attribute->getSolrBoost());
-                        }
-
-                        if ($this->_foundNoResults) {
-
-                            foreach ($searchValue as $value) {
-                                $queryText .= ($isFirst) ? '' : ' ';
-                                $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
-                                $isFirst = false;
-                            }
-
-                        } else {
-                            $queryText .= ($isFirst) ? '' : ' ';
-                            $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
-                            $isFirst = false;
-                        }
-                    }
-                }
-            }
-        }
-
+        $queryText = $this->_query->getSolrQueryText($allowFuzzy, $this->_foundNoResults);
         $this->_lastQueryText = $queryText;
         return $queryText;
     }

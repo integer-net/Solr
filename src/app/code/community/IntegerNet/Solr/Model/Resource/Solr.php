@@ -81,7 +81,7 @@ class IntegerNet_Solr_Model_Resource_Solr
             $core = $serverConfig->getCore();
             $useHttps = $serverConfig->isUseHttps();
             if ($this->_useSwapIndex) {
-                $core = $indexingConfig->getSwapCore();
+                $core = $serverConfig->getSwapCore();
             }
             if ($core) {
                 $path .= $core . '/';
@@ -208,7 +208,7 @@ class IntegerNet_Solr_Model_Resource_Solr
                 ->setBasePath($this->getStoreConfig($storeIdToSwap)->getServerConfig()->getPath())
                 ->swapCores(
                     $this->getStoreConfig($storeIdToSwap)->getServerConfig()->getCore(),
-                    $this->getStoreConfig($storeIdToSwap)->getIndexingConfig()->getSwapCore()
+                    $this->getStoreConfig($storeIdToSwap)->getServerConfig()->getSwapCore()
                 );
         }
     }

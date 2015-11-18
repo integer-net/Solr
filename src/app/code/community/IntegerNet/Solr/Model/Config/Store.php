@@ -72,6 +72,7 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
                 $this->_getConfig($prefix . 'port'),
                 $this->_getConfig($prefix . 'path'),
                 $this->_getConfig($prefix . 'core'),
+                $this->_getConfig('integernet_solr/indexing/swap_core'),
                 $this->_getConfigFlag($prefix . 'use_https'),
                 $this->_getConfig($prefix . 'http_method'),
                 $this->_getConfigFlag($prefix . 'use_http_basic_auth'),
@@ -94,8 +95,7 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
             $this->_indexing = new IntegerNet_Solr_Config_Indexing(
                 $this->_getConfig($prefix . 'pagesize'),
                 $this->_getConfig($prefix . 'delete_documents_before_indexing'),
-                $this->_getConfig($prefix . 'swap_cores'),
-                $this->_getConfig($prefix . 'swap_core')
+                $this->_getConfig($prefix . 'swap_cores')
             );
         }
         return $this->_indexing;

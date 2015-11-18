@@ -26,6 +26,10 @@ final class IntegerNet_Solr_Config_Server
      */
     private $core;
     /**
+     * @var string
+     */
+    private $swapCore;
+    /**
      * @var bool
      */
     private $useHttps;
@@ -51,18 +55,20 @@ final class IntegerNet_Solr_Config_Server
      * @param int $port
      * @param string $path
      * @param string $core
+     * @param string $swapCore
      * @param bool $useHttps
      * @param string $httpMethod
      * @param bool $useHttpBasicAuth
      * @param string $httpBasicAuthUsername
      * @param string $httpBasicAuthPassword
      */
-    public function __construct($host, $port, $path, $core, $useHttps, $httpMethod, $useHttpBasicAuth, $httpBasicAuthUsername, $httpBasicAuthPassword)
+    public function __construct($host, $port, $path, $core, $swapCore, $useHttps, $httpMethod, $useHttpBasicAuth, $httpBasicAuthUsername, $httpBasicAuthPassword)
     {
         $this->host = $host;
         $this->port = $port;
         $this->path = $path;
         $this->core = $core;
+        $this->swapCore = $swapCore;
         $this->useHttps = $useHttps;
         $this->httpTransportMethod = $httpMethod;
         $this->useHttpBasicAuth = $useHttpBasicAuth;
@@ -152,5 +158,11 @@ final class IntegerNet_Solr_Config_Server
         return $this->httpBasicAuthPassword;
     }
 
-
+    /**
+     * @return string
+     */
+    public function getSwapCore()
+    {
+        return $this->swapCore;
+    }
 }

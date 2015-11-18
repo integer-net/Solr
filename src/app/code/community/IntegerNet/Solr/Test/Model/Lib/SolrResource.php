@@ -39,47 +39,47 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     public static function dataSwapConfig()
     {
         $defaultGeneralConfig = IntegerNet_Solr_Config_General_Builder::defaultConfig();
-        $defaultServerConfig = IntegerNet_Solr_Config_Server_Builder::defaultConfig();
+        $swapCoreServerConfig = IntegerNet_Solr_Config_Server_Builder::swapCoreConfig();
         $swapCoreIndexingConfig = IntegerNet_Solr_Config_Indexing_Builder::swapCoreConfig();
         return [
             'singlestore' => [
                 'config' => [0 => [
                     'getGeneralConfig' => $defaultGeneralConfig->build(),
-                    'getServerConfig' => $defaultServerConfig->build(),
+                    'getServerConfig' => $swapCoreServerConfig->build(),
                     'getIndexingConfig' => $swapCoreIndexingConfig->build()]
                 ],
-                'expectation' => [0 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Indexing_Builder::SWAP_CORE]]
+                'expectation' => [0 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Server_Builder::SWAP_CORE]]
             ],
             'stores-with-same-config' => [
                 'config' => [
                     0 => [
                         'getGeneralConfig' => $defaultGeneralConfig->build(),
-                        'getServerConfig' => $defaultServerConfig->build(),
+                        'getServerConfig' => $swapCoreServerConfig->build(),
                         'getIndexingConfig' => $swapCoreIndexingConfig->build()
                     ],
                     1 => [
                         'getGeneralConfig' => $defaultGeneralConfig->build(),
-                        'getServerConfig' => $defaultServerConfig->build(),
+                        'getServerConfig' => $swapCoreServerConfig->build(),
                         'getIndexingConfig' => $swapCoreIndexingConfig->build()
                     ]
                 ],
-                'expectation' => [1 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Indexing_Builder::SWAP_CORE]]
+                'expectation' => [1 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Server_Builder::SWAP_CORE]]
             ],
             'stores-with-different-config' => [
                 'config' => [
                     0 => [
                         'getGeneralConfig' => $defaultGeneralConfig->build(),
-                        'getServerConfig' => $defaultServerConfig->build(),
+                        'getServerConfig' => $swapCoreServerConfig->build(),
                         'getIndexingConfig' => $swapCoreIndexingConfig->build()
                     ],
                     1 => [
                         'getGeneralConfig' => $defaultGeneralConfig->build(),
-                        'getServerConfig' => $defaultServerConfig->withCore('core2')->build(),
-                        'getIndexingConfig' => $swapCoreIndexingConfig->withSwapCore('core3')->build()
+                        'getServerConfig' => $swapCoreServerConfig->withCore('core2')->withSwapCore('core3')->build(),
+                        'getIndexingConfig' => $swapCoreIndexingConfig->build()
                     ]
                 ],
                 'expectation' => [
-                    0 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Indexing_Builder::SWAP_CORE],
+                    0 => [IntegerNet_Solr_Config_Server_Builder::DEFAULT_CORE, IntegerNet_Solr_Config_Server_Builder::SWAP_CORE],
                     1 => ['core2', 'core3']
                 ]
             ]
@@ -163,6 +163,7 @@ class IntegerNet_Solr_Config_Server_Builder
         $port = 8983,
         $path= 'solr',
         $core = self::DEFAULT_CORE,
+        $swapCore = '',
         $useHttps = false,
         $httpMethod = 'GET',
         $useHttpBasicAuth = false,
@@ -170,6 +171,7 @@ class IntegerNet_Solr_Config_Server_Builder
         $httpBasicAuthPassword = '';
 
     const DEFAULT_CORE = 'core0';
+    const SWAP_CORE = 'core1';
 
     private function __construct()
     {
@@ -177,6 +179,10 @@ class IntegerNet_Solr_Config_Server_Builder
     public static function defaultConfig()
     {
         return new static;
+    }
+    public static function swapCoreConfig()
+    {
+        return self::defaultConfig()->withSwapCore(self::SWAP_CORE);
     }
 
     /**
@@ -216,6 +222,16 @@ class IntegerNet_Solr_Config_Server_Builder
     public function withCore($core)
     {
         $this->core = $core;
+        return $this;
+    }
+
+    /**
+     * @param string $swapCore
+     * @return $this
+     */
+    public function withSwapCore($swapCore)
+    {
+        $this->swapCore = $swapCore;
         return $this;
     }
 
@@ -273,7 +289,7 @@ class IntegerNet_Solr_Config_Server_Builder
     public function build()
     {
         return new IntegerNet_Solr_Config_Server(
-            $this->host, $this->port, $this->path, $this->core, $this->useHttps, $this->httpMethod,
+            $this->host, $this->port, $this->path, $this->core, $this->swapCore, $this->useHttps, $this->httpMethod,
             $this->useHttpBasicAuth, $this->httpBasicAuthUsername, $this->httpBasicAuthPassword);
     }
 }
@@ -289,10 +305,7 @@ class IntegerNet_Solr_Config_Indexing_Builder
      */
     private $pagesize = 1000,
         $deleteDocumentsBeforeIndexing = true,
-        $swapCores = false,
-        $swapCore = '';
-
-    const SWAP_CORE = 'core1';
+        $swapCores = false;
 
     private function __construct()
     {
@@ -303,7 +316,7 @@ class IntegerNet_Solr_Config_Indexing_Builder
     }
     public static function swapCoreConfig()
     {
-        return self::defaultConfig()->withSwapCores(true)->withSwapCore(self::SWAP_CORE);
+        return self::defaultConfig()->withSwapCores(true);
     }
 
     /**
@@ -336,19 +349,8 @@ class IntegerNet_Solr_Config_Indexing_Builder
         return $this;
     }
 
-    /**
-     * @param string $swapCore
-     * @return IntegerNet_Solr_Config_Indexing_Builder
-     */
-    public function withSwapCore($swapCore)
-    {
-        $this->swapCore = $swapCore;
-        return $this;
-    }
-
-    
     public function build()
     {
-        return new IntegerNet_Solr_Config_Indexing($this->pagesize, $this->deleteDocumentsBeforeIndexing, $this->swapCores, $this->swapCore);
+        return new IntegerNet_Solr_Config_Indexing($this->pagesize, $this->deleteDocumentsBeforeIndexing, $this->swapCores);
     }
 }

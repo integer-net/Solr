@@ -21,10 +21,6 @@ final class IntegerNet_Solr_Config_Indexing
      * @var bool
      */
     private $swapCores;
-    /**
-     * @var string
-     */
-    private $swapCore;
 
     /**
      * @param int $pagesize
@@ -32,12 +28,11 @@ final class IntegerNet_Solr_Config_Indexing
      * @param bool $swapCores
      * @param string $swapCore
      */
-    public function __construct($pagesize, $deleteDocumentsBeforeIndexing, $swapCores, $swapCore)
+    public function __construct($pagesize, $deleteDocumentsBeforeIndexing, $swapCores)
     {
         $this->pagesize = $pagesize;
         $this->deleteDocumentsBeforeIndexing = $deleteDocumentsBeforeIndexing;
         $this->swapCores = $swapCores;
-        $this->swapCore = $swapCore;
     }
 
     /**
@@ -63,14 +58,5 @@ final class IntegerNet_Solr_Config_Indexing
     {
         return $this->swapCores;
     }
-
-    /**
-     * @return string
-     */
-    public function getSwapCore()
-    {
-        return $this->swapCore;
-    }
-
 
 }

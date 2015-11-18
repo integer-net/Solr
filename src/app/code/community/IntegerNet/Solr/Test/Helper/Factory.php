@@ -22,12 +22,21 @@ class IntegerNet_Solr_Test_Helper_Factory extends EcomDev_PHPUnit_Test_Case
             $resource->getStoreConfig(null) // admin store view
         ];
         foreach ($storeConfigs as $storeConfig) {
-            $this->assertInstanceOf(IntegerNet_Solr_Config_Interface::class, $storeConfig);
+            $this->assertInstanceOf(IntegerNet_Solr_Implementor_Config::class, $storeConfig);
             $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $storeConfig->getIndexingConfig());
             $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $storeConfig->getServerConfig());
         }
 
         $this->setExpectedException(IntegerNet_Solr_Exception::class, "Store with ID -1 not found.");
         $resource->getStoreConfig(-1);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCreateSolrResult()
+    {
+        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $this->assertInstanceOf(IntegerNet_Solr_Model_Result::class, $result);
     }
 }

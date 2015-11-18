@@ -25,4 +25,14 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         }
         return new IntegerNet_Solr_Model_Resource_Solr($storeConfig);
     }
+
+    /**
+     * Returns new Solr result wrapper
+     *
+     * @return IntegerNet_Solr_Test_Model_Result
+     */
+    public function getSolrResult()
+    {
+        return Mage::getModel('integernet_solr/result');
+    }
 }

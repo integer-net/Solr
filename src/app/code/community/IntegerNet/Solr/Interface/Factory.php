@@ -19,4 +19,11 @@ interface IntegerNet_Solr_Interface_Factory
      * @return IntegerNet_Solr_Model_Resource_Solr
      */
     public function getSolrResource();
+
+    /**
+     * Returns new Solr result wrapper
+     *
+     * @return IntegerNet_Solr_Test_Model_Result
+     */
+    public function getSolrResult();
 }

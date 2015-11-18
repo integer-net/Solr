@@ -7,16 +7,35 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+/**
+ * @todo extract interfaces to Magento: layered navigation, category
+ * @todo inject is_autosuggest
+ * @todo don't use it as singleton
+ * @todo implement factory for autosuggest
+ * @todo extract to /lib
+ */
 class IntegerNet_Solr_Model_Result
 {
+    protected $_isAutosuggest;
+    /**
+     * @var int
+     */
+    protected $_storeId;
+    /**
+     * @var bool
+     */
+    protected $_isCategoryPage;
+    /**
+     * @var IntegerNet_Solr_Implementor_Pagination
+     */
+    protected $_pagination;
+
     /** @var null|IntegerNet_Solr_Model_Resource_Solr */
     protected $_resource = null;
 
     /** @var null|IntegerNet_Solr_Service */
     protected $_solrResult = null;
-
-    /** @var null|Mage_Catalog_Block_Product_List_Toolbar */
-    protected $_toolbarBlock = null;
 
     protected $_filters = array();
 
@@ -39,35 +58,46 @@ class IntegerNet_Solr_Model_Result
     private $_foundNoResults = false;
 
     /**
+     * @todo use constructor injection as soon as this is not a Magento singleton anymore
+     */
+    function __construct()
+    {
+        $this->_isAutosuggest = Mage::registry('is_autosuggest');
+        $this->_storeId = Mage::app()->getStore()->getId();
+        $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
+        $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
+            $this->_pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
+        } else {
+            $config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
+            $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $config->getAutosuggestConfig());
+        }
+    }
+
+
+    /**
      * @return IntegerNet_Solr_Model_Resource_Solr
      */
     protected function _getResource()
     {
-        if (is_null($this->_resource)) {
-            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
-        }
-
         return $this->_resource;
     }
 
     /**
      * Call Solr server twice: Once without fuzzy search, once with (if configured)
      *
-     * @param $storeId
      * @return Apache_Solr_Response
      */
-    public function getSolrResult($storeId = null)
+    public function getSolrResult()
     {
         if (is_null($this->_solrResult)) {
-            if (is_null($storeId)) {
-                $storeId = Mage::app()->getStore()->getId();
-            }
+            $storeId = $this->_storeId;
 
             $pageSize = $this->_getPageSize();
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
-            if (Mage::helper('integernet_solr')->isCategoryPage()) {
+            if ($this->_isCategoryPage) {
                 $result = $this->_getCategoryResultFromRequest($storeId, $lastItemNumber);
             } else {
 
@@ -152,21 +182,15 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCurrentPage()
     {
-        if (!$this->_getToolbarBlock()) {
-            return 0;
-        }
-        return $this->_getToolbarBlock()->getCurrentPage() - 1;
+        return $this->_pagination->getCurrentPage() - 1;
     }
 
     /**
-     * @return int
+     * @return string
      */
     protected function _getCurrentSort()
     {
-        if (!$this->_getToolbarBlock()) {
-            return 'position';
-        }
-        return $this->_getToolbarBlock()->getCurrentOrder();
+        return $this->_pagination->getCurrentOrder();
     }
 
     /**
@@ -174,12 +198,11 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getCurrentSortDirection()
     {
-        if (!$this->_getToolbarBlock()) {
-            return 'desc';
-        }
+        $direction = $this->_pagination->getCurrentDirection();
+
         if ($this->_getCurrentSort() == 'position') {
-            if (!Mage::helper('integernet_solr')->isCategoryPage()) {
-                switch (strtolower($this->_getToolbarBlock()->getCurrentDirection())) {
+            if (!$this->_isCategoryPage) {
+                switch (strtolower($direction)) {
                     case 'desc':
                         return 'asc';
                     default:
@@ -187,7 +210,7 @@ class IntegerNet_Solr_Model_Result
                 }
             }
         }
-        return $this->_getToolbarBlock()->getCurrentDirection();
+        return $direction;
     }
 
     /**
@@ -195,25 +218,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getPageSize()
     {
-        if (!$this->_getToolbarBlock()) {
-            return intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
-        }
-        return $this->_getToolbarBlock()->getLimit();
-    }
-
-    /**
-     * @return Mage_Catalog_Block_Product_List_Toolbar
-     */
-    protected function _getToolbarBlock()
-    {
-        if (is_null($this->_toolbarBlock)) {
-            if (!Mage::app()->getLayout()) {
-                $this->_toolbarBlock = false;
-            } else {
-                $this->_toolbarBlock = Mage::app()->getLayout()->getBlock('product_list_toolbar');
-            }
-        }
-        return $this->_toolbarBlock;
+        return $this->_pagination->getPageSize();
     }
 
     /**
@@ -274,8 +279,8 @@ class IntegerNet_Solr_Model_Result
             $params['mm'] = '0%';
         }
 
-        if (!$this->_getToolbarBlock()) {
-            $params['rows'] = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
+        if ($this->_pagination instanceof IntegerNet_Solr_Model_Result_Pagination_Autosuggest) {
+            $params['rows'] = $this->_pagination->getPageSize();
         }
 
         return $params;
@@ -503,7 +508,7 @@ class IntegerNet_Solr_Model_Result
         $sortField = $this->_getCurrentSort();
         switch ($sortField) {
             case 'position':
-                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                if ($this->_isCategoryPage) {
                     $param = 'category_' . Mage::registry('current_category')->getId() . '_position_i';
                 } else {
                     $param = 'score';
@@ -529,7 +534,7 @@ class IntegerNet_Solr_Model_Result
         if ($this->_filterQuery == null) {
             
             $filterQuery = 'store_id:' . $storeId;
-            if (Mage::helper('integernet_solr')->isCategoryPage()) {
+            if ($this->_isCategoryPage) {
                 $filterQuery .= ' AND is_visible_in_catalog_i:1';
             } else {
                 $filterQuery .= ' AND is_visible_in_search_i:1';
@@ -764,6 +769,6 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _isAutosuggest()
     {
-        return Mage::registry('is_autosuggest');
+        return $this->_isAutosuggest;
     }
 }

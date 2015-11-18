@@ -18,7 +18,7 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     {
         $configStubs = [];
         foreach ($config as $storeId => $storeConfig) {
-            $configStubs[$storeId] = $this->getMockForAbstractClass(IntegerNet_Solr_Config_Interface::class);
+            $configStubs[$storeId] = $this->getMockForAbstractClass(IntegerNet_Solr_Implementor_Config::class);
             foreach ($storeConfig as $method => $return) {
                 $configStubs[$storeId]->expects($this->any())
                     ->method($method)

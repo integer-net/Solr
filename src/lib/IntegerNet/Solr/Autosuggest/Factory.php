@@ -27,4 +27,15 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
 
         return new IntegerNet_Solr_Model_Resource_Solr($storeConfig);
     }
+
+    /**
+     * Returns new Solr result wrapper
+     *
+     * @return IntegerNet_Solr_Test_Model_Result
+     */
+    public function getSolrResult()
+    {
+        // TODO: Implement getSolrResult() method.
+    }
+
 }

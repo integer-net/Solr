@@ -29,7 +29,7 @@ class IntegerNet_Solr_Test_Controller_Autosuggest_Magestub extends EcomDev_PHPUn
         $resource = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->assertInstanceOf(IntegerNet_Solr_Model_Resource_Solr::class, $resource);
         $defaultStoreConfig = $resource->getStoreConfig(1);
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Interface::class, $defaultStoreConfig);
+        $this->assertInstanceOf(IntegerNet_Solr_Implementor_Config::class, $defaultStoreConfig);
         $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $defaultStoreConfig->getIndexingConfig());
         $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $defaultStoreConfig->getServerConfig());
     }

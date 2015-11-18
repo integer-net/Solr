@@ -11,7 +11,7 @@
 /**
  * Magento configuration reader, one instance per store view
  */
-final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config_Interface
+final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implementor_Config
 {
     /**
      * @var int
@@ -29,6 +29,10 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
      * @var IntegerNet_Solr_Config_Indexing
      */
     protected $_indexing;
+    /**
+     * @var IntegerNet_Solr_Config_Autosuggest
+     */
+    protected $_autosuggest;
 
     /**
      * @param int $_storeId
@@ -48,10 +52,10 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
         if ($this->_general === null) {
             $prefix = 'integernet_solr/general/';
             $this->_general = new IntegerNet_Solr_Config_General(
-                $this->_getConfig($prefix . 'is_active'),
+                $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'license_key'),
-                $this->_getConfig($prefix . 'log'),
-                $this->_getConfig($prefix . 'debug')
+                $this->_getConfigFlag($prefix . 'log'),
+                $this->_getConfigFlag($prefix . 'debug')
             );
         }
         return $this->_general;
@@ -94,13 +98,37 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
             $prefix = 'integernet_solr/indexing/';
             $this->_indexing = new IntegerNet_Solr_Config_Indexing(
                 $this->_getConfig($prefix . 'pagesize'),
-                $this->_getConfig($prefix . 'delete_documents_before_indexing'),
-                $this->_getConfig($prefix . 'swap_cores')
+                $this->_getConfigFlag($prefix . 'delete_documents_before_indexing'),
+                $this->_getConfigFlag($prefix . 'swap_cores')
             );
         }
         return $this->_indexing;
     }
-    
+
+    /**
+     * Returns autosuggest configuration
+     *
+     * @return IntegerNet_Solr_Config_Autosuggest
+     */
+    public function getAutosuggestConfig()
+    {
+        if ($this->_autosuggest === null) {
+            $prefix = 'integernet_solr/autosuggest/';
+            $this->_autosuggest = new IntegerNet_Solr_Config_Autosuggest(
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'use_php_file_in_home_dir'),
+                $this->_getConfig($prefix . 'max_number_searchword_suggestions'),
+                $this->_getConfig($prefix . 'max_number_product_suggestions'),
+                $this->_getConfig($prefix . 'max_number_category_suggestions'),
+                $this->_getConfigFlag($prefix . 'show_complete_category_path'),
+                $this->_getConfigFlag($prefix . 'category_link_type'),
+                unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
+            );
+        }
+        return $this->_autosuggest;
+    }
+
+
     protected function _getConfig($path)
     {
         return Mage::getStoreConfig($path, $this->_storeId);

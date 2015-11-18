@@ -11,7 +11,7 @@
 /**
  * Interface for configuration reader. One instance per store.
  */
-interface IntegerNet_Solr_Config_Interface
+interface IntegerNet_Solr_Implementor_Config
 {
     /**
      * Returns general Solr module configuration
@@ -32,4 +32,11 @@ interface IntegerNet_Solr_Config_Interface
      * @return IntegerNet_Solr_Config_Indexing
      */
     public function getIndexingConfig();
+
+    /**
+     * Returns autosuggest configuration
+     *
+     * @return IntegerNet_Solr_Config_Autosuggest
+     */
+    public function getAutosuggestConfig();
 }

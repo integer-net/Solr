@@ -18,7 +18,7 @@ class IntegerNet_Solr_Model_Resource_Solr
     /**
      * Configuration reader, by store id
      *
-     * @var  IntegerNet_Solr_Config_Interface[]
+     * @var  IntegerNet_Solr_Implementor_Config[]
      */
     protected $_config;
 
@@ -33,7 +33,7 @@ class IntegerNet_Solr_Model_Resource_Solr
     protected $_useSwapIndex = false;
 
     /**
-     * @param IntegerNet_Solr_Config_Interface[] $storeConfig
+     * @param IntegerNet_Solr_Implementor_Config[] $storeConfig
      */
     public function __construct(array $storeConfig = [])
     {
@@ -42,7 +42,7 @@ class IntegerNet_Solr_Model_Resource_Solr
 
     /**
      * @param $storeId
-     * @return IntegerNet_Solr_Config_Interface
+     * @return IntegerNet_Solr_Implementor_Config
      * @throws IntegerNet_Solr_Exception
      */
     public function getStoreConfig($storeId)
@@ -138,7 +138,7 @@ class IntegerNet_Solr_Model_Resource_Solr
         $swapCoreNames = array();
 
         foreach($this->_config as $storeId => $storeConfig) {
-            /** @var IntegerNet_Solr_Config_Interface $storeConfig */
+            /** @var IntegerNet_Solr_Implementor_Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
@@ -176,7 +176,7 @@ class IntegerNet_Solr_Model_Resource_Solr
         $storeIdsToSwap = array();
         
         foreach($this->_config as $storeId => $storeConfig) {
-            /** @var IntegerNet_Solr_Config_Interface $storeConfig */
+            /** @var IntegerNet_Solr_Implementor_Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {

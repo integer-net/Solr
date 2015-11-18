@@ -11,7 +11,6 @@
 /**
  * Solr resource, interface between Magento and solr service
  *
- * @todo use $this->_config instead of Mage class
  * @todo extract to /lib
  */
 class IntegerNet_Solr_Model_Resource_Solr
@@ -138,31 +137,21 @@ class IntegerNet_Solr_Model_Resource_Solr
         $coresNotToSwap = array();
         $swapCoreNames = array();
 
-        foreach(Mage::app()->getStores() as $store) {
-            /** @var Mage_Core_Model_Store $store */
-
-            $storeId = $store->getId();
-
-            $solrServerInfo = Mage::getStoreConfig('integernet_solr/server/host', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/port', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/path', $storeId) .
-                Mage::getStoreConfig('integernet_solr/server/core', $storeId);
+        foreach($this->_config as $storeId => $storeConfig) {
+            /** @var IntegerNet_Solr_Config_Interface $storeConfig */
+            $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
                 continue;
             }
 
-            if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
+            if (! $storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
 
-            if (!$store->getIsActive()) {
-                continue;
-            }
-
-            if (Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
+            if ($storeConfig->getIndexingConfig()->isSwapCores()) {
                 $coresToSwap[$storeId] = $solrServerInfo;
-                $swapCoreNames[$solrServerInfo][$storeId] = Mage::getStoreConfig('integernet_solr/indexing/swap_core', $storeId);
+                $swapCoreNames[$solrServerInfo][$storeId] = $storeConfig->getServerConfig()->getSwapCore();
             } else {
                 $coresNotToSwap[$storeId] = $solrServerInfo;
             }

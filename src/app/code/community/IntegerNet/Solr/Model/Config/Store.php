@@ -46,7 +46,7 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Config
     public function getGeneralConfig()
     {
         if ($this->_general === null) {
-            $prefix = 'integernet_solr/general';
+            $prefix = 'integernet_solr/general/';
             $this->_general = new IntegerNet_Solr_Config_General(
                 $this->_getConfig($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'license_key'),

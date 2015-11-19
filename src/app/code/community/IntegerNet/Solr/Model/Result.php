@@ -9,10 +9,9 @@
  */
 
 /**
- * @todo extract interfaces to Magento: layered navigation, category
- * @todo inject is_autosuggest
+ * @todo extract interfaces to Magento: configuration, facets, category, log, events
  * @todo don't use it as singleton
- * @todo implement factory for autosuggest
+ * @todo implement factory for autosuggest stub
  * @todo extract to /lib
  */
 class IntegerNet_Solr_Model_Result
@@ -22,6 +21,10 @@ class IntegerNet_Solr_Model_Result
      * @var int
      */
     protected $_storeId;
+    /**
+     * @var IntegerNet_Solr_Implementor_Config
+     */
+    protected $_config;
     /**
      * @var bool
      */
@@ -68,14 +71,14 @@ class IntegerNet_Solr_Model_Result
     {
         $this->_isAutosuggest = Mage::registry('is_autosuggest');
         $this->_storeId = Mage::app()->getStore()->getId();
+        $this->_config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
         $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $this->_query = Mage::getModel('integernet_solr/query', $this->_isAutosuggest);
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
         } else {
-            $config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
-            $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $config->getAutosuggestConfig());
+            $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $this->_config->getAutosuggestConfig());
         }
     }
 
@@ -107,11 +110,11 @@ class IntegerNet_Solr_Model_Result
             } else {
 
                 if ($this->_isAutosuggest()) {
-                    $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
-                    $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results_autosuggest');
+                    $isFuzzyActive = $this->_config->getFuzzyAutosuggestConfig()->isActive();
+                    $minimumResults = $this->_config->getFuzzyAutosuggestConfig()->getMinimumResults();
                 } else {
-                    $isFuzzyActive = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
-                    $minimumResults = Mage::getStoreConfig('integernet_solr/fuzzy/minimum_results');
+                    $isFuzzyActive = $this->_config->getFuzzySearchConfig()->isActive();
+                    $minimumResults = $this->_config->getFuzzySearchConfig()->getMinimumResults();
                 }
                 if ($this->_getCurrentSort() != 'position') {
                     $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
@@ -232,8 +235,9 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getParams($storeId, $fuzzy = true)
     {
+        $resultsConfig = $this->_config->getResultsConfig();
         $params = array(
-            'q.op' => Mage::getStoreConfig('integernet_solr/results/search_operator'),
+            'q.op' => $resultsConfig->getSearchOperator(),
             'fq' => $this->_getFilterQuery($storeId),
             'fl' => 'result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'sort' => $this->_getSortParam(),
@@ -251,25 +255,25 @@ class IntegerNet_Solr_Model_Result
             $params['stats.field'] = 'price_f';
 
 
-            if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
-                && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+            if (($priceStepsize = $resultsConfig->getPriceStepSize())
+                && ($maxPrice = $resultsConfig->getMaxPrice())) {
                 $params['facet.range'] = 'price_f';
                 $params['f.price_f.facet.range.start'] = 0;
                 $params['f.price_f.facet.range.end'] = $maxPrice;
                 $params['f.price_f.facet.range.gap'] = $priceStepsize;
             }
 
-            if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
-                && ($customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals'))) {
+            if ($resultsConfig->isUseCustomPriceIntervals()
+                && ($customPriceIntervals = $resultsConfig->getCustomPriceIntervals())) {
                 $params['f.price_f.facet.interval.set'] = array();
                 $lowerBorder = 0;
-                foreach(explode(',', $customPriceIntervals) as $upperBorder) {
+                foreach($customPriceIntervals as $upperBorder) {
                     $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
                     $lowerBorder = $upperBorder;
                 }
                 $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
-            } else if (($priceStepsize = Mage::getStoreConfig('integernet_solr/results/price_step_size'))
-                && ($maxPrice = Mage::getStoreConfig('integernet_solr/results/max_price'))) {
+            } else if (($priceStepsize = $resultsConfig->getPriceStepSize())
+                && ($maxPrice = $resultsConfig->getMaxPrice())) {
                 $params['f.price_f.facet.interval.set'] = array();
                 $lowerBorder = 0;
                 for ($upperBorder = $priceStepsize; $upperBorder <= $maxPrice; $upperBorder += $priceStepsize) {
@@ -520,8 +524,8 @@ class IntegerNet_Solr_Model_Result
      */
     public function addPriceRangeFilterByIndex($range, $index)
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
-            && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
+        if ($this->_config->getResultsConfig()->isUseCustomPriceIntervals()
+            && $customPriceIntervals = $this->_config->getResultsConfig()->getCustomPriceIntervals()) {
             $lowerBorder = 0;
             $i = 1;
             foreach(explode(',', $customPriceIntervals) as $upperBorder) {
@@ -646,16 +650,14 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+        if ($this->_config->getGeneralConfig()->isLog() || $this->_config->getGeneralConfig()->isDebug()) {
             $this->_logResult($result, microtime(true) - $startTime);
 
-            if (Mage::getStoreConfigFlag('integernet_solr/results/search_fields') && Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');
-                Mage::log('Query over all searchable fields:', null, 'solr.log');
-                Mage::log($this->_lastQueryText, null, 'solr.log');
-                Mage::log('Filter Query:', null, 'solr.log');
-                Mage::log($this->_filterQuery, null, 'solr.log');
-            }
+            Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');
+            Mage::log('Query over all searchable fields:', null, 'solr.log');
+            Mage::log($this->_lastQueryText, null, 'solr.log');
+            Mage::log('Filter Query:', null, 'solr.log');
+            Mage::log($this->_filterQuery, null, 'solr.log');
         }
 
         Mage::dispatchEvent('integernet_solr_after_search_request', array('result' => $result));
@@ -691,7 +693,7 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
+        if ($this->_config->getGeneralConfig()->isLog()) {
 
             $this->_logResult($result, microtime(true) - $startTime);
         }

@@ -128,7 +128,11 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      */
     protected function _reindexProducts($productIds = null, $emptyIndex = false)
     {
-        Mage::getSingleton('integernet_solr/indexer_product')->reindex($productIds, $emptyIndex);
+        try {
+            Mage::getSingleton('integernet_solr/indexer_product')->reindex($productIds, $emptyIndex);
+        } catch (IntegerNet_Solr_Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
     }
 
     /**

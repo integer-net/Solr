@@ -33,6 +33,18 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
      * @var IntegerNet_Solr_Config_Autosuggest
      */
     protected $_autosuggest;
+    /**
+     * @var IntegerNet_Solr_Config_Fuzzy
+     */
+    protected $_fuzzySearch;
+    /**
+     * @var IntegerNet_Solr_Config_Fuzzy
+     */
+    protected $_fuzzyAutosuggest;
+    /**
+     * @var IntegerNet_Solr_Config_Results
+     */
+    protected $_results;
 
     /**
      * @param int $_storeId
@@ -126,6 +138,63 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
             );
         }
         return $this->_autosuggest;
+    }
+
+    /**
+     * Returns fuzzy configuration for search
+     *
+     * @return IntegerNet_Solr_Config_Fuzzy
+     */
+    public function getFuzzySearchConfig()
+    {
+        if ($this->_fuzzySearch === null) {
+            $prefix = 'integernet_solr/fuzzy/';
+            $this->_fuzzySearch = new IntegerNet_Solr_Config_Fuzzy(
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'sensitivity'),
+                $this->_getConfig($prefix . 'minimum_results')
+            );
+        }
+        return $this->_fuzzySearch;
+    }
+
+    /**
+     * Returns fuzzy configuration for autosuggest
+     *
+     * @return IntegerNet_Solr_Config_Fuzzy
+     */
+    public function getFuzzyAutosuggestConfig()
+    {
+        if ($this->_fuzzyAutosuggest === null) {
+            $prefix = 'integernet_solr/fuzzy/';
+            $this->_fuzzyAutosuggest = new IntegerNet_Solr_Config_Fuzzy(
+                $this->_getConfigFlag($prefix . 'is_active_autosuggest'),
+                $this->_getConfig($prefix . 'sensitivity_autosuggest'),
+                $this->_getConfig($prefix . 'minimum_results_autosuggest')
+            );
+        }
+        return $this->_fuzzySearch;
+    }
+
+    /**
+     * Returns search results configuration
+     *
+     * @return IntegerNet_Solr_Config_Results
+     */
+    public function getResultsConfig()
+    {
+        if ($this->_results === null) {
+            $prefix = 'integernet_solr/results/';
+            $this->_results = new IntegerNet_Solr_Config_Results(
+                $this->_getConfigFlag($prefix . 'use_html_from_solr'),
+                $this->_getConfig($prefix . 'search_operator'),
+                $this->_getConfig($prefix . 'price_step_size'),
+                $this->_getConfig($prefix . 'max_price'),
+                $this->_getConfigFlag($prefix . 'use_custom_price_intervals'),
+                explode(',', $this->_getConfig($prefix . 'custom_price_intervals'))
+            );
+        }
+        return $this->_results;
     }
 
 

@@ -53,17 +53,13 @@ class IntegerNet_Solr_Model_Query
         Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
 
         $queryText          = $transportObject->getQueryText();
-        $searchAllFields    = false;
 
         if ($this->_isAutosuggest) {
             $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
             $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
-            $searchFieldName    = 'text_autocomplete';
         } else {
             $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active');
             $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
-            $searchAllFields    = Mage::getStoreConfigFlag('integernet_solr/results/search_fields');
-            $searchFieldName    = 'text_plain';
         }
 
         $queryText = Mage::helper('integernet_solr/query')->escape($queryText);

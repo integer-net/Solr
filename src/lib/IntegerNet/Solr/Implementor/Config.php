@@ -39,4 +39,25 @@ interface IntegerNet_Solr_Implementor_Config
      * @return IntegerNet_Solr_Config_Autosuggest
      */
     public function getAutosuggestConfig();
+
+    /**
+     * Returns fuzzy configuration for search
+     *
+     * @return IntegerNet_Solr_Config_Fuzzy
+     */
+    public function getFuzzySearchConfig();
+
+    /**
+     * Returns fuzzy configuration for autosuggest
+     *
+     * @return IntegerNet_Solr_Config_Fuzzy
+     */
+    public function getFuzzyAutosuggestConfig();
+
+    /**
+     * Returns search results configuration
+     *
+     * @return IntegerNet_Solr_Config_Results
+     */
+    public function getResultsConfig();
 }

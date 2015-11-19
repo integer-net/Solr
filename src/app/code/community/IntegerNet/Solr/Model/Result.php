@@ -650,7 +650,7 @@ class IntegerNet_Solr_Model_Result
             $transportObject->getParams()
         );
 
-        if ($this->_config->getGeneralConfig()->isLog() || $this->_config->getGeneralConfig()->isDebug()) {
+        if ($this->_config->getGeneralConfig()->isLog()) {
             $this->_logResult($result, microtime(true) - $startTime);
 
             Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');

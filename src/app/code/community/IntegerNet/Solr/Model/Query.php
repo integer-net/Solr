@@ -83,9 +83,7 @@ class IntegerNet_Solr_Model_Query
 
                     if (strstr($fieldName, '_f') == false) {
 
-                        if (Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
-                            $boost = '^' . floatval($attribute->getSolrBoost());
-                        }
+                        $boost = '^' . floatval($attribute->getSolrBoost());
 
                         if ($broaden) {
 

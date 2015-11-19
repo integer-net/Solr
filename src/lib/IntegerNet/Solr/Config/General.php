@@ -21,20 +21,15 @@ final class IntegerNet_Solr_Config_General
      * @var bool
      */
     private $log;
-    /**
-     * @var bool
-     */
-    private $debug;
 
     /**
      * @param bool $active
      */
-    public function __construct($active, $licenseKey, $log, $debug)
+    public function __construct($active, $licenseKey, $log)
     {
         $this->active = $active;
         $this->licenseKey = $licenseKey;
         $this->log = $log;
-        $this->debug = $debug;
     }
 
     /**
@@ -61,12 +56,5 @@ final class IntegerNet_Solr_Config_General
         return $this->log;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isDebug()
-    {
-        return $this->debug;
-    }
 
 }

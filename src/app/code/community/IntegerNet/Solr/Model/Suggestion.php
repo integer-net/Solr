@@ -48,7 +48,7 @@ class IntegerNet_Solr_Model_Suggestion
                 $this->_getParams($storeId)
             );
 
-            if (Mage::getStoreConfigFlag('integernet_solr/general/log') || Mage::getStoreConfigFlag('integernet_solr/general/debug')) {
+            if (Mage::getStoreConfigFlag('integernet_solr/general/log')) {
                 $this->_logSuggestion($this->_solrSuggestion, microtime(true) - $startTime);
             }
         }

@@ -133,6 +133,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
                 'attribute_code' => $attribute->getAttributeCode(),
                 'label' => $attribute->getStoreLabel(),
                 'solr_boost' => $attribute->getSolrBoost(),
+                'used_for_sortby' => $attribute->getUsedForSortBy(),
             );
         }
     }

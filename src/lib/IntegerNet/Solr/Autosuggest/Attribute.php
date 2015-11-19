@@ -49,4 +49,9 @@ class IntegerNet_Solr_Autosuggest_Attribute
     {
         return 'varchar';
     }
+
+    public function getUsedForSortBy()
+    {
+        return $this->_attributeConfig['used_for_sortby'];
+    }
 }

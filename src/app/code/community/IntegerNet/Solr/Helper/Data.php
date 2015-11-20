@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
-class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
+class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract implements IntegerNet_Solr_Implementor_AttributeRepository
 {
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_searchableAttributes = null;
@@ -60,7 +60,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return IntegerNet_Solr_Implementor_Attribute[]
      */
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
@@ -73,7 +73,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return IntegerNet_Solr_Implementor_Attribute[]
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
@@ -94,13 +94,13 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        return $this->_filterableInSearchAttributes;
+        return self::getAttributeArrayFromCollection($this->_filterableInSearchAttributes);
     }
 
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return IntegerNet_Solr_Implementor_Attribute[]
      */
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
@@ -121,7 +121,17 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        return $this->_filterableInCatalogAttributes;
+        return self::getAttributeArrayFromCollection($this->_filterableInCatalogAttributes);
+    }
+
+    private static function getAttributeArrayFromCollection(Mage_Catalog_Model_Resource_Product_Attribute_Collection $collection)
+    {
+        return array_map(
+            function($item) {
+                return new IntegerNet_Solr_Model_Bridge_Attribute($item);
+            },
+            $collection->getItems()
+        );
     }
     
     /**
@@ -156,7 +166,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        return $this->_filterableInCatalogOrSearchAttributes;
+        return self::getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
     }
 
 

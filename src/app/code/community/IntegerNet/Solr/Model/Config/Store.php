@@ -173,7 +173,7 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
                 $this->_getConfig($prefix . 'minimum_results_autosuggest')
             );
         }
-        return $this->_fuzzySearch;
+        return $this->_fuzzyAutosuggest;
     }
 
     /**

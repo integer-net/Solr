@@ -13,7 +13,7 @@
  *
  * Class IntegerNet_Solr_Autosuggest_Helper
  */
-final class IntegerNet_Solr_Autosuggest_Helper
+final class IntegerNet_Solr_Autosuggest_Helper implements IntegerNet_Solr_Implementor_AttributeRepository
 {
     protected $_query;
 
@@ -27,17 +27,17 @@ final class IntegerNet_Solr_Autosuggest_Helper
     }
     
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return IntegerNet_Solr_Implementor_Attribute[]
      */
-    public function getFilterableAttributes()
+    public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
         return $this->getFilterableInSearchAttributes();
     }
 
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return IntegerNet_Solr_Implementor_Attribute[]
      */
-    public function getFilterableInSearchAttributes()
+    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
         $attributes = array();
         foreach((array)Mage::getStoreConfig('attribute') as $attributeCode => $attributeConfig) {
@@ -174,4 +174,26 @@ final class IntegerNet_Solr_Autosuggest_Helper
 
         return '"' . preg_replace($pattern, $replace, $value) . '"';
     }
+
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return IntegerNet_Solr_Implementor_Attribute[]
+     */
+    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
+    {
+        // not used in autosuggest
+        return [];
+    }
+
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
+    {
+        // not used in autosuggest
+        return [];
+    }
+
+
 }

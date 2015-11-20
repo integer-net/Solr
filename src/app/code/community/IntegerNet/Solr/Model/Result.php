@@ -9,7 +9,7 @@
  */
 
 /**
- * @todo extract interfaces to Magento: configuration, facets, category, log, events
+ * @todo extract interfaces to Magento: facets, category, log, events
  * @todo don't use it as singleton
  * @todo implement factory for autosuggest stub
  * @todo extract to /lib
@@ -25,6 +25,10 @@ class IntegerNet_Solr_Model_Result
      * @var IntegerNet_Solr_Implementor_Config
      */
     protected $_config;
+    /**
+     * @var IntegerNet_Solr_Implementor_AttributeRepository
+     */
+    protected $_attributeRespository;
     /**
      * @var bool
      */
@@ -72,6 +76,7 @@ class IntegerNet_Solr_Model_Result
         $this->_isAutosuggest = Mage::registry('is_autosuggest');
         $this->_storeId = Mage::app()->getStore()->getId();
         $this->_config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
+        $this->_attributeRespository = Mage::helper('integernet_solr');
         $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $this->_query = Mage::getModel('integernet_solr/query', $this->_isAutosuggest);
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
@@ -302,7 +307,7 @@ class IntegerNet_Solr_Model_Result
     {
         $codes = array('category');
 
-        foreach(Mage::helper('integernet_solr')->getFilterableAttributes() as $attribute) {
+        foreach($this->_attributeRespository->getFilterableAttributes() as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
         return $codes;

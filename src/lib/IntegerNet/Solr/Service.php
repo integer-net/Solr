@@ -7,6 +7,10 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+/**
+ * @todo move to namespace, move Apache_Solr and extend autoloader for it
+ */
 class IntegerNet_Solr_Service extends Apache_Solr_Service
 {
     const SUGGEST_SERVLET = 'suggest';

@@ -111,7 +111,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
         if (!$className) {
             throw new Exception('Class for alias ' . $modelClass . ' not found');
         }
-        return new $className;
+        return new $className($arguments);
     }
 
     /**
@@ -129,7 +129,7 @@ final class IntegerNet_Solr_Autosuggest_Mage
         if (!$className) {
             throw new Exception('Class for alias ' . $modelClass . ' not found');
         }
-        return new $className;
+        return new $className($arguments);
     }
 
         /**
@@ -308,5 +308,16 @@ final class IntegerNet_Solr_Autosuggest_Mage
         }
         
         return $url;
+    }
+
+    /**
+     * Retrieve application root absolute path
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function getBaseDir($type = 'base')
+    {
+        return getcwd();
     }
 }

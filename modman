@@ -12,6 +12,7 @@ src/app/locale/en_US/template/email/*                               app/locale/e
 src/app/code/community/Apache/Solr                                  app/code/community/Apache/Solr
 src/lib/IntegerNet/Solr                                             lib/IntegerNet/Solr
 src/lib/IntegerNet_Solr                                             lib/IntegerNet_Solr
+src/lib/Psr_Log                                                     lib/Psr_Log
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/

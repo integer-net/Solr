@@ -12,6 +12,8 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     protected $_modelIdentifiers = array(
         'integernet_solr/suggestion_collection',
         'integernet_solr/result',
+        'integernet_solr/query',
+        'integernet_solr/result_pagination_autosuggest',
         'integernet_solr/suggestion',
     );
 

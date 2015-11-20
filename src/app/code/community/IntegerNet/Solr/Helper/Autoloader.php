@@ -152,4 +152,17 @@ class IntegerNet_Solr_Helper_Autoloader
         }
         return false;
     }
+
+
+    public static function createAndRegister()
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
+            $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
+            if ($libBaseDir[0] !== '/') {
+                $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
+            }
+            $autoloader = new self;
+            $autoloader->addNamespace('IntegerNet\Solr', $libBaseDir, true)->register();
+        }
+    }
 }

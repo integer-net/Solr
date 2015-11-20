@@ -9,13 +9,14 @@
  */
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
+use \IntegerNet\Solr\Implementor\EventDispatcher;
 
 /**
  * This class is a low weight replacement for the "Mage_Core_Model_Store" class in autosuggest calls
  *
  * Class IntegerNet_Solr_Autosuggest_Helper
  */
-final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository
+final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, EventDispatcher
 {
     protected $_query;
 
@@ -195,6 +196,18 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository
     {
         // not used in autosuggest
         return [];
+    }
+
+    /**
+     * Dispatch event
+     *
+     * @param string $eventName
+     * @param array $data
+     * @return void
+     */
+    public function dispatch($eventName, array $data = [])
+    {
+        Mage::dispatchEvent($eventName, $data);
     }
 
 

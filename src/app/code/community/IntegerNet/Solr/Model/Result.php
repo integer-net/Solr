@@ -11,9 +11,9 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
+use Psr\Log\LoggerInterface;
 
 /**
- * @todo extract interfaces to Magento: log (psr-3)
  * @todo break into more classes
  * @todo don't use it as singleton
  * @todo implement factory for autosuggest stub
@@ -38,6 +38,10 @@ class IntegerNet_Solr_Model_Result
      * @var EventDispatcher
      */
     protected $_eventDispatcher;
+    /**
+     * @var LoggerInterface
+     */
+    protected $_logger;
     /**
      * @var bool
      */
@@ -90,6 +94,7 @@ class IntegerNet_Solr_Model_Result
         $this->_storeId = Mage::app()->getStore()->getId();
         $this->_config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
         $this->_eventDispatcher = $this->_attributeRespository = Mage::helper('integernet_solr');
+        $this->_logger = Mage::helper('integernet_solr/log');
         $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         if ($this->_isCategoryPage) {
             $this->_categoryId = Mage::registry('current_category')->getId();
@@ -575,8 +580,8 @@ class IntegerNet_Solr_Model_Result
                 }
             }
         }
-        Mage::log($resultClone, null, 'solr.log');
-        Mage::log('Elapsed time: ' . $time . 's', null, 'solr.log');
+        $this->_logger->debug($resultClone);
+        $this->_logger->debug('Elapsed time: ' . $time . 's');
     }
 
     /**
@@ -611,11 +616,11 @@ class IntegerNet_Solr_Model_Result
         if ($this->_config->getGeneralConfig()->isLog()) {
             $this->_logResult($result, microtime(true) - $startTime);
 
-            Mage::log((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'), null, 'solr.log');
-            Mage::log('Query over all searchable fields:', null, 'solr.log');
-            Mage::log($this->_lastQueryText, null, 'solr.log');
-            Mage::log('Filter Query:', null, 'solr.log');
-            Mage::log($this->_filterQuery, null, 'solr.log');
+            $this->_logger->debug((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'));
+            $this->_logger->debug('Query over all searchable fields:');
+            $this->_logger->debug($this->_lastQueryText);
+            $this->_logger->debug('Filter Query:');
+            $this->_logger->debug($this->_filterQuery);
         }
 
         $this->_eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));

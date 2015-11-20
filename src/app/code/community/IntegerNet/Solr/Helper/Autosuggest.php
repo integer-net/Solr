@@ -55,11 +55,11 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_stopStoreEmulation();
 
             foreach($this->_modelIdentifiers as $identifier) {
-                $config['model'][$identifier] = get_class(Mage::getModel($identifier));
+                $config['model'][$identifier] = Mage::getConfig()->getModelClassName($identifier);
             }
 
             foreach($this->_resourceModelIdentifiers as $identifier) {
-                $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
+                $config['resource_model'][$identifier] = Mage::getConfig()->getResourceModelClassName($identifier);
             }
 
             $transportObject = new Varien_Object(array('config' => $config));

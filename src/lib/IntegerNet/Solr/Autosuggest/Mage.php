@@ -267,6 +267,8 @@ final class IntegerNet_Solr_Autosuggest_Mage
                 self::$_factory = new IntegerNet_Solr_Autosuggest_Factory();
             }
             return self::$_factory;
+        } elseif ($identifier === 'integernet_solr/log') {
+            return new IntegerNet_Solr_Helper_Log();
         }
         if (is_null(self::$_helper)) {
             self::$_helper = new IntegerNet_Solr_Autosuggest_Helper();

@@ -30,7 +30,7 @@ class IntegerNet_Solr_Helper_Autoloader
      */
     public function register()
     {
-        spl_autoload_register(array($this, 'loadClass'));
+        spl_autoload_register(array($this, 'loadClass'), true, true);
     }
 
     /**
@@ -162,7 +162,10 @@ class IntegerNet_Solr_Helper_Autoloader
                 $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
             }
             $autoloader = new self;
-            $autoloader->addNamespace('IntegerNet\Solr', $libBaseDir, true)->register();
+            $autoloader
+                ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
+                ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
+                ->register();
         }
     }
 }

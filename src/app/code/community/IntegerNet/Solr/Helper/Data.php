@@ -7,7 +7,8 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
-class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract implements IntegerNet_Solr_Implementor_AttributeRepository
+class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
+    implements IntegerNet_Solr_Implementor_AttributeRepository, IntegerNet_Solr_Implementor_EventDispatcher
 {
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_searchableAttributes = null;
@@ -284,4 +285,18 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract implements I
 
         return true;
     }
+
+    /**
+     * Dispatch event
+     *
+     * @param string $eventName
+     * @param array $data
+     * @return void
+     */
+    public function dispatch($eventName, array $data = [])
+    {
+        Mage::dispatchEvent($eventName, $data);
+    }
+
+
 }

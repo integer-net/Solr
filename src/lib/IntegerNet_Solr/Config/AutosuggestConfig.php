@@ -1,4 +1,5 @@
 <?php
+namespace IntegerNet\Solr\Config;
 /**
  * integer_net Magento Module
  *
@@ -7,7 +8,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-final class IntegerNet_Solr_Config_Autosuggest
+final class AutosuggestConfig
 {
     const USE_MAGENTO_CONTROLLER = 0;
     const USE_PHP_FILE_WITHOUT_MAGENTO = 1;
@@ -62,9 +63,9 @@ final class IntegerNet_Solr_Config_Autosuggest
     {
         $this->active = $active;
         $this->usePhpFile = $usePhpFile;
-        $this->maxNumberSearchwordSuggestions = (int) $maxNumberSearchwordSuggestions;
-        $this->maxNumberProductSuggestions = (int) $maxNumberProductSuggestions;
-        $this->maxNumberCategorySuggestions = (int) $maxNumberCategorySuggestions;
+        $this->maxNumberSearchwordSuggestions = (int)$maxNumberSearchwordSuggestions;
+        $this->maxNumberProductSuggestions = (int)$maxNumberProductSuggestions;
+        $this->maxNumberCategorySuggestions = (int)$maxNumberCategorySuggestions;
         $this->showCompleteCategoryPath = $showCompleteCategoryPath;
         $this->categoryLinkType = $categoryLinkType;
         $this->attributeFilterSuggestions = $attributeFilterSuggestions;

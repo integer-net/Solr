@@ -23,7 +23,7 @@ interface IntegerNet_Solr_Interface_Factory
     /**
      * Returns new Solr result wrapper
      *
-     * @return IntegerNet_Solr_Test_Model_Result
+     * @return IntegerNet_Solr_Model_Result
      */
     public function getSolrResult();
 }

@@ -7,6 +7,10 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\Pagination;
 
 /**
  * @todo extract interfaces to Magento: log (psr-3)
@@ -23,15 +27,15 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_storeId;
     /**
-     * @var IntegerNet_Solr_Implementor_Config
+     * @var Config
      */
     protected $_config;
     /**
-     * @var IntegerNet_Solr_Implementor_AttributeRepository
+     * @var AttributeRepository
      */
     protected $_attributeRespository;
     /**
-     * @var IntegerNet_Solr_Implementor_EventDispatcher
+     * @var EventDispatcher
      */
     protected $_eventDispatcher;
     /**
@@ -47,7 +51,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_query;
     /**
-     * @var IntegerNet_Solr_Implementor_Pagination
+     * @var Pagination
      */
     protected $_pagination;
 

@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Implementor\Attribute;
+
 /**
  * integer_net Magento Module
  *
@@ -30,7 +32,7 @@ class IntegerNet_Solr_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
         $this->assertInternalType('array', $actualAttributes);
         $this->assertNotEmpty($actualAttributes);
         foreach ($actualAttributes as $actualAttribute) {
-            $this->assertInstanceOf(IntegerNet_Solr_Implementor_Attribute::class, $actualAttribute);
+            $this->assertInstanceOf(Attribute::class, $actualAttribute);
         }
     }
 
@@ -45,7 +47,7 @@ class IntegerNet_Solr_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
         $this->assertInternalType('array', $actualAttributes);
         $this->assertNotEmpty($actualAttributes);
         foreach ($actualAttributes as $actualAttribute) {
-            $this->assertInstanceOf(IntegerNet_Solr_Implementor_Attribute::class, $actualAttribute);
+            $this->assertInstanceOf(Attribute::class, $actualAttribute);
         }
     }
     /**
@@ -59,7 +61,7 @@ class IntegerNet_Solr_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
         $this->assertInternalType('array', $actualAttributes);
         $this->assertNotEmpty($actualAttributes);
         foreach ($actualAttributes as $actualAttribute) {
-            $this->assertInstanceOf(IntegerNet_Solr_Implementor_Attribute::class, $actualAttribute);
+            $this->assertInstanceOf(Attribute::class, $actualAttribute);
         }
     }
 }

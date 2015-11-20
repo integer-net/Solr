@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Implementor\Attribute;
+
 /**
  * integer_net Magento Module
  *
@@ -7,7 +9,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-final class IntegerNet_Solr_Autosuggest_Attribute implements IntegerNet_Solr_Implementor_Attribute
+final class IntegerNet_Solr_Autosuggest_Attribute implements Attribute
 {
     protected $_attributeConfig = null;
     protected $_source = null;

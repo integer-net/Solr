@@ -7,42 +7,49 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Config\ResultsConfig;
+use IntegerNet\Solr\Implementor\Config;
 
 /**
  * Magento configuration reader, one instance per store view
  */
-final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implementor_Config
+final class IntegerNet_Solr_Model_Config_Store implements Config
 {
     /**
      * @var int
      */
     protected $_storeId;
     /**
-     * @var IntegerNet_Solr_Config_General
+     * @var GeneralConfig
      */
     protected $_general;
     /**
-     * @var IntegerNet_Solr_Config_Server
+     * @var ServerConfig
      */
     protected $_server;
     /**
-     * @var IntegerNet_Solr_Config_Indexing
+     * @var IndexingConfig
      */
     protected $_indexing;
     /**
-     * @var IntegerNet_Solr_Config_Autosuggest
+     * @var AutosuggestConfig
      */
     protected $_autosuggest;
     /**
-     * @var IntegerNet_Solr_Config_Fuzzy
+     * @var FuzzyConfig
      */
     protected $_fuzzySearch;
     /**
-     * @var IntegerNet_Solr_Config_Fuzzy
+     * @var FuzzyConfig
      */
     protected $_fuzzyAutosuggest;
     /**
-     * @var IntegerNet_Solr_Config_Results
+     * @var ResultsConfig
      */
     protected $_results;
 
@@ -57,13 +64,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns general Solr module configuration
      *
-     * @return IntegerNet_Solr_Config_General
+     * @return GeneralConfig
      */
     public function getGeneralConfig()
     {
         if ($this->_general === null) {
             $prefix = 'integernet_solr/general/';
-            $this->_general = new IntegerNet_Solr_Config_General(
+            $this->_general = new GeneralConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'license_key'),
                 $this->_getConfigFlag($prefix . 'log'),
@@ -77,13 +84,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns Solr server configuration
      *
-     * @return IntegerNet_Solr_Config_Server
+     * @return ServerConfig
      */
     public function getServerConfig()
     {
         if ($this->_server === null) {
             $prefix = 'integernet_solr/server/';
-            $this->_server = new IntegerNet_Solr_Config_Server(
+            $this->_server = new ServerConfig(
                 $this->_getConfig($prefix . 'host'),
                 $this->_getConfig($prefix . 'port'),
                 $this->_getConfig($prefix . 'path'),
@@ -102,13 +109,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns indexing configuration
      *
-     * @return IntegerNet_Solr_Config_Indexing
+     * @return IndexingConfig
      */
     public function getIndexingConfig()
     {
         if ($this->_indexing === null) {
             $prefix = 'integernet_solr/indexing/';
-            $this->_indexing = new IntegerNet_Solr_Config_Indexing(
+            $this->_indexing = new IndexingConfig(
                 $this->_getConfig($prefix . 'pagesize'),
                 $this->_getConfigFlag($prefix . 'delete_documents_before_indexing'),
                 $this->_getConfigFlag($prefix . 'swap_cores')
@@ -120,13 +127,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns autosuggest configuration
      *
-     * @return IntegerNet_Solr_Config_Autosuggest
+     * @return AutosuggestConfig
      */
     public function getAutosuggestConfig()
     {
         if ($this->_autosuggest === null) {
             $prefix = 'integernet_solr/autosuggest/';
-            $this->_autosuggest = new IntegerNet_Solr_Config_Autosuggest(
+            $this->_autosuggest = new AutosuggestConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'use_php_file_in_home_dir'),
                 $this->_getConfig($prefix . 'max_number_searchword_suggestions'),
@@ -143,13 +150,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns fuzzy configuration for search
      *
-     * @return IntegerNet_Solr_Config_Fuzzy
+     * @return FuzzyConfig
      */
     public function getFuzzySearchConfig()
     {
         if ($this->_fuzzySearch === null) {
             $prefix = 'integernet_solr/fuzzy/';
-            $this->_fuzzySearch = new IntegerNet_Solr_Config_Fuzzy(
+            $this->_fuzzySearch = new FuzzyConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'sensitivity'),
                 $this->_getConfig($prefix . 'minimum_results')
@@ -161,13 +168,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns fuzzy configuration for autosuggest
      *
-     * @return IntegerNet_Solr_Config_Fuzzy
+     * @return FuzzyConfig
      */
     public function getFuzzyAutosuggestConfig()
     {
         if ($this->_fuzzyAutosuggest === null) {
             $prefix = 'integernet_solr/fuzzy/';
-            $this->_fuzzyAutosuggest = new IntegerNet_Solr_Config_Fuzzy(
+            $this->_fuzzyAutosuggest = new FuzzyConfig(
                 $this->_getConfigFlag($prefix . 'is_active_autosuggest'),
                 $this->_getConfig($prefix . 'sensitivity_autosuggest'),
                 $this->_getConfig($prefix . 'minimum_results_autosuggest')
@@ -179,13 +186,13 @@ final class IntegerNet_Solr_Model_Config_Store implements IntegerNet_Solr_Implem
     /**
      * Returns search results configuration
      *
-     * @return IntegerNet_Solr_Config_Results
+     * @return ResultsConfig
      */
     public function getResultsConfig()
     {
         if ($this->_results === null) {
             $prefix = 'integernet_solr/results/';
-            $this->_results = new IntegerNet_Solr_Config_Results(
+            $this->_results = new ResultsConfig(
                 $this->_getConfigFlag($prefix . 'use_html_from_solr'),
                 $this->_getConfig($prefix . 'search_operator'),
                 $this->_getConfig($prefix . 'price_step_size'),

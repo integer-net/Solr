@@ -7,6 +7,8 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\Implementor\Config;
 
 /**
  * Solr resource, interface between Magento and solr service
@@ -18,7 +20,7 @@ class IntegerNet_Solr_Model_Resource_Solr
     /**
      * Configuration reader, by store id
      *
-     * @var  IntegerNet_Solr_Implementor_Config[]
+     * @var  Config[]
      */
     protected $_config;
 
@@ -33,7 +35,7 @@ class IntegerNet_Solr_Model_Resource_Solr
     protected $_useSwapIndex = false;
 
     /**
-     * @param IntegerNet_Solr_Implementor_Config[] $storeConfig
+     * @param Config[] $storeConfig
      */
     public function __construct(array $storeConfig = [])
     {
@@ -42,14 +44,14 @@ class IntegerNet_Solr_Model_Resource_Solr
 
     /**
      * @param $storeId
-     * @return IntegerNet_Solr_Implementor_Config
-     * @throws IntegerNet_Solr_Exception
+     * @return Config
+     * @throws Exception
      */
     public function getStoreConfig($storeId)
     {
         $storeId = (int) $storeId;
         if (!isset($this->_config[$storeId])) {
-            throw new IntegerNet_Solr_Exception("Store with ID {$storeId} not found.");
+            throw new Exception("Store with ID {$storeId} not found.");
         }
         return $this->_config[$storeId];
     }
@@ -129,7 +131,7 @@ class IntegerNet_Solr_Model_Resource_Solr
 
     /**
      * @param null|Mage_Core_Model_Store $restrictToStore
-     * @throws IntegerNet_Solr_Exception
+     * @throws Exception
      */
     public function checkSwapCoresConfiguration($restrictToStore = null) 
     {
@@ -138,7 +140,7 @@ class IntegerNet_Solr_Model_Resource_Solr
         $swapCoreNames = array();
 
         foreach($this->_config as $storeId => $storeConfig) {
-            /** @var IntegerNet_Solr_Implementor_Config $storeConfig */
+            /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
@@ -158,12 +160,12 @@ class IntegerNet_Solr_Model_Resource_Solr
         }
 
         if (sizeof(array_intersect($coresToSwap, $coresNotToSwap))) {
-            throw new IntegerNet_Solr_Exception('Configuration Error: Activate Core Swapping for all Store Views using the same Solr Core.');
+            throw new Exception('Configuration Error: Activate Core Swapping for all Store Views using the same Solr Core.');
         }
 
         foreach($swapCoreNames as $swapCoreNamesByCore) {
             if (sizeof(array_unique($swapCoreNamesByCore)) > 1) {
-                throw new IntegerNet_Solr_Exception('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
+                throw new Exception('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
             }
         }
     }
@@ -176,7 +178,7 @@ class IntegerNet_Solr_Model_Resource_Solr
         $storeIdsToSwap = array();
         
         foreach($this->_config as $storeId => $storeConfig) {
-            /** @var IntegerNet_Solr_Implementor_Config $storeConfig */
+            /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {

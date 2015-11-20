@@ -7,13 +7,15 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Implementor\AttributeRepository;
 
 /**
  * This class is a low weight replacement for the "Mage_Core_Model_Store" class in autosuggest calls
  *
  * Class IntegerNet_Solr_Autosuggest_Helper
  */
-final class IntegerNet_Solr_Autosuggest_Helper implements IntegerNet_Solr_Implementor_AttributeRepository
+final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository
 {
     protected $_query;
 
@@ -27,7 +29,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements IntegerNet_Solr_Implem
     }
     
     /**
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
@@ -35,7 +37,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements IntegerNet_Solr_Implem
     }
 
     /**
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
@@ -177,7 +179,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements IntegerNet_Solr_Implem
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {

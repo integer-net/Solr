@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Implementor\Source;
+
 /**
  * integer_net Magento Module
  *
@@ -7,7 +9,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Bridge_Source implements IntegerNet_Solr_Implementor_Source
+class IntegerNet_Solr_Model_Bridge_Source implements Source
 {
     /**
      * @var Mage_Eav_Model_Entity_Attribute_Source_Interface

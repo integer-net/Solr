@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Exception;
 
 /**
  * @loadFixture config
@@ -31,7 +32,7 @@ class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Ca
      * @test
      * @dataProvider dataProvider
      * @dataProviderFile invalid-config.yaml
-     * @expectedException IntegerNet_Solr_Exception
+     * @expectedException Exception
      */
     public function invalidSwapConfigurationShouldThrowException(array $config)
     {

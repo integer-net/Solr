@@ -8,6 +8,9 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
+namespace IntegerNet\Solr\Implementor;
+use IntegerNet\Solr\Implementor\Source;
+
 /**
  * integer_net Magento Module
  *
@@ -16,7 +19,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-interface IntegerNet_Solr_Implementor_Attribute
+interface Attribute
 {
     /**
      * @return string
@@ -34,7 +37,7 @@ interface IntegerNet_Solr_Implementor_Attribute
     public function getSolrBoost();
 
     /**
-     * @return IntegerNet_Solr_Implementor_Source
+     * @return Source
      */
     public function getSource();
 

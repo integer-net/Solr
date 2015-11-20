@@ -7,6 +7,9 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Implementor\Config;
 
 /**
  * Test case for the low weight replacement of Magento classes in autosuggest calls
@@ -29,8 +32,8 @@ class IntegerNet_Solr_Test_Controller_Autosuggest_Magestub extends EcomDev_PHPUn
         $resource = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->assertInstanceOf(IntegerNet_Solr_Model_Resource_Solr::class, $resource);
         $defaultStoreConfig = $resource->getStoreConfig(1);
-        $this->assertInstanceOf(IntegerNet_Solr_Implementor_Config::class, $defaultStoreConfig);
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $defaultStoreConfig->getIndexingConfig());
-        $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $defaultStoreConfig->getServerConfig());
+        $this->assertInstanceOf(Config::class, $defaultStoreConfig);
+        $this->assertInstanceOf(IndexingConfig::class, $defaultStoreConfig->getIndexingConfig());
+        $this->assertInstanceOf(ServerConfig::class, $defaultStoreConfig->getServerConfig());
     }
 }

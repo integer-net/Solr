@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Implementor\Pagination;
+
 /**
  * integer_net Magento Module
  *
@@ -7,7 +9,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements IntegerNet_Solr_Implementor_Pagination
+class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
 {
     /**
      * @var Mage_Catalog_Block_Product_List_Toolbar

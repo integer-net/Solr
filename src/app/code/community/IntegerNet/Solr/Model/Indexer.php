@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\Exception;
 
 /**
  * Class IntegerNet_Solr_Model_Indexer
@@ -130,7 +131,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         try {
             Mage::getSingleton('integernet_solr/indexer_product')->reindex($productIds, $emptyIndex);
-        } catch (IntegerNet_Solr_Exception $e) {
+        } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
     }

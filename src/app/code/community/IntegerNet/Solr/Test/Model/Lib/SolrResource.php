@@ -1,4 +1,9 @@
 <?php
+use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Implementor\Config;
+
 /**
  * integer_net Magento Module
  *
@@ -18,7 +23,7 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     {
         $configStubs = [];
         foreach ($config as $storeId => $storeConfig) {
-            $configStubs[$storeId] = $this->getMockForAbstractClass(IntegerNet_Solr_Implementor_Config::class);
+            $configStubs[$storeId] = $this->getMockForAbstractClass(Config::class);
             foreach ($storeConfig as $method => $return) {
                 $configStubs[$storeId]->expects($this->any())
                     ->method($method)
@@ -38,6 +43,13 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     }
     public static function dataSwapConfig()
     {
+        /**
+         * Trigger Autoloader for Magento
+         *
+         * @todo use own autoloader for lib tests as soon as extracted, then remove this call:
+         */
+        Mage::helper('integernet_solr/factory');
+
         $defaultGeneralConfig = IntegerNet_Solr_Config_General_Builder::defaultConfig();
         $swapCoreServerConfig = IntegerNet_Solr_Config_Server_Builder::swapCoreConfig();
         $swapCoreIndexingConfig = IntegerNet_Solr_Config_Indexing_Builder::swapCoreConfig();
@@ -146,7 +158,7 @@ class IntegerNet_Solr_Config_General_Builder
 
     public function build()
     {
-        return new IntegerNet_Solr_Config_General(
+        return new GeneralConfig(
             $this->active, $this->licenseKey, $this->log, $this->debug
         );
     }
@@ -288,7 +300,7 @@ class IntegerNet_Solr_Config_Server_Builder
 
     public function build()
     {
-        return new IntegerNet_Solr_Config_Server(
+        return new ServerConfig(
             $this->host, $this->port, $this->path, $this->core, $this->swapCore, $this->useHttps, $this->httpMethod,
             $this->useHttpBasicAuth, $this->httpBasicAuthUsername, $this->httpBasicAuthPassword);
     }
@@ -351,6 +363,6 @@ class IntegerNet_Solr_Config_Indexing_Builder
 
     public function build()
     {
-        return new IntegerNet_Solr_Config_Indexing($this->pagesize, $this->deleteDocumentsBeforeIndexing, $this->swapCores);
+        return new IndexingConfig($this->pagesize, $this->deleteDocumentsBeforeIndexing, $this->swapCores);
     }
 }

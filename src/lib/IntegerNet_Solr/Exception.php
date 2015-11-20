@@ -8,10 +8,13 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
+namespace IntegerNet\Solr;
+use Exception as BaseException;
+
 /**
  * Generic exception
  */
-class IntegerNet_Solr_Exception extends Exception
+class Exception extends BaseException
 {
 
 }

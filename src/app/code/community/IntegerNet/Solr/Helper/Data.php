@@ -1,4 +1,8 @@
 <?php
+use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\EventDispatcher;
+
 /**
  * integer_net Magento Module
  *
@@ -8,7 +12,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
-    implements IntegerNet_Solr_Implementor_AttributeRepository, IntegerNet_Solr_Implementor_EventDispatcher
+    implements AttributeRepository, EventDispatcher
 {
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_searchableAttributes = null;
@@ -24,6 +28,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
+
 
     /**
      * @return Mage_Catalog_Model_Entity_Attribute[]
@@ -61,7 +66,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
@@ -74,7 +79,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     
     /**
      * @param bool $useAlphabeticalSearch
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
@@ -101,7 +106,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return IntegerNet_Solr_Implementor_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
@@ -297,6 +302,5 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     {
         Mage::dispatchEvent($eventName, $data);
     }
-
 
 }

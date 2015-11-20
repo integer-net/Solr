@@ -1,4 +1,5 @@
 <?php
+namespace IntegerNet\Solr\Config;
 /**
  * integer_net Magento Module
  *
@@ -7,7 +8,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-final class IntegerNet_Solr_Config_Fuzzy
+final class FuzzyConfig
 {
     /**
      * @var bool

@@ -1,4 +1,7 @@
 <?php
+use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Implementor\Source;
+
 /**
  * integer_net Magento Module
  *
@@ -7,7 +10,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-final class IntegerNet_Solr_Model_Bridge_Attribute implements IntegerNet_Solr_Implementor_Attribute
+final class IntegerNet_Solr_Model_Bridge_Attribute implements Attribute
 {
     /**
      * @var Mage_Catalog_Model_Resource_Eav_Attribute
@@ -52,7 +55,7 @@ final class IntegerNet_Solr_Model_Bridge_Attribute implements IntegerNet_Solr_Im
     }
 
     /**
-     * @return IntegerNet_Solr_Implementor_Source
+     * @return Source
      */
     public function getSource()
     {

@@ -1,4 +1,7 @@
 <?php
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Implementor\Pagination;
+
 /**
  * integer_net Magento Module
  *
@@ -7,17 +10,17 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Result_Pagination_Autosuggest implements IntegerNet_Solr_Implementor_Pagination
+class IntegerNet_Solr_Model_Result_Pagination_Autosuggest implements Pagination
 {
     /**
-     * @var IntegerNet_Solr_Config_Autosuggest
+     * @var AutosuggestConfig
      */
     protected $_config;
 
     /**
-     * @param IntegerNet_Solr_Config_Autosuggest $config
+     * @param AutosuggestConfig $config
      */
-    public function __construct(IntegerNet_Solr_Config_Autosuggest $config)
+    public function __construct(AutosuggestConfig $config)
     {
         $this->_config = $config;
     }

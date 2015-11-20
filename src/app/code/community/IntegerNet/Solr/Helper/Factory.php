@@ -9,6 +9,10 @@
  */
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
+    public function __construct()
+    {
+        $this->registerAutoloader();
+    }
     /**
      * Returns new configured Solr recource
      *
@@ -34,5 +38,17 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     public function getSolrResult()
     {
         return Mage::getModel('integernet_solr/result');
+    }
+
+
+    public function registerAutoloader()
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
+            $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
+            if ($libBaseDir[0] !== '/') {
+                $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
+            }
+            Mage::helper('integernet_solr/autoloader')->addNamespace('IntegerNet\Solr', $libBaseDir, true)->register();
+        }
     }
 }

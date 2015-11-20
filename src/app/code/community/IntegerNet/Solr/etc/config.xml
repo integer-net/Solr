@@ -310,6 +310,10 @@
                 <category_link_type>filter</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>
+            <dev>
+                <register_autoloader>1</register_autoloader>
+                <autoloader_basepath>lib/IntegerNet_Solr</autoloader_basepath>
+            </dev>
         </integernet_solr>
     </default>
 

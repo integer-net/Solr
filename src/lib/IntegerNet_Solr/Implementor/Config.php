@@ -8,56 +8,65 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
+namespace IntegerNet\Solr\Implementor;
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ResultsConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+
 /**
  * Interface for configuration reader. One instance per store.
  */
-interface IntegerNet_Solr_Implementor_Config
+interface Config
 {
     /**
      * Returns general Solr module configuration
      *
-     * @return IntegerNet_Solr_Config_General
+     * @return \IntegerNet\Solr\Config\GeneralConfig
      */
     public function getGeneralConfig();
+
     /**
      * Returns Solr server configuration
      *
-     * @return IntegerNet_Solr_Config_Server
+     * @return \IntegerNet\Solr\Config\ServerConfig
      */
     public function getServerConfig();
 
     /**
      * Returns indexing configuration
      *
-     * @return IntegerNet_Solr_Config_Indexing
+     * @return IndexingConfig
      */
     public function getIndexingConfig();
 
     /**
      * Returns autosuggest configuration
      *
-     * @return IntegerNet_Solr_Config_Autosuggest
+     * @return \IntegerNet\Solr\Config\AutosuggestConfig
      */
     public function getAutosuggestConfig();
 
     /**
      * Returns fuzzy configuration for search
      *
-     * @return IntegerNet_Solr_Config_Fuzzy
+     * @return FuzzyConfig
      */
     public function getFuzzySearchConfig();
 
     /**
      * Returns fuzzy configuration for autosuggest
      *
-     * @return IntegerNet_Solr_Config_Fuzzy
+     * @return FuzzyConfig
      */
     public function getFuzzyAutosuggestConfig();
 
     /**
      * Returns search results configuration
      *
-     * @return IntegerNet_Solr_Config_Results
+     * @return ResultsConfig
      */
     public function getResultsConfig();
 }

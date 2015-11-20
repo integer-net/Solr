@@ -130,3 +130,7 @@
 "Use HTTPS","HTTPS verwenden"
 "Use Solr to display products on category pages","Solr für die Darstellung von Produkten auf Kategorieseiten verwenden"
 "Category Pages","Kategorieseiten"
+"Register Autoloader","Autoloader registrieren"
+"Disable if you are using an own PSR-4 autoloader, e.g. from composer","Deaktivieren, wenn Sie einen eigenen PSR-4 Autoloader nutzen, z.B. von composer"
+"Autoloader Base Path","Basis-Pfad für Autoloader"
+"Path to IntegerNet_Solr library. Absolute path or relative to Magento base dir.","Pfad zur IntegerNet_Solr Bibliothek. Absoluter Pfad oder relativ zum Magento Basisverzeichnis."

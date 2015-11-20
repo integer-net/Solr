@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Implementor\Source;
+
 /**
  * integer_net Magento Module
  *
@@ -7,7 +9,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-final class IntegerNet_Solr_Autosuggest_Source implements IntegerNet_Solr_Implementor_Source
+final class IntegerNet_Solr_Autosuggest_Source implements Source
 {
     protected $_options = null;
     

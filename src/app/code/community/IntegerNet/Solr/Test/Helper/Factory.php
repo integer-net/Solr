@@ -1,4 +1,9 @@
 <?php
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\Implementor\Config;
+
 /**
  * integer_net Magento Module
  *
@@ -22,12 +27,12 @@ class IntegerNet_Solr_Test_Helper_Factory extends EcomDev_PHPUnit_Test_Case
             $resource->getStoreConfig(null) // admin store view
         ];
         foreach ($storeConfigs as $storeConfig) {
-            $this->assertInstanceOf(IntegerNet_Solr_Implementor_Config::class, $storeConfig);
-            $this->assertInstanceOf(IntegerNet_Solr_Config_Indexing::class, $storeConfig->getIndexingConfig());
-            $this->assertInstanceOf(IntegerNet_Solr_Config_Server::class, $storeConfig->getServerConfig());
+            $this->assertInstanceOf(Config::class, $storeConfig);
+            $this->assertInstanceOf(IndexingConfig::class, $storeConfig->getIndexingConfig());
+            $this->assertInstanceOf(ServerConfig::class, $storeConfig->getServerConfig());
         }
 
-        $this->setExpectedException(IntegerNet_Solr_Exception::class, "Store with ID -1 not found.");
+        $this->setExpectedException(Exception::class, "Store with ID -1 not found.");
         $resource->getStoreConfig(-1);
     }
 

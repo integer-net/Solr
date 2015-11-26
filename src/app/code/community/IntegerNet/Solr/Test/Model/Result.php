@@ -78,7 +78,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $currentPage = 2;
         $pageSize = 10;
 
-        /** @var Mage_Core_Block_Text $toolbar Not using actual toolbar block which reads from session */
+        /* @var Mage_Core_Block_Text $toolbar Not using actual toolbar block which reads from session */
         $toolbar = $this->app()->getLayout()->createBlock('core/text', 'product_list_toolbar');
         $toolbar->addData([
             'current_page' => $currentPage,

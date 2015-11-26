@@ -11,6 +11,8 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Implementor\Attribute;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,65 +25,77 @@ class IntegerNet_Solr_Model_Result
 {
     protected $_isAutosuggest;
     /**
-     * @var int
+     * @var $storeId int
      */
     protected $_storeId;
     /**
-     * @var Config
+     * @var $_config Config
      */
     protected $_config;
     /**
-     * @var AttributeRepository
+     * @var $_attributeRepository AttributeRepository
      */
     protected $_attributeRespository;
     /**
-     * @var EventDispatcher
+     * @var $_eventDispatcher EventDispatcher
      */
     protected $_eventDispatcher;
     /**
-     * @var LoggerInterface
+     * @var $_logger LoggerInterface
      */
     protected $_logger;
     /**
-     * @var bool
+     * @var $_isCategoryPage bool
      */
     protected $_isCategoryPage;
     /**
-     * @var int
+     * @var $_categoryId int
      */
     protected $_categoryId;
     /**
-     * @var IntegerNet_Solr_Model_Query
+     * @var $_query IntegerNet_Solr_Model_Query
      */
     protected $_query;
     /**
-     * @var Pagination
+     * @var $_pagination Pagination
      */
     protected $_pagination;
 
-    /** @var null|IntegerNet_Solr_Model_Resource_Solr */
+    /**
+     * @var $_resource null|IntegerNet_Solr_Model_Resource_Solr
+     */
     protected $_resource = null;
 
-    /** @var null|IntegerNet_Solr_Service */
+    /**
+     * @var $_solrResult null|IntegerNet_Solr_Service
+     */
     protected $_solrResult = null;
 
+    /**
+     * @var $_filters array
+     */
     protected $_filters = array();
 
     /**
+     * @var $_filterQueryBuilder FilterQueryBuilder
+     */
+    protected $_filterQueryBuilder;
+
+    /**
      * Filter Query string
-     * @var null|string
+     * @var $_filterQuery null|string
      */
     protected $_filterQuery = null;
 
     /**
      * last executed search query
-     * @var string
+     * @var $_lastQueryText string
      */
     protected $_lastQueryText = '';
 
     /**
      * Second run to Solr, when the first search hasn't found anything!
-     * @var bool
+     * @var $_foundNoResults bool
      */
     private $_foundNoResults = false;
 
@@ -100,6 +114,8 @@ class IntegerNet_Solr_Model_Result
             $this->_categoryId = Mage::registry('current_category')->getId();
         }
         $this->_query = Mage::getModel('integernet_solr/query', $this->_isAutosuggest);
+        $this->_filterQueryBuilder = new FilterQueryBuilder();
+        $this->_filterQueryBuilder->setIsCategoryPage($this->_isCategoryPage);
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
@@ -194,6 +210,7 @@ class IntegerNet_Solr_Model_Result
 
     /**
      * @param $storeId
+     * @param $fuzzy
      * @return array
      */
     protected function _getParams($storeId, $fuzzy = true)
@@ -436,29 +453,7 @@ class IntegerNet_Solr_Model_Result
     protected function _getFilterQuery($storeId)
     {
         if ($this->_filterQuery == null) {
-            
-            $filterQuery = 'store_id:' . $storeId;
-            if ($this->_isCategoryPage) {
-                $filterQuery .= ' AND is_visible_in_catalog_i:1';
-            } else {
-                $filterQuery .= ' AND is_visible_in_search_i:1';
-            }
-
-            foreach($this->getFilters() as $attributeCode => $value) {
-                if (is_array($value)) {
-                    $filterQuery .= ' AND (';
-                    $filterQueryParts = array();
-                    foreach($value as $singleValue) {
-                        $filterQueryParts[] = $attributeCode . ':' . $singleValue;
-                    }
-                    $filterQuery .= implode(' OR ', $filterQueryParts);
-                    $filterQuery .= ')';
-                } else {
-                    $filterQuery .= ' AND ' . $attributeCode . ':' . $value;
-                }
-            }
-
-            $this->_filterQuery = $filterQuery;
+            $this->_filterQuery = $this->_filterQueryBuilder->buildFilterQuery($storeId);
         }
 
         return $this->_filterQuery;
@@ -470,7 +465,7 @@ class IntegerNet_Solr_Model_Result
      */
     public function addAttributeFilter($attribute, $value)
     {
-        $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
+        $this->_filterQueryBuilder->addAttributeFilter(new Attribute($attribute), $value);
     }
 
     /**
@@ -478,7 +473,7 @@ class IntegerNet_Solr_Model_Result
      */
     public function addCategoryFilter($category)
     {
-        $this->_filters['category'] = $category->getId();
+        $this->_filterQueryBuilder->addCategoryFilter($category->getId());
     }
 
     /**
@@ -488,39 +483,21 @@ class IntegerNet_Solr_Model_Result
     public function addPriceRangeFilterByIndex($range, $index)
     {
         if ($this->_config->getResultsConfig()->isUseCustomPriceIntervals()
-            && $customPriceIntervals = $this->_config->getResultsConfig()->getCustomPriceIntervals()) {
-            $lowerBorder = 0;
-            $i = 1;
-            foreach(explode(',', $customPriceIntervals) as $upperBorder) {
-                if ($i == $index) {
-                    $this->_filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
-                    return;
-                }
-                $i++;
-                $lowerBorder = $upperBorder;
-                continue;
-            }
-            $this->_filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
-            return;
-
+            && $customPriceIntervals = $this->_config->getResultsConfig()->getCustomPriceIntervals()
+        ) {
+            $this->_filterQueryBuilder->addPriceRangeFilterWithCustomIntervals($index, $customPriceIntervals);
         } else {
-            $maxPrice = $index * $range;
-            $minPrice = $maxPrice - $range;
+            $this->_filterQueryBuilder->addPriceRangeFilter($range, $index);
         }
-        $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
     }
 
     /**
      * @param float $minPrice
      * @param float $maxPrice
      */
-    public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = 0.0)
+    public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = null)
     {
-        if ($maxPrice) {
-            $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
-        } else {
-            $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
-        }
+        $this->_filterQueryBuilder->addPriceRangeFilterByMinMax($minPrice, $maxPrice);
     }
 
     /**
@@ -542,7 +519,7 @@ class IntegerNet_Solr_Model_Result
     public function resetSearch()
     {
         $this->_solrResult = null;
-        $this->_filters = array();
+        $this->_filterQueryBuilder = new FilterQueryBuilder();
         $this->_filterQuery = null;
     }
 
@@ -555,7 +532,7 @@ class IntegerNet_Solr_Model_Result
         $resultClone = unserialize(serialize($result));
         if (isset($resultClone->response->docs)) {
             foreach ($resultClone->response->docs as $key => $doc) {
-                /** @var Apache_Solr_Document $doc */
+                /* @var Apache_Solr_Document $doc */
                 foreach ($doc->getFieldNames() as $fieldName) {
                     $field = $doc->getField($fieldName);
                     $value = $field['value'];
@@ -604,7 +581,7 @@ class IntegerNet_Solr_Model_Result
 
         $startTime = microtime(true);
 
-        /** @var Apache_Solr_Response $result */
+        /* @var Apache_Solr_Response $result */
         $result = $this->_getResource()->search(
             $storeId,
             $transportObject->getQueryText(),
@@ -647,7 +624,7 @@ class IntegerNet_Solr_Model_Result
 
         $startTime = microtime(true);
 
-        /** @var Apache_Solr_Response $result */
+        /* @var Apache_Solr_Response $result */
         $result = $this->_getResource()->search(
             $storeId,
             $transportObject->getQueryText(),
@@ -704,13 +681,13 @@ class IntegerNet_Solr_Model_Result
 
                     $foundProductIds = array();
                     foreach ($result->response->docs as $nonFuzzyDoc) {
-                        /** @var Apache_Solr_Document $nonFuzzyDoc */
+                        /* @var $nonFuzzyDoc Apache_Solr_Document */
                         $field = $nonFuzzyDoc->getField('product_id');
                         $foundProductIds[] = $field['value'];
                     }
 
                     foreach ($fuzzyResult->response->docs as $fuzzyDoc) {
-                        /** @var Apache_Solr_Document $fuzzyDoc */
+                        /* @var $fuzzyDoc Apache_Solr_Document */
                         $field = $fuzzyDoc->getField('product_id');
                         if (!in_array($field['value'], $foundProductIds)) {
                             $result->response->docs[] = $fuzzyDoc;

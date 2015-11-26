@@ -14,41 +14,34 @@ use IntegerNet\Solr\Implementor\EventDispatcher;
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     implements AttributeRepository, EventDispatcher
 {
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection */
     protected $_searchableAttributes = null;
 
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_filterableInSearchAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_filterableInCatalogAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection */
     protected $_filterableInCatalogOrSearchAttributes = null;
 
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
+    /** @var Mage_Eav_Model_Entity_Attribute[] */
+    protected $_filterableInSearchAttributes = null;
+
+    /** @var Mage_Eav_Model_Entity_Attribute[] */
+    protected $_filterableInCatalogAttributes = null;
+
+    /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
 
 
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Mage_Eav_Model_Entity_Attribute[]
      */
     public function getSearchableAttributes()
     {
-        if (is_null($this->_searchableAttributes)) {
+        $this->_prepareSearchableAttributeCollection();
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsSearchableFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-        }
-
-        return $this->_searchableAttributes;
+        return $this->_searchableAttributes->getItems();
     }
 
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Mage_Eav_Model_Entity_Attribute[]
      */
     public function getSortableAttributes()
     {
@@ -142,42 +135,32 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Mage_Eav_Model_Entity_Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
-        if (is_null($this->_filterableInCatalogOrSearchAttributes)) {
+        $this->_prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch);
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter(
-                    array(
-                        'additional_table.is_filterable', 
-                        'additional_table.is_filterable_in_search'
-                    ), 
-                    array(
-                        array('gt' => 0),
-                        array('gt' => 0),
-                    )
-                )
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
+        //return self::getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
+        return $this->_filterableInCatalogOrSearchAttributes->getItems();
+    }
 
-            if ($useAlphabeticalSearch) {
-                $this->_filterableInCatalogOrSearchAttributes
-                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            } else {
-                $this->_filterableInCatalogOrSearchAttributes
-                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            }
-        }
-
-        return self::getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
+    /**
+     * @return string[]
+     */
+    public function getAttributeCodesToIndex()
+    {
+        $this->_prepareFilterableInCatalogOrSearchAttributeCollection(true);
+        $this->_prepareSearchableAttributeCollection();
+        return array_merge(
+            $this->_filterableInCatalogOrSearchAttributes->getColumnValues('attribute_code'),
+            $this->_searchableAttributes->getColumnValues('attribute_code')
+        );
     }
 
 
     /**
-     * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param Mage_Eav_Model_Entity_Attribute $attribute
      * @param bool $forSorting
      * @return string
      */
@@ -301,6 +284,48 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function dispatch($eventName, array $data = [])
     {
         Mage::dispatchEvent($eventName, $data);
+    }
+
+    /**
+     * @param $useAlphabeticalSearch
+     */
+    protected function _prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch)
+    {
+        if (is_null($this->_filterableInCatalogOrSearchAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addFieldToFilter(
+                    array(
+                        'additional_table.is_filterable',
+                        'additional_table.is_filterable_in_search'
+                    ),
+                    array(
+                        array('gt' => 0),
+                        array('gt' => 0),
+                    )
+                )
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')));
+
+            if ($useAlphabeticalSearch) {
+                $this->_filterableInCatalogOrSearchAttributes
+                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            } else {
+                $this->_filterableInCatalogOrSearchAttributes
+                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            }
+        }
+    }
+
+    protected function _prepareSearchableAttributeCollection()
+    {
+        if (is_null($this->_searchableAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addIsSearchableFilter()
+                ->addFieldToFilter('attribute_code', array('nin' => array('status')));
+        }
     }
 
 }

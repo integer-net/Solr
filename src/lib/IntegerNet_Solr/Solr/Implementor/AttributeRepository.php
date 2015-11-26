@@ -52,4 +52,9 @@ interface AttributeRepository
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true);
+
+    /**
+     * @return string[]
+     */
+    public function getAttributeCodesToIndex();
 }

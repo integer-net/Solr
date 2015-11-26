@@ -172,9 +172,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes()->getColumnValues('attribute_code'));
-            
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getAttributeCodesToIndex());
+
         if (is_array($productIds)) {
             $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
         }
@@ -247,7 +246,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _addFacetsToProductData($product, $productData)
     {
         foreach (Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes() as $attribute) {
-
             switch ($attribute->getFrontendInput()) {
                 case 'select':
                     $rawValue = $product->getData($attribute->getAttributeCode());
@@ -673,7 +671,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'));
+            ->addAttributeToSelect(Mage::helper('integernet_solr')->getAttributeCodesToIndex());
 
         return $childProductCollection;
     }

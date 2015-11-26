@@ -1,0 +1,140 @@
+# Thanks to https://github.com/EcomDev/EcomDev_UrlRewrite
+eav:
+  catalog_category:
+    - entity_id: 1 # Root category
+      attribute_set_id: 0
+      path: 1
+      name: Root
+      level: 0
+      children_count: 3
+      is_active: 1
+    - entity_id: 2 # Books Store category
+      parent_id: 1
+      path: 1/2
+      name: Books Store
+      level: 1
+      children_count: 2
+      is_active: 1
+# Books Store categories
+    - entity_id: 21
+      attribute_set_id: 3
+      parent_id: 2
+      path: 1/2/21
+      name: Comedy
+      level: 2
+      children_count: 0
+      is_active: 1
+    - entity_id: 22
+      attribute_set_id: 3
+      parent_id: 2
+      path: 1/2/22
+      name: Science-Fiction
+      url_key: sci-fi
+      level: 2
+      children_count: 2
+      is_active: 1
+    - entity_id: 221
+      attribute_set_id: 3
+      parent_id: 22
+      path: 1/2/22/221
+      name: Aliens
+      level: 3
+      is_anchor: 1
+      children_count: 1
+      is_active: 1
+    - entity_id: 2211
+      attribute_set_id: 3
+      parent_id: 221
+      path: 1/2/22/221/2211
+      name: Humanoids
+      level: 4
+      children_count: 0
+    - entity_id: 222
+      attribute_set_id: 3
+      parent_id: 22
+      path: 1/2/22/222
+      name: Time Travels
+      level: 3
+      children_count: 0
+      is_active: 1
+    - entity_id: 3 # Extension Store category
+      attribute_set_id: 3
+      parent_id: 1
+      path: 1/3
+      name: Extension Store
+      level: 1
+      children_count: 1
+      is_active: 1
+  catalog_product:
+    - entity_id: 21001 # First part of id is related to base category
+      attribute_set_id: 4
+      type_id: simple
+      sku: yanukovych-0001
+      name: "Viktor Yanukovych: Autobiography"
+      short_description: "Viktor Yanukovych: Autobiography"
+      description: "Viktor Yanukovych: Autobiography"
+      stock:
+        qty: 100000000.00
+        is_in_stock: 1
+      website_ids:
+        - base
+      category_ids:
+        - 21 # Comedy
+      price: 0.99
+      tax_class_id: 2 # Taxable Goods
+      status: 1             # Enabled
+      visibility: 4         # Visible in Catalog & Search
+    - entity_id: 22101
+      attribute_set_id: 4
+      type_id: simple
+      sku: wells-0001
+      name: "Herbert George Wells: The War of the Worlds"
+      short_description: "Herbert George Wells: The War of the Worlds"
+      description: "Herbert George Wells: The War of the Worlds"
+      stock:
+        qty: 100000000.00
+        is_in_stock: 1
+      website_ids:
+        - base
+      category_ids:
+        - 221 # Aliens
+      price: 0.99
+      tax_class_id: 2 # Taxable Goods
+      status: 1             # Enabled
+      visibility: 4         # Visible in Catalog & Search
+    - entity_id: 22111
+      attribute_set_id: 4
+      type_id: simple
+      sku: williamson-0001
+      name: "Jack Williamson: The Humanoids: A Novel"
+      short_description: "Jack Williamson: The Humanoids: A Novel"
+      description: "Jack Williamson: The Humanoids: A Novel"
+      stock:
+        qty: 100000000.00
+        is_in_stock: 1
+      website_ids:
+        - base
+      category_ids:
+        - 2211 # Aliens -> Humanoids
+      price: 11.99
+      tax_class_id: 2 # Taxable Goods
+      status: 1             # Enabled
+      visibility: 4         # Visible in Catalog & Search
+    - entity_id: 22201
+      attribute_set_id: 4
+      type_id: simple
+      sku: wells-0002
+      name: "Wells, H.G. 1898. The Time Machine"
+      short_description: "Wells, H.G. 1898. The Time Machine"
+      description: "Wells, H.G. 1898. The Time Machine"
+      stock:
+        qty: 100000000.00
+        is_in_stock: 1
+      website_ids:
+        - base
+      category_ids:
+        - 222         # Time travels
+      price: 0.99
+      tax_class_id: 2 # Taxable Goods
+      status: 1             # Enabled
+      visibility: 4         # Visible in Catalog & Search

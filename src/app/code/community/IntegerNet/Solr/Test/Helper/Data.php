@@ -61,7 +61,9 @@ class IntegerNet_Solr_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
         $this->assertInternalType('array', $actualAttributes);
         $this->assertNotEmpty($actualAttributes);
         foreach ($actualAttributes as $actualAttribute) {
-            $this->assertInstanceOf(Attribute::class, $actualAttribute);
+            //$this->assertInstanceOf(Attribute::class, $actualAttribute);
+            // still needs to be actual attribute for indexer
+            $this->assertInstanceOf(Mage_Eav_Model_Entity_Attribute::class, $actualAttribute);
         }
     }
 }

@@ -228,12 +228,12 @@ class IntegerNet_Solr_Model_Result
 
 
     /**
-     * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param Attribute $attribute
      * @param int $value
      */
     public function addAttributeFilter($attribute, $value)
     {
-        $this->_filterQueryBuilder->addAttributeFilter(new Attribute($attribute), $value);
+        $this->_filterQueryBuilder->addAttributeFilter($attribute, $value);
     }
 
     /**

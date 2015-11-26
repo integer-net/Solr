@@ -19,3 +19,4 @@ config:
   default/integernet_solr/server/use_http_basic_auth: 0
   default/integernet_solr/connection_check/is_active: 1
   default/integernet_solr/fuzzy/is_active: 0
+  default/integernet_solr/category/is_active: 1

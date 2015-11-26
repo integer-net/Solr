@@ -12,6 +12,7 @@ use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Implementor\Attribute;
 use Psr\Log\LoggerInterface;
 
@@ -72,6 +73,10 @@ class IntegerNet_Solr_Model_Result
     protected $_solrResult = null;
 
     /**
+     * @var ParamsBuilder
+     */
+    protected $_paramsBuilder;
+    /**
      * @var $_filterQueryBuilder FilterQueryBuilder
      */
     protected $_filterQueryBuilder;
@@ -105,6 +110,12 @@ class IntegerNet_Solr_Model_Result
         } else {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $this->_config->getAutosuggestConfig());
         }
+        $this->_paramsBuilder = new ParamsBuilder($this->_categoryId, $this->_isAutosuggest,
+            $this->_attributeRespository,
+            $this->_filterQueryBuilder,
+            $this->_pagination,
+            $this->_config->getResultsConfig()
+        );
     }
 
 
@@ -166,26 +177,6 @@ class IntegerNet_Solr_Model_Result
     /**
      * @return int
      */
-    protected function _getCurrentSortDirection()
-    {
-        $direction = $this->_pagination->getCurrentDirection();
-
-        if ($this->_getCurrentSort() == 'position') {
-            if (!$this->_isCategoryPage) {
-                switch (strtolower($direction)) {
-                    case 'desc':
-                        return 'asc';
-                    default:
-                        return 'desc';
-                }
-            }
-        }
-        return $direction;
-    }
-
-    /**
-     * @return int
-     */
     protected function _getPageSize()
     {
         return $this->_pagination->getPageSize();
@@ -198,77 +189,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getParams($storeId, $fuzzy = true)
     {
-        $resultsConfig = $this->_config->getResultsConfig();
-        $params = array(
-            'q.op' => $resultsConfig->getSearchOperator(),
-            'fq' => $this->_getFilterQuery($storeId),
-            'fl' => 'result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
-            'sort' => $this->_getSortParam(),
-            'facet' => 'true',
-            'facet.sort' => 'true',
-            'facet.mincount' => '1',
-            'facet.field' => $this->_getFacetFieldCodes(),
-            'defType' => 'edismax',
-        );
-
-        if (!$this->_isAutosuggest()) {
-            $params['fl'] = 'result_html_list_nonindex,result_html_grid_nonindex,score,sku_s,name_s,product_id';
-            $params['facet.interval'] = 'price_f';
-            $params['stats'] = 'true';
-            $params['stats.field'] = 'price_f';
-
-
-            if (($priceStepsize = $resultsConfig->getPriceStepSize())
-                && ($maxPrice = $resultsConfig->getMaxPrice())) {
-                $params['facet.range'] = 'price_f';
-                $params['f.price_f.facet.range.start'] = 0;
-                $params['f.price_f.facet.range.end'] = $maxPrice;
-                $params['f.price_f.facet.range.gap'] = $priceStepsize;
-            }
-
-            if ($resultsConfig->isUseCustomPriceIntervals()
-                && ($customPriceIntervals = $resultsConfig->getCustomPriceIntervals())) {
-                $params['f.price_f.facet.interval.set'] = array();
-                $lowerBorder = 0;
-                foreach($customPriceIntervals as $upperBorder) {
-                    $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
-                    $lowerBorder = $upperBorder;
-                }
-                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
-            } else if (($priceStepsize = $resultsConfig->getPriceStepSize())
-                && ($maxPrice = $resultsConfig->getMaxPrice())) {
-                $params['f.price_f.facet.interval.set'] = array();
-                $lowerBorder = 0;
-                for ($upperBorder = $priceStepsize; $upperBorder <= $maxPrice; $upperBorder += $priceStepsize) {
-                    $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%f]', $lowerBorder, $upperBorder);
-                    $lowerBorder = $upperBorder;
-                }
-                $params['f.price_f.facet.interval.set'][] = sprintf('(%f,%s]', $lowerBorder, '*');
-            }
-        }
-
-        if (!$fuzzy) {
-            $params['mm'] = '0%';
-        }
-
-        if ($this->_pagination instanceof IntegerNet_Solr_Model_Result_Pagination_Autosuggest) {
-            $params['rows'] = $this->_pagination->getPageSize();
-        }
-
-        return $params;
-    }
-
-    /**
-     * @return array
-     */
-    protected function _getFacetFieldCodes()
-    {
-        $codes = array('category');
-
-        foreach($this->_attributeRespository->getFilterableAttributes() as $attribute) {
-            $codes[] = $attribute->getAttributeCode() . '_facet';
-        }
-        return $codes;
+        return $this->_paramsBuilder->buildAsArray($storeId, $fuzzy);
     }
 
     /**
@@ -402,39 +323,6 @@ class IntegerNet_Solr_Model_Result
         return $this->_query->getSolrQueryText($allowFuzzy, $this->_foundNoResults);
     }
 
-    /**
-     * @return string
-     */
-    protected function _getSortParam()
-    {
-        $sortField = $this->_getCurrentSort();
-        switch ($sortField) {
-            case 'position':
-                if ($this->_isCategoryPage) {
-                    $param = 'category_' . $this->_categoryId . '_position_i';
-                } else {
-                    $param = 'score';
-                }
-                break;
-            case 'price':
-                $param = 'price_f';
-                break;
-            default:
-                $param = $sortField . '_s';
-        }
-
-        $param .= ' ' . $this->_getCurrentSortDirection();
-        return $param;
-    }
-
-    /**
-     * @param int $storeId
-     * @return string
-     */
-    protected function _getFilterQuery($storeId)
-    {
-        return $this->_filterQueryBuilder->buildFilterQuery($storeId);
-    }
 
     /**
      * @param Mage_Catalog_Model_Entity_Attribute $attribute

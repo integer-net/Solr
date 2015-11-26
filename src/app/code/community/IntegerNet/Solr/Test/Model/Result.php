@@ -156,7 +156,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
                 $this->logicalAnd(
                     $this->isType('array'),
                     $this->contains('score desc', true, true),
-                    $this->arrayHasKey('rows')
+                    $this->logicalNot($this->arrayHasKey('rows'))
                 ))
             ->willReturn($this->_getDummyResponse());
         $result = Mage::helper('integernet_solr/factory')->getSolrResult();

@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\SolrService;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
@@ -15,6 +16,7 @@ use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Implementor\Attribute;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * @todo break into more classes
@@ -24,7 +26,10 @@ use Psr\Log\LoggerInterface;
  */
 class IntegerNet_Solr_Model_Result
 {
-    protected $_isAutosuggest;
+    /**
+     * @var $_solrService SolrService
+     */
+    protected $_solrService;
     /**
      * @var $storeId int
      */
@@ -82,26 +87,24 @@ class IntegerNet_Solr_Model_Result
     protected $_filterQueryBuilder;
 
     /**
-     * Second run to Solr, when the first search hasn't found anything!
-     * @var $_foundNoResults bool
-     */
-    private $_foundNoResults = false;
-
-    /**
      * @todo use constructor injection as soon as this is not a Magento singleton anymore
      */
     function __construct()
     {
-        $this->_isAutosuggest = Mage::registry('is_autosuggest');
+        $isAutosuggest = Mage::registry('is_autosuggest');
         $this->_storeId = Mage::app()->getStore()->getId();
         $this->_config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
         $this->_eventDispatcher = $this->_attributeRespository = Mage::helper('integernet_solr');
-        $this->_logger = Mage::helper('integernet_solr/log');
+        if ($this->_config->getGeneralConfig()->isLog()) {
+            $this->_logger = Mage::helper('integernet_solr/log');
+        } else {
+            $this->_logger = new NullLogger;
+        }
         $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         if ($this->_isCategoryPage) {
             $this->_categoryId = Mage::registry('current_category')->getId();
         }
-        $this->_query = Mage::getModel('integernet_solr/query', $this->_isAutosuggest);
+        $this->_query = Mage::getModel('integernet_solr/query', $isAutosuggest);
         $this->_filterQueryBuilder = new FilterQueryBuilder();
         $this->_filterQueryBuilder->setIsCategoryPage($this->_isCategoryPage);
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
@@ -110,7 +113,7 @@ class IntegerNet_Solr_Model_Result
         } else {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $this->_config->getAutosuggestConfig());
         }
-        if ($this->_isAutosuggest) {
+        if ($isAutosuggest) {
             $this->_paramsBuilder = new \IntegerNet\Solr\Query\AutosuggestParamsBuilder(
                 $this->_attributeRespository,
                 $this->_filterQueryBuilder,
@@ -133,6 +136,22 @@ class IntegerNet_Solr_Model_Result
                 $this->_config->getResultsConfig()
             );
         }
+
+
+        if ($this->_isCategoryPage) {
+            $this->_solrService = new \IntegerNet\Solr\CategoryService();
+        } else {
+            $this->_solrService = new \IntegerNet\Solr\SearchService(
+                $this->_resource,
+                $this->_query,
+                $this->_pagination,
+                $isAutosuggest ? $this->_config->getFuzzyAutosuggestConfig() : $this->_config->getFuzzySearchConfig(),
+                $this->_paramsBuilder,
+                $this->_eventDispatcher,
+                $this->_logger
+            );
+        }
+
     }
 
 
@@ -161,7 +180,7 @@ class IntegerNet_Solr_Model_Result
             if ($this->_isCategoryPage) {
                 $result = $this->_getCategoryResultFromRequest($storeId, $lastItemNumber);
             } else {
-                $result = $this->_getSearchResultFromRequest($storeId, $lastItemNumber);
+                $result = $this->_solrService->doRequest($storeId, $lastItemNumber);
             }
 
 
@@ -183,13 +202,7 @@ class IntegerNet_Solr_Model_Result
         return $this->_pagination->getCurrentPage() - 1;
     }
 
-    /**
-     * @return string
-     */
-    protected function _getCurrentSort()
-    {
-        return $this->_pagination->getCurrentOrder();
-    }
+
 
     /**
      * @return int
@@ -209,136 +222,9 @@ class IntegerNet_Solr_Model_Result
         return $this->_paramsBuilder->buildAsArray($storeId, $fuzzy);
     }
 
-    /**
-     * Merge facet counts of both results and store them into $result
-     *
-     * @param $result
-     * @param $fuzzyResult
-     */
-    public function _mergeFacetFieldCounts($result, $fuzzyResult)
-    {
-        $facetFields = (array)$fuzzyResult->facet_counts->facet_fields;
 
-        foreach($facetFields as $facetName => $facetCounts) {
-            $facetCounts = (array)$facetCounts;
 
-            foreach($facetCounts as $facetId => $facetCount) {
-                if (isset($result->facet_counts->facet_fields->$facetName->$facetId)) {
-                    $result->facet_counts->facet_fields->$facetName->$facetId = max(
-                        $result->facet_counts->facet_fields->$facetName->$facetId,
-                        $facetCount
-                    );
-                } else {
-                    $result->facet_counts->facet_fields->$facetName->$facetId = $facetCount;
-                }
-            }
-        }
 
-        if (isset($fuzzyResult->facet_counts->facet_ranges)) {
-
-            $facetRanges = (array)$fuzzyResult->facet_counts->facet_ranges;
-
-            foreach ($facetRanges as $facetName => $facetCounts) {
-                $facetCounts = (array)$facetCounts->counts;
-
-                if (!isset($result->facet_counts)) {
-                    $result->facet_counts = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_ranges)) {
-                    $result->facet_counts->facet_ranges = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_ranges->$facetName)) {
-                    $result->facet_counts->facet_ranges->$facetName = new stdClass();
-                    $result->facet_counts->facet_ranges->$facetName->counts = new stdClass();
-                }
-
-                foreach ($facetCounts as $facetId => $facetCount) {
-                    if (isset($result->facet_counts->facet_ranges->$facetName->counts->$facetId)) {
-                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = max(
-                            $result->facet_counts->facet_ranges->$facetName->counts->$facetId,
-                            $facetCount
-                        );
-                    } else {
-                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = $facetCount;
-                    }
-                }
-            }
-        }
-
-        if (isset($fuzzyResult->facet_counts->facet_intervals)) {
-
-            $facetIntervals = (array)$fuzzyResult->facet_counts->facet_intervals;
-
-            foreach ($facetIntervals as $facetName => $facetCounts) {
-                $facetCounts = (array)$facetCounts;
-
-                if (!isset($result->facet_counts)) {
-                    $result->facet_counts = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_intervals)) {
-                    $result->facet_counts->facet_intervals = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_intervals->$facetName)) {
-                    $result->facet_counts->facet_intervals->$facetName = new stdClass();
-                }
-
-                foreach ($facetCounts as $facetId => $facetCount) {
-                    if (isset($result->facet_counts->facet_intervals->$facetName->$facetId)) {
-                        $result->facet_counts->facet_intervals->$facetName->$facetId = max(
-                            $result->facet_counts->facet_intervals->$facetName->$facetId,
-                            $facetCount
-                        );
-                    } else {
-                        $result->facet_counts->facet_intervals->$facetName->$facetId = $facetCount;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Merge price information (min, max, intervals) of both results and store them into $result
-     *
-     * @param $result
-     * @param $fuzzyResult
-     */
-    public function _mergePriceData($result, $fuzzyResult)
-    {
-        if (!isset($fuzzyResult->stats->stats_fields)) {
-            return;
-        }
-
-        $statsFields = (array)$fuzzyResult->stats->stats_fields;
-
-        foreach($statsFields as $fieldName => $fieldData) {
-
-            if (!isset($result->stats)) {
-                $result->stats = new stdClass();
-            }
-            if (!isset($result->stats->stats_fields)) {
-                $result->stats->stats_fields = new stdClass();
-            }
-            if (!isset($result->stats->stats_fields->$fieldName)) {
-                $result->stats->stats_fields->$fieldName = new stdClass();
-            }
-
-            $fieldData = (array)$fieldData;
-            if (isset($fieldData['min'])) {
-                $result->stats->stats_fields->$fieldName->min = $fieldData['min'];
-            }
-            if (isset($fieldData['max'])) {
-                $result->stats->stats_fields->$fieldName->max = $fieldData['max'];
-            }
-        }
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getQueryText($allowFuzzy = true)
-    {
-        return $this->_query->getSolrQueryText($allowFuzzy, $this->_foundNoResults);
-    }
 
 
     /**
@@ -429,49 +315,6 @@ class IntegerNet_Solr_Model_Result
     /**
      * @param int $storeId
      * @param int $pageSize
-     * @param boolean $fuzzy
-     * @return Apache_Solr_Response
-     */
-    protected function _getResultFromRequest($storeId, $pageSize, $fuzzy = true)
-    {
-        //TODO create TransportObject class, compatible to Varien_Object
-        $transportObject = new Varien_Object(array(
-            'store_id' => $storeId,
-            'query_text' => $this->_getQueryText($fuzzy),
-            'start_item' => 0,
-            'page_size' => $pageSize,
-            'params' => $this->_getParams($storeId, $fuzzy),
-        ));
-
-        $this->_eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
-
-        $startTime = microtime(true);
-
-        /* @var Apache_Solr_Response $result */
-        $result = $this->_getResource()->search(
-            $storeId,
-            $transportObject->getQueryText(),
-            $transportObject->getStartItem(), // Start item
-            $transportObject->getPageSize(), // Items per page
-            $transportObject->getParams()
-        );
-
-        if ($this->_config->getGeneralConfig()->isLog()) {
-            $this->_logResult($result, microtime(true) - $startTime);
-
-            $this->_logger->debug((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'));
-            $this->_logger->debug('Query over all searchable fields: ' . $transportObject['query_text']);
-            $this->_logger->debug('Filter Query: ' . $transportObject['params']['fq']);
-        }
-
-        $this->_eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));
-
-        return $result;
-    }
-
-    /**
-     * @param int $storeId
-     * @param int $pageSize
      * @return Apache_Solr_Response
      */
     protected function _getCategoryResultFromRequest($storeId, $pageSize)
@@ -507,86 +350,6 @@ class IntegerNet_Solr_Model_Result
         return $result;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function _isAutosuggest()
-    {
-        return $this->_isAutosuggest;
-    }
 
-    /**
-     * @param $storeId
-     * @param $lastItemNumber
-     * @return Apache_Solr_Response
-     */
-    protected function _getSearchResultFromRequest($storeId, $lastItemNumber)
-    {
-        if ($this->_isAutosuggest()) {
-            $isFuzzyActive = $this->_config->getFuzzyAutosuggestConfig()->isActive();
-            $minimumResults = $this->_config->getFuzzyAutosuggestConfig()->getMinimumResults();
-        } else {
-            $isFuzzyActive = $this->_config->getFuzzySearchConfig()->isActive();
-            $minimumResults = $this->_config->getFuzzySearchConfig()->getMinimumResults();
-        }
-        if ($this->_getCurrentSort() != 'position') {
-            $result = $this->_getResultFromRequest($storeId, $lastItemNumber, $isFuzzyActive);
-            return $result;
-        } else {
-            $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
 
-            $numberResults = sizeof($result->response->docs);
-            $numberDuplicates = 0;
-            if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
-
-                $fuzzyResult = $this->_getResultFromRequest($storeId, $lastItemNumber, true);
-
-                if ($numberResults < $lastItemNumber) {
-
-                    $foundProductIds = array();
-                    foreach ($result->response->docs as $nonFuzzyDoc) {
-                        /* @var $nonFuzzyDoc Apache_Solr_Document */
-                        $field = $nonFuzzyDoc->getField('product_id');
-                        $foundProductIds[] = $field['value'];
-                    }
-
-                    foreach ($fuzzyResult->response->docs as $fuzzyDoc) {
-                        /* @var $fuzzyDoc Apache_Solr_Document */
-                        $field = $fuzzyDoc->getField('product_id');
-                        if (!in_array($field['value'], $foundProductIds)) {
-                            $result->response->docs[] = $fuzzyDoc;
-                            if (++$numberResults >= $lastItemNumber) {
-                                break;
-                            }
-                        } else {
-                            $numberDuplicates++;
-                        }
-                    }
-
-                    $result->response->numFound = $result->response->numFound
-                        + $fuzzyResult->response->numFound
-                        - $numberDuplicates;
-                } else {
-                    $result->response->numFound = max(
-                        $result->response->numFound,
-                        $fuzzyResult->response->numFound
-                    );
-                }
-
-                $this->_mergeFacetFieldCounts($result, $fuzzyResult);
-                $this->_mergePriceData($result, $fuzzyResult);
-            }
-
-            if (sizeof($result->response->docs) == 0) {
-                $this->_foundNoResults = true;
-                $check = explode(' ', $this->_query->getUserQueryText());
-                if (count($check) > 1) {
-                    $result = $this->_getResultFromRequest($storeId, $lastItemNumber, false);
-                }
-                $this->_foundNoResults = false;
-                return $result;
-            }
-            return $result;
-        }
-    }
 }

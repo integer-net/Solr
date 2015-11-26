@@ -9,10 +9,6 @@
  */
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
-    public function __construct()
-    {
-        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
-    }
     /**
      * Returns new configured Solr recource
      *

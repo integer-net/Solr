@@ -156,7 +156,8 @@ class IntegerNet_Solr_Helper_Autoloader
 
     public static function createAndRegister()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
+        static $registered = false;
+        if (!$registered && Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
             $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
             if ($libBaseDir[0] !== '/') {
                 $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
@@ -166,6 +167,7 @@ class IntegerNet_Solr_Helper_Autoloader
                 ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
                 ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
                 ->register();
+            $registered = true;
         }
     }
 }

@@ -43,17 +43,10 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     }
     public static function dataSwapConfig()
     {
-        /**
-         * Trigger Autoloader for Magento
-         *
-         * @todo use own autoloader for lib tests as soon as extracted, then remove this call:
-         */
-        Mage::helper('integernet_solr/factory');
-
         $defaultGeneralConfig = IntegerNet_Solr_Config_General_Builder::defaultConfig();
         $swapCoreServerConfig = IntegerNet_Solr_Config_Server_Builder::swapCoreConfig();
         $swapCoreIndexingConfig = IntegerNet_Solr_Config_Indexing_Builder::swapCoreConfig();
-        return [
+        $allData = [
             'singlestore' => [
                 'config' => [0 => [
                     'getGeneralConfig' => $defaultGeneralConfig->build(),
@@ -96,6 +89,9 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
                 ]
             ]
         ];
+        foreach ($allData as $parameters) {
+            yield $parameters;
+        }
     }
 }
 

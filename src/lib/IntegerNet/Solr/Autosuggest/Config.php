@@ -107,12 +107,18 @@ namespace {
  * Dummy interfaces to be able to instantiate Magento helper without loaded configuration
  *
  * storeSolrConfig() needs it to translate phtml template
+ *
+ * Will be obsolete as soon as writing the config cache is moved to the module
  */
 namespace IntegerNet\Solr\Implementor {
-    interface Attribute {};
-    interface AttributeRepository {};
-    interface EventDispatcher {};
+    if (! interface_exists('IntegerNet\\Solr\\Implementor\\Attribute', false)) {
+        interface Attribute {}
+        interface AttributeRepository {}
+        interface EventDispatcher {}
+    }
 }
 namespace IntegerNet\Solr\Implementor {
-    interface Config {};
+    if (! interface_exists('IntegerNet\\Solr\\Implementor\\Config', false)) {
+        interface Config {}
+    }
 }

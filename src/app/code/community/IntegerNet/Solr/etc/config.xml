@@ -98,6 +98,16 @@
                     </integernet_solr>
                 </observers>
             </application_clean_cache>
+
+            <controller_front_init_before>
+                <observers>
+                    <integernet_solr>
+                        <type>object</type>
+                        <class>IntegerNet_Solr_Helper_Autoloader</class>
+                        <method>createAndRegister</method>
+                    </integernet_solr>
+                </observers>
+            </controller_front_init_before>
         </events>
 
         <resources>

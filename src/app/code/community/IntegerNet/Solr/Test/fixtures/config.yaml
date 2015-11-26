@@ -9,6 +9,7 @@ scope:
 config:
   default/dev/template/allow_symlink: 1
   default/integernet_solr/general/is_active: 1
+  default/integernet_solr/general/log: 1
   default/integernet_solr/server/host: localhost
   default/integernet_solr/server/port: 8983
   default/integernet_solr/server/path: /solr/

@@ -72,26 +72,9 @@ class IntegerNet_Solr_Model_Result
     protected $_solrResult = null;
 
     /**
-     * @var $_filters array
-     */
-    protected $_filters = array();
-
-    /**
      * @var $_filterQueryBuilder FilterQueryBuilder
      */
     protected $_filterQueryBuilder;
-
-    /**
-     * Filter Query string
-     * @var $_filterQuery null|string
-     */
-    protected $_filterQuery = null;
-
-    /**
-     * last executed search query
-     * @var $_lastQueryText string
-     */
-    protected $_lastQueryText = '';
 
     /**
      * Second run to Solr, when the first search hasn't found anything!
@@ -416,9 +399,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getQueryText($allowFuzzy = true)
     {
-        $queryText = $this->_query->getSolrQueryText($allowFuzzy, $this->_foundNoResults);
-        $this->_lastQueryText = $queryText;
-        return $queryText;
+        return $this->_query->getSolrQueryText($allowFuzzy, $this->_foundNoResults);
     }
 
     /**
@@ -452,11 +433,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getFilterQuery($storeId)
     {
-        if ($this->_filterQuery == null) {
-            $this->_filterQuery = $this->_filterQueryBuilder->buildFilterQuery($storeId);
-        }
-
-        return $this->_filterQuery;
+        return $this->_filterQueryBuilder->buildFilterQuery($storeId);
     }
 
     /**
@@ -500,27 +477,10 @@ class IntegerNet_Solr_Model_Result
         $this->_filterQueryBuilder->addPriceRangeFilterByMinMax($minPrice, $maxPrice);
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
-    {
-        return $this->_filters;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastQueryText()
-    {
-        return $this->_lastQueryText;
-    }
-
     public function resetSearch()
     {
         $this->_solrResult = null;
         $this->_filterQueryBuilder = new FilterQueryBuilder();
-        $this->_filterQuery = null;
     }
 
     /**
@@ -569,6 +529,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected function _getResultFromRequest($storeId, $pageSize, $fuzzy = true)
     {
+        //TODO create TransportObject class, compatible to Varien_Object
         $transportObject = new Varien_Object(array(
             'store_id' => $storeId,
             'query_text' => $this->_getQueryText($fuzzy),
@@ -594,10 +555,8 @@ class IntegerNet_Solr_Model_Result
             $this->_logResult($result, microtime(true) - $startTime);
 
             $this->_logger->debug((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'));
-            $this->_logger->debug('Query over all searchable fields:');
-            $this->_logger->debug($this->_lastQueryText);
-            $this->_logger->debug('Filter Query:');
-            $this->_logger->debug($this->_filterQuery);
+            $this->_logger->debug('Query over all searchable fields: ' . $transportObject['query_text']);
+            $this->_logger->debug('Filter Query: ' . $transportObject['params']['fq']);
         }
 
         $this->_eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));

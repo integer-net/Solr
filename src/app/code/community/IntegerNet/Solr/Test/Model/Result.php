@@ -29,6 +29,16 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
     }
 
     /**
+     * @return EcomDev_PHPUnit_Mock_Proxy|\Psr\Log\LoggerInterface
+     */
+    protected function _mockLog()
+    {
+        $mock = $this->getMockForAbstractClass(\Psr\Log\LoggerInterface::class);
+        $this->replaceByMock('helper', 'integernet_solr/log', $mock);
+        return $mock;
+    }
+
+    /**
      * @test
      * @helper integernet_solr/factory
      * @singleton integernet_solr/result
@@ -43,6 +53,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->assertEventDispatchedExactly('integernet_solr_update_query_text', 1);
         $this->assertEventDispatchedExactly('integernet_solr_before_search_request', 1);
         $this->assertEventDispatchedExactly('integernet_solr_after_search_request', 1);
+
     }
 
     /**
@@ -68,6 +79,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
     /**
      * @test
      * @helper integernet_solr/factory
+     * @helper integernet_solr/log
      * @helper catalogsearch
      * @singleton integernet_solr/result
      */
@@ -77,6 +89,12 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $query = 'tshirt';
         $currentPage = 2;
         $pageSize = 10;
+
+        $logMock = $this->_mockLog();
+        $logMock->expects($this->at(3))->method('debug')->with(
+            $this->stringContains('name_t:"tshirt"~100^5 short_description_t_mv:"tshirt"~100^1'));
+        $logMock->expects($this->at(4))->method('debug')->with(
+            'Filter Query: store_id:1 AND is_visible_in_search_i:1');
 
         /* @var Mage_Core_Block_Text $toolbar Not using actual toolbar block which reads from session */
         $toolbar = $this->app()->getLayout()->createBlock('core/text', 'product_list_toolbar');
@@ -171,6 +189,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
     }
+
     /**
      * @return Apache_Solr_Response
      */

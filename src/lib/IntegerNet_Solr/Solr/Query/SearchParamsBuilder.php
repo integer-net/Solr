@@ -9,15 +9,6 @@
  */
 namespace IntegerNet\Solr\Query;
 
-interface ParamsBuilder
+final class SearchParamsBuilder extends AbstractParamsBuilder
 {
-    /**
-     * Return parameters as array as expected by solr service
-     *
-     * @param int $storeId
-     * @param bool $fuzzy
-     * @return mixed[]
-     */
-    public function buildAsArray($storeId, $fuzzy);
-
 }

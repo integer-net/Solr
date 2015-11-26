@@ -110,12 +110,29 @@ class IntegerNet_Solr_Model_Result
         } else {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $this->_config->getAutosuggestConfig());
         }
-        $this->_paramsBuilder = new ParamsBuilder($this->_categoryId, $this->_isAutosuggest,
-            $this->_attributeRespository,
-            $this->_filterQueryBuilder,
-            $this->_pagination,
-            $this->_config->getResultsConfig()
-        );
+        if ($this->_isAutosuggest) {
+            $this->_paramsBuilder = new \IntegerNet\Solr\Query\AutosuggestParamsBuilder(
+                $this->_attributeRespository,
+                $this->_filterQueryBuilder,
+                $this->_pagination,
+                $this->_config->getResultsConfig()
+            );
+        } elseif ($this->_isCategoryPage) {
+            $this->_paramsBuilder = new \IntegerNet\Solr\Query\CategoryParamsBuilder(
+                $this->_attributeRespository,
+                $this->_filterQueryBuilder,
+                $this->_pagination,
+                $this->_config->getResultsConfig(),
+                $this->_categoryId
+            );
+        } else {
+            $this->_paramsBuilder = new \IntegerNet\Solr\Query\SearchParamsBuilder(
+                $this->_attributeRespository,
+                $this->_filterQueryBuilder,
+                $this->_pagination,
+                $this->_config->getResultsConfig()
+            );
+        }
     }
 
 

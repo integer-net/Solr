@@ -13,16 +13,12 @@ use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
-use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Implementor\Attribute;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * @todo break into more classes
  * @todo don't use it as singleton
- * @todo implement factory for autosuggest stub
- * @todo extract to /lib
+ * @todo implement factory / autosuggest stub
  */
 class IntegerNet_Solr_Model_Result
 {
@@ -39,122 +35,81 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_config;
     /**
-     * @var $_attributeRepository AttributeRepository
-     */
-    protected $_attributeRespository;
-    /**
-     * @var $_eventDispatcher EventDispatcher
-     */
-    protected $_eventDispatcher;
-    /**
-     * @var $_logger LoggerInterface
-     */
-    protected $_logger;
-    /**
-     * @var $_isCategoryPage bool
-     */
-    protected $_isCategoryPage;
-    /**
-     * @var $_categoryId int
-     */
-    protected $_categoryId;
-    /**
-     * @var $_query IntegerNet_Solr_Model_Query
-     */
-    protected $_query;
-    /**
      * @var $_pagination Pagination
      */
     protected $_pagination;
-
     /**
-     * @var $_resource null|IntegerNet_Solr_Model_Resource_Solr
+     * @var $_filterQueryBuilder FilterQueryBuilder
      */
-    protected $_resource = null;
-
+    protected $_filterQueryBuilder;
     /**
      * @var $_solrResult null|IntegerNet_Solr_Service
      */
     protected $_solrResult = null;
 
-    /**
-     * @var ParamsBuilder
-     */
-    protected $_paramsBuilder;
-    /**
-     * @var $_filterQueryBuilder FilterQueryBuilder
-     */
-    protected $_filterQueryBuilder;
-
-    /**
-     * @todo use constructor injection as soon as this is not a Magento singleton anymore
-     */
     function __construct()
     {
         $isAutosuggest = Mage::registry('is_autosuggest');
+        /** @var IntegerNet_Solr_Helper_Data $eventDispatcher */
+        $eventDispatcher = $attributeRepository = Mage::helper('integernet_solr');
         $this->_storeId = Mage::app()->getStore()->getId();
         $this->_config = new IntegerNet_Solr_Model_Config_Store($this->_storeId);
-        $this->_eventDispatcher = $this->_attributeRespository = Mage::helper('integernet_solr');
         if ($this->_config->getGeneralConfig()->isLog()) {
-            $this->_logger = Mage::helper('integernet_solr/log');
+            $logger = Mage::helper('integernet_solr/log');
         } else {
-            $this->_logger = new NullLogger;
+            $logger = new NullLogger;
         }
-        $this->_isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
-        if ($this->_isCategoryPage) {
-            $this->_categoryId = Mage::registry('current_category')->getId();
-        }
-        $this->_query = Mage::getModel('integernet_solr/query', $isAutosuggest);
+        $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
+        $categoryId = $isCategoryPage ? Mage::registry('current_category')->getId() : null;
         $this->_filterQueryBuilder = new FilterQueryBuilder();
-        $this->_filterQueryBuilder->setIsCategoryPage($this->_isCategoryPage);
-        $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        $this->_filterQueryBuilder->setIsCategoryPage($isCategoryPage);
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
         } else {
             $this->_pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $this->_config->getAutosuggestConfig());
         }
         if ($isAutosuggest) {
-            $this->_paramsBuilder = new \IntegerNet\Solr\Query\AutosuggestParamsBuilder(
-                $this->_attributeRespository,
+            $paramsBuilder = new \IntegerNet\Solr\Query\AutosuggestParamsBuilder(
+                $attributeRepository,
                 $this->_filterQueryBuilder,
                 $this->_pagination,
                 $this->_config->getResultsConfig()
             );
-        } elseif ($this->_isCategoryPage) {
-            $this->_paramsBuilder = new \IntegerNet\Solr\Query\CategoryParamsBuilder(
-                $this->_attributeRespository,
+        } elseif ($isCategoryPage) {
+            $paramsBuilder = new \IntegerNet\Solr\Query\CategoryParamsBuilder(
+                $attributeRepository,
                 $this->_filterQueryBuilder,
                 $this->_pagination,
                 $this->_config->getResultsConfig(),
-                $this->_categoryId
+                $categoryId
             );
         } else {
-            $this->_paramsBuilder = new \IntegerNet\Solr\Query\SearchParamsBuilder(
-                $this->_attributeRespository,
+            $paramsBuilder = new \IntegerNet\Solr\Query\SearchParamsBuilder(
+                $attributeRepository,
                 $this->_filterQueryBuilder,
                 $this->_pagination,
                 $this->_config->getResultsConfig()
             );
         }
 
-
-        if ($this->_isCategoryPage) {
+        $resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        if ($isCategoryPage) {
             $this->_solrService = new \IntegerNet\Solr\CategoryService(
-                $this->_categoryId,
-                $this->_resource,
-                $this->_paramsBuilder,
-                $this->_logger,
-                $this->_eventDispatcher
+                $categoryId,
+                $resource,
+                $paramsBuilder,
+                $logger,
+                $eventDispatcher
             );
         } else {
             $this->_solrService = new \IntegerNet\Solr\SearchService(
-                $this->_resource,
-                $this->_query,
+                $resource,
+                Mage::getModel('integernet_solr/query', $isAutosuggest),
                 $this->_pagination,
                 $isAutosuggest ? $this->_config->getFuzzyAutosuggestConfig() : $this->_config->getFuzzySearchConfig(),
-                $this->_paramsBuilder,
-                $this->_eventDispatcher,
-                $this->_logger
+                $paramsBuilder,
+                $eventDispatcher,
+                $logger
             );
         }
 

@@ -139,7 +139,13 @@ class IntegerNet_Solr_Model_Result
 
 
         if ($this->_isCategoryPage) {
-            $this->_solrService = new \IntegerNet\Solr\CategoryService();
+            $this->_solrService = new \IntegerNet\Solr\CategoryService(
+                $this->_categoryId,
+                $this->_resource,
+                $this->_paramsBuilder,
+                $this->_logger,
+                $this->_eventDispatcher
+            );
         } else {
             $this->_solrService = new \IntegerNet\Solr\SearchService(
                 $this->_resource,
@@ -156,14 +162,6 @@ class IntegerNet_Solr_Model_Result
 
 
     /**
-     * @return IntegerNet_Solr_Model_Resource_Solr
-     */
-    protected function _getResource()
-    {
-        return $this->_resource;
-    }
-
-    /**
      * Call Solr server twice: Once without fuzzy search, once with (if configured)
      *
      * @return Apache_Solr_Response
@@ -177,12 +175,7 @@ class IntegerNet_Solr_Model_Result
             $firstItemNumber = $this->_getCurrentPage() * $pageSize;
             $lastItemNumber = $firstItemNumber + $pageSize;
 
-            if ($this->_isCategoryPage) {
-                $result = $this->_getCategoryResultFromRequest($storeId, $lastItemNumber);
-            } else {
-                $result = $this->_solrService->doRequest($storeId, $lastItemNumber);
-            }
-
+            $result = $this->_solrService->doRequest($storeId, $lastItemNumber);
 
             if ($firstItemNumber > 0) {
                 $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
@@ -211,20 +204,6 @@ class IntegerNet_Solr_Model_Result
     {
         return $this->_pagination->getPageSize();
     }
-
-    /**
-     * @param $storeId
-     * @param $fuzzy
-     * @return array
-     */
-    protected function _getParams($storeId, $fuzzy = true)
-    {
-        return $this->_paramsBuilder->buildAsArray($storeId, $fuzzy);
-    }
-
-
-
-
 
 
     /**
@@ -272,82 +251,6 @@ class IntegerNet_Solr_Model_Result
     {
         $this->_solrResult = null;
         $this->_filterQueryBuilder = new FilterQueryBuilder();
-    }
-
-    /**
-     * @param Apache_Solr_Response $result
-     * @param int $time in microseconds
-     */
-    protected function _logResult($result, $time)
-    {
-        $resultClone = unserialize(serialize($result));
-        if (isset($resultClone->response->docs)) {
-            foreach ($resultClone->response->docs as $key => $doc) {
-                /* @var Apache_Solr_Document $doc */
-                foreach ($doc->getFieldNames() as $fieldName) {
-                    $field = $doc->getField($fieldName);
-                    $value = $field['value'];
-                    if (is_array($value)) {
-                        foreach($value as $subKey => $subValue) {
-                            $subValue = str_replace(array("\n", "\r"), '', $subValue);
-                            if (strlen($subValue) > 50) {
-                                $subValue = substr($subValue, 0, 50) . '...';
-                                $value[$subKey] = $subValue;
-                                $doc->setField($fieldName, $value);
-                                $resultClone->response->docs[$key] = $doc;
-                            }
-                        }
-                    } else {
-                        $value = str_replace(array("\n", "\r"), '', $value);
-                        if (strlen($value) > 50) {
-                            $value = substr($value, 0, 50) . '...';
-                            $doc->setField($fieldName, $value);
-                            $resultClone->response->docs[$key] = $doc;
-                        }
-                    }
-                }
-            }
-        }
-        $this->_logger->debug($resultClone);
-        $this->_logger->debug('Elapsed time: ' . $time . 's');
-    }
-
-    /**
-     * @param int $storeId
-     * @param int $pageSize
-     * @return Apache_Solr_Response
-     */
-    protected function _getCategoryResultFromRequest($storeId, $pageSize)
-    {
-        $transportObject = new Varien_Object(array(
-            'store_id' => $storeId,
-            'query_text' => 'category_' . $this->_categoryId . '_position_i:*',
-            'start_item' => 0,
-            'page_size' => $pageSize,
-            'params' => $this->_getParams($storeId),
-        ));
-
-        $this->_eventDispatcher->dispatch('integernet_solr_before_category_request', array('transport' => $transportObject));
-
-        $startTime = microtime(true);
-
-        /* @var Apache_Solr_Response $result */
-        $result = $this->_getResource()->search(
-            $storeId,
-            $transportObject->getQueryText(),
-            $transportObject->getStartItem(), // Start item
-            $transportObject->getPageSize(), // Items per page
-            $transportObject->getParams()
-        );
-
-        if ($this->_config->getGeneralConfig()->isLog()) {
-
-            $this->_logResult($result, microtime(true) - $startTime);
-        }
-
-        $this->_eventDispatcher->dispatch('integernet_solr_after_category_request', array('result' => $result));
-
-        return $result;
     }
 
 

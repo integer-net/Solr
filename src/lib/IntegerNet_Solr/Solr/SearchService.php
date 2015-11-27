@@ -15,6 +15,7 @@ use IntegerNet\Solr\Implementor\Pagination;
 use Apache_Solr_Response;
 use Apache_Solr_Document;
 use IntegerNet\Solr\Query\ParamsBuilder;
+use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 use Varien_Object;
 use IntegerNet_Solr_Model_Resource_Solr;
@@ -47,7 +48,7 @@ class SearchService implements SolrService
      */
     private $eventDispatcher;
     /**
-     * @var $logger LoggerInterface
+     * @var $logger Logger
      */
     private $logger;
     /**
@@ -74,7 +75,7 @@ class SearchService implements SolrService
         $this->fuzzyConfig = $fuzzyConfig;
         $this->paramsBuilder = $paramsBuilder;
         $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
+        $this->logger = new Logger($logger);
     }
 
 
@@ -87,17 +88,17 @@ class SearchService implements SolrService
     {
         $isFuzzyActive = $this->fuzzyConfig->isActive();
         $minimumResults = $this->fuzzyConfig->getMinimumResults();
-        if ($this->_getCurrentSort() != 'position') {
-            $result = $this->_getResultFromRequest($storeId, $pageSize, $isFuzzyActive);
+        if ($this->getCurrentSort() != 'position') {
+            $result = $this->getResultFromRequest($storeId, $pageSize, $isFuzzyActive);
             return $result;
         } else {
-            $result = $this->_getResultFromRequest($storeId, $pageSize, false);
+            $result = $this->getResultFromRequest($storeId, $pageSize, false);
 
             $numberResults = sizeof($result->response->docs);
             $numberDuplicates = 0;
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                $fuzzyResult = $this->_getResultFromRequest($storeId, $pageSize, true);
+                $fuzzyResult = $this->getResultFromRequest($storeId, $pageSize, true);
 
                 if ($numberResults < $pageSize) {
 
@@ -139,7 +140,7 @@ class SearchService implements SolrService
                 $this->foundNoResults = true;
                 $check = explode(' ', $this->query->getUserQueryText());
                 if (count($check) > 1) {
-                    $result = $this->_getResultFromRequest($storeId, $pageSize, false);
+                    $result = $this->getResultFromRequest($storeId, $pageSize, false);
                 }
                 $this->foundNoResults = false;
                 return $result;
@@ -150,7 +151,7 @@ class SearchService implements SolrService
     /**
      * @return string
      */
-    protected function _getCurrentSort()
+    private function getCurrentSort()
     {
         return $this->pagination->getCurrentOrder();
     }
@@ -289,15 +290,15 @@ class SearchService implements SolrService
      * @param boolean $fuzzy
      * @return \Apache_Solr_Response
      */
-    protected function _getResultFromRequest($storeId, $pageSize, $fuzzy = true)
+    private function getResultFromRequest($storeId, $pageSize, $fuzzy = true)
     {
         //TODO create TransportObject class, compatible to Varien_Object
         $transportObject = new Varien_Object(array(
             'store_id' => $storeId,
-            'query_text' => $this->_getQueryText($fuzzy),
+            'query_text' => $this->getQueryText($fuzzy),
             'start_item' => 0,
             'page_size' => $pageSize,
-            'params' => $this->_getParams($storeId, $fuzzy),
+            'params' => $this->getParams($storeId, $fuzzy),
         ));
 
         $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
@@ -305,7 +306,7 @@ class SearchService implements SolrService
         $startTime = microtime(true);
 
         /* @var Apache_Solr_Response $result */
-        $result = $this->_getResource()->search(
+        $result = $this->getResource()->search(
             $storeId,
             $transportObject->getQueryText(),
             $transportObject->getStartItem(), // Start item
@@ -313,7 +314,7 @@ class SearchService implements SolrService
             $transportObject->getParams()
         );
 
-        $this->_logResult($result, microtime(true) - $startTime);
+        $this->logger->logResult($result, microtime(true) - $startTime);
 
         $this->logger->debug((($fuzzy) ? 'Fuzzy Search' : 'Normal Search'));
         $this->logger->debug('Query over all searchable fields: ' . $transportObject['query_text']);
@@ -327,7 +328,7 @@ class SearchService implements SolrService
     /**
      * @return string
      */
-    protected function _getQueryText($allowFuzzy = true)
+    private function getQueryText($allowFuzzy = true)
     {
         return $this->query->getSolrQueryText($allowFuzzy, $this->foundNoResults);
     }
@@ -337,7 +338,7 @@ class SearchService implements SolrService
      * @param $fuzzy
      * @return array
      */
-    protected function _getParams($storeId, $fuzzy = true)
+    private function getParams($storeId, $fuzzy = true)
     {
         return $this->paramsBuilder->buildAsArray($storeId, $fuzzy);
     }
@@ -345,48 +346,8 @@ class SearchService implements SolrService
     /**
      * @return IntegerNet_Solr_Model_Resource_Solr
      */
-    protected function _getResource()
+    private function getResource()
     {
         return $this->resource;
-    }
-
-    /**
-     * @todo extract result formatter
-     *
-     * @param Apache_Solr_Response $result
-     * @param int $time in microseconds
-     */
-    protected function _logResult($result, $time)
-    {
-        $resultClone = unserialize(serialize($result));
-        if (isset($resultClone->response->docs)) {
-            foreach ($resultClone->response->docs as $key => $doc) {
-                /* @var Apache_Solr_Document $doc */
-                foreach ($doc->getFieldNames() as $fieldName) {
-                    $field = $doc->getField($fieldName);
-                    $value = $field['value'];
-                    if (is_array($value)) {
-                        foreach($value as $subKey => $subValue) {
-                            $subValue = str_replace(array("\n", "\r"), '', $subValue);
-                            if (strlen($subValue) > 50) {
-                                $subValue = substr($subValue, 0, 50) . '...';
-                                $value[$subKey] = $subValue;
-                                $doc->setField($fieldName, $value);
-                                $resultClone->response->docs[$key] = $doc;
-                            }
-                        }
-                    } else {
-                        $value = str_replace(array("\n", "\r"), '', $value);
-                        if (strlen($value) > 50) {
-                            $value = substr($value, 0, 50) . '...';
-                            $doc->setField($fieldName, $value);
-                            $resultClone->response->docs[$key] = $doc;
-                        }
-                    }
-                }
-            }
-        }
-        $this->logger->debug($resultClone);
-        $this->logger->debug('Elapsed time: ' . $time . 's');
     }
 }

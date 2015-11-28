@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\SolrResource;
 
 /**
  * @loadFixture config
@@ -14,7 +15,7 @@
 class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Controller
 {
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject|IntegerNet_Solr_Model_Resource_Solr
+     * @var PHPUnit_Framework_MockObject_MockObject|SolrResource
      */
     protected $_resourceMock;
     protected $_resourceMockMethods = ['search'];
@@ -22,7 +23,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
     protected function setUp()
     {
         parent::setUp();
-        $this->_resourceMock = $this->getMock(IntegerNet_Solr_Model_Resource_Solr::class, $this->_resourceMockMethods);
+        $this->_resourceMock = $this->getMock(SolrResource::class, $this->_resourceMockMethods);
         $factoryStub = $this->mockHelper('integernet_solr/factory', ['getSolrResource']);
         $factoryStub->expects($this->any())->method('getSolrResource')->willReturn($this->_resourceMock);
         $this->replaceByMock('helper', 'integernet_solr/factory', $factoryStub);

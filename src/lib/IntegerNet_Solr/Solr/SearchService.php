@@ -18,13 +18,12 @@ use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 use Varien_Object;
-use IntegerNet_Solr_Model_Resource_Solr;
 use IntegerNet_Solr_Model_Query;
 
 class SearchService implements SolrService
 {
     /**
-     * @var $resource IntegerNet_Solr_Model_Resource_Solr
+     * @var $resource SolrResource
      */
     private $resource;
     /**
@@ -59,7 +58,7 @@ class SearchService implements SolrService
 
     /**
      * SearchService constructor.
-     * @param IntegerNet_Solr_Model_Resource_Solr $resource
+     * @param SolrResource $resource
      * @param IntegerNet_Solr_Model_Query $query
      * @param Pagination $pagination
      * @param FuzzyConfig $fuzzyConfig
@@ -67,7 +66,7 @@ class SearchService implements SolrService
      * @param EventDispatcher $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(IntegerNet_Solr_Model_Resource_Solr $resource, IntegerNet_Solr_Model_Query $query, Pagination $pagination, FuzzyConfig $fuzzyConfig, ParamsBuilder $paramsBuilder, EventDispatcher $eventDispatcher, LoggerInterface $logger)
+    public function __construct(SolrResource $resource, IntegerNet_Solr_Model_Query $query, Pagination $pagination, FuzzyConfig $fuzzyConfig, ParamsBuilder $paramsBuilder, EventDispatcher $eventDispatcher, LoggerInterface $logger)
     {
         $this->resource = $resource;
         $this->query = $query;
@@ -344,7 +343,7 @@ class SearchService implements SolrService
     }
 
     /**
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     private function getResource()
     {

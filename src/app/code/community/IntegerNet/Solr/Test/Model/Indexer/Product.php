@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\SolrResource;
 
 /**
  * @loadFixture config
@@ -25,7 +26,7 @@ class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Ca
         $factoryMock->expects($this->once())->method('getSolrResource');
         $this->replaceByMock('helper', 'integernet_solr/factory', $factoryMock);
         $resource = Mage::getModel('integernet_solr/indexer_product')->getResource();
-        $this->assertInstanceOf(IntegerNet_Solr_Model_Resource_Solr::class, $resource);
+        $this->assertInstanceOf(SolrResource::class, $resource);
     }
     /**
      * @param array $config

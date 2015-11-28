@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\SolrResource;
 
 /**
  * Class IntegerNet_Solr_Model_Indexer
@@ -45,7 +46,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     /**
      * Retrieve model resource
      *
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     public function getResource()
     {
@@ -54,7 +55,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     /**
      * Retrieve model resource
      *
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     protected function _getResource()
     {

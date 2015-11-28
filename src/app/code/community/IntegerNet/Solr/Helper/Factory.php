@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\SolrResource;
+
 /**
  * integer_net Magento Module
  *
@@ -12,7 +14,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new configured Solr recource
      *
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     public function getSolrResource()
     {
@@ -23,7 +25,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
                 $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
             }
         }
-        return new IntegerNet_Solr_Model_Resource_Solr($storeConfig);
+        return new SolrResource($storeConfig);
     }
 
     /**

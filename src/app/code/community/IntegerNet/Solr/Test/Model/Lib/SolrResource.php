@@ -3,6 +3,7 @@ use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\SolrResource;
 
 /**
  * integer_net Magento Module
@@ -30,7 +31,7 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
                     ->willReturn($return);
             }
         }
-        $resource = new IntegerNet_Solr_Model_Resource_Solr($configStubs);
+        $resource = new SolrResource($configStubs);
 
         foreach ($expectation as $storeId => $arguments) {
             $_solrMock = $this->getMock(IntegerNet_Solr_Service::class, ['swapCores']);

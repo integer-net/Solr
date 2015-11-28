@@ -9,6 +9,8 @@
  */
 namespace IntegerNet\Solr;
 
+use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+
 interface SolrService
 {
     /**
@@ -17,4 +19,5 @@ interface SolrService
      * @return \Apache_Solr_Response
      */
     public function doRequest($storeId, $pageSize);
+
 }

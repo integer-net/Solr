@@ -7,15 +7,24 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-use IntegerNet\Solr\Exception;
+namespace IntegerNet\Solr;
+
+use Apache_Solr_Compatibility_Solr4CompatibilityLayer;
+use Apache_Solr_Document;
+use Apache_Solr_HttpTransport_Abstract;
+use Apache_Solr_HttpTransport_Curl;
+use Apache_Solr_HttpTransport_FileGetContents;
+use Apache_Solr_Response;
 use IntegerNet\Solr\Implementor\Config;
+use IntegerNet_Solr_Model_Source_HttpTransportMethod;
+use IntegerNet_Solr_Service;
+use Mage_Core_Model_Store;
 
 /**
  * Solr resource, interface between Magento and solr service
  *
- * @todo extract to /lib
  */
-class IntegerNet_Solr_Model_Resource_Solr
+class SolrResource
 {
     /**
      * Configuration reader, by store id
@@ -30,7 +39,7 @@ class IntegerNet_Solr_Model_Resource_Solr
      * @var IntegerNet_Solr_Service[]
      */
     protected $_solr;
-    
+
     /** @var bool */
     protected $_useSwapIndex = false;
 
@@ -49,7 +58,7 @@ class IntegerNet_Solr_Model_Resource_Solr
      */
     public function getStoreConfig($storeId)
     {
-        $storeId = (int) $storeId;
+        $storeId = (int)$storeId;
         if (!isset($this->_config[$storeId])) {
             throw new Exception("Store with ID {$storeId} not found.");
         }
@@ -133,13 +142,13 @@ class IntegerNet_Solr_Model_Resource_Solr
      * @param null|Mage_Core_Model_Store $restrictToStore
      * @throws Exception
      */
-    public function checkSwapCoresConfiguration($restrictToStore = null) 
+    public function checkSwapCoresConfiguration($restrictToStore = null)
     {
         $coresToSwap = array();
         $coresNotToSwap = array();
         $swapCoreNames = array();
 
-        foreach($this->_config as $storeId => $storeConfig) {
+        foreach ($this->_config as $storeId => $storeConfig) {
             /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
@@ -147,7 +156,7 @@ class IntegerNet_Solr_Model_Resource_Solr
                 continue;
             }
 
-            if (! $storeConfig->getGeneralConfig()->isActive()) {
+            if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
 
@@ -163,7 +172,7 @@ class IntegerNet_Solr_Model_Resource_Solr
             throw new Exception('Configuration Error: Activate Core Swapping for all Store Views using the same Solr Core.');
         }
 
-        foreach($swapCoreNames as $swapCoreNamesByCore) {
+        foreach ($swapCoreNames as $swapCoreNamesByCore) {
             if (sizeof(array_unique($swapCoreNamesByCore)) > 1) {
                 throw new Exception('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
             }
@@ -176,8 +185,8 @@ class IntegerNet_Solr_Model_Resource_Solr
     public function swapCores($restrictToStore = null)
     {
         $storeIdsToSwap = array();
-        
-        foreach($this->_config as $storeId => $storeConfig) {
+
+        foreach ($this->_config as $storeId => $storeConfig) {
             /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
@@ -185,7 +194,7 @@ class IntegerNet_Solr_Model_Resource_Solr
                 continue;
             }
 
-            if (! $storeConfig->getGeneralConfig()->isActive()) {
+            if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
 
@@ -193,8 +202,8 @@ class IntegerNet_Solr_Model_Resource_Solr
                 $storeIdsToSwap[$solrServerInfo] = $storeId;
             }
         }
-        
-        foreach($storeIdsToSwap as $storeIdToSwap) {
+
+        foreach ($storeIdsToSwap as $storeIdToSwap) {
             $this->getSolrService($storeIdToSwap)
                 ->setBasePath($this->getStoreConfig($storeIdToSwap)->getServerConfig()->getPath())
                 ->swapCores(
@@ -210,7 +219,7 @@ class IntegerNet_Solr_Model_Resource_Solr
      */
     public function getInfo($storeId)
     {
-        if (! $this->getStoreConfig($storeId)->getServerConfig()->getCore()) {
+        if (!$this->getStoreConfig($storeId)->getServerConfig()->getCore()) {
             return null;
         }
         try {
@@ -230,7 +239,7 @@ class IntegerNet_Solr_Model_Resource_Solr
     public function addDocument($storeId, $data)
     {
         $document = new Apache_Solr_Document();
-        foreach($data as $key => $value) {
+        foreach ($data as $key => $value) {
             if ($key == '_boost') {
                 $document->setBoost($value);
                 continue;
@@ -254,10 +263,10 @@ class IntegerNet_Solr_Model_Resource_Solr
     public function addDocuments($storeId, $combinedData)
     {
         $documents = array();
-        foreach($combinedData as $data) {
+        foreach ($combinedData as $data) {
 
             $document = new Apache_Solr_Document();
-            foreach($data as $key => $value) {
+            foreach ($data as $key => $value) {
                 if ($key == '_boost') {
                     $document->setBoost($value);
                     continue;
@@ -267,7 +276,7 @@ class IntegerNet_Solr_Model_Resource_Solr
                     continue;
                 }
                 if (is_array($value)) {
-                    foreach($value as $subValue) {
+                    foreach ($value as $subValue) {
                         $document->addField($key, $subValue);
                     }
                 } else {
@@ -318,14 +327,14 @@ class IntegerNet_Solr_Model_Resource_Solr
             default:
                 $adapter = new Apache_Solr_HttpTransport_FileGetContents();
         }
-        
+
         if ($this->getStoreConfig($storeId)->getServerConfig()->isUseHttpBasicAuth()) {
             $adapter->setAuthenticationCredentials(
                 $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthUsername(),
                 $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthPassword()
             );
         }
-        
+
         return $adapter;
     }
 }

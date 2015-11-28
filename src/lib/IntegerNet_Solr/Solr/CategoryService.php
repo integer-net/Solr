@@ -11,11 +11,12 @@ namespace IntegerNet\Solr;
 
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use Apache_Solr_Response;
+use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 use Varien_Object;
-use IntegerNet_Solr_Model_Resource_Solr;
+use IntegerNet\Solr\SolrResource;
 
 class CategoryService implements SolrService
 {
@@ -24,7 +25,7 @@ class CategoryService implements SolrService
      */
     private $categoryId;
     /**
-     * @var $resource IntegerNet_Solr_Model_Resource_Solr
+     * @var $resource SolrResource
      */
     private $resource;
     /**
@@ -45,7 +46,7 @@ class CategoryService implements SolrService
      * @param LoggerInterface $logger
      * @param EventDispatcher $eventDispatcher
      */
-    public function __construct($categoryId, IntegerNet_Solr_Model_Resource_Solr $resource, ParamsBuilder $paramsBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
+    public function __construct($categoryId, SolrResource $resource, ParamsBuilder $paramsBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
     {
         $this->categoryId = $categoryId;
         $this->resource = $resource;
@@ -100,7 +101,7 @@ class CategoryService implements SolrService
     }
 
     /**
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     private function getResource()
     {

@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\SolrResource;
+
 /**
  * integer_net Magento Module
  *
@@ -9,14 +11,14 @@
  */
 class IntegerNet_Solr_Model_Suggestion
 {
-    /** @var null|IntegerNet_Solr_Model_Resource_Solr */
+    /** @var null|SolrResource */
     protected $_resource = null;
 
     /** @var null|IntegerNet_Solr_Service */
     protected $_solrSuggestion = null;
 
     /**
-     * @return IntegerNet_Solr_Model_Resource_Solr
+     * @return SolrResource
      */
     protected function _getResource()
     {

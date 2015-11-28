@@ -16,7 +16,6 @@ use IntegerNet\Solr\SolrService;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Implementor\Attribute;
 use Psr\Log\NullLogger;

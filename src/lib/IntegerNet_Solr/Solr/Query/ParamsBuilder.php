@@ -21,11 +21,9 @@ interface ParamsBuilder
     /**
      * Return parameters as array as expected by solr service
      *
-     * @param int $storeId
-     * @param bool $fuzzy
      * @return mixed[]
      */
-    public function buildAsArray($storeId, $fuzzy);
+    public function buildAsArray();
     /**
      * Return filter query builder used to build the filter query paramter
      *

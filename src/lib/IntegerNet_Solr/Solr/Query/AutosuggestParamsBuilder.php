@@ -11,9 +11,9 @@ namespace IntegerNet\Solr\Query;
 
 class AutosuggestParamsBuilder extends AbstractParamsBuilder
 {
-    public function buildAsArray($storeId, $fuzzy)
+    public function buildAsArray()
     {
-        $params = parent::buildAsArray($storeId, $fuzzy);
+        $params = parent::buildAsArray();
         $params['rows'] = $this->pagination->getPageSize();
 
         return $params;

@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\Solr\Query;
+use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Implementor\AttributeRepository;
@@ -22,11 +23,14 @@ final class CategoryParamsBuilder extends AbstractParamsBuilder
      * @param FilterQueryBuilder $filterQueryBuilder
      * @param Pagination $pagination
      * @param ResultsConfig $resultsConfig
+     * @param FuzzyConfig $fuzzyConfig
      * @param int $categoryId
      */
-    public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder, Pagination $pagination, ResultsConfig $resultsConfig, $storeId, $categoryId)
+    public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder,
+                                Pagination $pagination, ResultsConfig $resultsConfig, FuzzyConfig $fuzzyConfig,
+                                $storeId, $categoryId)
     {
-        parent::__construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $storeId);
+        parent::__construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $fuzzyConfig, $storeId);
         $this->categoryId = $categoryId;
     }
 

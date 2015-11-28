@@ -90,21 +90,20 @@ class SearchService implements SolrService
      */
     public function doRequest()
     {
-        $storeId = $this->paramsBuilder->getStoreId();
         $pageSize = $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage();
         $isFuzzyActive = $this->fuzzyConfig->isActive();
         $minimumResults = $this->fuzzyConfig->getMinimumResults();
         if ($this->getCurrentSort() != 'position') {
-            $result = $this->getResultFromRequest($storeId, $pageSize, $isFuzzyActive);
+            $result = $this->getResultFromRequest($pageSize, $isFuzzyActive);
             return $this->sliceResult($result);
         } else {
-            $result = $this->getResultFromRequest($storeId, $pageSize, false);
+            $result = $this->getResultFromRequest($pageSize, false);
 
             $numberResults = sizeof($result->response->docs);
             $numberDuplicates = 0;
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                $fuzzyResult = $this->getResultFromRequest($storeId, $pageSize, true);
+                $fuzzyResult = $this->getResultFromRequest( $pageSize, true);
 
                 if ($numberResults < $pageSize) {
 
@@ -146,7 +145,7 @@ class SearchService implements SolrService
                 $this->foundNoResults = true;
                 $check = explode(' ', $this->query->getUserQueryText());
                 if (count($check) > 1) {
-                    $result = $this->getResultFromRequest($storeId, $pageSize, false);
+                    $result = $this->getResultFromRequest($pageSize, false);
                 }
                 $this->foundNoResults = false;
                 return $this->sliceResult($result);
@@ -307,20 +306,19 @@ class SearchService implements SolrService
     }
 
     /**
-     * @param int $storeId
      * @param int $pageSize
      * @param boolean $fuzzy
      * @return \Apache_Solr_Response
      */
-    private function getResultFromRequest($storeId, $pageSize, $fuzzy = true)
+    private function getResultFromRequest($pageSize, $fuzzy = true)
     {
         //TODO create TransportObject class, compatible to Varien_Object
         $transportObject = new Varien_Object(array(
-            'store_id' => $storeId,
+            'store_id' => $this->getParamsBuilder()->getStoreId(),
             'query_text' => $this->getQueryText($fuzzy),
             'start_item' => 0,
             'page_size' => $pageSize,
-            'params' => $this->getParams($storeId, $fuzzy),
+            'params' => $this->getParams($fuzzy),
         ));
 
         $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
@@ -329,7 +327,7 @@ class SearchService implements SolrService
 
         /* @var Apache_Solr_Response $result */
         $result = $this->getResource()->search(
-            $storeId,
+            $transportObject->getStoreId(),
             $transportObject->getQueryText(),
             $transportObject->getStartItem(), // Start item
             $transportObject->getPageSize(), // Items per page
@@ -356,13 +354,11 @@ class SearchService implements SolrService
     }
 
     /**
-     * @param $storeId
-     * @param $fuzzy
      * @return array
      */
-    private function getParams($storeId, $fuzzy = true)
+    private function getParams()
     {
-        return $this->paramsBuilder->buildAsArray($storeId, $fuzzy);
+        return $this->paramsBuilder->buildAsArray();
     }
 
     /**

@@ -51,6 +51,7 @@ class SearchServiceFactory extends SolrServiceFactory
             $this->getFilterQueryBuilder(),
             $this->getPagination(),
             $this->getResultsConfig(),
+            $this->getFuzzyConfig(),
             $this->getStoreId()
         );
     }

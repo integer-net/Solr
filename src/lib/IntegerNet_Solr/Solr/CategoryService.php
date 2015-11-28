@@ -68,13 +68,12 @@ class CategoryService implements SolrService
      */
     public function doRequest()
     {
-        $storeId = $this->paramsBuilder->getStoreId();
         $transportObject = new Varien_Object(array(
-            'store_id' => $storeId,
+            'store_id' => $this->paramsBuilder->getStoreId(),
             'query_text' => 'category_' . $this->categoryId . '_position_i:*',
             'start_item' => 0,
             'page_size' => $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage(),
-            'params' => $this->getParams($storeId),
+            'params' => $this->getParams(),
         ));
 
         $this->eventDispatcher->dispatch('integernet_solr_before_category_request', array('transport' => $transportObject));
@@ -83,7 +82,7 @@ class CategoryService implements SolrService
 
         /* @var Apache_Solr_Response $result */
         $result = $this->getResource()->search(
-            $storeId,
+            $transportObject->getStoreId(),
             $transportObject->getQueryText(),
             $transportObject->getStartItem(), // Start item
             $transportObject->getPageSize(), // Items per page
@@ -113,13 +112,11 @@ class CategoryService implements SolrService
     }
 
     /**
-     * @param $storeId
-     * @param $fuzzy
      * @return array
      */
-    private function getParams($storeId, $fuzzy = true)
+    private function getParams()
     {
-        return $this->paramsBuilder->buildAsArray($storeId, $fuzzy);
+        return $this->paramsBuilder->buildAsArray();
     }
 
     /**

@@ -47,6 +47,7 @@ class CategoryServiceFactory extends SolrServiceFactory
             $this->getFilterQueryBuilder(),
             $this->getPagination(),
             $this->getResultsConfig(),
+            new FuzzyConfig(false, 0, 0), //TODO check if BC breaking change (category fuzzy=false)
             $this->getStoreId(),
             $this->getCategoryId()
         );

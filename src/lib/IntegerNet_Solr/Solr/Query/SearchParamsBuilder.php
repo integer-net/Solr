@@ -11,4 +11,5 @@ namespace IntegerNet\Solr\Query;
 
 final class SearchParamsBuilder extends AbstractParamsBuilder
 {
+
 }

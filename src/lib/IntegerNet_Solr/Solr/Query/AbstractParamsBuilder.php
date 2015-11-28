@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\Solr\Query;
+use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Implementor\AttributeRepository;
@@ -33,16 +34,22 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
      */
     protected $resultsConfig;
     /**
+     * @var $fuzzyConfig FuzzyConfig
+     */
+    protected $fuzzyConfig;
+    /**
      * @var $storeId int
      */
     private $storeId;
 
-    public function __construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $storeId)
+    public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder,
+                                Pagination $pagination, ResultsConfig $resultsConfig, FuzzyConfig $fuzzyConfig, $storeId)
     {
         $this->attributeRespository = $attributeRepository;
         $this->filterQueryBuilder = $filterQueryBuilder;
         $this->pagination = $pagination;
         $this->resultsConfig = $resultsConfig;
+        $this->fuzzyConfig = $fuzzyConfig;
         $this->storeId = (int) $storeId;
     }
 
@@ -54,11 +61,11 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
         return $this->filterQueryBuilder;
     }
 
-    public function buildAsArray($storeId, $fuzzy)
+    public function buildAsArray()
     {
         $params = array(
             'q.op' => $this->resultsConfig->getSearchOperator(),
-            'fq' => $this->getFilterQuery($storeId),
+            'fq' => $this->getFilterQuery(),
             'fl' => 'result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'sort' => $this->getSortParam(),
             'facet' => 'true',
@@ -70,7 +77,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
 
         $params = $this->addFacetParams($params);
 
-        if (!$fuzzy) {
+        if (!$this->fuzzyConfig->isActive()) {
             $params['mm'] = '0%';
         }
         return $params;
@@ -116,12 +123,11 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
     }
 
     /**
-     * @param int $storeId
      * @return string
      */
-    private function getFilterQuery($storeId)
+    private function getFilterQuery()
     {
-        return $this->filterQueryBuilder->buildFilterQuery($storeId);
+        return $this->filterQueryBuilder->buildFilterQuery($this->getStoreId());
     }
 
     /**

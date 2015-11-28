@@ -77,19 +77,26 @@ class SearchService implements SolrService
         $this->logger = new Logger($logger);
     }
 
+    /**
+     * @return ParamsBuilder
+     */
+    public function getParamsBuilder()
+    {
+        return $this->paramsBuilder;
+    }
 
     /**
-     * @param $storeId
-     * @param $pageSize
      * @return Apache_Solr_Response
      */
-    public function doRequest($storeId, $pageSize)
+    public function doRequest()
     {
+        $storeId = $this->paramsBuilder->getStoreId();
+        $pageSize = $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage();
         $isFuzzyActive = $this->fuzzyConfig->isActive();
         $minimumResults = $this->fuzzyConfig->getMinimumResults();
         if ($this->getCurrentSort() != 'position') {
             $result = $this->getResultFromRequest($storeId, $pageSize, $isFuzzyActive);
-            return $result;
+            return $this->sliceResult($result);
         } else {
             $result = $this->getResultFromRequest($storeId, $pageSize, false);
 
@@ -142,10 +149,26 @@ class SearchService implements SolrService
                     $result = $this->getResultFromRequest($storeId, $pageSize, false);
                 }
                 $this->foundNoResults = false;
-                return $result;
+                return $this->sliceResult($result);
             }
-            return $result;
+            return $this->sliceResult($result);
         }
+    }
+
+    /**
+     * Remove all but last page from multipage result
+     *
+     * @param Apache_Solr_Response $result
+     * @return Apache_Solr_Response
+     */
+    private function sliceResult(Apache_Solr_Response $result)
+    {
+        $pageSize = $this->paramsBuilder->getPageSize();
+        $firstItemNumber = ($this->paramsBuilder->getCurrentPage() - 1) * $pageSize;
+        if ($firstItemNumber > 0) {
+            $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
+        }
+        return $result;
     }
     /**
      * @return string

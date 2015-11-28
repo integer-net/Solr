@@ -24,9 +24,9 @@ final class CategoryParamsBuilder extends AbstractParamsBuilder
      * @param ResultsConfig $resultsConfig
      * @param int $categoryId
      */
-    public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder, Pagination $pagination, ResultsConfig $resultsConfig, $categoryId)
+    public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder, Pagination $pagination, ResultsConfig $resultsConfig, $storeId, $categoryId)
     {
-        parent::__construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig);
+        parent::__construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $storeId);
         $this->categoryId = $categoryId;
     }
 

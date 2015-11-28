@@ -10,14 +10,17 @@
 namespace IntegerNet\Solr;
 
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Query\ParamsBuilder;
 
 interface SolrService
 {
     /**
-     * @param int $storeId
-     * @param int $pageSize
      * @return \Apache_Solr_Response
      */
-    public function doRequest($storeId, $pageSize);
+    public function doRequest();
 
+    /**
+     * @return ParamsBuilder
+     */
+    public function getParamsBuilder();
 }

@@ -41,6 +41,10 @@ abstract class SolrServiceFactory
      */
     private $resultsConfig;
     /**
+     * @var $storeId int
+     */
+    private $storeId;
+    /**
      * @var $logger LoggerInterface
      */
     private $logger;
@@ -52,17 +56,17 @@ abstract class SolrServiceFactory
     /**
      * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
-     * @param FilterQueryBuilder $filterQueryBuilder
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, FilterQueryBuilder $filterQueryBuilder)
+    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
     {
         $this->resource = $resource;
         $this->attributeRepository = $applicationContext->getAttributeRepository();
-        $this->filterQueryBuilder = $filterQueryBuilder;
+        $this->filterQueryBuilder = new FilterQueryBuilder();
         $this->pagination = $applicationContext->getPagination();
         $this->resultsConfig = $applicationContext->getResultsConfig();
         $this->logger = $applicationContext->getLogger();
         $this->eventDispatcher = $applicationContext->getEventDispatcher();
+        $this->storeId = $storeId;
     }
 
     abstract public function createParamsBuilder();
@@ -124,6 +128,12 @@ abstract class SolrServiceFactory
         return $this->eventDispatcher;
     }
 
-    
+    /**
+     * @return int
+     */
+    protected function getStoreId()
+    {
+        return $this->storeId;
+    }
 
 }

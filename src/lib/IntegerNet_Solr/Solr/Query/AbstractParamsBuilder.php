@@ -29,16 +29,29 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
      */
     protected $pagination;
     /**
-     * @var ResultsConfig
+     * @var $resultsConfig ResultsConfig
      */
     protected $resultsConfig;
+    /**
+     * @var $storeId int
+     */
+    private $storeId;
 
-    public function __construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig)
+    public function __construct($attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $storeId)
     {
         $this->attributeRespository = $attributeRepository;
         $this->filterQueryBuilder = $filterQueryBuilder;
         $this->pagination = $pagination;
         $this->resultsConfig = $resultsConfig;
+        $this->storeId = (int) $storeId;
+    }
+
+    /**
+     * @return FilterQueryBuilder
+     */
+    public function getFilterQueryBuilder()
+    {
+        return $this->filterQueryBuilder;
     }
 
     public function buildAsArray($storeId, $fuzzy)
@@ -61,6 +74,32 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
             $params['mm'] = '0%';
         }
         return $params;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentPage()
+    {
+        return $this->pagination->getCurrentPage();
+    }
+
+    /**
+     * @return int
+     */
+    public function getPageSize()
+    {
+        return $this->pagination->getPageSize();
+    }
+
+    /**
+     * Return store id
+     *
+     * @return int
+     */
+    public function getStoreId()
+    {
+        return $this->storeId;
     }
 
     /**

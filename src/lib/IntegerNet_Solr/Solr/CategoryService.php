@@ -56,17 +56,24 @@ class CategoryService implements SolrService
     }
 
     /**
-     * @param int $storeId
-     * @param int $pageSize
+     * @return ParamsBuilder
+     */
+    public function getParamsBuilder()
+    {
+        return $this->paramsBuilder;
+    }
+
+    /**
      * @return Apache_Solr_Response
      */
-    public function doRequest($storeId, $pageSize)
+    public function doRequest()
     {
+        $storeId = $this->paramsBuilder->getStoreId();
         $transportObject = new Varien_Object(array(
             'store_id' => $storeId,
             'query_text' => 'category_' . $this->categoryId . '_position_i:*',
             'start_item' => 0,
-            'page_size' => $pageSize,
+            'page_size' => $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage(),
             'params' => $this->getParams($storeId),
         ));
 
@@ -87,6 +94,21 @@ class CategoryService implements SolrService
 
         $this->eventDispatcher->dispatch('integernet_solr_after_category_request', array('result' => $result));
 
+        return $this->sliceResult($result);
+    }
+    /**
+     * Remove all but last page from multipage result
+     *
+     * @param Apache_Solr_Response $result
+     * @return Apache_Solr_Response
+     */
+    private function sliceResult(Apache_Solr_Response $result)
+    {
+        $pageSize = $this->paramsBuilder->getPageSize();
+        $firstItemNumber = ($this->paramsBuilder->getCurrentPage() - 1) * $pageSize;
+        if ($firstItemNumber > 0) {
+            $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
+        }
         return $result;
     }
 

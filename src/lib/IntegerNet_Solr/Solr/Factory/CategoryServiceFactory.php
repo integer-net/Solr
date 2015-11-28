@@ -29,13 +29,14 @@ class CategoryServiceFactory extends SolrServiceFactory
     /**
      * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
-     * @param FilterQueryBuilder $filterQueryBuilder
+     * @param $storeId
      * @param $categoryId
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, FilterQueryBuilder $filterQueryBuilder, $categoryId)
+    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId, $categoryId)
     {
-        parent::__construct($applicationContext, $resource, $filterQueryBuilder);
         $this->categoryId = $categoryId;
+        parent::__construct($applicationContext, $resource, $storeId);
+        $this->getFilterQueryBuilder()->setIsCategoryPage(true);
     }
 
 
@@ -46,6 +47,7 @@ class CategoryServiceFactory extends SolrServiceFactory
             $this->getFilterQueryBuilder(),
             $this->getPagination(),
             $this->getResultsConfig(),
+            $this->getStoreId(),
             $this->getCategoryId()
         );
     }

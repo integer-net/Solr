@@ -36,11 +36,10 @@ class SearchServiceFactory extends SolrServiceFactory
     /**
      * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
-     * @param FilterQueryBuilder $filterQueryBuilder
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, FilterQueryBuilder $filterQueryBuilder)
+    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
     {
-        parent::__construct($applicationContext, $resource, $filterQueryBuilder);
+        parent::__construct($applicationContext, $resource, $storeId);
         $this->fuzzyConfig = $applicationContext->getFuzzyConfig();
         $this->query = $applicationContext->getQuery();
     }
@@ -51,7 +50,8 @@ class SearchServiceFactory extends SolrServiceFactory
             $this->getAttributeRepository(),
             $this->getFilterQueryBuilder(),
             $this->getPagination(),
-            $this->getResultsConfig()
+            $this->getResultsConfig(),
+            $this->getStoreId()
         );
     }
 

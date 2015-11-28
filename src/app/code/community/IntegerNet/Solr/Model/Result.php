@@ -70,45 +70,37 @@ class IntegerNet_Solr_Model_Result
         $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $this->_filterQueryBuilder = new FilterQueryBuilder();
         $this->_filterQueryBuilder->setIsCategoryPage($isCategoryPage);
+        $applicationContext = new \IntegerNet\Solr\Factory\ApplicationContext(
+            Mage::helper('integernet_solr'),
+            $this->_config->getResultsConfig(),
+            $this->_pagination,
+            Mage::helper('integernet_solr'),
+            $logger
+        );
         /** @var SolrServiceFactory $factory */
-        /**
-         * @todo inject IntegerNet_Solr_Interface_Factory as ImplementorFactory into SolrServiceFactory
-         *       include create methods for pagination, attributeconfig, eventdispatcher, ...
-         */
         if ($isCategoryPage) {
-            $factory = new CategoryServiceFactory(
+            $factory = new CategoryServiceFactory($applicationContext,
                 Mage::helper('integernet_solr/factory')->getSolrResource(),
-                Mage::helper('integernet_solr'),
                 $this->_filterQueryBuilder,
-                $this->_pagination,
-                $this->_config->getResultsConfig(),
-                $logger,
-                Mage::helper('integernet_solr'),
                 Mage::registry('current_category')->getId()
             );
         } elseif ($isAutosuggest) {
+            $applicationContext
+                ->setFuzzyConfig($this->_config->getFuzzyAutosuggestConfig())
+                ->setQuery(Mage::getModel('integernet_solr/query', true));
             $factory = new AutosuggestServiceFactory(
+                $applicationContext,
                 Mage::helper('integernet_solr/factory')->getSolrResource(),
-                Mage::helper('integernet_solr'),
-                $this->_filterQueryBuilder,
-                $this->_pagination,
-                $this->_config->getResultsConfig(),
-                $logger,
-                Mage::helper('integernet_solr'),
-                $this->_config->getFuzzyAutosuggestConfig(),
-                Mage::getModel('integernet_solr/query', $isAutosuggest)
+                $this->_filterQueryBuilder
             );
         } else {
+            $applicationContext
+                ->setFuzzyConfig($this->_config->getFuzzySearchConfig())
+                ->setQuery(Mage::getModel('integernet_solr/query', false));
             $factory = new SearchServiceFactory(
+                $applicationContext,
                 Mage::helper('integernet_solr/factory')->getSolrResource(),
-                Mage::helper('integernet_solr'),
-                $this->_filterQueryBuilder,
-                $this->_pagination,
-                $this->_config->getResultsConfig(),
-                $logger,
-                Mage::helper('integernet_solr'),
-                $this->_config->getFuzzySearchConfig(),
-                Mage::getModel('integernet_solr/query', $isAutosuggest)
+                $this->_filterQueryBuilder
             );
         }
         $this->_solrService = $factory->createSolrService();

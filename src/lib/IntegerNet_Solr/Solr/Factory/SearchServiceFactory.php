@@ -32,22 +32,17 @@ class SearchServiceFactory extends SolrServiceFactory
      * @var Query
      */
     private $query;
+
     /**
+     * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
-     * @param AttributeRepository $attributeRepository
      * @param FilterQueryBuilder $filterQueryBuilder
-     * @param Pagination $pagination
-     * @param ResultsConfig $resultsConfig
-     * @param LoggerInterface $logger
-     * @param EventDispatcher $eventDispatcher
-     * @param FuzzyConfig $fuzzyConfig
-     * @param Query $query
      */
-    public function __construct(SolrResource $resource, AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder, Pagination $pagination, ResultsConfig $resultsConfig, LoggerInterface $logger, EventDispatcher $eventDispatcher, FuzzyConfig $fuzzyConfig, Query $query)
+    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, FilterQueryBuilder $filterQueryBuilder)
     {
-        parent::__construct($resource, $attributeRepository, $filterQueryBuilder, $pagination, $resultsConfig, $logger, $eventDispatcher);
-        $this->fuzzyConfig = $fuzzyConfig;
-        $this->query = $query;
+        parent::__construct($applicationContext, $resource, $filterQueryBuilder);
+        $this->fuzzyConfig = $applicationContext->getFuzzyConfig();
+        $this->query = $applicationContext->getQuery();
     }
 
     public function createParamsBuilder()

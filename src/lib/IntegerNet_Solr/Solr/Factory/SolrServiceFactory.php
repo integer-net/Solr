@@ -50,23 +50,19 @@ abstract class SolrServiceFactory
     private $eventDispatcher;
 
     /**
+     * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
-     * @param AttributeRepository $attributeRepository
      * @param FilterQueryBuilder $filterQueryBuilder
-     * @param Pagination $pagination
-     * @param ResultsConfig $resultsConfig
-     * @param LoggerInterface $logger
-     * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(SolrResource $resource, AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder, Pagination $pagination, ResultsConfig $resultsConfig, LoggerInterface $logger, EventDispatcher $eventDispatcher)
+    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, FilterQueryBuilder $filterQueryBuilder)
     {
         $this->resource = $resource;
-        $this->attributeRepository = $attributeRepository;
+        $this->attributeRepository = $applicationContext->getAttributeRepository();
         $this->filterQueryBuilder = $filterQueryBuilder;
-        $this->pagination = $pagination;
-        $this->resultsConfig = $resultsConfig;
-        $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->pagination = $applicationContext->getPagination();
+        $this->resultsConfig = $applicationContext->getResultsConfig();
+        $this->logger = $applicationContext->getLogger();
+        $this->eventDispatcher = $applicationContext->getEventDispatcher();
     }
 
     abstract public function createParamsBuilder();

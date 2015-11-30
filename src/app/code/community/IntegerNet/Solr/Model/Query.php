@@ -7,8 +7,9 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Query;
 
-class IntegerNet_Solr_Model_Query implements \IntegerNet\Solr\Implementor\Query
+class IntegerNet_Solr_Model_Query implements Query
 {
     protected $_isAutosuggest = false;
 
@@ -48,14 +49,22 @@ class IntegerNet_Solr_Model_Query implements \IntegerNet\Solr\Implementor\Query
     {
         $queryText = $this->getUserQueryText();
 
+        // => transport object
         $transportObject = new Varien_Object(array(
             'query_text' => $queryText,
         ));
 
+        // => event dispatcher
         Mage::dispatchEvent('integernet_solr_update_query_text', array('transport' => $transportObject));
 
         $queryText          = $transportObject->getQueryText();
+        // escape() is needed in suggestion params + search query
+        //TODO move event AND escaping to getUserQueryText ?
+        //     or just move escaping to new class \IntegerNetß
+        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
 
+
+        // => fuzzy config
         if ($this->_isAutosuggest) {
             $isFuzzyActive      = Mage::getStoreConfigFlag('integernet_solr/fuzzy/is_active_autosuggest');
             $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity_autosuggest');
@@ -64,8 +73,6 @@ class IntegerNet_Solr_Model_Query implements \IntegerNet\Solr\Implementor\Query
             $sensitivity        = Mage::getStoreConfig('integernet_solr/fuzzy/sensitivity');
         }
 
-        $queryText = Mage::helper('integernet_solr/query')->escape($queryText);
-
         if ($allowFuzzy && $isFuzzyActive) {
             $queryText .= '~' . floatval($sensitivity);
         } else {
@@ -73,6 +80,7 @@ class IntegerNet_Solr_Model_Query implements \IntegerNet\Solr\Implementor\Query
             $searchValue = ($broaden) ? explode(' ', $queryText) : $queryText;
             $queryText = '';
 
+            // => attribute repository
             $attributes = Mage::helper('integernet_solr')->getSearchableAttributes();
             $boost      = '';
             $isFirst    = true;
@@ -81,6 +89,7 @@ class IntegerNet_Solr_Model_Query implements \IntegerNet\Solr\Implementor\Query
 
                 if ($attribute->getIsSearchable() == 1) {
 
+                    // getFieldName => query builder
                     $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
 
                     if (strstr($fieldName, '_f') == false) {

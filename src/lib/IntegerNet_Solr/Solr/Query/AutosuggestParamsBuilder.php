@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\Solr\Query;
 
-class AutosuggestParamsBuilder extends AbstractParamsBuilder
+final class AutosuggestParamsBuilder extends AbstractParamsBuilder
 {
     public function buildAsArray()
     {

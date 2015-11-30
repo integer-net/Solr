@@ -30,13 +30,13 @@ class SearchStringTest extends PHPUnit_Framework_TestCase
         // which mentions: + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
         // of which we escape: ( ) { } [ ] ^ " ~ : \ /
         // and explicitly don't escape: + - && || ! * ?
-        return array(
+        return [
             'single_word' => ['foo', 'foo'],
             'operators' => ['foo +bar', 'foo +bar'],
             'all_special' => ['+ - && || ! ( ) { } [ ] ^ " ~ * ? : \\ /',
                 '+ - && || ! \( \) \{ \} \[ \] \^ \" \~ * ? \: \\\\ \/'],
             'phrase' => ['"multiple words (quoted, can contain "quotes" or \\(escaped\\) characters)"',
                 '"multiple words (quoted, can contain \\"quotes\\" or \\\\(escaped\\\\) characters)"'],
-        );
+        ];
     }
 }

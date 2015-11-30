@@ -27,46 +27,60 @@ class FilterQueryBuilder
 
     }
 
+    public static function noFilterQueryBuilder()
+    {
+        return new self;
+    }
+
     /**
      * @param $isCategoryPage
+     * @return $this
      */
     public function setIsCategoryPage($isCategoryPage)
     {
         $this->_isCategoryPage = $isCategoryPage;
+        return $this;
     }
 
     /**
      * @param Attribute $attribute
      * @param $value
+     * @return $this
      */
     public function addAttributeFilter(Attribute $attribute, $value)
     {
         $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
+        return $this;
     }
 
 
     /**
      * @param int $categoryId
+     * @return $this
      */
     public function addCategoryFilter($categoryId)
     {
         $this->_filters['category'] = $categoryId;
+        return $this;
     }
 
     /**
      * @param $range
      * @param $index
+     * @return $this
      */
     public function addPriceRangeFilter($range, $index)
     {
         $maxPrice = $index * $range;
         $minPrice = $maxPrice - $range;
         $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+        return $this;
     }
 
     /**
      * @param $index
      * @param $customPriceIntervals
+     * @return $this
      */
     public function addPriceRangeFilterWithCustomIntervals($index, $customPriceIntervals)
     {
@@ -82,11 +96,13 @@ class FilterQueryBuilder
             continue;
         }
         $this->_filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
+        return $this;
     }
 
     /**
      * @param float $minPrice
      * @param float $maxPrice
+     * @return $this
      */
     public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = 0.0)
     {
@@ -95,6 +111,7 @@ class FilterQueryBuilder
         } else {
             $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
         }
+        return $this;
     }
 
     /**

@@ -139,7 +139,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
     }
 
     /**
-     * @return int
+     * @return string
      */
     protected function getCurrentSortDirection()
     {
@@ -153,7 +153,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
                     return 'desc';
             }
         }
-        return $direction;
+        return strtolower($direction);
     }
 
     /**

@@ -41,8 +41,9 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);
         $eventDispatcherMock->expects($this->once())->method('dispatch')->with(
-            //TODO assert content of transport, test changing value in event
-            'integernet_solr_update_query_text', $this->isType('array')
+            'integernet_solr_update_query_text', $this->equalTo(
+                ['transport' => new Transport(['query_text' => $searchString->getRawString()])]
+            )
         );
         $attributeRepositoryStub = new AttributeRepositoryStub();
         $paramsBuilder = new SearchParamsBuilder($attributeRepositoryStub, $filterQueryBuilder, $paginationStub,
@@ -55,7 +56,6 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
     public static function dataQueryBuilder()
     {
         $defaultStoreId = 0;
-        $noFilterQueryBuilder = new FilterQueryBuilder();
         $defaultPagination = PaginationStub::defaultPagination();
         $defaultExpectedParams = [
             'q.op' => ResultsConfig::SEARCH_OPERATOR_AND,
@@ -80,8 +80,31 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $allData = [
             'default' => [$defaultStoreId, ResultConfigBuilder::defaultConfig()->build(), FuzzyConfigBuilder::defaultConfig()->build(),
-                $noFilterQueryBuilder, $defaultPagination, new SearchString('foo bar'),
+                FilterQueryBuilder::noFilterQueryBuilder(), $defaultPagination, new SearchString('foo bar'),
                 new Query($defaultStoreId, 'foo bar~0.7', 0, PaginationStub::DEFAULT_PAGESIZE, $defaultExpectedParams)
+            ],
+            'alternative' => [1, ResultConfigBuilder::alternativeConfig()->build(), FuzzyConfigBuilder::inactiveConfig()->build(),
+                FilterQueryBuilder::noFilterQueryBuilder(), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
+                new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0', 0, 24, [
+                        'q.op' => ResultsConfig::SEARCH_OPERATOR_OR,
+                        'fq' => "store_id:1 AND is_visible_in_search_i:1",
+                        'sort' => 'attribute1_s desc',
+                        'f.price_f.facet.interval.set' => [
+                            "(0.000000,10.000000]", "(10.000000,20.000000]", "(20.000000,50.000000]", "(50.000000,100.000000]", "(100.000000,200.000000]",
+                            "(200.000000,300.000000]", "(300.000000,400.000000]", "(400.000000,500.000000]", "(500.000000,*]",
+                        ],
+                        'mm' => '0%'
+                    ] + $defaultExpectedParams)
+            ],
+            'filters' => [$defaultStoreId, ResultConfigBuilder::defaultConfig()->build(), FuzzyConfigBuilder::defaultConfig()->build(),
+                FilterQueryBuilder::noFilterQueryBuilder()
+                    ->addAttributeFilter(AttributeStub::sortableString('attribute1'), 'blue')
+                    ->addCategoryFilter(42)
+                    ->addPriceRangeFilterByMinMax(13,37),
+                $defaultPagination, new SearchString('foo bar'),
+                new Query($defaultStoreId, 'foo bar~0.7', 0, PaginationStub::DEFAULT_PAGESIZE, [
+                        'fq' => 'store_id:0 AND is_visible_in_search_i:1 AND attribute1_facet:blue AND category:42 AND price_f:[13.000000 TO 37.000000]'
+                    ] + $defaultExpectedParams)
             ]
         ];
         foreach ($allData as $parameters) {
@@ -121,6 +144,73 @@ class ResultConfigBuilder
     public static function defaultConfig()
     {
         return new static;
+    }
+    public static function alternativeConfig()
+    {
+        return self::defaultConfig()
+            ->withUseHtmlFromSolr(true)
+            ->withSearchOperator(ResultsConfig::SEARCH_OPERATOR_OR)
+            ->withUseCustomPriceIntervals(true);
+    }
+
+    /**
+     * @param boolean $useHtmlFromSolr
+     * @return $this
+     */
+    public function withUseHtmlFromSolr($useHtmlFromSolr)
+    {
+        $this->useHtmlFromSolr = $useHtmlFromSolr;
+        return $this;
+    }
+
+    /**
+     * @param string $searchOperator
+     * @return $this
+     */
+    public function withSearchOperator($searchOperator)
+    {
+        $this->searchOperator = $searchOperator;
+        return $this;
+    }
+
+    /**
+     * @param float $priceStepSize
+     * @return $this
+     */
+    public function withPriceStepSize($priceStepSize)
+    {
+        $this->priceStepSize = $priceStepSize;
+        return $this;
+    }
+
+    /**
+     * @param float $maxPrice
+     * @return $this
+     */
+    public function withMaxPrice($maxPrice)
+    {
+        $this->maxPrice = $maxPrice;
+        return $this;
+    }
+
+    /**
+     * @param boolean $useCustomPriceIntervals
+     * @return $this
+     */
+    public function withUseCustomPriceIntervals($useCustomPriceIntervals)
+    {
+        $this->useCustomPriceIntervals = $useCustomPriceIntervals;
+        return $this;
+    }
+
+    /**
+     * @param \float[] $customPriceIntervals
+     * @return $this
+     */
+    public function withCustomPriceIntervals($customPriceIntervals)
+    {
+        $this->customPriceIntervals = $customPriceIntervals;
+        return $this;
     }
 
     public function build()
@@ -220,6 +310,10 @@ class PaginationStub implements Pagination
     {
         return new self(self::DEFAULT_PAGESIZE, self::DEFAULT_CURRENT, 'ASC', 'position');
     }
+    public static function alternativePagination()
+    {
+        return new self(12, 2, 'DESC', 'attribute1');
+    }
 
     /**
      * @return int
@@ -295,7 +389,7 @@ class AttributeRepositoryStub implements AttributeRepository
      */
     public function getSearchableAttributes()
     {
-        throw new BadMethodCallException('not used in query builder');
+        return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
     }
 
     /**

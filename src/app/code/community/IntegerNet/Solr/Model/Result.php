@@ -73,7 +73,7 @@ class IntegerNet_Solr_Model_Result
         } elseif ($isAutosuggest) {
             $applicationContext
                 ->setFuzzyConfig($this->_config->getFuzzyAutosuggestConfig())
-                ->setQuery(Mage::getModel('integernet_solr/query', true));
+                ->setQuery(Mage::helper('integernet_solr'));
             $factory = new AutosuggestServiceFactory(
                 $applicationContext,
                 Mage::helper('integernet_solr/factory')->getSolrResource(),
@@ -82,7 +82,7 @@ class IntegerNet_Solr_Model_Result
         } else {
             $applicationContext
                 ->setFuzzyConfig($this->_config->getFuzzySearchConfig())
-                ->setQuery(Mage::getModel('integernet_solr/query', false));
+                ->setQuery(Mage::helper('integernet_solr'));
             $factory = new SearchServiceFactory(
                 $applicationContext,
                 Mage::helper('integernet_solr/factory')->getSolrResource(),
@@ -90,7 +90,7 @@ class IntegerNet_Solr_Model_Result
             );
         }
         $this->_solrService = $factory->createSolrService();
-        $this->_filterQueryBuilder = $this->_solrService->getParamsBuilder()->getFilterQueryBuilder();
+        $this->_filterQueryBuilder = $this->_solrService->getFilterQueryBuilder();
     }
 
 

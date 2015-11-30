@@ -2,7 +2,7 @@
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-
+use IntegerNet\Solr\Implementor\HasUserQuery;
 /**
  * integer_net Magento Module
  *
@@ -12,7 +12,7 @@ use IntegerNet\Solr\Implementor\EventDispatcher;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
-    implements AttributeRepository, EventDispatcher
+    implements AttributeRepository, EventDispatcher, HasUserQuery
 {
     /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection */
     protected $_searchableAttributes = null;
@@ -326,6 +326,22 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
                 ->addIsSearchableFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')));
         }
+    }
+
+    /**
+     * Returns query as entered by user
+     *
+     * @return string
+     */
+    public function getUserQueryText()
+    {
+        $query = Mage::helper('catalogsearch')->getQuery();
+        $queryText = $query->getQueryText();
+        if ($query->getSynonymFor()) {
+            $queryText = $query->getSynonymFor();
+            return $queryText;
+        }
+        return $queryText;
     }
 
 }

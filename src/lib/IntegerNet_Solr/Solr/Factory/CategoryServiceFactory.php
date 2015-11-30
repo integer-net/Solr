@@ -10,14 +10,12 @@
 namespace IntegerNet\Solr\Factory;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
-use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Query\CategoryParamsBuilder;
-use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\SolrResource;
-use Psr\Log\LoggerInterface;
+use IntegerNet\Solr\CategoryService;
 
 class CategoryServiceFactory extends SolrServiceFactory
 {
@@ -39,8 +37,16 @@ class CategoryServiceFactory extends SolrServiceFactory
         $this->getFilterQueryBuilder()->setIsCategoryPage(true);
     }
 
+    protected function createQueryBuilder()
+    {
+        return new CategoryQueryBuilder(
+            $this->getCategoryId(),
+            $this->getAttributeRepository(), $this->getPagination(),
+            $this->createParamsBuilder(), $this->getStoreId(), $this->getEventDispatcher()
+        );
+    }
 
-    public function createParamsBuilder()
+    protected function createParamsBuilder()
     {
         return new CategoryParamsBuilder(
             $this->getAttributeRepository(),
@@ -55,10 +61,9 @@ class CategoryServiceFactory extends SolrServiceFactory
 
     public function createSolrService()
     {
-        return new \IntegerNet\Solr\CategoryService(
-            $this->getCategoryId(),
+        return new CategoryService(
             $this->getResource(),
-            $this->createParamsBuilder(),
+            $this->createQueryBuilder(),
             $this->getLogger(),
             $this->getEventDispatcher()
         );

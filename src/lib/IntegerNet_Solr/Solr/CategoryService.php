@@ -9,25 +9,25 @@
  */
 namespace IntegerNet\Solr;
 
+use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use Apache_Solr_Response;
+use IntegerNet\Solr\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
-use Varien_Object;
-use IntegerNet\Solr\SolrResource;
 
 class CategoryService implements SolrService
 {
     /**
-     * @var $categoryId int
-     */
-    private $categoryId;
-    /**
      * @var $resource SolrResource
      */
     private $resource;
+    /**
+     * @var $queryBuilder CategoryQueryBuilder
+     */
+    private $queryBuilder;
     /**
      * @var ParamsBuilder
      */
@@ -42,15 +42,13 @@ class CategoryService implements SolrService
     private $eventDispatcher;
 
     /**
-     * @param int $categoryId
      * @param LoggerInterface $logger
      * @param EventDispatcher $eventDispatcher
      */
-    public function __construct($categoryId, SolrResource $resource, ParamsBuilder $paramsBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
+    public function __construct(SolrResource $resource, CategoryQueryBuilder $queryBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
     {
-        $this->categoryId = $categoryId;
+        $this->queryBuilder = $queryBuilder;
         $this->resource = $resource;
-        $this->paramsBuilder = $paramsBuilder;
         $this->logger = new Logger($logger);
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -58,22 +56,32 @@ class CategoryService implements SolrService
     /**
      * @return ParamsBuilder
      */
-    public function getParamsBuilder()
+    private function getParamsBuilder()
     {
-        return $this->paramsBuilder;
+        return $this->queryBuilder->getParamsBuilder();
     }
+
+    /**
+     * @return FilterQueryBuilder
+     */
+    public function getFilterQueryBuilder()
+    {
+        return $this->getParamsBuilder()->getFilterQueryBuilder();
+    }
+
 
     /**
      * @return Apache_Solr_Response
      */
     public function doRequest()
     {
-        $transportObject = new Varien_Object(array(
-            'store_id' => $this->paramsBuilder->getStoreId(),
-            'query_text' => 'category_' . $this->categoryId . '_position_i:*',
+        $query = $this->queryBuilder->build();
+        $transportObject = new Transport(array(
+            'store_id' => $this->getParamsBuilder()->getStoreId(),
+            'query_text' => $query->getQueryText(),
             'start_item' => 0,
-            'page_size' => $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage(),
-            'params' => $this->getParams(),
+            'page_size' => $this->getParamsBuilder()->getPageSize() * $this->getParamsBuilder()->getCurrentPage(),
+            'params' => $query->getParams(),
         ));
 
         $this->eventDispatcher->dispatch('integernet_solr_before_category_request', array('transport' => $transportObject));
@@ -103,20 +111,12 @@ class CategoryService implements SolrService
      */
     private function sliceResult(Apache_Solr_Response $result)
     {
-        $pageSize = $this->paramsBuilder->getPageSize();
-        $firstItemNumber = ($this->paramsBuilder->getCurrentPage() - 1) * $pageSize;
+        $pageSize = $this->getParamsBuilder()->getPageSize();
+        $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;
         if ($firstItemNumber > 0) {
             $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
         }
         return $result;
-    }
-
-    /**
-     * @return array
-     */
-    private function getParams()
-    {
-        return $this->paramsBuilder->buildAsArray();
     }
 
     /**

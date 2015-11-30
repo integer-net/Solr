@@ -20,7 +20,7 @@ interface SolrService
     public function doRequest();
 
     /**
-     * @return ParamsBuilder
+     * @return FilterQueryBuilder
      */
-    public function getParamsBuilder();
+    public function getFilterQueryBuilder();
 }

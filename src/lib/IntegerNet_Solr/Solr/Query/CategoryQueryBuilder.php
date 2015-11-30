@@ -9,12 +9,31 @@
  */
 namespace IntegerNet\Solr\Query;
 
+use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\Pagination;
+
 final class CategoryQueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @var $categoryId int
      */
     private $categoryId;
+
+    /**
+     * @param int $categoryId
+     * @param AttributeRepository $attributeRepository
+     * @param Pagination $pagination
+     * @param ParamsBuilder $paramsBuilder
+     * @param int $storeId
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function __construct($categoryId, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
+    {
+        parent::__construct($attributeRepository, $pagination, $paramsBuilder, $storeId, $eventDispatcher);
+        $this->categoryId = $categoryId;
+    }
 
     protected function getQueryText()
     {

@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\Solr\Implementor;
 
-interface Query
+interface HasUserQuery
 {
     /**
      * Returns query as entered by user
@@ -17,13 +17,5 @@ interface Query
      * @return string
      */
     public function getUserQueryText();
-    /**
-     * Returns query prepared for Solr
-     *
-     * @param $allowFuzzy
-     * @param $broaden
-     * @return string
-     */
-    public function getSolrQueryText($allowFuzzy, $broaden);
 
 }

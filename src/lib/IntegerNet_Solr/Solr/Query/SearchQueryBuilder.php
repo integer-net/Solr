@@ -15,7 +15,6 @@ use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
-use Varien_Object;
 
 final class SearchQueryBuilder extends AbstractQueryBuilder
 {
@@ -31,20 +30,24 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
      * @var bool
      */
     private $allowFuzzy = true;
+    /**
+     * @var $fuzzyConfig FuzzyConfig
+     */
+    private $fuzzyConfig;
 
     /**
-     * @param SearchString $searchString
      * @param FuzzyConfig $fuzzyConfig
      * @param AttributeRepository $attributeRepository
      * @param Pagination $pagination
      * @param ParamsBuilder $paramsBuilder
      * @param int $storeId
      * @param EventDispatcher $eventDispatcher
-     * @todo default values + setters
+     * @todo params builder initialization?
      */
     public function __construct(SearchString $searchString, FuzzyConfig $fuzzyConfig, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
     {
-        parent::__construct($fuzzyConfig, $attributeRepository, $pagination, $paramsBuilder, $storeId, $eventDispatcher);
+        parent::__construct($attributeRepository, $pagination, $paramsBuilder, $storeId, $eventDispatcher);
+        $this->fuzzyConfig = $fuzzyConfig;
         $this->searchString = $searchString;
     }
 
@@ -68,7 +71,26 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
         return $this;
     }
 
+    /**
+     * @param SearchString $searchString
+     * @return SearchQueryBuilder
+     */
+    public function setSearchString($searchString)
+    {
+        $this->searchString = $searchString;
+        return $this;
+    }
+    /**
+     * @return FuzzyConfig
+     */
+    protected function getFuzzyConfig()
+    {
+        return $this->fuzzyConfig;
+    }
 
+    /**
+     * @return string
+     */
     protected function getQueryText()
     {
         $searchString = $this->getSearchString();
@@ -97,6 +119,11 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
             $isFirst    = true;
 
             foreach ($attributes as $attribute) {
+                if (! $attribute instanceof Attribute) {
+                    //TODO getSearchableAttributes should return Attribute implementor directly,
+                    //     (as soon as indexer is refactored)
+                    $attribute = new \IntegerNet_Solr_Model_Bridge_Attribute($attribute);
+                }
                 /** @var $attribute Attribute */
                 if ($attribute->getIsSearchable() == 1) {
 
@@ -129,7 +156,7 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
     /**
      * @return SearchString
      */
-    private function getSearchString()
+    public function getSearchString()
     {
         return $this->searchString;
     }

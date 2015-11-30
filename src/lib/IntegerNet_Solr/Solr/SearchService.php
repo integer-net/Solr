@@ -10,15 +10,16 @@
 namespace IntegerNet\Solr;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
 use Apache_Solr_Response;
 use Apache_Solr_Document;
+use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
+use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
-use Varien_Object;
-use IntegerNet_Solr_Model_Query;
 
 class SearchService implements SolrService
 {
@@ -27,9 +28,9 @@ class SearchService implements SolrService
      */
     private $resource;
     /**
-     * @var $query IntegerNet_Solr_Model_Query
+     * @var $queryBuilder SearchQueryBuilder
      */
-    private $query;
+    private $queryBuilder;
     /**
      * @var $pagination Pagination
      */
@@ -59,20 +60,19 @@ class SearchService implements SolrService
     /**
      * SearchService constructor.
      * @param SolrResource $resource
-     * @param IntegerNet_Solr_Model_Query $query
+     * @param SearchQueryBuilder $queryBuilder
      * @param Pagination $pagination
      * @param FuzzyConfig $fuzzyConfig
-     * @param ParamsBuilder $paramsBuilder
      * @param EventDispatcher $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(SolrResource $resource, IntegerNet_Solr_Model_Query $query, Pagination $pagination, FuzzyConfig $fuzzyConfig, ParamsBuilder $paramsBuilder, EventDispatcher $eventDispatcher, LoggerInterface $logger)
+    public function __construct(SolrResource $resource, SearchQueryBuilder $queryBuilder, Pagination $pagination, FuzzyConfig $fuzzyConfig, EventDispatcher $eventDispatcher, LoggerInterface $logger)
     {
         $this->resource = $resource;
-        $this->query = $query;
+        $this->queryBuilder = $queryBuilder;
         $this->pagination = $pagination;
         $this->fuzzyConfig = $fuzzyConfig;
-        $this->paramsBuilder = $paramsBuilder;
+        $this->paramsBuilder = $queryBuilder->getParamsBuilder();
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = new Logger($logger);
     }
@@ -80,9 +80,17 @@ class SearchService implements SolrService
     /**
      * @return ParamsBuilder
      */
-    public function getParamsBuilder()
+    private function getParamsBuilder()
     {
         return $this->paramsBuilder;
+    }
+
+    /**
+     * @return FilterQueryBuilder
+     */
+    public function getFilterQueryBuilder()
+    {
+        return $this->getParamsBuilder()->getFilterQueryBuilder();
     }
 
     /**
@@ -90,7 +98,7 @@ class SearchService implements SolrService
      */
     public function doRequest()
     {
-        $pageSize = $this->paramsBuilder->getPageSize() * $this->paramsBuilder->getCurrentPage();
+        $pageSize = $this->getParamsBuilder()->getPageSize() * $this->getParamsBuilder()->getCurrentPage();
         $isFuzzyActive = $this->fuzzyConfig->isActive();
         $minimumResults = $this->fuzzyConfig->getMinimumResults();
         if ($this->getCurrentSort() != 'position') {
@@ -143,7 +151,7 @@ class SearchService implements SolrService
 
             if (sizeof($result->response->docs) == 0) {
                 $this->foundNoResults = true;
-                $check = explode(' ', $this->query->getUserQueryText());
+                $check = explode(' ', $this->queryBuilder->getSearchString()->getRawString());
                 if (count($check) > 1) {
                     $result = $this->getResultFromRequest($pageSize, false);
                 }
@@ -162,8 +170,8 @@ class SearchService implements SolrService
      */
     private function sliceResult(Apache_Solr_Response $result)
     {
-        $pageSize = $this->paramsBuilder->getPageSize();
-        $firstItemNumber = ($this->paramsBuilder->getCurrentPage() - 1) * $pageSize;
+        $pageSize = $this->getParamsBuilder()->getPageSize();
+        $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;
         if ($firstItemNumber > 0) {
             $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
         }
@@ -312,13 +320,13 @@ class SearchService implements SolrService
      */
     private function getResultFromRequest($pageSize, $fuzzy = true)
     {
-        //TODO create TransportObject class, compatible to Varien_Object
-        $transportObject = new Varien_Object(array(
+        $query = $this->queryBuilder->setAllowFuzzy($fuzzy)->setBroaden($this->foundNoResults)->build();
+        $transportObject = new Transport(array(
             'store_id' => $this->getParamsBuilder()->getStoreId(),
-            'query_text' => $this->getQueryText($fuzzy),
+            'query_text' => $query->getQueryText(),
             'start_item' => 0,
             'page_size' => $pageSize,
-            'params' => $this->getParams($fuzzy),
+            'params' => $query->getParams(),
         ));
 
         $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
@@ -343,22 +351,6 @@ class SearchService implements SolrService
         $this->eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));
 
         return $result;
-    }
-
-    /**
-     * @return string
-     */
-    private function getQueryText($allowFuzzy = true)
-    {
-        return $this->query->getSolrQueryText($allowFuzzy, $this->foundNoResults);
-    }
-
-    /**
-     * @return array
-     */
-    private function getParams()
-    {
-        return $this->paramsBuilder->buildAsArray();
     }
 
     /**

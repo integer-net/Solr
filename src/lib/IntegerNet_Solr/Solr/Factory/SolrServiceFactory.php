@@ -14,7 +14,9 @@ use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Query\QueryBuilder;
 use IntegerNet\Solr\SolrResource;
 use Psr\Log\LoggerInterface;
 
@@ -56,6 +58,7 @@ abstract class SolrServiceFactory
     /**
      * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
+     * @param int $storeId
      */
     public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
     {
@@ -69,7 +72,8 @@ abstract class SolrServiceFactory
         $this->storeId = $storeId;
     }
 
-    abstract public function createParamsBuilder();
+    abstract protected function createQueryBuilder();
+    abstract protected function createParamsBuilder();
     abstract public function createSolrService();
 
     /**

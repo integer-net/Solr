@@ -14,8 +14,11 @@ use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
-use IntegerNet\Solr\Implementor\Query;
+use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Query\QueryBuilder;
+use IntegerNet\Solr\Query\SearchQueryBuilder;
+use IntegerNet\Solr\Query\SearchString;
 use IntegerNet\Solr\SolrResource;
 use Psr\Log\LoggerInterface;
 use IntegerNet\Solr\Query\SearchParamsBuilder;
@@ -29,13 +32,14 @@ class SearchServiceFactory extends SolrServiceFactory
     private $fuzzyConfig;
 
     /**
-     * @var Query
+     * @var HasUserQuery
      */
     private $query;
 
     /**
      * @param ApplicationContext $applicationContext
      * @param SolrResource $resource
+     * @param int $storeId
      */
     public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
     {
@@ -44,7 +48,16 @@ class SearchServiceFactory extends SolrServiceFactory
         $this->query = $applicationContext->getQuery();
     }
 
-    public function createParamsBuilder()
+    protected function createQueryBuilder()
+    {
+        return new SearchQueryBuilder(
+            new SearchString($this->getQuery()->getUserQueryText()),
+            $this->getFuzzyConfig(), $this->getAttributeRepository(), $this->getPagination(),
+            $this->createParamsBuilder(), $this->getStoreId(), $this->getEventDispatcher()
+        );
+    }
+
+    protected function createParamsBuilder()
     {
         return new SearchParamsBuilder(
             $this->getAttributeRepository(),
@@ -60,10 +73,9 @@ class SearchServiceFactory extends SolrServiceFactory
     {
         return new SearchService(
             $this->getResource(),
-            $this->getQuery(),
+            $this->createQueryBuilder(),
             $this->getPagination(),
             $this->getFuzzyConfig(),
-            $this->createParamsBuilder(),
             $this->getEventDispatcher(),
             $this->getLogger()
         );
@@ -78,10 +90,11 @@ class SearchServiceFactory extends SolrServiceFactory
     }
 
     /**
-     * @return Query
+     * @return HasUserQuery
      */
     protected function getQuery()
     {
         return $this->query;
     }
+
 }

@@ -17,10 +17,6 @@ use IntegerNet\Solr\Implementor\Pagination;
 abstract class AbstractQueryBuilder implements QueryBuilder
 {
     /**
-     * @var $fuzzyConfig FuzzyConfig
-     */
-    private $fuzzyConfig;
-    /**
      * @var $attributeRepository AttributeRepository
      */
     private $attributeRepository;
@@ -42,17 +38,14 @@ abstract class AbstractQueryBuilder implements QueryBuilder
     private $eventDispatcher;
 
     /**
-     * AbstractQueryBuilder constructor.
-     * @param FuzzyConfig $fuzzyConfig
      * @param AttributeRepository $attributeRepository
      * @param Pagination $pagination
      * @param ParamsBuilder $paramsBuilder
      * @param int $storeId
      * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(FuzzyConfig $fuzzyConfig, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
+    public function __construct(AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
     {
-        $this->fuzzyConfig = $fuzzyConfig;
         $this->attributeRepository = $attributeRepository;
         $this->pagination = $pagination;
         $this->paramsBuilder = $paramsBuilder;
@@ -72,13 +65,6 @@ abstract class AbstractQueryBuilder implements QueryBuilder
 
     abstract protected function getQueryText();
 
-    /**
-     * @return FuzzyConfig
-     */
-    protected function getFuzzyConfig()
-    {
-        return $this->fuzzyConfig;
-    }
 
     /**
      * @return AttributeRepository
@@ -99,7 +85,7 @@ abstract class AbstractQueryBuilder implements QueryBuilder
     /**
      * @return ParamsBuilder
      */
-    protected function getParamsBuilder()
+    public function getParamsBuilder()
     {
         return $this->paramsBuilder;
     }

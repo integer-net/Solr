@@ -13,7 +13,7 @@ use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
-use IntegerNet\Solr\Implementor\Query;
+use IntegerNet\Solr\Implementor\HasUserQuery;
 use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
 
@@ -41,7 +41,7 @@ final class ApplicationContext
      */
     private $pagination;
     /**
-     * @var $query Query
+     * @var $query HasUserQuery
      */
     private $query;
     /**
@@ -81,7 +81,7 @@ final class ApplicationContext
     }
 
     /**
-     * @param Query $query
+     * @param HasUserQuery $query
      * @return ApplicationContext
      */
     public function setQuery($query)
@@ -126,7 +126,7 @@ final class ApplicationContext
     }
 
     /**
-     * @return Query
+     * @return HasUserQuery
      */
     public function getQuery()
     {

@@ -6,8 +6,16 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
-class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model_Layer 
+ */
+if (@class_exists('GoMage_Navigation_Model_Search_Layer')) {
+    class IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract extends GoMage_Navigation_Model_Search_Layer
+    {}
+} else {
+    class IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract extends Mage_CatalogSearch_Model_Layer
+    {}
+}
+
+class IntegerNet_Solr_Model_CatalogSearch_Layer extends IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract
 {
     /**
      * Get current layer product collection
@@ -45,6 +53,7 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model
         $collection
             ->setItemObjectClass('catalog/resource_eav_attribute')
             ->addStoreLabel(Mage::app()->getStore()->getId())
+            ->addIsFilterableInSearchFilter()
             ->setOrder('position', 'ASC');
         $collection = $this->_prepareAttributeCollection($collection);
         $collection->load();

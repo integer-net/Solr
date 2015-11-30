@@ -6,8 +6,17 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
-class IntegerNet_Solr_Model_Catalog_Layer extends Mage_Catalog_Model_Layer
+ */
+
+if (@class_exists('GoMage_Navigation_Model_Layer')) {
+    class IntegerNet_Solr_Model_Catalog_Layer_Abstract extends GoMage_Navigation_Model_Layer
+    {}
+} else {
+    class IntegerNet_Solr_Model_Catalog_Layer_Abstract extends Mage_Catalog_Model_Layer
+    {}
+}
+
+class IntegerNet_Solr_Model_Catalog_Layer extends IntegerNet_Solr_Model_Catalog_Layer_Abstract
 {
     /**
      * Get current layer product collection

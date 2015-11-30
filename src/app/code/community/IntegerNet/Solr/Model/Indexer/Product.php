@@ -173,7 +173,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             ->addTaxPercents()
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
-            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost'))
+            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getSearchableAttributes()->getColumnValues('attribute_code'))
             ->addAttributeToSelect(Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes()->getColumnValues('attribute_code'));
             
@@ -213,6 +213,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         Mage::dispatchEvent('integernet_solr_can_index_product', array('product' => $product));
 
+        if ($product->getSolrExclude()) {
+            return false;
+        }
         if ($product->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
             return false;
         }
@@ -264,7 +267,20 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
             $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
             if (!$productData->hasData($fieldName)) {
-                $productData->setData($fieldName, trim(strip_tags($attribute->getFrontend()->getValue($product))));
+                $value = trim(strip_tags($attribute->getFrontend()->getValue($product)));
+                if (!empty($value)) {
+                    if ($attribute->getFrontendInput() == 'multiselect') {
+                        $value = array_map('trim', explode(',', $value));
+                    }
+                    $productData->setData($fieldName, $value);
+
+                    if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
+                        $productData->setData(
+                            Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                            $value
+                        );
+                    }
+                }
             }
 
             if ($attribute->getAttributeCode() == 'price') {
@@ -336,7 +352,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             if ($product->getData($attribute->getAttributeCode())
                 && $value = trim(strip_tags($attribute->getFrontend()->getValue($product)))
             ) {
+                if ($attribute->getFrontendInput() == 'multiselect') {
+                    $value = array_map('trim', explode(',', $value));
+                }
                 $productData->setData($fieldName, $value);
+
+                if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
+                    $productData->setData(
+                        Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                        $value
+                    );
+                }
             }
 
             if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {

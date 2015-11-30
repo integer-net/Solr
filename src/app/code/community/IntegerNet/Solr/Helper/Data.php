@@ -6,7 +6,7 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /** @var Mage_Catalog_Model_Entity_Attribute[] */
@@ -70,7 +70,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             return $this->getFilterableInSearchAttributes($useAlphabeticalSearch);
         }
     }
-    
+
     /**
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
@@ -84,7 +84,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
                 ->addIsFilterableInSearchFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
             ;
-            
+
             if ($useAlphabeticalSearch) {
                 $this->_filterableInSearchAttributes
                     ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
@@ -123,7 +123,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $this->_filterableInCatalogAttributes;
     }
-    
+
     /**
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
@@ -136,9 +136,9 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addFieldToFilter(
                     array(
-                        'additional_table.is_filterable', 
+                        'additional_table.is_filterable',
                         'additional_table.is_filterable_in_search'
-                    ), 
+                    ),
                     array(
                         array('gt' => 0),
                         array('gt' => 0),
@@ -162,9 +162,10 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @param bool $forSorting
      * @return string
      */
-    public function getFieldName($attribute)
+    public function getFieldName($attribute, $forSorting = false)
     {
         if ($attribute->getUsedForSortBy()) {
             switch ($attribute->getBackendType()) {
@@ -175,7 +176,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
                     return $attribute->getAttributeCode() . '_t';
 
                 default:
-                    return $attribute->getAttributeCode() . '_s';
+                    return ($forSorting) ? $attribute->getAttributeCode() . '_s' : $attribute->getAttributeCode() . '_t';
             }
         } else {
             switch ($attribute->getBackendType()) {
@@ -186,7 +187,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
                     return $attribute->getAttributeCode() . '_t_mv';
 
                 default:
-                    return $attribute->getAttributeCode() . '_s_mv';
+                    return $attribute->getAttributeCode() . '_t_mv';
             }
         }
     }
@@ -203,7 +204,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$this->isLicensed()) {
             return false;
         }
-        
+
         if ($this->isCategoryPage() && !$this->isCategoryDisplayActive()) {
             return false;
         }
@@ -216,8 +217,8 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCategoryPage()
     {
-        return Mage::app()->getRequest()->getModuleName() == 'catalog'
-            && Mage::app()->getRequest()->getControllerName() == 'category';
+        return Mage::app()->getRequest()->getModuleName() != 'catalogsearch'
+            || Mage::app()->getRequest()->getControllerName() != 'result';
     }
 
     /**
@@ -239,13 +240,13 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $key = trim(strtolower($key));
         $key = str_replace(array('-', '_', ' '), '', $key);
-        
+
         if (strlen($key) != 10) {
             return false;
         }
-        
+
         $hash = md5($key);
-        
+
         return substr($hash, -3) == 'f11';
     }
 

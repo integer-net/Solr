@@ -12,7 +12,7 @@ use IntegerNet\Solr\Implementor\Pagination;
 class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
 {
     /**
-     * @var Mage_Catalog_Block_Product_List_Toolbar
+     * @var Varien_Object|Mage_Catalog_Block_Product_List_Toolbar
      */
     protected $_toolbarBlock;
 

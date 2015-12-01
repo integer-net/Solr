@@ -64,7 +64,7 @@ abstract class SolrServiceFactory
     {
         $this->resource = $resource;
         $this->attributeRepository = $applicationContext->getAttributeRepository();
-        $this->filterQueryBuilder = new FilterQueryBuilder();
+        $this->filterQueryBuilder = new FilterQueryBuilder($applicationContext->getResultsConfig());
         $this->pagination = $applicationContext->getPagination();
         $this->resultsConfig = $applicationContext->getResultsConfig();
         $this->logger = $applicationContext->getLogger();

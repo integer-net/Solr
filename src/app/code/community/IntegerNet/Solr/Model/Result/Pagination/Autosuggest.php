@@ -10,6 +10,11 @@ use IntegerNet\Solr\Implementor\Pagination;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+
+/**
+ * Class IntegerNet_Solr_Model_Result_Pagination_Autosuggest
+ * @todo move to lib
+ */
 class IntegerNet_Solr_Model_Result_Pagination_Autosuggest implements Pagination
 {
     /**

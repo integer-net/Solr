@@ -37,12 +37,4 @@ class IntegerNet_Solr_Test_Helper_Factory extends EcomDev_PHPUnit_Test_Case
         $resource->getStoreConfig(-1);
     }
 
-    /**
-     * @test
-     */
-    public function shouldCreateSolrResult()
-    {
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
-        $this->assertInstanceOf(IntegerNet_Solr_Model_Result::class, $result);
-    }
 }

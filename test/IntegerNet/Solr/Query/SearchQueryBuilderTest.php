@@ -78,13 +78,14 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
                 "(0.000000,10.000000]", "(10.000000,20.000000]", "(20.000000,30.000000]", "(30.000000,40.000000]", "(40.000000,50.000000]", "(50.000000,*]"
             ]
         ];
+        $defaultResultConfig = ResultConfigBuilder::defaultConfig()->build();
         $allData = [
-            'default' => [$defaultStoreId, ResultConfigBuilder::defaultConfig()->build(), FuzzyConfigBuilder::defaultConfig()->build(),
-                FilterQueryBuilder::noFilterQueryBuilder(), $defaultPagination, new SearchString('foo bar'),
+            'default' => [$defaultStoreId, $defaultResultConfig, FuzzyConfigBuilder::defaultConfig()->build(),
+                FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig), $defaultPagination, new SearchString('foo bar'),
                 new Query($defaultStoreId, 'foo bar~0.7', 0, PaginationStub::DEFAULT_PAGESIZE, $defaultExpectedParams)
             ],
             'alternative' => [1, ResultConfigBuilder::alternativeConfig()->build(), FuzzyConfigBuilder::inactiveConfig()->build(),
-                FilterQueryBuilder::noFilterQueryBuilder(), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
+                FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
                 new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0', 0, 24, [
                         'q.op' => ResultsConfig::SEARCH_OPERATOR_OR,
                         'fq' => "store_id:1 AND is_visible_in_search_i:1",
@@ -96,8 +97,8 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
                         'mm' => '0%'
                     ] + $defaultExpectedParams)
             ],
-            'filters' => [$defaultStoreId, ResultConfigBuilder::defaultConfig()->build(), FuzzyConfigBuilder::defaultConfig()->build(),
-                FilterQueryBuilder::noFilterQueryBuilder()
+            'filters' => [$defaultStoreId, $defaultResultConfig, FuzzyConfigBuilder::defaultConfig()->build(),
+                FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig)
                     ->addAttributeFilter(AttributeStub::sortableString('attribute1'), 'blue')
                     ->addCategoryFilter(42)
                     ->addPriceRangeFilterByMinMax(13,37),

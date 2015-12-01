@@ -49,7 +49,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->_resourceMock->expects($this->once())
             ->method('search')
             ->willReturn($this->_getDummyResponse());
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $result = Mage::getModel('integernet_solr/result');
         $result->getSolrResult();
         $this->assertEventDispatchedExactly('integernet_solr_update_query_text', 1);
         $this->assertEventDispatchedExactly('integernet_solr_before_search_request', 1);
@@ -69,7 +69,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->_resourceMock->expects($this->exactly(2))
             ->method('search')
             ->willReturn($this->_getDummyResponse());
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $result = Mage::getModel('integernet_solr/result');
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
         $this->assertEventDispatchedExactly('integernet_solr_update_query_text', 2);
@@ -124,7 +124,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
                     $this->logicalNot($this->arrayHasKey('rows'))
                 ))
             ->willReturn($this->_getDummyResponse());
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $result = Mage::getModel('integernet_solr/result');
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
     }
@@ -160,7 +160,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
                     $this->logicalNot($this->arrayHasKey('rows'))
                 ))
             ->willReturn($this->_getDummyResponse());
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $result = Mage::getModel('integernet_solr/result');
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
     }
@@ -186,7 +186,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
         $this->_resourceMock->expects($this->exactly(2))
             ->method('search')
             ->willReturn($this->_getDummyResponse());
-        $result = Mage::helper('integernet_solr/factory')->getSolrResult();
+        $result = Mage::getModel('integernet_solr/result');
         $this->setCurrentStore($storeId);
         $result->getSolrResult();
     }

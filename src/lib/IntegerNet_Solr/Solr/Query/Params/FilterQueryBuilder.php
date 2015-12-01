@@ -9,28 +9,45 @@
  */
 namespace IntegerNet\Solr\Query\Params;
 
+use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\Attribute;
 
 class FilterQueryBuilder
 {
     /**
-     * @var $_isCategoryPage bool
+     * @var $resultsConfig ResultsConfig
      */
-    private $_isCategoryPage = false;
+    private $resultsConfig;
     /**
-     * @var $_filters array
+     * @var $isCategoryPage bool
      */
-    private $_filters = array();
+    private $isCategoryPage = false;
+    /**
+     * @var $filters array
+     */
+    private $filters = array();
 
-    public function __construct()
+    /**
+     * @param ResultsConfig $resultsConfig
+     */
+    public function __construct(ResultsConfig $resultsConfig)
     {
-
+        $this->resultsConfig = $resultsConfig;
     }
 
-    public static function noFilterQueryBuilder()
+    public static function noFilterQueryBuilder(ResultsConfig $resultsConfig)
     {
-        return new self;
+        return new self($resultsConfig);
     }
+
+    /**
+     * @return ResultsConfig
+     */
+    private function getResultsConfig()
+    {
+        return $this->resultsConfig;
+    }
+
 
     /**
      * @param $isCategoryPage
@@ -38,7 +55,7 @@ class FilterQueryBuilder
      */
     public function setIsCategoryPage($isCategoryPage)
     {
-        $this->_isCategoryPage = $isCategoryPage;
+        $this->isCategoryPage = $isCategoryPage;
         return $this;
     }
 
@@ -49,7 +66,7 @@ class FilterQueryBuilder
      */
     public function addAttributeFilter(Attribute $attribute, $value)
     {
-        $this->_filters[$attribute->getAttributeCode() . '_facet'] = $value;
+        $this->filters[$attribute->getAttributeCode() . '_facet'] = $value;
         return $this;
     }
 
@@ -60,8 +77,23 @@ class FilterQueryBuilder
      */
     public function addCategoryFilter($categoryId)
     {
-        $this->_filters['category'] = $categoryId;
+        $this->filters['category'] = $categoryId;
         return $this;
+    }
+
+    /**
+     * @param int $range
+     * @param int $index
+     */
+    public function addPriceRangeFilterByConfiguration($range, $index)
+    {
+        if ($this->getResultsConfig()->isUseCustomPriceIntervals()
+            && $customPriceIntervals = $this->getResultsConfig()->getCustomPriceIntervals()
+        ) {
+            $this->addPriceRangeFilterWithCustomIntervals($index, $customPriceIntervals);
+        } else {
+            $this->addPriceRangeFilter($range, $index);
+        }
     }
 
     /**
@@ -73,7 +105,7 @@ class FilterQueryBuilder
     {
         $maxPrice = $index * $range;
         $minPrice = $maxPrice - $range;
-        $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+        $this->filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
         return $this;
     }
 
@@ -88,14 +120,14 @@ class FilterQueryBuilder
         $i = 1;
         foreach (explode(',', $customPriceIntervals) as $upperBorder) {
             if ($i == $index) {
-                $this->_filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
+                $this->filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
                 return;
             }
             $i++;
             $lowerBorder = $upperBorder;
             continue;
         }
-        $this->_filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
+        $this->filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
         return $this;
     }
 
@@ -107,9 +139,9 @@ class FilterQueryBuilder
     public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = 0.0)
     {
         if ($maxPrice) {
-            $this->_filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+            $this->filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
         } else {
-            $this->_filters['price_f'] = sprintf('[%f TO *]', $minPrice);
+            $this->filters['price_f'] = sprintf('[%f TO *]', $minPrice);
         }
         return $this;
     }
@@ -121,13 +153,13 @@ class FilterQueryBuilder
     public function buildFilterQuery($storeId)
     {
             $filterQuery = 'store_id:' . $storeId;
-            if ($this->_isCategoryPage) {
+            if ($this->isCategoryPage) {
                 $filterQuery .= ' AND is_visible_in_catalog_i:1';
             } else {
                 $filterQuery .= ' AND is_visible_in_search_i:1';
             }
 
-            foreach($this->_filters as $attributeCode => $value) {
+            foreach($this->filters as $attributeCode => $value) {
                 if (is_array($value)) {
                     $filterQuery .= ' AND (';
                     $filterQueryParts = array();

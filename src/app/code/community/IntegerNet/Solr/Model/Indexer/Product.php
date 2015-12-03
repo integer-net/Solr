@@ -250,6 +250,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         foreach (Mage::helper('integernet_solr')->getFilterableInCatalogOrSearchAttributes() as $attribute) {
 
+            if (!$product->getData($attribute->getAttributeCode())) {
+                continue;
+            }
+            
             switch ($attribute->getFrontendInput()) {
                 case 'select':
                     $rawValue = $product->getData($attribute->getAttributeCode());

@@ -75,6 +75,10 @@ class IntegerNet_Solr_Helper_Autoloader
      */
     public function loadClass($class)
     {
+        // handle pseudo namespaces
+        if (strpos($class, '\\') === false) {
+            $class = str_replace('_', '\\', $class);
+        }
         // the current namespace prefix
         $prefix = $class;
 
@@ -166,6 +170,7 @@ class IntegerNet_Solr_Helper_Autoloader
             $autoloader
                 ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
                 ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
+                ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')
                 ->register();
             $registered = true;
         }

@@ -14,7 +14,7 @@ class IntegerNet_Solr_Model_Suggestion
     /** @var null|SolrResource */
     protected $_resource = null;
 
-    /** @var null|IntegerNet_Solr_Service */
+    /** @var null|Apache_Solr_Response */
     protected $_solrSuggestion = null;
 
     /**

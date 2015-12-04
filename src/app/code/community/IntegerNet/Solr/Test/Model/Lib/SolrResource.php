@@ -34,7 +34,7 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
         $resource = new SolrResource($configStubs);
 
         foreach ($expectation as $storeId => $arguments) {
-            $_solrMock = $this->getMock(IntegerNet_Solr_Service::class, ['swapCores']);
+            $_solrMock = $this->getMock(\IntegerNet\Solr\Resource\Service::class, ['swapCores']);
             $_mocker = $_solrMock->expects($this->once())->method('swapCores');
             // PHP 5.6: ->with(...$arguments)
             call_user_func_array([$_mocker, 'with'], $arguments);

@@ -17,11 +17,11 @@ use Apache_Solr_HttpTransport_FileGetContents;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet_Solr_Model_Source_HttpTransportMethod;
-use IntegerNet_Solr_Service;
+use IntegerNet\Solr\Resource\Service;
 use Mage_Core_Model_Store;
 
 /**
- * Solr resource, interface between Magento and solr service
+ * Solr resource, facade for Apache_Solr library
  *
  */
 class SolrResource
@@ -36,7 +36,7 @@ class SolrResource
     /**
      * Solr service, by store id
      *
-     * @var IntegerNet_Solr_Service[]
+     * @var Service[]
      */
     protected $_solr;
 
@@ -73,7 +73,7 @@ class SolrResource
 
     /**
      * @param int $storeId
-     * @return IntegerNet_Solr_Service
+     * @return Service
      */
     public function getSolrService($storeId)
     {
@@ -96,7 +96,7 @@ class SolrResource
             if ($core) {
                 $path .= $core . '/';
             }
-            $this->_solr[$storeId] = new IntegerNet_Solr_Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
+            $this->_solr[$storeId] = new Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
         }
         return $this->_solr[$storeId];
     }

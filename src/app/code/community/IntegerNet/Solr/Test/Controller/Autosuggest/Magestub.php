@@ -10,7 +10,7 @@
 use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Implementor\Config;
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
  * Test case for the low weight replacement of Magento classes in autosuggest calls
@@ -31,7 +31,7 @@ class IntegerNet_Solr_Test_Controller_Autosuggest_Magestub extends EcomDev_PHPUn
     public function shouldCreateSolrResourceWithFactoryHelper()
     {
         $resource = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr/factory')->getSolrResource();
-        $this->assertInstanceOf(SolrResource::class, $resource);
+        $this->assertInstanceOf(ResourceFacade::class, $resource);
         $defaultStoreConfig = $resource->getStoreConfig(1);
         $this->assertInstanceOf(Config::class, $defaultStoreConfig);
         $this->assertInstanceOf(IndexingConfig::class, $defaultStoreConfig->getIndexingConfig());

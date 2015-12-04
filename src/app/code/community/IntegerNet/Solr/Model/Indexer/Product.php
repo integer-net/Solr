@@ -1,5 +1,5 @@
 <?php
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
  * integer_net Magento Module
@@ -632,7 +632,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /**
      * Retrieve model resource
      *
-     * @return SolrResource
+     * @return ResourceFacade
      */
     public function getResource()
     {
@@ -641,7 +641,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /**
      * Retrieve model resource
      *
-     * @return SolrResource
+     * @return \IntegerNet\Solr\Resource\ResourceFacade
      */
     protected function _getResource()
     {

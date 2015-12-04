@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-namespace IntegerNet\Solr;
+namespace IntegerNet\Solr\Resource;
 
 use Apache_Solr_Compatibility_Solr4CompatibilityLayer;
 use Apache_Solr_Document;
@@ -15,16 +15,16 @@ use Apache_Solr_HttpTransport_Abstract;
 use Apache_Solr_HttpTransport_Curl;
 use Apache_Solr_HttpTransport_FileGetContents;
 use Apache_Solr_Response;
+use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet_Solr_Model_Source_HttpTransportMethod;
-use IntegerNet\Solr\Resource\Service;
 use Mage_Core_Model_Store;
 
 /**
  * Solr resource, facade for Apache_Solr library
  *
  */
-class SolrResource
+class ResourceFacade
 {
     /**
      * Configuration reader, by store id

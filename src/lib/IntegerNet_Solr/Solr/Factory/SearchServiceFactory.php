@@ -19,7 +19,7 @@ use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\QueryBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Query\SearchString;
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use Psr\Log\LoggerInterface;
 use IntegerNet\Solr\Query\SearchParamsBuilder;
 use IntegerNet\Solr\SearchService;
@@ -38,10 +38,10 @@ class SearchServiceFactory extends SolrServiceFactory
 
     /**
      * @param ApplicationContext $applicationContext
-     * @param SolrResource $resource
+     * @param ResourceFacade $resource
      * @param int $storeId
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
+    public function __construct(ApplicationContext $applicationContext, ResourceFacade $resource, $storeId)
     {
         parent::__construct($applicationContext, $resource, $storeId);
         $this->fuzzyConfig = $applicationContext->getFuzzyConfig();

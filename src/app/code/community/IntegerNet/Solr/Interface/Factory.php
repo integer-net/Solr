@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\SolrService;
 
 /**
@@ -18,7 +18,7 @@ interface IntegerNet_Solr_Interface_Factory
     /**
      * Returns new configured Solr recource
      *
-     * @return SolrResource
+     * @return ResourceFacade
      */
     public function getSolrResource();
 

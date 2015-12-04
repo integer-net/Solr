@@ -18,13 +18,14 @@ use Apache_Solr_Document;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 
 class SearchService implements SolrService
 {
     /**
-     * @var $resource SolrResource
+     * @var $resource ResourceFacade
      */
     private $resource;
     /**
@@ -59,14 +60,14 @@ class SearchService implements SolrService
 
     /**
      * SearchService constructor.
-     * @param SolrResource $resource
+     * @param ResourceFacade $resource
      * @param SearchQueryBuilder $queryBuilder
      * @param Pagination $pagination
      * @param FuzzyConfig $fuzzyConfig
      * @param EventDispatcher $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(SolrResource $resource, SearchQueryBuilder $queryBuilder, Pagination $pagination, FuzzyConfig $fuzzyConfig, EventDispatcher $eventDispatcher, LoggerInterface $logger)
+    public function __construct(ResourceFacade $resource, SearchQueryBuilder $queryBuilder, Pagination $pagination, FuzzyConfig $fuzzyConfig, EventDispatcher $eventDispatcher, LoggerInterface $logger)
     {
         $this->resource = $resource;
         $this->queryBuilder = $queryBuilder;
@@ -354,7 +355,7 @@ class SearchService implements SolrService
     }
 
     /**
-     * @return SolrResource
+     * @return ResourceFacade
      */
     private function getResource()
     {

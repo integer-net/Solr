@@ -14,7 +14,7 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Query\CategoryParamsBuilder;
 use IntegerNet\Solr\Query\CategoryQueryBuilder;
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\CategoryService;
 
 class CategoryServiceFactory extends SolrServiceFactory
@@ -26,11 +26,11 @@ class CategoryServiceFactory extends SolrServiceFactory
 
     /**
      * @param ApplicationContext $applicationContext
-     * @param SolrResource $resource
+     * @param ResourceFacade $resource
      * @param $storeId
      * @param $categoryId
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId, $categoryId)
+    public function __construct(ApplicationContext $applicationContext, ResourceFacade $resource, $storeId, $categoryId)
     {
         $this->categoryId = $categoryId;
         parent::__construct($applicationContext, $resource, $storeId);

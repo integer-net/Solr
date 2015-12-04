@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
  * This class is a low weight replacement for the factory helper class in autosuggest calls
@@ -17,7 +17,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
     /**
      * Returns new configured Solr recource
      *
-     * @return SolrResource
+     * @return ResourceFacade
      */
     public function getSolrResource()
     {
@@ -26,7 +26,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
             $store->getId() => new IntegerNet_Solr_Model_Config_Store($store->getId())
         ];
 
-        return new SolrResource($storeConfig);
+        return new ResourceFacade($storeConfig);
     }
 
     /**

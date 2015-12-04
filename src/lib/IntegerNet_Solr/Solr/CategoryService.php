@@ -15,13 +15,14 @@ use Apache_Solr_Response;
 use IntegerNet\Solr\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 
 class CategoryService implements SolrService
 {
     /**
-     * @var $resource SolrResource
+     * @var $resource ResourceFacade
      */
     private $resource;
     /**
@@ -45,7 +46,7 @@ class CategoryService implements SolrService
      * @param LoggerInterface $logger
      * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(SolrResource $resource, CategoryQueryBuilder $queryBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
+    public function __construct(ResourceFacade $resource, CategoryQueryBuilder $queryBuilder, LoggerInterface $logger, EventDispatcher $eventDispatcher)
     {
         $this->queryBuilder = $queryBuilder;
         $this->resource = $resource;
@@ -120,7 +121,7 @@ class CategoryService implements SolrService
     }
 
     /**
-     * @return SolrResource
+     * @return ResourceFacade
      */
     private function getResource()
     {

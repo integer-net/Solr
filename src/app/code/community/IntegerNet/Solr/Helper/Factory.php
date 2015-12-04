@@ -1,5 +1,5 @@
 <?php
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\SolrService;
 use Psr\Log\NullLogger;
 use IntegerNet\Solr\Factory\SolrServiceFactory;
@@ -21,7 +21,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new configured Solr recource
      *
-     * @return SolrResource
+     * @return ResourceFacade
      */
     public function getSolrResource()
     {
@@ -32,7 +32,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
                 $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
             }
         }
-        return new SolrResource($storeConfig);
+        return new ResourceFacade($storeConfig);
     }
 
     /**

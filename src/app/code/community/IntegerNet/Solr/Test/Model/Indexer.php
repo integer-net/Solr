@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
  * @loadFixture config
@@ -25,6 +25,6 @@ class IntegerNet_Solr_Test_Model_Indexer extends EcomDev_PHPUnit_Test_Case
         $factoryMock->expects($this->once())->method('getSolrResource');
         $this->replaceByMock('helper', 'integernet_solr/factory', $factoryMock);
         $resource = Mage::getModel('integernet_solr/indexer')->getResource();
-        $this->assertInstanceOf(SolrResource::class, $resource);
+        $this->assertInstanceOf(ResourceFacade::class, $resource);
     }
 }

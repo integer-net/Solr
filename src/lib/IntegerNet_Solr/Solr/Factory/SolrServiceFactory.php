@@ -17,13 +17,13 @@ use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\QueryBuilder;
-use IntegerNet\Solr\SolrResource;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use Psr\Log\LoggerInterface;
 
 abstract class SolrServiceFactory
 {
     /**
-     * @var $resource SolrResource
+     * @var $resource ResourceFacade
      */
     private $resource;
     /**
@@ -57,10 +57,10 @@ abstract class SolrServiceFactory
 
     /**
      * @param ApplicationContext $applicationContext
-     * @param SolrResource $resource
+     * @param \IntegerNet\Solr\Resource\ResourceFacade $resource
      * @param int $storeId
      */
-    public function __construct(ApplicationContext $applicationContext, SolrResource $resource, $storeId)
+    public function __construct(ApplicationContext $applicationContext, ResourceFacade $resource, $storeId)
     {
         $this->resource = $resource;
         $this->attributeRepository = $applicationContext->getAttributeRepository();
@@ -77,7 +77,7 @@ abstract class SolrServiceFactory
     abstract public function createSolrService();
 
     /**
-     * @return SolrResource
+     * @return \IntegerNet\Solr\Resource\ResourceFacade
      */
     protected function getResource()
     {

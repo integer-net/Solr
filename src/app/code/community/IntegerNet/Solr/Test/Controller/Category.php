@@ -30,6 +30,8 @@ class IntegerNet_Solr_Test_Controller_Category extends EcomDev_PHPUnit_Test_Case
      * @singleton catalog/session
      * @singleton customer/session
      * @singleton reports/session
+     * @singleton integernet_solr/indexer_product
+     * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
@@ -52,12 +54,13 @@ class IntegerNet_Solr_Test_Controller_Category extends EcomDev_PHPUnit_Test_Case
      * @singleton catalog/session
      * @singleton customer/session
      * @singleton reports/session
+     * @singleton integernet_solr/indexer_product
+     * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldShowProductsInCategory()
     {
-        $this->markTestSkipped('Still global state somewhere. only one of the test cases can run successfully');
         $this->dispatch('catalog/category/view', ['id' => self::CATEGORY_ID]);
         $this->assertResponseBodyContains('Aliens');
         $this->assertResponseBodyContains('2 Item(s)');

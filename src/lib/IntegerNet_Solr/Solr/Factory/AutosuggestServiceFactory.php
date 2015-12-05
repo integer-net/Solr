@@ -20,8 +20,8 @@ class AutosuggestServiceFactory extends SearchServiceFactory
             $this->getFilterQueryBuilder(),
             $this->getPagination(),
             $this->getResultsConfig(),
-            $this->getFuzzyConfig()
+            $this->getFuzzyConfig(),
+            $this->getStoreId()
         );
     }
-
 }

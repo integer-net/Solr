@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\Solr\Result;
 
+use IntegerNet\Solr\Resource\SolrResponse;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -26,10 +27,10 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param \Apache_Solr_Response $result
+     * @param SolrResponse $result
      * @param int $time in microseconds
      */
-    public function logResult(\Apache_Solr_Response $result, $time)
+    public function logResult(SolrResponse $result, $time)
     {
         $resultClone = unserialize(serialize($result));
         if (isset($resultClone->response->docs)) {

@@ -19,6 +19,8 @@ use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\Resource\ResponseDecorator;
+use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -95,7 +97,7 @@ class SearchService implements SolrService
     }
 
     /**
-     * @return Apache_Solr_Response
+     * @return SolrResponse
      */
     public function doRequest()
     {
@@ -109,45 +111,10 @@ class SearchService implements SolrService
             $result = $this->getResultFromRequest($pageSize, false);
 
             $numberResults = sizeof($result->response->docs);
-            $numberDuplicates = 0;
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
                 $fuzzyResult = $this->getResultFromRequest( $pageSize, true);
-
-                if ($numberResults < $pageSize) {
-
-                    $foundProductIds = array();
-                    foreach ($result->response->docs as $nonFuzzyDoc) {
-                        /* @var $nonFuzzyDoc Apache_Solr_Document */
-                        $field = $nonFuzzyDoc->getField('product_id');
-                        $foundProductIds[] = $field['value'];
-                    }
-
-                    foreach ($fuzzyResult->response->docs as $fuzzyDoc) {
-                        /* @var $fuzzyDoc Apache_Solr_Document */
-                        $field = $fuzzyDoc->getField('product_id');
-                        if (!in_array($field['value'], $foundProductIds)) {
-                            $result->response->docs[] = $fuzzyDoc;
-                            if (++$numberResults >= $pageSize) {
-                                break;
-                            }
-                        } else {
-                            $numberDuplicates++;
-                        }
-                    }
-
-                    $result->response->numFound = $result->response->numFound
-                        + $fuzzyResult->response->numFound
-                        - $numberDuplicates;
-                } else {
-                    $result->response->numFound = max(
-                        $result->response->numFound,
-                        $fuzzyResult->response->numFound
-                    );
-                }
-
-                $this->mergeFacetFieldCounts($result, $fuzzyResult);
-                $this->mergePriceData($result, $fuzzyResult);
+                $result = $result->merge($fuzzyResult, $pageSize);
             }
 
             if (sizeof($result->response->docs) == 0) {
@@ -166,10 +133,10 @@ class SearchService implements SolrService
     /**
      * Remove all but last page from multipage result
      *
-     * @param Apache_Solr_Response $result
+     * @param SolrResponse $result
      * @return Apache_Solr_Response
      */
-    private function sliceResult(Apache_Solr_Response $result)
+    private function sliceResult(SolrResponse $result)
     {
         $pageSize = $this->getParamsBuilder()->getPageSize();
         $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;
@@ -188,136 +155,9 @@ class SearchService implements SolrService
 
 
     /**
-     * Merge facet counts of both results and store them into $result
-     *
-     * @todo extract to result class
-     *
-     * @param $result
-     * @param $fuzzyResult
-     */
-    private function mergeFacetFieldCounts($result, $fuzzyResult)
-    {
-        $facetFields = (array)$fuzzyResult->facet_counts->facet_fields;
-
-        foreach($facetFields as $facetName => $facetCounts) {
-            $facetCounts = (array)$facetCounts;
-
-            foreach($facetCounts as $facetId => $facetCount) {
-                if (isset($result->facet_counts->facet_fields->$facetName->$facetId)) {
-                    $result->facet_counts->facet_fields->$facetName->$facetId = max(
-                        $result->facet_counts->facet_fields->$facetName->$facetId,
-                        $facetCount
-                    );
-                } else {
-                    $result->facet_counts->facet_fields->$facetName->$facetId = $facetCount;
-                }
-            }
-        }
-
-        if (isset($fuzzyResult->facet_counts->facet_ranges)) {
-
-            $facetRanges = (array)$fuzzyResult->facet_counts->facet_ranges;
-
-            foreach ($facetRanges as $facetName => $facetCounts) {
-                $facetCounts = (array)$facetCounts->counts;
-
-                if (!isset($result->facet_counts)) {
-                    $result->facet_counts = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_ranges)) {
-                    $result->facet_counts->facet_ranges = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_ranges->$facetName)) {
-                    $result->facet_counts->facet_ranges->$facetName = new stdClass();
-                    $result->facet_counts->facet_ranges->$facetName->counts = new stdClass();
-                }
-
-                foreach ($facetCounts as $facetId => $facetCount) {
-                    if (isset($result->facet_counts->facet_ranges->$facetName->counts->$facetId)) {
-                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = max(
-                            $result->facet_counts->facet_ranges->$facetName->counts->$facetId,
-                            $facetCount
-                        );
-                    } else {
-                        $result->facet_counts->facet_ranges->$facetName->counts->$facetId = $facetCount;
-                    }
-                }
-            }
-        }
-
-        if (isset($fuzzyResult->facet_counts->facet_intervals)) {
-
-            $facetIntervals = (array)$fuzzyResult->facet_counts->facet_intervals;
-
-            foreach ($facetIntervals as $facetName => $facetCounts) {
-                $facetCounts = (array)$facetCounts;
-
-                if (!isset($result->facet_counts)) {
-                    $result->facet_counts = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_intervals)) {
-                    $result->facet_counts->facet_intervals = new stdClass();
-                }
-                if (!isset($result->facet_counts->facet_intervals->$facetName)) {
-                    $result->facet_counts->facet_intervals->$facetName = new stdClass();
-                }
-
-                foreach ($facetCounts as $facetId => $facetCount) {
-                    if (isset($result->facet_counts->facet_intervals->$facetName->$facetId)) {
-                        $result->facet_counts->facet_intervals->$facetName->$facetId = max(
-                            $result->facet_counts->facet_intervals->$facetName->$facetId,
-                            $facetCount
-                        );
-                    } else {
-                        $result->facet_counts->facet_intervals->$facetName->$facetId = $facetCount;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Merge price information (min, max, intervals) of both results and store them into $result
-     *
-     * @todo extract to result class
-     *
-     * @param $result
-     * @param $fuzzyResult
-     */
-    private function mergePriceData($result, $fuzzyResult)
-    {
-        if (!isset($fuzzyResult->stats->stats_fields)) {
-            return;
-        }
-
-        $statsFields = (array)$fuzzyResult->stats->stats_fields;
-
-        foreach($statsFields as $fieldName => $fieldData) {
-
-            if (!isset($result->stats)) {
-                $result->stats = new stdClass();
-            }
-            if (!isset($result->stats->stats_fields)) {
-                $result->stats->stats_fields = new stdClass();
-            }
-            if (!isset($result->stats->stats_fields->$fieldName)) {
-                $result->stats->stats_fields->$fieldName = new stdClass();
-            }
-
-            $fieldData = (array)$fieldData;
-            if (isset($fieldData['min'])) {
-                $result->stats->stats_fields->$fieldName->min = $fieldData['min'];
-            }
-            if (isset($fieldData['max'])) {
-                $result->stats->stats_fields->$fieldName->max = $fieldData['max'];
-            }
-        }
-    }
-
-    /**
      * @param int $pageSize
      * @param boolean $fuzzy
-     * @return \Apache_Solr_Response
+     * @return SolrResponse
      */
     private function getResultFromRequest($pageSize, $fuzzy = true)
     {
@@ -334,7 +174,6 @@ class SearchService implements SolrService
 
         $startTime = microtime(true);
 
-        /* @var Apache_Solr_Response $result */
         $result = $this->getResource()->search(
             $transportObject->getStoreId(),
             $transportObject->getQueryText(),

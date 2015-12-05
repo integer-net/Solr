@@ -16,6 +16,7 @@ use IntegerNet\Solr\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -72,7 +73,7 @@ class CategoryService implements SolrService
 
 
     /**
-     * @return Apache_Solr_Response
+     * @return SolrResponse
      */
     public function doRequest()
     {
@@ -89,7 +90,6 @@ class CategoryService implements SolrService
 
         $startTime = microtime(true);
 
-        /* @var Apache_Solr_Response $result */
         $result = $this->getResource()->search(
             $transportObject->getStoreId(),
             $transportObject->getQueryText(),
@@ -104,13 +104,14 @@ class CategoryService implements SolrService
 
         return $this->sliceResult($result);
     }
+
     /**
      * Remove all but last page from multipage result
      *
-     * @param Apache_Solr_Response $result
+     * @param SolrResponse $result
      * @return Apache_Solr_Response
      */
-    private function sliceResult(Apache_Solr_Response $result)
+    private function sliceResult(SolrResponse $result)
     {
         $pageSize = $this->getParamsBuilder()->getPageSize();
         $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;

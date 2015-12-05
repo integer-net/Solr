@@ -116,12 +116,12 @@ class ResourceFacade
      * @param int $offset The starting offset for result documents
      * @param int $limit The maximum number of result documents to return
      * @param array $params key / value pairs for other query parameters (see Solr documentation), use arrays for parameter keys used more than once (e.g. facet.field)
-     * @return Apache_Solr_Response
+     * @return SolrResponse
      */
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
         $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params);
-        return $response;
+        return new ResponseDecorator($response);
     }
 
     /**

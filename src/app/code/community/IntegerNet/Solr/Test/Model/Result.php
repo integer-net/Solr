@@ -8,6 +8,8 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\Resource\ResponseDecorator;
+use IntegerNet\Solr\Resource\SolrResponse;
 
 /**
  * @loadFixture config
@@ -192,7 +194,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
     }
 
     /**
-     * @return Apache_Solr_Response
+     * @return SolrResponse
      */
     protected function _getDummyResponse()
     {
@@ -200,6 +202,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
             'response' => ['docs' => [], 'numFound' => 0],
             'facet_counts' => ['facet_fields' => []]
         ];
-        return new Apache_Solr_Response(new Apache_Solr_HttpTransport_Response(200, 'application/json', json_encode($result)));
+        return new ResponseDecorator(new Apache_Solr_Response(new Apache_Solr_HttpTransport_Response(
+            200, 'application/json', json_encode($result))));
     }
 }

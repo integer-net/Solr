@@ -11,11 +11,12 @@ namespace IntegerNet\Solr;
 
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
+use IntegerNet\Solr\Resource\SolrResponse;
 
 interface SolrService
 {
     /**
-     * @return \Apache_Solr_Response
+     * @return SolrResponse
      */
     public function doRequest();
 

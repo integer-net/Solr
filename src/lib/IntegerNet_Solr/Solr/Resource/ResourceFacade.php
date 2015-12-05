@@ -17,10 +17,11 @@ use Apache_Solr_HttpTransport_FileGetContents;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Config;
-use IntegerNet_Solr_Model_Source_HttpTransportMethod;
 
 /**
  * Solr resource, facade for Apache_Solr library
+ *
+ * @todo adapter/wrapper for Apache_Solr_Respons
  */
 class ResourceFacade
 {
@@ -70,6 +71,7 @@ class ResourceFacade
     }
 
     /**
+     * @deprecated should be completely abstracted
      * @param int $storeId
      * @return Service
      */
@@ -319,7 +321,7 @@ class ResourceFacade
     protected function _getHttpTransportAdapter($storeId)
     {
         switch ($this->getStoreConfig($storeId)->getServerConfig()->getHttpTransportMethod()) {
-            case IntegerNet_Solr_Model_Source_HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL:
+            case HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL:
                 $adapter = new Apache_Solr_HttpTransport_Curl();
                 break;
             default:

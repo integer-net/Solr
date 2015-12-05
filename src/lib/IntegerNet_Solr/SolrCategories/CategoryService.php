@@ -7,17 +7,18 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr;
+namespace IntegerNet\SolrCategories;
 
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use Apache_Solr_Response;
-use IntegerNet\Solr\Query\CategoryQueryBuilder;
+use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Result\Logger;
+use IntegerNet\Solr\SolrService;
 use Psr\Log\LoggerInterface;
 
 class CategoryService implements SolrService
@@ -27,7 +28,7 @@ class CategoryService implements SolrService
      */
     private $resource;
     /**
-     * @var $queryBuilder CategoryQueryBuilder
+     * @var $queryBuilder \IntegerNet\SolrCategories\Query\CategoryQueryBuilder
      */
     private $queryBuilder;
     /**

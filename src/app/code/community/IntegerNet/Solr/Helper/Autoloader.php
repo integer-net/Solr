@@ -169,6 +169,8 @@ class IntegerNet_Solr_Helper_Autoloader
             $autoloader = new self;
             $autoloader
                 ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
+                ->addNamespace('IntegerNet\SolrCategories', $libBaseDir . '/SolrCategories')
+                ->addNamespace('IntegerNet\SolrSuggest', $libBaseDir . '/SolrSuggest')
                 ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
                 ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')
                 ->register();

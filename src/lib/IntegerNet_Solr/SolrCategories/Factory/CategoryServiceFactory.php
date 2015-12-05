@@ -7,15 +7,17 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr\Factory;
+namespace IntegerNet\SolrCategories\Factory;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Factory\ApplicationContext;
+use IntegerNet\Solr\Factory\SolrServiceFactory;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Query\CategoryParamsBuilder;
-use IntegerNet\Solr\Query\CategoryQueryBuilder;
+use IntegerNet\SolrCategories\Query\CategoryParamsBuilder;
+use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\CategoryService;
+use IntegerNet\SolrCategories\CategoryService;
 
 class CategoryServiceFactory extends SolrServiceFactory
 {

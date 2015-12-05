@@ -7,12 +7,14 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr\Query;
+namespace IntegerNet\SolrCategories\Query;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Query\AbstractQueryBuilder;
+use IntegerNet\Solr\Query\ParamsBuilder;
 
 final class CategoryQueryBuilder extends AbstractQueryBuilder
 {

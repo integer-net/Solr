@@ -18,11 +18,9 @@ use Apache_Solr_Response;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet_Solr_Model_Source_HttpTransportMethod;
-use Mage_Core_Model_Store;
 
 /**
  * Solr resource, facade for Apache_Solr library
- *
  */
 class ResourceFacade
 {
@@ -139,7 +137,7 @@ class ResourceFacade
     }
 
     /**
-     * @param null|Mage_Core_Model_Store $restrictToStore
+     * @param null|int $restrictToStore
      * @throws Exception
      */
     public function checkSwapCoresConfiguration($restrictToStore = null)
@@ -152,7 +150,7 @@ class ResourceFacade
             /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+            if (!is_null($restrictToStore) && ($restrictToStore != $storeId)) {
                 continue;
             }
 
@@ -180,7 +178,7 @@ class ResourceFacade
     }
 
     /**
-     * @param null|Mage_Core_Model_Store $restrictToStore
+     * @param null|int $restrictToStore
      */
     public function swapCores($restrictToStore = null)
     {
@@ -190,7 +188,7 @@ class ResourceFacade
             /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+            if (!is_null($restrictToStore) && ($restrictToStore != $storeId)) {
                 continue;
             }
 

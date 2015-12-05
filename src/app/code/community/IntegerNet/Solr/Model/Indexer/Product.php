@@ -34,7 +34,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
         if (is_null($productIds)) {
-            $this->getResource()->checkSwapCoresConfiguration($restrictToStore);
+            $this->getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
         }
 
         $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
@@ -84,7 +84,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $this->_stopStoreEmulation();
 
         if (is_null($productIds)) {
-            $this->getResource()->swapCores($restrictToStore);
+            $this->getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
         }
     }
     

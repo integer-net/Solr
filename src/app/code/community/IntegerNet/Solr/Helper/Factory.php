@@ -19,19 +19,14 @@ use IntegerNet\Solr\Factory\ApplicationContext;
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
     /**
-     * Returns new configured Solr recource
+     * Returns new configured Solr recource. Instantiation separate from SolrServiceFactory
+     * for easy mocking in integration tests
      *
      * @return ResourceFacade
      */
     public function getSolrResource()
     {
-        $storeConfig = [];
-        foreach (Mage::app()->getStores(true) as $store) {
-            /** @var Mage_Core_Model_Store $store */
-            if ($store->getIsActive()) {
-                $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
-            }
-        }
+        $storeConfig = $this->_getStoreConfig();
         return new ResourceFacade($storeConfig);
     }
 
@@ -67,7 +62,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         /** @var SolrServiceFactory $factory */
         if ($isCategoryPage) {
             $factory = new CategoryServiceFactory($applicationContext,
-                Mage::helper('integernet_solr/factory')->getSolrResource(),
+                $this->getSolrResource(),
                 $storeId,
                 Mage::registry('current_category')->getId()
             );
@@ -77,7 +72,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
                 ->setQuery(Mage::helper('integernet_solr'));
             $factory = new AutosuggestServiceFactory(
                 $applicationContext,
-                Mage::helper('integernet_solr/factory')->getSolrResource(),
+                $this->getSolrResource(),
                 $storeId
             );
         } else {
@@ -86,11 +81,26 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
                 ->setQuery(Mage::helper('integernet_solr'));
             $factory = new SearchServiceFactory(
                 $applicationContext,
-                Mage::helper('integernet_solr/factory')->getSolrResource(),
+                $this->getSolrResource(),
                 $storeId
             );
         }
         return $factory->createSolrService();
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getStoreConfig()
+    {
+        $storeConfig = [];
+        foreach (Mage::app()->getStores(true) as $store) {
+            /** @var Mage_Core_Model_Store $store */
+            if ($store->getIsActive()) {
+                $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
+            }
+        }
+        return $storeConfig;
     }
 
 

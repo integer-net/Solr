@@ -21,7 +21,7 @@ use IntegerNet\Solr\Implementor\Config;
 /**
  * Solr resource, facade for Apache_Solr library
  *
- * @todo adapter/wrapper for Apache_Solr_Respons
+ * @todo split pro features
  */
 class ResourceFacade
 {

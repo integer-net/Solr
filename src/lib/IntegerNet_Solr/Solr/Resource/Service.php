@@ -16,6 +16,10 @@ use Apache_Solr_InvalidArgumentException;
 use Apache_Solr_HttpTransportException;
 use Apache_Solr_Response;
 
+/**
+ * @todo split pro features
+ * @package IntegerNet\Solr\Resource
+ */
 class Service extends Apache_Solr_Service
 {
     const SUGGEST_SERVLET = 'suggest';

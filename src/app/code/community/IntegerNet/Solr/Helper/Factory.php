@@ -5,7 +5,7 @@ use Psr\Log\NullLogger;
 use IntegerNet\Solr\Factory\SolrServiceFactory;
 use IntegerNet\Solr\Factory\SearchServiceFactory;
 use IntegerNet\SolrCategories\Factory\CategoryServiceFactory;
-use IntegerNet\Solr\Factory\AutosuggestServiceFactory;
+use IntegerNet\SolrSuggest\Factory\AutosuggestServiceFactory;
 use IntegerNet\Solr\Factory\ApplicationContext;
 
 /**

@@ -18,9 +18,10 @@ use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\QueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\Service\Request;
 use Psr\Log\LoggerInterface;
 
-abstract class SolrServiceFactory
+abstract class RequestFactory
 {
     /**
      * @var $resource ResourceFacade
@@ -74,7 +75,11 @@ abstract class SolrServiceFactory
 
     abstract protected function createQueryBuilder();
     abstract protected function createParamsBuilder();
-    abstract public function createSolrService();
+
+    /**
+     * @return Request
+     */
+    abstract public function createRequest();
 
     /**
      * @return \IntegerNet\Solr\Resource\ResourceFacade

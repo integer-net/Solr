@@ -11,15 +11,15 @@ namespace IntegerNet\SolrCategories\Factory;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Factory\ApplicationContext;
-use IntegerNet\Solr\Factory\SolrServiceFactory;
+use IntegerNet\Solr\Factory\RequestFactory;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrCategories\Query\CategoryParamsBuilder;
 use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\SolrCategories\CategoryService;
+use IntegerNet\SolrCategories\CategoryRequest;
 
-class CategoryServiceFactory extends SolrServiceFactory
+class CategoryRequestFactory extends RequestFactory
 {
     /**
      * @var $categoryId int
@@ -61,9 +61,12 @@ class CategoryServiceFactory extends SolrServiceFactory
         );
     }
 
-    public function createSolrService()
+    /**
+     * @return CategoryRequest
+     */
+    public function createRequest()
     {
-        return new CategoryService(
+        return new CategoryRequest(
             $this->getResource(),
             $this->createQueryBuilder(),
             $this->getLogger(),

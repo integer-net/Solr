@@ -7,24 +7,22 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr;
+namespace IntegerNet\Solr\Service;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
 use Apache_Solr_Response;
-use Apache_Solr_Document;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\Resource\ResponseDecorator;
 use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Result\Logger;
 use Psr\Log\LoggerInterface;
 
-class SearchService implements SolrService
+class SearchRequest implements Request, HasFilter
 {
     /**
      * @var $resource ResourceFacade
@@ -61,7 +59,6 @@ class SearchService implements SolrService
     private $foundNoResults = false;
 
     /**
-     * SearchService constructor.
      * @param ResourceFacade $resource
      * @param SearchQueryBuilder $queryBuilder
      * @param Pagination $pagination

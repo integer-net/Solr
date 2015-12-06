@@ -32,11 +32,11 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
     /**
      * Returns new Solr result wrapper
      *
-     * @return \IntegerNet\Solr\SolrService
+     * @return \IntegerNet\Solr\Service\Request
      */
-    public function getSolrService()
+    public function getSolrRequest()
     {
-        // TODO: Implement getSolrService() method.
+        // TODO: Implement getSolrRequest() method.
         // not used as long as autosuggest lib uses its own result model
     }
 

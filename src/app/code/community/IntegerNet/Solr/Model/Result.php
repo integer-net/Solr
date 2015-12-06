@@ -7,15 +7,16 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-use IntegerNet\Solr\SolrService;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
+use IntegerNet\Solr\Service\HasFilter;
+use IntegerNet\Solr\Service\Request;
 
 class IntegerNet_Solr_Model_Result
 {
     /**
-     * @var $_solrService SolrService
+     * @var $_solrRequest Request
      */
-    protected $_solrService;
+    protected $_solrRequest;
     /**
      * @var $_filterQueryBuilder FilterQueryBuilder
      */
@@ -27,8 +28,10 @@ class IntegerNet_Solr_Model_Result
 
     function __construct()
     {
-        $this->_solrService = Mage::helper('integernet_solr/factory')->getSolrService();
-        $this->_filterQueryBuilder = $this->_solrService->getFilterQueryBuilder();
+        $this->_solrRequest = Mage::helper('integernet_solr/factory')->getSolrRequest();
+        if ($this->_solrRequest instanceof HasFilter) {
+            $this->_filterQueryBuilder = $this->_solrRequest->getFilterQueryBuilder();
+        }
     }
 
     /**
@@ -39,7 +42,7 @@ class IntegerNet_Solr_Model_Result
     public function getSolrResult()
     {
         if (is_null($this->_solrResult)) {
-            $this->_solrResult = $this->_solrService->doRequest();
+            $this->_solrResult = $this->_solrRequest->doRequest();
         }
 
         return $this->_solrResult;

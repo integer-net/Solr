@@ -12,16 +12,17 @@ namespace IntegerNet\SolrCategories;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use Apache_Solr_Response;
+use IntegerNet\Solr\Service\HasFilter;
+use IntegerNet\Solr\Service\Request;
 use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Result\Logger;
-use IntegerNet\Solr\SolrService;
 use Psr\Log\LoggerInterface;
 
-class CategoryService implements SolrService
+class CategoryRequest implements Request, HasFilter
 {
     /**
      * @var $resource ResourceFacade

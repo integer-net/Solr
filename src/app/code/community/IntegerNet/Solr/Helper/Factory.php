@@ -8,18 +8,18 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\SolrService;
+use IntegerNet\Solr\Service\Request;
 use Psr\Log\NullLogger;
-use IntegerNet\Solr\Factory\SolrServiceFactory;
-use IntegerNet\Solr\Factory\SearchServiceFactory;
-use IntegerNet\SolrCategories\Factory\CategoryServiceFactory;
-use IntegerNet\SolrSuggest\Factory\AutosuggestServiceFactory;
+use IntegerNet\Solr\Factory\RequestFactory;
+use IntegerNet\Solr\Factory\SearchRequestFactory;
+use IntegerNet\SolrCategories\Factory\CategoryRequestFactory;
+use IntegerNet\SolrSuggest\Factory\AutosuggestRequestFactory;
 use IntegerNet\Solr\Factory\ApplicationContext;
 use IntegerNet\SolrSuggest\Result\DummyPagination;
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
     /**
-     * Returns new configured Solr recource. Instantiation separate from SolrServiceFactory
+     * Returns new configured Solr recource. Instantiation separate from RequestFactory
      * for easy mocking in integration tests
      *
      * @return ResourceFacade
@@ -33,9 +33,9 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
-     * @return SolrService
+     * @return Request
      */
-    public function getSolrService()
+    public function getSolrRequest()
     {
         $storeId = Mage::app()->getStore()->getId();
         $config = new IntegerNet_Solr_Model_Config_Store($storeId);
@@ -59,9 +59,9 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             Mage::helper('integernet_solr'),
             $logger
         );
-        /** @var SolrServiceFactory $factory */
+        /** @var RequestFactory $factory */
         if ($isCategoryPage) {
-            $factory = new CategoryServiceFactory($applicationContext,
+            $factory = new CategoryRequestFactory($applicationContext,
                 $this->getSolrResource(),
                 $storeId,
                 Mage::registry('current_category')->getId()
@@ -70,7 +70,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzyAutosuggestConfig())
                 ->setQuery(Mage::helper('integernet_solr'));
-            $factory = new AutosuggestServiceFactory(
+            $factory = new AutosuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
                 $storeId
@@ -79,13 +79,13 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzySearchConfig())
                 ->setQuery(Mage::helper('integernet_solr'));
-            $factory = new SearchServiceFactory(
+            $factory = new SearchRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
                 $storeId
             );
         }
-        return $factory->createSolrService();
+        return $factory->createRequest();
     }
 
     /**

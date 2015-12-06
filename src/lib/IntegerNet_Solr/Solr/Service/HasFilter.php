@@ -7,21 +7,13 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr;
+namespace IntegerNet\Solr\Service;
 
-use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
-use IntegerNet\Solr\Query\ParamsBuilder;
-use IntegerNet\Solr\Resource\SolrResponse;
-
-interface SolrService
+interface HasFilter
 {
-    /**
-     * @return SolrResponse
-     */
-    public function doRequest();
-
     /**
      * @return FilterQueryBuilder
      */
     public function getFilterQueryBuilder();
+
 }

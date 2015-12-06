@@ -22,9 +22,9 @@ use IntegerNet\Solr\Query\SearchString;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Psr\Log\LoggerInterface;
 use IntegerNet\Solr\Query\SearchParamsBuilder;
-use IntegerNet\Solr\SearchService;
+use IntegerNet\Solr\Service\SearchRequest;
 
-class SearchServiceFactory extends SolrServiceFactory
+class SearchRequestFactory extends RequestFactory
 {
     /**
      * @var $fuzzyConfig FuzzyConfig
@@ -69,9 +69,12 @@ class SearchServiceFactory extends SolrServiceFactory
         );
     }
 
-    public function createSolrService()
+    /**
+     * @return SearchRequest
+     */
+    public function createRequest()
     {
-        return new SearchService(
+        return new SearchRequest(
             $this->getResource(),
             $this->createQueryBuilder(),
             $this->getPagination(),

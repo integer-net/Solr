@@ -8,7 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\SolrService;
+use IntegerNet\Solr\Service\Request;
 
 /**
  * Interface for factory helper
@@ -25,7 +25,7 @@ interface IntegerNet_Solr_Interface_Factory
     /**
      * Returns new Solr result wrapper
      *
-     * @return SolrService
+     * @return Request
      */
-    public function getSolrService();
+    public function getSolrRequest();
 }

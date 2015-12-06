@@ -76,7 +76,7 @@ class ServiceBase extends Apache_Solr_Service
     public function appendService(ServiceBase $successor)
     {
         if ($this->successor !== null) {
-            $this->successor->appndServiced($successor);
+            $this->successor->appendService($successor);
         } else {
             $this->successor = $successor;
         }

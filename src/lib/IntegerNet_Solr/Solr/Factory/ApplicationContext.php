@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
 
 /**
- * Holds application context (bridge objects) for SolrServiceFactory
+ * Holds application context (bridge objects) for RequestFactory
  *
  * @package IntegerNet\Solr\Factory
  */

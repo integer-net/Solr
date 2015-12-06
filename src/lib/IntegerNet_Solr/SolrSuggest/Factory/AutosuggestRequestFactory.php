@@ -9,10 +9,10 @@
  */
 namespace IntegerNet\SolrSuggest\Factory;
 
-use IntegerNet\Solr\Factory\SearchServiceFactory;
+use IntegerNet\Solr\Factory\SearchRequestFactory;
 use IntegerNet\SolrSuggest\Query\AutosuggestParamsBuilder;
 
-class AutosuggestServiceFactory extends SearchServiceFactory
+class AutosuggestRequestFactory extends SearchRequestFactory
 {
     public function createParamsBuilder()
     {

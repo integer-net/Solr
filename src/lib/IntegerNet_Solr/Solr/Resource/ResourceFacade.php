@@ -33,6 +33,11 @@ class ResourceFacade
     protected $_config;
 
     /**
+     * @var ResourceBuilder
+     */
+    private $resourceBuilder;
+
+    /**
      * Solr service, by store id
      *
      * @var Service[]
@@ -48,6 +53,7 @@ class ResourceFacade
     public function __construct(array $storeConfig = [])
     {
         $this->_config = $storeConfig;
+        $this->resourceBuilder = ResourceBuilder::defaultResource();
     }
 
     /**
@@ -84,19 +90,7 @@ class ResourceFacade
             }
 
             $serverConfig = $this->getStoreConfig($storeId)->getServerConfig();
-            $indexingConfig = $this->getStoreConfig($storeId)->getIndexingConfig();
-            $host = $serverConfig->getHost();
-            $port = $serverConfig->getPort();
-            $path = $serverConfig->getPath();
-            $core = $serverConfig->getCore();
-            $useHttps = $serverConfig->isUseHttps();
-            if ($this->_useSwapIndex) {
-                $core = $serverConfig->getSwapCore();
-            }
-            if ($core) {
-                $path .= $core . '/';
-            }
-            $this->_solr[$storeId] = new Service($host, $port, $path, $this->_getHttpTransportAdapter($storeId), new Apache_Solr_Compatibility_Solr4CompatibilityLayer($storeId), $useHttps);
+            $this->_solr[$storeId] = $this->resourceBuilder->withConfig($serverConfig, $this->_useSwapIndex)->build();
         }
         return $this->_solr[$storeId];
     }
@@ -314,27 +308,4 @@ class ResourceFacade
         return $response;
     }
 
-    /**
-     * @param int $storeId
-     * @return Apache_Solr_HttpTransport_Abstract
-     */
-    protected function _getHttpTransportAdapter($storeId)
-    {
-        switch ($this->getStoreConfig($storeId)->getServerConfig()->getHttpTransportMethod()) {
-            case HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL:
-                $adapter = new Apache_Solr_HttpTransport_Curl();
-                break;
-            default:
-                $adapter = new Apache_Solr_HttpTransport_FileGetContents();
-        }
-
-        if ($this->getStoreConfig($storeId)->getServerConfig()->isUseHttpBasicAuth()) {
-            $adapter->setAuthenticationCredentials(
-                $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthUsername(),
-                $this->getStoreConfig($storeId)->getServerConfig()->getHttpBasicAuthPassword()
-            );
-        }
-
-        return $adapter;
-    }
 }

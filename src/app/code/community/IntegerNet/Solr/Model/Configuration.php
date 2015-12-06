@@ -286,7 +286,8 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canIssueSearchRequestToSwapCore($storeId)
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->setUseSwapIndex()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->
+        setUseSwapIndex()->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');

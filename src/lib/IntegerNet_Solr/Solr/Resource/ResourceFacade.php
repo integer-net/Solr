@@ -40,7 +40,7 @@ class ResourceFacade
     /**
      * Solr service, by store id
      *
-     * @var Service[]
+     * @var ServiceBase[]
      */
     protected $_solr;
 
@@ -79,7 +79,7 @@ class ResourceFacade
     /**
      * @deprecated should be completely abstracted
      * @param int $storeId
-     * @return Service
+     * @return ServiceBase
      */
     public function getSolrService($storeId)
     {

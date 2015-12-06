@@ -48,11 +48,11 @@ class ResourceBuilder
     }
 
     /**
-     * @return Service
+     * @return ServiceBase
      */
     public function build()
     {
-        return new Service($this->host, $this->port, $this->path,
+        return new ServiceBase($this->host, $this->port, $this->path,
             $this->httpTransportAdapter, $this->compatibilityLayer, $this->useHttps);
     }
     /**

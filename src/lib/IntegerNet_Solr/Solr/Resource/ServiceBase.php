@@ -17,7 +17,8 @@ use Apache_Solr_HttpTransportException;
 use Apache_Solr_Response;
 
 /**
- * @todo split pro features
+ * To split/add additional features, extend this class and use appendService() to chain multiple services
+ *
  * @package IntegerNet\Solr\Resource
  */
 class ServiceBase extends Apache_Solr_Service

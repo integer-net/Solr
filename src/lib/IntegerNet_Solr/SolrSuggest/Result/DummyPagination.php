@@ -1,6 +1,4 @@
 <?php
-use IntegerNet\Solr\Implementor\Pagination;
-
 /**
  * integer_net Magento Module
  *
@@ -9,20 +7,26 @@ use IntegerNet\Solr\Implementor\Pagination;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
+namespace IntegerNet\SolrSuggest\Result;
+
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Implementor\Pagination;
+
+class DummyPagination implements Pagination
 {
     /**
-     * @var Varien_Object|Mage_Catalog_Block_Product_List_Toolbar
+     * @var AutosuggestConfig
      */
-    protected $_toolbarBlock;
+    protected $_config;
 
     /**
-     * @param Varien_Object|Mage_Catalog_Block_Product_List_Toolbar $toolbarBlock
+     * @param AutosuggestConfig $config
      */
-    public function __construct(Varien_Object $toolbarBlock)
+    public function __construct(AutosuggestConfig $config)
     {
-        $this->_toolbarBlock = $toolbarBlock;
+        $this->_config = $config;
     }
+
     /**
      * Returns page size
      *
@@ -30,7 +34,7 @@ class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
      */
     public function getPageSize()
     {
-        return $this->_toolbarBlock->getLimit();
+        return $this->_config->getMaxNumberProductSuggestions();
     }
 
     /**
@@ -40,7 +44,7 @@ class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
      */
     public function getCurrentPage()
     {
-        return $this->_toolbarBlock->getCurrentPage();
+        return 1;
     }
 
     /**
@@ -50,7 +54,7 @@ class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
      */
     public function getCurrentDirection()
     {
-        return $this->_toolbarBlock->getCurrentDirection();
+        return 'asc';
     }
 
     /**
@@ -60,7 +64,7 @@ class IntegerNet_Solr_Model_Result_Pagination_Toolbar implements Pagination
      */
     public function getCurrentOrder()
     {
-        return $this->_toolbarBlock->getCurrentOrder();
+        return 'position';
     }
 
 }

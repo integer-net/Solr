@@ -1,13 +1,4 @@
 <?php
-use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\SolrService;
-use Psr\Log\NullLogger;
-use IntegerNet\Solr\Factory\SolrServiceFactory;
-use IntegerNet\Solr\Factory\SearchServiceFactory;
-use IntegerNet\SolrCategories\Factory\CategoryServiceFactory;
-use IntegerNet\SolrSuggest\Factory\AutosuggestServiceFactory;
-use IntegerNet\Solr\Factory\ApplicationContext;
-
 /**
  * integer_net Magento Module
  *
@@ -16,6 +7,15 @@ use IntegerNet\Solr\Factory\ApplicationContext;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\SolrService;
+use Psr\Log\NullLogger;
+use IntegerNet\Solr\Factory\SolrServiceFactory;
+use IntegerNet\Solr\Factory\SearchServiceFactory;
+use IntegerNet\SolrCategories\Factory\CategoryServiceFactory;
+use IntegerNet\SolrSuggest\Factory\AutosuggestServiceFactory;
+use IntegerNet\Solr\Factory\ApplicationContext;
+use IntegerNet\SolrSuggest\Result\DummyPagination;
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
     /**
@@ -45,9 +45,9 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             $logger = new NullLogger;
         }
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
-            $pagination = Mage::getModel('integernet_solr/result_pagination_toolbar', $block);
+            $pagination = Mage::getModel('integernet_solr/bridge_pagination_toolbar', $block);
         } else {
-            $pagination = Mage::getModel('integernet_solr/result_pagination_autosuggest', $config->getAutosuggestConfig());
+            $pagination = new DummyPagination($config->getAutosuggestConfig());
         }
 
         $isAutosuggest = Mage::registry('is_autosuggest');

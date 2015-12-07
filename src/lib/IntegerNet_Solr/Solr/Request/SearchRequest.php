@@ -19,7 +19,7 @@ use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
-use IntegerNet\Solr\Result\Logger;
+use IntegerNet\Solr\Resource\LoggerDecorator;
 use Psr\Log\LoggerInterface;
 
 class SearchRequest implements Request, HasFilter
@@ -49,7 +49,7 @@ class SearchRequest implements Request, HasFilter
      */
     private $eventDispatcher;
     /**
-     * @var $logger Logger
+     * @var $logger LoggerDecorator
      */
     private $logger;
     /**
@@ -74,7 +74,7 @@ class SearchRequest implements Request, HasFilter
         $this->fuzzyConfig = $fuzzyConfig;
         $this->paramsBuilder = $queryBuilder->getParamsBuilder();
         $this->eventDispatcher = $eventDispatcher;
-        $this->logger = new Logger($logger);
+        $this->logger = new LoggerDecorator($logger);
     }
 
     /**

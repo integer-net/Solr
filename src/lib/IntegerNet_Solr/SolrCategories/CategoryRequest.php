@@ -19,7 +19,7 @@ use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
-use IntegerNet\Solr\Result\Logger;
+use IntegerNet\Solr\Resource\LoggerDecorator;
 use Psr\Log\LoggerInterface;
 
 class CategoryRequest implements Request, HasFilter
@@ -37,7 +37,7 @@ class CategoryRequest implements Request, HasFilter
      */
     private $paramsBuilder;
     /**
-     * @var $logger Logger
+     * @var $logger LoggerDecorator
      */
     private $logger;
     /**
@@ -53,7 +53,7 @@ class CategoryRequest implements Request, HasFilter
     {
         $this->queryBuilder = $queryBuilder;
         $this->resource = $resource;
-        $this->logger = new Logger($logger);
+        $this->logger = new LoggerDecorator($logger);
         $this->eventDispatcher = $eventDispatcher;
     }
 

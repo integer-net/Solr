@@ -8,7 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\Service\Request;
+use IntegerNet\Solr\Request\Request;
 
 /**
  * Interface for factory helper

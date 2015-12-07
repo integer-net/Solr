@@ -8,7 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\Service\Request;
+use IntegerNet\Solr\Request\Request;
 use Psr\Log\NullLogger;
 use IntegerNet\Solr\Factory\RequestFactory;
 use IntegerNet\Solr\Factory\SearchRequestFactory;
@@ -33,7 +33,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
-     * @return Request
+     * @return \IntegerNet\Solr\Request\Request
      */
     public function getSolrRequest()
     {

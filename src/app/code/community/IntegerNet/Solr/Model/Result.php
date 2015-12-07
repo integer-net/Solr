@@ -8,13 +8,13 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
-use IntegerNet\Solr\Service\HasFilter;
-use IntegerNet\Solr\Service\Request;
+use IntegerNet\Solr\Request\HasFilter;
+use IntegerNet\Solr\Request\Request;
 
 class IntegerNet_Solr_Model_Result
 {
     /**
-     * @var $_solrRequest Request
+     * @var $_solrRequest \IntegerNet\Solr\Request\Request
      */
     protected $_solrRequest;
     /**

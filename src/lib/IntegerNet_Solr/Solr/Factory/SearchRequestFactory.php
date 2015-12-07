@@ -22,7 +22,7 @@ use IntegerNet\Solr\Query\SearchString;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Psr\Log\LoggerInterface;
 use IntegerNet\Solr\Query\SearchParamsBuilder;
-use IntegerNet\Solr\Service\SearchRequest;
+use IntegerNet\Solr\Request\SearchRequest;
 
 class SearchRequestFactory extends RequestFactory
 {
@@ -70,7 +70,7 @@ class SearchRequestFactory extends RequestFactory
     }
 
     /**
-     * @return SearchRequest
+     * @return \IntegerNet\Solr\Request\SearchRequest
      */
     public function createRequest()
     {

@@ -32,7 +32,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
     /**
      * Returns new Solr result wrapper
      *
-     * @return \IntegerNet\Solr\Service\Request
+     * @return \IntegerNet\Solr\Request\Request
      */
     public function getSolrRequest()
     {

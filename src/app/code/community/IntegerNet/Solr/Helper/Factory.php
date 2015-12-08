@@ -8,7 +8,6 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\Solr\Request\Request;
 use Psr\Log\NullLogger;
 use IntegerNet\Solr\Factory\RequestFactory;
 use IntegerNet\Solr\Factory\SearchRequestFactory;
@@ -16,6 +15,7 @@ use IntegerNet\SolrCategories\Factory\CategoryRequestFactory;
 use IntegerNet\SolrSuggest\Factory\AutosuggestRequestFactory;
 use IntegerNet\Solr\Factory\ApplicationContext;
 use IntegerNet\SolrSuggest\Result\DummyPagination;
+
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
     /**
@@ -26,7 +26,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
      */
     public function getSolrResource()
     {
-        $storeConfig = $this->_getStoreConfig();
+        $storeConfig = $this->getStoreConfig();
         return new ResourceFacade($storeConfig);
     }
 
@@ -91,7 +91,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * @return array
      */
-    protected function _getStoreConfig()
+    public function getStoreConfig()
     {
         $storeConfig = [];
         foreach (Mage::app()->getStores(true) as $store) {

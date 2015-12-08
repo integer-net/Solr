@@ -3,6 +3,7 @@ use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductIterator;
 /**
@@ -191,15 +192,15 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _addFacetsToProductData($product, $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes() as $attribute) {
-            switch ($attribute->getFrontendInput()) {
-                case 'select':
-                    $rawValue = $product->getAttributeValue(new IntegerNet_Solr_Model_Bridge_Attribute($attribute));
+            switch ($attribute->getFacetType()) {
+                case Attribute::FACET_TYPE_SELECT:
+                    $rawValue = $product->getAttributeValue($attribute);
                     if ($rawValue && $this->_isInteger($rawValue)) {
                         $productData->setData($attribute->getAttributeCode() . '_facet', $rawValue);
                     }
                     break;
-                case 'multiselect':
-                    $rawValue = $product->getAttributeValue(new IntegerNet_Solr_Model_Bridge_Attribute($attribute));
+                case Attribute::FACET_TYPE_MULTISELECT:
+                    $rawValue = $product->getAttributeValue($attribute);
                     if ($rawValue && $this->_isInteger($rawValue)) {
                         $productData->setData($attribute->getAttributeCode() . '_facet', explode(',', $rawValue));
                     }
@@ -281,9 +282,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $productData->setData($fieldName . '_boost', $solrBoost);
             }
 
-            $attribute->setStoreId($product->getStoreId());
+            $attribute->setStoreId($product->getStoreId()); //TODO (re)move
 
-            if ($product->getAttributeValue(new IntegerNet_Solr_Model_Bridge_Attribute($attribute))
+            if ($product->getAttributeValue($attribute)
                 && $value = $product->getSearchableAttributeValue($attribute)
             ) {
                 $productData->setData($fieldName, $value);

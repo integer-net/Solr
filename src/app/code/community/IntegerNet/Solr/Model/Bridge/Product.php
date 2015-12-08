@@ -76,11 +76,11 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
         return $this->_product->getData($attribute->getAttributeCode());
     }
 
-    public function getSearchableAttributeValue(Mage_Catalog_Model_Resource_Eav_Attribute $attribute)
+    public function getSearchableAttributeValue(Attribute $attribute)
     {
-        //TODO remove Mage_Catalog_Model_Entity_Attribute dependency
-        $value = trim(strip_tags($attribute->getFrontend()->getValue($this->_product)));
-        if (! empty($value) && $attribute->getFrontendInput() == 'multiselect') {
+        $magentoAttribute = Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getMagentoAttribute($attribute);
+        $value = trim(strip_tags($magentoAttribute->getFrontend()->getValue($this->_product)));
+        if (! empty($value) && $attribute->getFacetType() == Attribute::FACET_TYPE_MULTISELECT) {
             $value = array_map('trim', explode(',', $value));
         }
         return $value;

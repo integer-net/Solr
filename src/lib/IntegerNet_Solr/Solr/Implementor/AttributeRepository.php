@@ -24,8 +24,7 @@ use Mage_Catalog_Model_Resource_Product_Attribute_Collection;
 interface AttributeRepository
 {
     /**
-     * @todo convert to IntegerNet\Solr\Implementor\Attribute array, maybe add getSearchableAttributeCodes()
-     * @return Mage_Catalog_Model_Resource_Product_Attribute_Collection
+     * @return Attribute[]
      */
     public function getSearchableAttributes();
 
@@ -49,7 +48,7 @@ interface AttributeRepository
 
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true);
 

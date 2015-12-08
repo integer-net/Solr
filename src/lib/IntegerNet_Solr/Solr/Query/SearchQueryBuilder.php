@@ -119,11 +119,6 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
             $isFirst    = true;
 
             foreach ($attributes as $attribute) {
-                if (! $attribute instanceof Attribute) {
-                    //TODO getSearchableAttributes should return Attribute implementor directly,
-                    //     (as soon as indexer is refactored)
-                    $attribute = new \IntegerNet_Solr_Model_Bridge_Attribute($attribute);
-                }
                 /** @var $attribute Attribute */
                 if ($attribute->getIsSearchable() == 1) {
 

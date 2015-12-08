@@ -454,13 +454,15 @@ class AttributeStub implements Attribute
     private $isSearchable;
     /** @var  bool */
     private $usedForSortBy;
+    /** @var  string */
+    private $facetType;
 
     public static function sortableString($name)
     {
-        return new self($name, $name, 0, null, 'string', true, true);
+        return new self($name, $name, 0, null, 'string', true, true, 'text');
     }
 
-    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source = null, $backendType, $isSearchable, $usedForSortBy)
+    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source = null, $backendType, $isSearchable, $usedForSortBy, $facetType)
     {
         $this->attributeCode = $attributeCode;
         $this->storeLabel = $storeLabel;
@@ -469,6 +471,7 @@ class AttributeStub implements Attribute
         $this->backendType = $backendType;
         $this->isSearchable = $isSearchable;
         $this->usedForSortBy = $usedForSortBy;
+        $this->facetType = $facetType;
     }
 
     /**
@@ -582,5 +585,22 @@ class AttributeStub implements Attribute
     {
         $this->usedForSortBy = $usedForSortBy;
     }
+
+    /**
+     * @return string
+     */
+    public function getFacetType()
+    {
+        return $this->facetType;
+    }
+
+    /**
+     * @param string $facetType
+     */
+    public function setFacetType($facetType)
+    {
+        $this->facetType = $facetType;
+    }
+
 
 }

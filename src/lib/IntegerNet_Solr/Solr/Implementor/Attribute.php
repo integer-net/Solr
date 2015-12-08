@@ -21,6 +21,9 @@ use IntegerNet\Solr\Implementor\Source;
  */
 interface Attribute
 {
+    const FACET_TYPE_SELECT = 'select';
+    const FACET_TYPE_MULTISELECT = 'multiselect';
+
     /**
      * @return string
      */
@@ -40,6 +43,8 @@ interface Attribute
      * @return Source
      */
     public function getSource();
+
+    public function getFacetType();
 
     /**
      * @return bool

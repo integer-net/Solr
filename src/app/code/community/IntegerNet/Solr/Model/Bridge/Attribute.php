@@ -62,6 +62,11 @@ final class IntegerNet_Solr_Model_Bridge_Attribute implements Attribute
         return $this->_source;
     }
 
+    public function getFacetType()
+    {
+        return $this->_attribute->getFrontendInput();
+    }
+
     /**
      * @return bool
      */

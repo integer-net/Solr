@@ -31,17 +31,17 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
 
     /**
-     * @return Mage_Eav_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getSearchableAttributes()
     {
         $this->_prepareSearchableAttributeCollection();
 
-        return $this->_searchableAttributes->getItems();
+        return self::getAttributeArrayFromCollection($this->_searchableAttributes);
     }
 
     /**
-     * @return Mage_Eav_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getSortableAttributes()
     {
@@ -54,7 +54,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             ;
         }
 
-        return $this->_sortableAttributes;
+        return self::getAttributeArrayFromCollection($this->_sortableAttributes);
     }
 
     /**
@@ -127,7 +127,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return array_map(
             function($item) {
-                return new IntegerNet_Solr_Model_Bridge_Attribute($item);
+                return Mage::getSingleton('integernet_solr/bridge_attributeRepository')->_registerAttribute($item);
             },
             $collection->getItems()
         );
@@ -135,14 +135,13 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     
     /**
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Eav_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
         $this->_prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch);
 
-        //return self::getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
-        return $this->_filterableInCatalogOrSearchAttributes->getItems();
+        return self::getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
     }
 
     /**
@@ -160,7 +159,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
 
     /**
-     * @param Mage_Eav_Model_Entity_Attribute $attribute
+     * @param Attribute $attribute
      * @param bool $forSorting
      * @return string
      */

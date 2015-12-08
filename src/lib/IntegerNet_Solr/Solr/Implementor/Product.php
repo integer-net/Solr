@@ -27,7 +27,7 @@ interface Product extends IndexDocument
 
     public function getAttributeValue(Attribute $attribute);
 
-    public function getSearchableAttributeValue(\Mage_Catalog_Model_Resource_Eav_Attribute $attribute);
+    public function getSearchableAttributeValue(Attribute $attribute);
 
     public function getCategoryIds();
 

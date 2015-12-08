@@ -82,36 +82,18 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
 
     /**
-     * @todo move to lib
+     * @deprecated use IndexField directly
      * @param Attribute $attribute
      * @param bool $forSorting
      * @return string
      */
     public function getFieldName($attribute, $forSorting = false)
     {
-        if ($attribute->getUsedForSortBy()) {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t';
-
-                default:
-                    return ($forSorting) ? $attribute->getAttributeCode() . '_s' : $attribute->getAttributeCode() . '_t';
-            }
-        } else {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f_mv';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t_mv';
-
-                default:
-                    return $attribute->getAttributeCode() . '_t_mv';
-            }
+        if (! $attribute instanceof Attribute) {
+            $attribute = new IntegerNet_Solr_Model_Bridge_Attribute($attribute);
         }
+        $indexField = new \IntegerNet\Solr\Indexer\IndexField($attribute, $forSorting);
+        return $indexField->getFieldName();
     }
 
     /**

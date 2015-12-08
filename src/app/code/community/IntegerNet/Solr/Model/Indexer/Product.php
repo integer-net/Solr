@@ -6,6 +6,7 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductIterator;
+use IntegerNet\Solr\Indexer\IndexField;
 /**
  * integer_net Magento Module
  *
@@ -204,7 +205,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                     break;
             }
 
-            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+            $indexField = new IndexField($attribute);
+            $fieldName = $indexField->getFieldName();
             if (!$productData->hasData($fieldName)) {
                 $value = $product->getSearchableAttributeValue($attribute);
                 if (!empty($value)) {
@@ -212,7 +214,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
                     if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
                         $productData->setData(
-                            Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                            $indexField->forSorting()->getFieldName(),
                             $value
                         );
                     }
@@ -272,7 +274,8 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            $fieldName = Mage::helper('integernet_solr')->getFieldName($attribute);
+            $indexField = new IndexField($attribute);
+            $fieldName = $indexField->getFieldName();
 
             $solrBoost = floatval($attribute->getSolrBoost());
             if ($solrBoost != 1) {
@@ -288,7 +291,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
                 if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
                     $productData->setData(
-                        Mage::helper('integernet_solr')->getFieldName($attribute, true),
+                        $indexField->forSorting()->getFieldName(),
                         $value
                     );
                 }

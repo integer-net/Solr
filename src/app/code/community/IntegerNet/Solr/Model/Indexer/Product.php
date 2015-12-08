@@ -11,14 +11,11 @@ use IntegerNet\Solr\Resource\ResourceFacade;
  */
 class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 {
-    protected $_pathCategoryIds = array();
-
-    protected $_excludedCategoryIds = array();
-
-    protected $_categoryNames = array();
 
     /** @var  IntegerNet_Solr_Model_Indexer_Product_Renderer */
     protected $_renderer;
+    /** @var  IntegerNet_Solr_Model_Indexer_Category_Repository */
+    protected $_categoryRepository;
 
     /**
      * @var ResourceFacade
@@ -32,6 +29,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->_renderer = Mage::getModel('integernet_solr/indexer_product_renderer');
+        $this->_categoryRepository = Mage::getModel('integernet_solr/indexer_category_repository');
     }
 
     protected function _getStoreConfig($storeId = null)
@@ -137,12 +135,12 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _getProductData($product)
     {
-        $categoryIds = $this->_getCategoryIds($product);
+        $categoryIds = $this->_categoryRepository->getCategoryIds($product);
         $productData = new Varien_Object(array(
             'id' => $this->_getSolrId($product), // primary identifier, must be unique
             'product_id' => $product->getId(),
             'category' => $categoryIds, // @todo get category ids from parent anchor categories as well
-            'category_name_s_mv' => $this->_getCategoryNames($categoryIds, $product->getStoreId()),
+            'category_name_s_mv' => $this->_categoryRepository->getCategoryNames($categoryIds, $product->getStoreId()),
             'category_name_s_mv_boost' => 2,
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
@@ -416,146 +414,17 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         $this->_renderer->addResultHtmlToProductData($product, $productData, $useHtmlForResults);
     }
 
-
-    /**
-     * Get category ids of assigned categories and all parents
-     *
-     * @param Mage_Catalog_Model_Product $product
-     * @return int[]
-     */
-    protected function _getCategoryIds($product)
-    {
-        $categoryIds = $product->getCategoryIds();
-
-        if (!sizeof($categoryIds)) {
-            return array();
-        }
-
-        $storeId = $product->getStoreId();
-        if (!isset($this->_pathCategoryIds[$storeId])) {
-            $this->_pathCategoryIds[$storeId] = array();
-        }
-        $lookupCategoryIds = array_diff($categoryIds, array_keys($this->_pathCategoryIds[$storeId]));
-        $this->_lookupCategoryIdPaths($lookupCategoryIds, $storeId);
-
-        $foundCategoryIds = array();
-        foreach($categoryIds as $categoryId) {
-            $categoryPathIds = $this->_pathCategoryIds[$storeId][$categoryId];
-            $foundCategoryIds = array_merge($foundCategoryIds, $categoryPathIds);
-        }
-
-        $foundCategoryIds = array_unique($foundCategoryIds);
-
-        $foundCategoryIds = array_diff($foundCategoryIds, $this->_getExcludedCategoryIds($storeId));
-
-        return $foundCategoryIds;
-    }
-
-    /**
-     * Lookup and store all parent category ids and its own id of given category ids
-     *
-     * @param int[] $categoryIds
-     * @param int $storeId
-     */
-    protected function _lookupCategoryIdPaths($categoryIds, $storeId)
-    {
-        if (!sizeof($categoryIds)) {
-            return;
-        }
-
-        /** @var $categories Mage_Catalog_Model_Resource_Category_Collection */
-        $categories = Mage::getResourceModel('catalog/category_collection')
-            ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
-            ->addAttributeToSelect(array('is_active', 'include_in_menu'));
-
-        foreach ($categories as $category) {
-            /** @var Mage_Catalog_Model_Category $categoryPathIds */
-            if (!$category->getIsActive() || !$category->getIncludeInMenu()) {
-                $this->_pathCategoryIds[$storeId][$category->getId()] = array();
-                continue;
-            }
-
-            $categoryPathIds = explode('/', $category->getPath());
-            if (!in_array(Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId(), $categoryPathIds)) {
-                $this->_pathCategoryIds[$storeId][$category->getId()] = array();
-                continue;
-            }
-
-            array_shift($categoryPathIds);
-            array_shift($categoryPathIds);
-            $this->_pathCategoryIds[$storeId][$category->getId()] = $categoryPathIds;
-        }
-    }
-
-    /**
-     * @param int $storeId
-     * @return array
-     */
-    protected function _getExcludedCategoryIds($storeId)
-    {
-        if (!isset($this->_excludedCategoryIds[$storeId])) {
-
-            // exclude categories which are configured as excluded
-            /** @var $excludedCategories Mage_Catalog_Model_Resource_Category_Collection */
-            $excludedCategories = Mage::getResourceModel('catalog/category_collection')
-                ->addFieldToFilter('solr_exclude', 1);
-
-            $this->_excludedCategoryIds[$storeId] = $excludedCategories->getAllIds();
-
-            // exclude children of categories which are configured as "children excluded"
-            /** @var $categoriesWithChildrenExcluded Mage_Catalog_Model_Resource_Category_Collection */
-            $categoriesWithChildrenExcluded = Mage::getResourceModel('catalog/category_collection')
-                ->setStoreId($storeId)
-                ->addFieldToFilter('solr_exclude_children', 1);
-            $excludePaths = $categoriesWithChildrenExcluded->getColumnValues('path');
-
-            /** @var $excludedChildrenCategories Mage_Catalog_Model_Resource_Category_Collection */
-            $excludedChildrenCategories = Mage::getResourceModel('catalog/category_collection')
-                ->setStoreId($storeId);
-
-            $excludePathConditions = array();
-            foreach($excludePaths as $excludePath) {
-                $excludePathConditions[] = array('like' => $excludePath . '/%');
-            }
-            if (sizeof($excludePathConditions)) {
-                $excludedChildrenCategories->addAttributeToFilter('path', $excludePathConditions);
-                $this->_excludedCategoryIds[$storeId] = array_merge($this->_excludedCategoryIds[$storeId], $excludedChildrenCategories->getAllIds());
-            }
-        }
-
-        return $this->_excludedCategoryIds[$storeId];
-    }
-
     /**
      * @param Mage_Catalog_Model_Product $product
      * @param Varien_Object $productData
      */
     protected function _addCategoryProductPositionsToProductData($product, $productData)
     {
-        foreach($this->getCategoryPositions($product) as $positionRow) {
+        foreach($this->_categoryRepository->getCategoryPositions($product) as $positionRow) {
             $productData['category_' . $positionRow['category_id'] . '_position_i'] = $positionRow['position'];
         }
     }
 
-    /**
-     * Retrieve product category identifiers
-     *
-     * @param Mage_Catalog_Model_Product $product
-     * @return array
-     */
-    public function getCategoryPositions($product)
-    {
-        /** @var $setup Mage_Catalog_Model_Resource_Setup */
-        $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
-        $adapter = Mage::getSingleton('core/resource')->getConnection('catalog_read');
-
-        $select = $adapter->select()
-            ->from($setup->getTable('catalog/category_product_index'), array('category_id', 'position'))
-            ->where('product_id = ?', (int)$product->getId())
-            ->where('store_id = ?', $product->getStoreId());
-
-        return $adapter->fetchAll($select);
-    }
 
     /**
      * @param Mage_Catalog_Model_Product $product
@@ -652,23 +521,4 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         return $storeId;
     }
 
-    /**
-     * @param $categoryIds
-     * @param $storeId
-     * @return array
-     */
-    protected function _getCategoryNames($categoryIds, $storeId)
-    {
-        $categoryNames = array();
-
-        /** @var Mage_Catalog_Model_Resource_Category $categoryResource */
-        $categoryResource = Mage::getResourceModel('catalog/category');
-        foreach($categoryIds as $key => $categoryId) {
-            if (!isset($this->_categoryNames[$storeId][$categoryId])) {
-                $this->_categoryNames[$storeId][$categoryId] = $categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
-            }
-            $categoryNames[] = $this->_categoryNames[$storeId][$categoryId];
-        }
-        return $categoryNames;
-    }
 }

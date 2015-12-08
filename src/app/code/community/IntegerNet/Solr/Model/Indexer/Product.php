@@ -11,20 +11,36 @@ use IntegerNet\Solr\Resource\ResourceFacade;
  */
 class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 {
-    /** @var IntegerNet_Solr_Block_Indexer_Item[] */
-    protected $_itemBlocks = array();
-
     protected $_pathCategoryIds = array();
 
     protected $_excludedCategoryIds = array();
 
-    protected $_currentStoreId = null;
-
     protected $_categoryNames = array();
 
-    protected $_initialEnvironmentInfo = null;
+    /** @var  IntegerNet_Solr_Model_Indexer_Product_Renderer */
+    protected $_renderer;
 
-    protected $_isEmulated = false;
+    /**
+     * @var ResourceFacade
+     */
+    protected $_resource;
+
+    /**
+     * Internal constructor not depended on params. Can be used for object initialization
+     */
+    protected function _construct()
+    {
+        $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        $this->_renderer = Mage::getModel('integernet_solr/indexer_product_renderer');
+    }
+
+    protected function _getStoreConfig($storeId = null)
+    {
+        if ($storeId === null) {
+            $storeId = Mage::app()->getStore(true)->getId();
+        }
+        return $this->_resource->getStoreConfig($storeId);
+    }
 
     /**
      * @param array|null $productIds Restrict to given Products if this is set
@@ -37,7 +53,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $this->getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
         }
 
-        $pageSize = intval(Mage::getStoreConfig('integernet_solr/indexing/pagesize'));
+        $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
         if ($pageSize <= 0) {
             $pageSize = 100;
         }
@@ -51,7 +67,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
+            if (!$this->_getStoreConfig($storeId)->getGeneralConfig()->isActive()) {
                 continue;
             }
 
@@ -59,12 +75,12 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
-            if (is_null($productIds) && Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
+            if (is_null($productIds) && $this->_getStoreConfig($storeId)->getIndexingConfig()->isSwapCores()) {
                 $this->getResource()->setUseSwapIndex();
             }
 
             if (
-                ($emptyIndex && Mage::getStoreConfigFlag('integernet_solr/indexing/delete_documents_before_indexing', $storeId))
+                ($emptyIndex && $this->_getStoreConfig($storeId)->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
                 || $emptyIndex === 'force'
             ) {
                 $this->getResource()->deleteAllDocuments($storeId);
@@ -81,16 +97,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $this->getResource()->setUseSwapIndex(false);
         }
 
-        $this->_stopStoreEmulation();
+        $this->_renderer->stopStoreEmulation();
 
         if (is_null($productIds)) {
             $this->getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
         }
-    }
-    
-    protected function _swapCores()
-    {
-        
     }
 
     /**
@@ -103,7 +114,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             /** @var Mage_Core_Model_Store $store */
             $storeId = $store->getId();
 
-            if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $storeId)) {
+            if (! $this->_getStoreConfig($storeId)->getGeneralConfig()->isActive()) {
                 continue;
             }
 
@@ -401,78 +412,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      */
     protected function _addResultHtmlToProductData($product, $productData)
     {
-        $storeId = $product->getStoreId();
-        if ($this->_currentStoreId != $storeId) {
-
-            $this->_emulateStore($storeId);
-        }
-
-        /** @var IntegerNet_Solr_Block_Indexer_Item $block */
-        $block = $this->_getResultItemBlock();
-
-        $block->setProduct($product);
-
-        $block->setTemplate('integernet/solr/result/autosuggest/item.phtml');
-        $productData->setData('result_html_autosuggest_nonindex', $block->toHtml());
-
-        if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
-            $block->setTemplate('integernet/solr/result/list/item.phtml');
-            $productData->setData('result_html_list_nonindex', $block->toHtml());
-
-            $block->setTemplate('integernet/solr/result/grid/item.phtml');
-            $productData->setData('result_html_grid_nonindex', $block->toHtml());
-        }
+        $useHtmlForResults = $this->_getStoreConfig($product->getStoreId())->getResultsConfig()->isUseHtmlFromSolr();
+        $this->_renderer->addResultHtmlToProductData($product, $productData, $useHtmlForResults);
     }
 
-    /**
-     * @return IntegerNet_Solr_Block_Indexer_Item
-     */
-    protected function _getResultItemBlock()
-    {
-        if (!isset($this->_itemBlocks[Mage::app()->getStore()->getId()])) {
-            /** @var IntegerNet_Solr_Block_Indexer_Item _itemBlock */
-            $block = Mage::app()->getLayout()->createBlock('integernet_solr/indexer_item', 'solr_result_item');
-            $this->_addPriceBlockTypes($block);
-            // support for rwd theme
-            $block->setChild('name.after', Mage::app()->getLayout()->createBlock('core/text_list'));
-            $block->setChild('after', Mage::app()->getLayout()->createBlock('core/text_list'));
-            $this->_itemBlocks[Mage::app()->getStore()->getId()] = $block;
-        }
-
-        return $this->_itemBlocks[Mage::app()->getStore()->getId()];
-    }
-
-    /**
-     * Add custom price blocks for correct price display
-     *
-     * @param IntegerNet_Solr_Block_Indexer_Item $block
-     */
-    protected function _addPriceBlockTypes($block)
-    {
-        $block->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
-
-        $priceBlockType = 'germansetup/catalog_product_price';
-        if (@class_exists(Mage::getConfig()->getBlockClassName($priceBlockType)) && Mage::app()->getLayout()->createBlock($priceBlockType)) {
-
-            $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('grouped', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('downloadable', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('bundle', 'germansetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
-        }
-
-        $priceBlockType = 'magesetup/catalog_product_price';
-        if (@class_exists(Mage::getConfig()->getBlockClassName($priceBlockType)) && Mage::app()->getLayout()->createBlock($priceBlockType)) {
-
-            $block->addPriceBlockType('simple', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('virtual', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('grouped', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('downloadable', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
-            $block->addPriceBlockType('bundle', 'magesetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
-        }
-    }
 
     /**
      * Get category ids of assigned categories and all parents
@@ -641,13 +584,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     /**
      * Retrieve model resource
      *
-     * @return \IntegerNet\Solr\Resource\ResourceFacade
+     * @return ResourceFacade
      */
     protected function _getResource()
     {
-        if ($this->_resource === null) {
-            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
-        }
         return $this->_resource;
     }
 
@@ -730,30 +670,5 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             $categoryNames[] = $this->_categoryNames[$storeId][$categoryId];
         }
         return $categoryNames;
-    }
-
-    /**
-     * @param int $storeId
-     * @throws Mage_Core_Exception
-     */
-    protected function _emulateStore($storeId)
-    {
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-        $this->_currentStoreId = $storeId;
-        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-        $this->_isEmulated = true;
-        Mage::getDesign()->setStore($storeId);
-        Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
-    }
-
-    protected function _stopStoreEmulation()
-    {
-        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
-        }
     }
 }

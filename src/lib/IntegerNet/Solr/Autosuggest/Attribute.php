@@ -56,4 +56,10 @@ final class IntegerNet_Solr_Autosuggest_Attribute implements Attribute
     {
         return $this->_attributeConfig['used_for_sortby'];
     }
+
+    public function getFacetType()
+    {
+        return $this->_attributeConfig['frontend_input'];
+    }
+
 }

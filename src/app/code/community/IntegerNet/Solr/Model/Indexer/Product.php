@@ -26,32 +26,29 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected $_eventDispatcher;
     /** @var  AttributeRepository */
     protected $_attributeRepository;
+    /** @var  IntegerNet_Solr_Model_Bridge_CategoryRepository */
+    protected $_categoryRepository;
+    /** @var  IntegerNet_Solr_Model_Bridge_ProductRepository */
+    protected $_productRepository;
 
     /** @var  IntegerNet_Solr_Model_Indexer_Product_Renderer */
     protected $_renderer;
-    /** @var  IntegerNet_Solr_Model_Indexer_Category_Repository */
-    protected $_categoryRepository;
-    /** @var  IntegerNet_Solr_Model_Indexer_Product_Repository */
-    protected $_productRepository;
 
     /**
      * @var ResourceFacade
      */
     protected $_resource;
 
-    /**
-     * Internal constructor not depended on params. Can be used for object initialization
-     */
     protected function _construct()
     {
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->_config = Mage::helper('integernet_solr/factory')->getStoreConfig();
-        $this->_attributeRepository = Mage::helper('integernet_solr');
 
         $this->_eventDispatcher = Mage::helper('integernet_solr');
         $this->_renderer = Mage::getModel('integernet_solr/indexer_product_renderer');
-        $this->_categoryRepository = Mage::getModel('integernet_solr/indexer_category_repository');
-        $this->_productRepository = Mage::getModel('integernet_solr/indexer_product_repository');
+        $this->_attributeRepository = Mage::getSingleton('integernet_solr/bridge_attributeRepository');
+        $this->_categoryRepository = Mage::getModel('integernet_solr/bridge_categoryRepository');
+        $this->_productRepository = Mage::getModel('integernet_solr/bridge_productRepository');
     }
 
     protected function _getStoreConfig($storeId = null)
@@ -102,7 +99,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $this->getResource()->deleteAllDocuments($storeId);
             }
 
-            $productCollection = $this->_productRepository->setPageSize($pageSize)->getProducts($storeId, $productIds);
+            $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
             $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
 
             $this->getResource()->setUseSwapIndex(false);

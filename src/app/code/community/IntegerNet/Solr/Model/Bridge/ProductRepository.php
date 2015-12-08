@@ -10,7 +10,7 @@
 use IntegerNet\Solr\Implementor\ProductRepository;
 use IntegerNet\Solr\Implementor\ProductIterator;
 
-class IntegerNet_Solr_Model_Indexer_Product_Repository implements ProductRepository
+class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepository
 {
     /**
      * @var int
@@ -21,7 +21,7 @@ class IntegerNet_Solr_Model_Indexer_Product_Repository implements ProductReposit
      * @param int $pageSize
      * @return $this
      */
-    public function setPageSize($pageSize)
+    public function setPageSizeForIndex($pageSize)
     {
         $this->_pageSize = $pageSize;
         return $this;
@@ -34,7 +34,7 @@ class IntegerNet_Solr_Model_Indexer_Product_Repository implements ProductReposit
      * @param null|int[] $productIds filter by product ids
      * @return ProductIterator
      */
-    public function getProducts($storeId, $productIds = null)
+    public function getProductsForIndex($storeId, $productIds = null)
     {
         return new IntegerNet_Solr_Model_Indexer_Product_Iterator($storeId, $productIds, $this->_pageSize);
     }

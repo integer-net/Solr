@@ -28,7 +28,16 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
 
         return $this->_query;
     }
-    
+
+    /**
+     * @return string[]
+     */
+    public function getAttributeCodesToIndex()
+    {
+        // not used in autosuggest
+        return [];
+    }
+
     /**
      * @return Attribute[]
      */
@@ -51,7 +60,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
     }
 
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getSearchableAttributes()
     {

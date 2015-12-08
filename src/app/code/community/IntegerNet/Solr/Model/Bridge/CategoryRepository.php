@@ -8,8 +8,9 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Implementor\CategoryRepository;
 
-class IntegerNet_Solr_Model_Indexer_Category_Repository
+class IntegerNet_Solr_Model_Bridge_CategoryRepository implements CategoryRepository
 {
     protected $_pathCategoryIds = array();
     protected $_excludedCategoryIds = array();

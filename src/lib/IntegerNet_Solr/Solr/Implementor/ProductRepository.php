@@ -18,5 +18,5 @@ interface ProductRepository
      * @param null|int[] $productIds filter by product ids
      * @return ProductIterator
      */
-    public function getProducts($storeId, $productIds = null);
+    public function getProductsForIndex($storeId, $productIds = null);
 }

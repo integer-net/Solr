@@ -134,7 +134,7 @@ class IntegerNet_Solr_Model_Indexer_Product_Iterator implements ProductIterator,
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'))
-            ->addAttributeToSelect(Mage::helper('integernet_solr')->getAttributeCodesToIndex());
+            ->addAttributeToSelect(Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex());
 
         if (is_array($productIds)) {
             $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));

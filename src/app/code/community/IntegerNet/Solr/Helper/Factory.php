@@ -53,7 +53,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         $isAutosuggest = Mage::registry('is_autosuggest');
         $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $applicationContext = new ApplicationContext(
-            Mage::helper('integernet_solr'),
+            Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
             $config->getResultsConfig(),
             $pagination,
             Mage::helper('integernet_solr'),

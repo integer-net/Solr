@@ -9,10 +9,17 @@
  */
 namespace IntegerNet\Solr\Implementor;
 
-use IntegerNet\Solr\Indexer\IndexDocument;
-
-interface Product extends IndexDocument
+interface Product
 {
+    /**
+     * @return int
+     */
+    public function getSolrId();
+    /**
+     * @return bool
+     */
+    public function isIndexable();
+
     public function getId();
 
     public function getStoreId();

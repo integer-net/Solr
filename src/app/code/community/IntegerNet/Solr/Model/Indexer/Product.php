@@ -6,6 +6,9 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductIterator;
+use IntegerNet\Solr\Implementor\ProductRepository;
+use IntegerNet\Solr\Implementor\CategoryRepository;
+use IntegerNet\Solr\Indexer\IndexDocument;
 use IntegerNet\Solr\Indexer\IndexField;
 /**
  * integer_net Magento Module
@@ -15,7 +18,7 @@ use IntegerNet\Solr\Indexer\IndexField;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
+class IntegerNet_Solr_Model_Indexer_Product
 {
     /**
      * Configuration reader, by store id
@@ -23,24 +26,21 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
      * @var  Config[]
      */
     protected $_config;
+    /** @var  ResourceFacade */
+    protected $_resource;
     /** @var  EventDispatcher */
     protected $_eventDispatcher;
     /** @var  AttributeRepository */
     protected $_attributeRepository;
-    /** @var  IntegerNet_Solr_Model_Bridge_CategoryRepository */
+    /** @var  CategoryRepository */
     protected $_categoryRepository;
-    /** @var  IntegerNet_Solr_Model_Bridge_ProductRepository */
+    /** @var  ProductRepository */
     protected $_productRepository;
 
     /** @var  IntegerNet_Solr_Model_Indexer_Product_Renderer */
     protected $_renderer;
 
-    /**
-     * @var ResourceFacade
-     */
-    protected $_resource;
-
-    protected function _construct()
+    public function __construct()
     {
         $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
         $this->_config = Mage::helper('integernet_solr/factory')->getStoreConfig();
@@ -72,7 +72,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
         if (is_null($productIds)) {
-            $this->getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
+            $this->_getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
         }
 
         $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
@@ -90,26 +90,26 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             }
 
             if (is_null($productIds) && $storeConfig->getIndexingConfig()->isSwapCores()) {
-                $this->getResource()->setUseSwapIndex();
+                $this->_getResource()->setUseSwapIndex();
             }
 
             if (
                 ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
                 || $emptyIndex === 'force'
             ) {
-                $this->getResource()->deleteAllDocuments($storeId);
+                $this->_getResource()->deleteAllDocuments($storeId);
             }
 
             $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
             $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
 
-            $this->getResource()->setUseSwapIndex(false);
+            $this->_getResource()->setUseSwapIndex(false);
         }
 
         $this->_renderer->stopStoreEmulation();
 
         if (is_null($productIds)) {
-            $this->getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
+            $this->_getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
         }
     }
 
@@ -130,7 +130,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 $ids[] = $productId . '_' . $storeId;
             }
 
-            $this->getResource()->deleteByMultipleIds($storeId, $ids);
+            $this->_getResource()->deleteByMultipleIds($storeId, $ids);
         }
     }
 
@@ -144,7 +144,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _getProductData(Product $product)
     {
         $categoryIds = $this->_categoryRepository->getCategoryIds($product);
-        $productData = new Varien_Object(array(
+        $productData = new IndexDocument(array(
             'id' => $product->getSolrId(), // primary identifier, must be unique
             'product_id' => $product->getId(),
             'category' => $categoryIds, // @todo get category ids from parent anchor categories as well
@@ -166,8 +166,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
         $this->_addCategoryProductPositionsToProductData($product, $productData);
 
-        //TODO try to eliminate Magento product dependency without breaking observer compatibility
-        $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array('product' => $product->getMagentoProduct(), 'product_data' => $productData));
+        $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array('product' => $product, 'product_data' => $productData));
 
         return $productData->getData();
     }
@@ -185,9 +184,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Product $product
-     * @param Varien_Object $productData
+     * @param IndexDocument $productData
      */
-    protected function _addFacetsToProductData($product, $productData)
+    protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes() as $attribute) {
             switch ($attribute->getFacetType()) {
@@ -249,9 +248,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Product $product
-     * @param Varien_Object $productData
+     * @param IndexDocument $productData
      */
-    protected function _addSearchDataToProductData($product, $productData)
+    protected function _addSearchDataToProductData(Product $product, IndexDocument $productData)
     {
         $hasChildProducts = true;
         try {
@@ -330,21 +329,20 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * @todo try to remove Magento product dependency
-     * @param IntegerNet_Solr_Model_Bridge_Product $product
-     * @param Varien_Object $productData
+     * @param Product $product
+     * @param IndexDocument $productData
      */
-    protected function _addResultHtmlToProductData(IntegerNet_Solr_Model_Bridge_Product $product, $productData)
+    protected function _addResultHtmlToProductData(Product $product, IndexDocument $productData)
     {
         $useHtmlForResults = $this->_getStoreConfig($product->getStoreId())->getResultsConfig()->isUseHtmlFromSolr();
-        $this->_renderer->addResultHtmlToProductData($product->getMagentoProduct(), $productData, $useHtmlForResults);
+        $this->_renderer->addResultHtmlToProductData($product, $productData, $useHtmlForResults);
     }
 
     /**
      * @param Product $product
-     * @param Varien_Object $productData
+     * @param IndexDocument $productData
      */
-    protected function _addCategoryProductPositionsToProductData($product, $productData)
+    protected function _addCategoryProductPositionsToProductData(Product $product, IndexDocument $productData)
     {
         foreach($this->_categoryRepository->getCategoryPositions($product) as $positionRow) {
             $productData['category_' . $positionRow['category_id'] . '_position_i'] = $positionRow['position'];
@@ -354,9 +352,9 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
 
     /**
      * @param Product $product
-     * @param Varien_Object $productData
+     * @param IndexDocument $productData
      */
-    protected function _addBoostToProductData($product, &$productData)
+    protected function _addBoostToProductData(Product $product, IndexDocument $productData)
     {
         if ($boost = $product->getSolrBoost()) {
             if ($boost > 0) {
@@ -368,17 +366,6 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     }
 
     /**
-     * Retrieve model resource
-     *
-     * @return ResourceFacade
-     */
-    public function getResource()
-    {
-        return $this->_getResource();
-    }
-    /**
-     * Retrieve model resource
-     *
      * @return ResourceFacade
      */
     protected function _getResource()
@@ -414,11 +401,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
         }
 
         if (!$emptyIndex && sizeof($idsForDeletion)) {
-            $this->getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
+            $this->_getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
         }
 
         if (sizeof($combinedProductData)) {
-            $this->getResource()->addDocuments($storeId, $combinedProductData);
+            $this->_getResource()->addDocuments($storeId, $combinedProductData);
             return $storeId;
         }
         return $storeId;

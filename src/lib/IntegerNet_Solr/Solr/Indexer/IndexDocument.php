@@ -11,23 +11,23 @@ namespace IntegerNet\Solr\Indexer;
 
 /**
  * Represents a document to be indexed by Solr
- *
- * @package IntegerNet\Solr\Implementor
  */
-interface IndexDocument
+class IndexDocument extends \ArrayObject
 {
-    /**
-     * @return int
-     */
-    public function getSolrId();
-
-    /**
-     * @return bool
-     */
-    public function isIndexable();
-
-    /**
-     * @return array
-     */
-    public function getData();
+    public function getData($key = null)
+    {
+        if ($key === null) {
+            return $this->getArrayCopy();
+        }
+        return $this[$key];
+    }
+    public function hasData($key)
+    {
+        return $this->offsetExists($key);
+    }
+    public function setData($key, $value)
+    {
+        $this[$key] = $value;
+        return $this;
+    }
 }

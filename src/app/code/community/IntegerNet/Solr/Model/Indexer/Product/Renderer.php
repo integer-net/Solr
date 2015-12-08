@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
+use IntegerNet\Solr\Indexer\IndexDocument;
 /**
  * @todo create bridge interface
  * @todo don't require call to stopStoreEmulation()
@@ -21,12 +22,13 @@ class IntegerNet_Solr_Model_Indexer_Product_Renderer
     protected $_initialEnvironmentInfo = null;
 
     /**
-     * @param Mage_Catalog_Model_Product $product
-     * @param Varien_Object $productData
+     * @param IntegerNet_Solr_Model_Bridge_Product $product
+     * @param IndexDocument $productData
      * @param bool $useHtmlInResults
      */
-    public function addResultHtmlToProductData($product, $productData, $useHtmlInResults)
+    public function addResultHtmlToProductData(IntegerNet_Solr_Model_Bridge_Product $product, IndexDocument $productData, $useHtmlInResults)
     {
+        $product = $product->getMagentoProduct();
         $storeId = $product->getStoreId();
         if ($this->_currentStoreId != $storeId) {
 

@@ -155,16 +155,6 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
     }
 
     /**
-     * @return array
-     */
-    public function getData()
-    {
-        throw new BadMethodCallException('Not implemented');
-        // TODO: Implement and use to collect index document data
-    }
-
-
-    /**
      * @param $method
      * @param $args
      * @return mixed

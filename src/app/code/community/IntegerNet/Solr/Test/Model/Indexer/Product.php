@@ -16,19 +16,6 @@ use IntegerNet\Solr\Resource\ResourceFacade;
 class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * @test
-     * @helper integernet_solr/factory
-     */
-    public function shouldUseFactoryForGetResource()
-    {
-        $factoryMock = $this->mockHelper('integernet_solr/factory', ['getSolrResource']);
-        $factoryMock->enableProxyingToOriginalMethods();
-        $factoryMock->expects($this->once())->method('getSolrResource');
-        $this->replaceByMock('helper', 'integernet_solr/factory', $factoryMock);
-        $resource = Mage::getModel('integernet_solr/indexer_product')->getResource();
-        $this->assertInstanceOf(ResourceFacade::class, $resource);
-    }
-    /**
      * @param array $config
      * @test
      * @dataProvider dataProvider

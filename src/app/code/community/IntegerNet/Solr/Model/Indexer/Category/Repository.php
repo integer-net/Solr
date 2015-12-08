@@ -7,6 +7,8 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Product;
+
 class IntegerNet_Solr_Model_Indexer_Category_Repository
 {
     protected $_pathCategoryIds = array();
@@ -37,7 +39,7 @@ class IntegerNet_Solr_Model_Indexer_Category_Repository
     /**
      * Get category ids of assigned categories and all parents
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param Product $product
      * @return int[]
      */
     public function getCategoryIds($product)
@@ -147,7 +149,7 @@ class IntegerNet_Solr_Model_Indexer_Category_Repository
     /**
      * Retrieve product category identifiers
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param Product $product
      * @return array
      */
     public function getCategoryPositions($product)

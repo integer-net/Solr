@@ -114,7 +114,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
             ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect($this->_attributeRepository->getAttributeCodesToIndex());
+            ->addAttributeToSelect(Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex());
 
         return new IntegerNet_Solr_Model_Bridge_ProductIterator($childProductCollection);
 

@@ -18,15 +18,7 @@ class IntegerNet_Solr_Model_Bridge_ProductIterator extends IteratorIterator impl
      */
     public function __construct(Mage_Catalog_Model_Resource_Product_Collection $_collection)
     {
-        parent::__construct($_collection);
-    }
-
-    /**
-     * @return Mage_Catalog_Model_Resource_Product_Collection
-     */
-    public function getInnerIterator()
-    {
-        parent::getInnerIterator();
+        parent::__construct($_collection->getIterator());
     }
 
     /**

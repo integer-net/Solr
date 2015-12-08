@@ -10,8 +10,8 @@
 
 use IntegerNet\Solr\Indexer\IndexDocument;
 /**
- * @todo create bridge interface
  * @todo don't require call to stopStoreEmulation()
+ * @todo create bridge interface
  */
 class IntegerNet_Solr_Model_Indexer_Product_Renderer
 {

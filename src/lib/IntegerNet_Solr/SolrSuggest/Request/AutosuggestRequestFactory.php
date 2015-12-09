@@ -7,9 +7,9 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Factory;
+namespace IntegerNet\SolrSuggest\Request;
 
-use IntegerNet\Solr\Factory\SearchRequestFactory;
+use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\SolrSuggest\Query\AutosuggestParamsBuilder;
 
 class AutosuggestRequestFactory extends SearchRequestFactory

@@ -9,11 +9,11 @@
  */
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Psr\Log\NullLogger;
-use IntegerNet\Solr\Factory\RequestFactory;
-use IntegerNet\Solr\Factory\SearchRequestFactory;
-use IntegerNet\SolrCategories\Factory\CategoryRequestFactory;
-use IntegerNet\SolrSuggest\Factory\AutosuggestRequestFactory;
-use IntegerNet\Solr\Factory\ApplicationContext;
+use IntegerNet\Solr\Request\RequestFactory;
+use IntegerNet\Solr\Request\SearchRequestFactory;
+use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
+use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
+use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\SolrSuggest\Result\DummyPagination;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 

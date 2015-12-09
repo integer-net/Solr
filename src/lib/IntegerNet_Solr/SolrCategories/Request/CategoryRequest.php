@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrCategories;
+namespace IntegerNet\SolrCategories\Request;
 
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;

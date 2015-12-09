@@ -7,19 +7,19 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrCategories\Factory;
+namespace IntegerNet\SolrCategories\Request;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
-use IntegerNet\Solr\Factory\ApplicationContext;
-use IntegerNet\Solr\Factory\RequestFactory;
+use IntegerNet\Solr\Request\ApplicationContext;
+use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrCategories\Query\CategoryParamsBuilder;
 use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\SolrCategories\CategoryRequest;
+use IntegerNet\SolrCategories\Request\CategoryRequest;
 
-class CategoryRequestFactory extends RequestFactory
+class CategoryRequestFactory extends \IntegerNet\Solr\Request\RequestFactory
 {
     /**
      * @var $categoryId int
@@ -27,12 +27,12 @@ class CategoryRequestFactory extends RequestFactory
     private $categoryId;
 
     /**
-     * @param ApplicationContext $applicationContext
+     * @param \IntegerNet\Solr\Request\ApplicationContext $applicationContext
      * @param ResourceFacade $resource
      * @param $storeId
      * @param $categoryId
      */
-    public function __construct(ApplicationContext $applicationContext, ResourceFacade $resource, $storeId, $categoryId)
+    public function __construct(\IntegerNet\Solr\Request\ApplicationContext $applicationContext, ResourceFacade $resource, $storeId, $categoryId)
     {
         $this->categoryId = $categoryId;
         parent::__construct($applicationContext, $resource, $storeId);

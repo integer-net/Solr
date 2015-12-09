@@ -8,7 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 use IntegerNet\Solr\Exception;
-use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\Solr\Indexer\ProductIndexer;
 
 /**
  * Class IntegerNet_Solr_Model_Indexer
@@ -17,6 +17,13 @@ use IntegerNet\Solr\Resource\ResourceFacade;
  */
 class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 {
+    /**
+     * @var ProductIndexer
+     */
+    protected $_productIndexer;
+    /**
+     * @var string[]
+     */
     protected $_matchedEntities = array(
         Mage_Catalog_Model_Product::ENTITY => array(
             Mage_Index_Model_Event::TYPE_SAVE,
@@ -24,6 +31,15 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
             Mage_Index_Model_Event::TYPE_MASS_ACTION,
         ),
     );
+
+    /**
+     * Internal constructor not depended on params. Can be used for object initialization
+     */
+    protected function _construct()
+    {
+        $this->_productIndexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
+    }
+
 
     public function getName()
     {
@@ -41,28 +57,6 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     public function reindexAll()
     {
         $this->_reindexProducts(null, true);
-    }
-
-    /**
-     * Retrieve model resource
-     *
-     * @return \IntegerNet\Solr\Resource\ResourceFacade
-     */
-    public function getResource()
-    {
-        return $this->_getResource();
-    }
-    /**
-     * Retrieve model resource
-     *
-     * @return ResourceFacade
-     */
-    protected function _getResource()
-    {
-        if ($this->_resource === null) {
-            $this->_resource = Mage::helper('integernet_solr/factory')->getSolrResource();
-        }
-        return $this->_resource;
     }
 
     /**
@@ -131,7 +125,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     protected function _reindexProducts($productIds = null, $emptyIndex = false)
     {
         try {
-            Mage::getSingleton('integernet_solr/indexer_product')->reindex($productIds, $emptyIndex);
+            $this->_productIndexer->reindex($productIds, $emptyIndex);
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
@@ -142,6 +136,6 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      */
     protected function _deleteProductsIndex($productIds)
     {
-        Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex($productIds);
+        $this->_productIndexer->deleteIndex($productIds);
     }
 }

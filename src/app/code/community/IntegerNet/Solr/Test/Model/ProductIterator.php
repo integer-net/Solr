@@ -21,7 +21,7 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
         // and replacing it with a mock causes side effects with other tests :-(
         // these lines above accidentally have the same amount of characters :-)
         $this->customerSession(0);
-        $iterator = new IntegerNet_Solr_Model_Indexer_Product_Iterator(1, $idFilter, $pageSize);
+        $iterator = new IntegerNet_Solr_Model_Bridge_LazyProductIterator(1, $idFilter, $pageSize);
         $actualProductIds = [];
         $guard = 0;
         foreach ($iterator as $product)

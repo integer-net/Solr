@@ -131,7 +131,7 @@ class IntegerNet_Solr_Model_Observer
         if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
             /** @var Mage_Catalog_Model_Product $product */
             $product = $observer->getProduct();
-            Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex(array($product->getId()));
+            Mage::helper('integernet_solr/factory')->getProductIndexer()->deleteIndex(array($product->getId()));
         }
     }
 

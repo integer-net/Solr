@@ -26,7 +26,7 @@ class IntegerNet_Solr_Test_Controller_Suggest extends EcomDev_PHPUnit_Test_Case_
      * @singleton catalog/session
      * @singleton customer/session
      * @singleton reports/session
-     * @singleton integernet_solr/indexer_product
+     * @singleton integernet_solr/bridge_attributeRepository
      * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @helper catalogsearch

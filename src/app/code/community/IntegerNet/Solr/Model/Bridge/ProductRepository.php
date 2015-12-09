@@ -36,7 +36,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
-        return new IntegerNet_Solr_Model_Indexer_Product_Iterator($storeId, $productIds, $this->_pageSize);
+        return new IntegerNet_Solr_Model_Bridge_LazyProductIterator($storeId, $productIds, $this->_pageSize);
     }
 
 }

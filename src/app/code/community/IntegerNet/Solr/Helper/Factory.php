@@ -15,6 +15,7 @@ use IntegerNet\SolrCategories\Factory\CategoryRequestFactory;
 use IntegerNet\SolrSuggest\Factory\AutosuggestRequestFactory;
 use IntegerNet\Solr\Factory\ApplicationContext;
 use IntegerNet\SolrSuggest\Result\DummyPagination;
+use IntegerNet\Solr\Indexer\ProductIndexer;
 
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
@@ -28,6 +29,26 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     {
         $storeConfig = $this->getStoreConfig();
         return new ResourceFacade($storeConfig);
+    }
+
+    /**
+     * Returns new product indexer.
+     *
+     * @return ProductIndexer
+     */
+    public function getProductIndexer()
+    {
+        $defaultStoreId = Mage::app()->getStore(true)->getId();
+        return new ProductIndexer(
+            $defaultStoreId,
+            $this->getStoreConfig(),
+            $this->getSolrResource(),
+            Mage::helper('integernet_solr'),
+            Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
+            Mage::getModel('integernet_solr/bridge_categoryRepository'),
+            Mage::getModel('integernet_solr/bridge_productRepository'),
+            Mage::getModel('integernet_solr/bridge_productRenderer')
+        );
     }
 
     /**

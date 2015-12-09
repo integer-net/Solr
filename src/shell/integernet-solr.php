@@ -32,8 +32,9 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
                 $emptyIndex = false;
             }
 
+            $indexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
             foreach($stores as $store) {
-                Mage::getSingleton('integernet_solr/indexer_product')->reindex(null, $emptyIndex, $store);
+                $indexer->reindex(null, $emptyIndex, $store);
                 echo "Solr index rebuilt for Store '{$store->getCode()}'.\n";
             }
 

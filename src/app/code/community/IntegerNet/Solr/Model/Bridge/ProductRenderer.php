@@ -12,7 +12,7 @@ use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Indexer\IndexDocument;
 
-class IntegerNet_Solr_Model_Indexer_Product_Renderer implements ProductRenderer
+class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
 {
     /** @var IntegerNet_Solr_Block_Indexer_Item[] */
     protected $_itemBlocks = array();

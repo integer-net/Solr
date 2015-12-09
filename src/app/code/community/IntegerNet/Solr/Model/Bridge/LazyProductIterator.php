@@ -10,7 +10,11 @@
 use IntegerNet\Solr\Implementor\ProductIterator;
 use IntegerNet\Solr\Implementor\Product;
 
-class IntegerNet_Solr_Model_Indexer_Product_Iterator implements ProductIterator, OuterIterator
+/**
+ * Product iterator implementation with lazy loading of multiple collections (chunking).
+ * Collections are prepared to be used by the indexer.
+ */
+class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterator, OuterIterator
 {
     /**
      * @var int
@@ -48,9 +52,9 @@ class IntegerNet_Solr_Model_Indexer_Product_Iterator implements ProductIterator,
 
 
     /**
-     * @param int $_storeId
-     * @param int[]|null $_productIdFilter
-     * @param int $_pageSize
+     * @param int $_storeId store id for the collections
+     * @param int[]|null $_productIdFilter array of product ids to be loaded, or null for all product ids
+     * @param int $_pageSize Number of products per loaded collection (chunk)
      */
     public function __construct($_storeId, $_productIdFilter, $_pageSize)
     {

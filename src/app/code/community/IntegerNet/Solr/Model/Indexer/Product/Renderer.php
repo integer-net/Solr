@@ -8,12 +8,11 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
+use IntegerNet\Solr\Implementor\ProductRenderer;
+use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Indexer\IndexDocument;
-/**
- * @todo don't require call to stopStoreEmulation()
- * @todo create bridge interface
- */
-class IntegerNet_Solr_Model_Indexer_Product_Renderer
+
+class IntegerNet_Solr_Model_Indexer_Product_Renderer implements ProductRenderer
 {
     /** @var IntegerNet_Solr_Block_Indexer_Item[] */
     protected $_itemBlocks = array();
@@ -22,12 +21,16 @@ class IntegerNet_Solr_Model_Indexer_Product_Renderer
     protected $_initialEnvironmentInfo = null;
 
     /**
-     * @param IntegerNet_Solr_Model_Bridge_Product $product
+     * @param Product $product
      * @param IndexDocument $productData
      * @param bool $useHtmlInResults
      */
-    public function addResultHtmlToProductData(IntegerNet_Solr_Model_Bridge_Product $product, IndexDocument $productData, $useHtmlInResults)
+    public function addResultHtmlToProductData(Product $product, IndexDocument $productData, $useHtmlInResults)
     {
+        if (! $product instanceof IntegerNet_Solr_Model_Bridge_Product) {
+            // We need direct access to the Magento product
+            throw new InvalidArgumentException('Magento 1 product bridge expected, '. get_class($product) .' received.');
+        }
         $product = $product->getMagentoProduct();
         $storeId = $product->getStoreId();
         if ($this->_currentStoreId != $storeId) {

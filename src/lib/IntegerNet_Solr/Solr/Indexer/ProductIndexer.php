@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 namespace IntegerNet\Solr\Indexer;
+use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
@@ -39,7 +40,7 @@ class ProductIndexer
     /** @var  ProductRepository */
     private $_productRepository;
 
-    /** @var  \IntegerNet_Solr_Model_Indexer_Product_Renderer */
+    /** @var  ProductRenderer */
     private $_renderer;
 
     /**
@@ -50,11 +51,11 @@ class ProductIndexer
      * @param AttributeRepository $_attributeRepository
      * @param CategoryRepository $_categoryRepository
      * @param ProductRepository $_productRepository
-     * @param \IntegerNet_Solr_Model_Indexer_Product_Renderer $_renderer
+     * @param ProductRenderer $_renderer
      */
     public function __construct($defaultStoreId, array $_config, ResourceFacade $_resource, EventDispatcher $_eventDispatcher,
                                 AttributeRepository $_attributeRepository, CategoryRepository $_categoryRepository,
-                                ProductRepository $_productRepository, \IntegerNet_Solr_Model_Indexer_Product_Renderer $_renderer)
+                                ProductRepository $_productRepository, ProductRenderer $_renderer)
     {
         $this->_defaultStoreId = $defaultStoreId;
         $this->_config = $_config;

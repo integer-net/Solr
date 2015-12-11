@@ -16,6 +16,7 @@ use IntegerNet\Solr\Implementor\Pagination;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Query\ParamsBuilder;
+use IntegerNet\Solr\Query\SearchParamsBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
@@ -41,7 +42,7 @@ class SearchRequest implements Request, HasFilter
      */
     private $fuzzyConfig;
     /**
-     * @var $paramsBuilder ParamsBuilder
+     * @var $paramsBuilder SearchParamsBuilder
      */
     private $paramsBuilder;
     /**
@@ -78,7 +79,7 @@ class SearchRequest implements Request, HasFilter
     }
 
     /**
-     * @return ParamsBuilder
+     * @return SearchParamsBuilder
      */
     private function getParamsBuilder()
     {

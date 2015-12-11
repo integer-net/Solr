@@ -7,24 +7,21 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Result;
+namespace IntegerNet\Solr\Request;
 
-use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Implementor\Pagination;
 
-class DummyPagination implements Pagination
+final class SinglePage implements Pagination
 {
-    /**
-     * @var AutosuggestConfig
-     */
-    protected $_config;
+    private $pageSize;
 
     /**
-     * @param AutosuggestConfig $config
+     * SinglePage constructor.
+     * @param $pageSize
      */
-    public function __construct(AutosuggestConfig $config)
+    public function __construct($pageSize)
     {
-        $this->_config = $config;
+        $this->pageSize = $pageSize;
     }
 
     /**
@@ -34,7 +31,7 @@ class DummyPagination implements Pagination
      */
     public function getPageSize()
     {
-        return $this->_config->getMaxNumberProductSuggestions();
+        return $this->pageSize;
     }
 
     /**
@@ -66,5 +63,4 @@ class DummyPagination implements Pagination
     {
         return 'position';
     }
-
 }

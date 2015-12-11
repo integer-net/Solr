@@ -11,7 +11,7 @@
 /**
  * @loadFixture config
  */
-class IntegerNet_Solr_Test_Controller_Suggest extends EcomDev_PHPUnit_Test_Case_Controller
+class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Controller_Abstract
 {
 
     protected function setUp()

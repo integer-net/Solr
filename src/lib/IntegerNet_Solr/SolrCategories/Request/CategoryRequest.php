@@ -14,9 +14,9 @@ use IntegerNet\Solr\Implementor\EventDispatcher;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Request\HasFilter;
 use IntegerNet\Solr\Request\Request;
+use IntegerNet\SolrCategories\Query\CategoryParamsBuilder;
 use IntegerNet\SolrCategories\Query\CategoryQueryBuilder;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
-use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Resource\LoggerDecorator;
@@ -29,13 +29,9 @@ class CategoryRequest implements Request, HasFilter
      */
     private $resource;
     /**
-     * @var $queryBuilder \IntegerNet\SolrCategories\Query\CategoryQueryBuilder
+     * @var $queryBuilder CategoryQueryBuilder
      */
     private $queryBuilder;
-    /**
-     * @var ParamsBuilder
-     */
-    private $paramsBuilder;
     /**
      * @var $logger LoggerDecorator
      */
@@ -58,7 +54,7 @@ class CategoryRequest implements Request, HasFilter
     }
 
     /**
-     * @return ParamsBuilder
+     * @return CategoryParamsBuilder
      */
     private function getParamsBuilder()
     {

@@ -14,7 +14,6 @@ use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\Solr\Request\ApplicationContext;
-use IntegerNet\SolrSuggest\Result\DummyPagination;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
@@ -65,21 +64,20 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         } else {
             $logger = new NullLogger;
         }
-        if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
-            $pagination = Mage::getModel('integernet_solr/bridge_pagination_toolbar', $block);
-        } else {
-            $pagination = new DummyPagination($config->getAutosuggestConfig());
-        }
 
         $isAutosuggest = Mage::registry('is_autosuggest');
         $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $applicationContext = new ApplicationContext(
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
             $config->getResultsConfig(),
-            $pagination,
+            $config->getAutosuggestConfig(),
             Mage::helper('integernet_solr'),
             $logger
         );
+        if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
+            $pagination = Mage::getModel('integernet_solr/bridge_pagination_toolbar', $block);
+            $applicationContext->setPagination($pagination);
+        }
         /** @var RequestFactory $factory */
         if ($isCategoryPage) {
             $factory = new CategoryRequestFactory($applicationContext,

@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\Solr\Request;
+use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Implementor\AttributeRepository;
@@ -37,6 +38,10 @@ final class ApplicationContext
      */
     private $fuzzyConfig;
     /**
+     * @var $autosuggestConfig AutosuggestConfig
+     */
+    private $autosuggestConfig;
+    /**
      * @var $pagination Pagination
      */
     private $pagination;
@@ -56,16 +61,16 @@ final class ApplicationContext
     /**
      * @param AttributeRepository $attributeRepository
      * @param ResultsConfig $resultsConfig
-     * @param Pagination $pagination
+     * @param AutosuggestConfig $autosuggestConfig
      * @param EventDispatcher $eventDispatcher
      * @param LoggerInterface $logger
      */
     public function __construct(AttributeRepository $attributeRepository, ResultsConfig $resultsConfig,
-                                Pagination $pagination, EventDispatcher $eventDispatcher, LoggerInterface $logger)
+                                AutosuggestConfig $autosuggestConfig, EventDispatcher $eventDispatcher, LoggerInterface $logger)
     {
         $this->attributeRepository = $attributeRepository;
         $this->resultsConfig = $resultsConfig;
-        $this->pagination = $pagination;
+        $this->autosuggestConfig = $autosuggestConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
     }
@@ -77,6 +82,16 @@ final class ApplicationContext
     public function setFuzzyConfig($fuzzyConfig)
     {
         $this->fuzzyConfig = $fuzzyConfig;
+        return $this;
+    }
+
+    /**
+     * @param Pagination $pagination
+     * @return ApplicationContext
+     */
+    public function setPagination($pagination)
+    {
+        $this->pagination = $pagination;
         return $this;
     }
 
@@ -118,10 +133,30 @@ final class ApplicationContext
     }
 
     /**
+     * @return AutosuggestConfig
+     */
+    public function getAutosuggestConfig()
+    {
+        return $this->autosuggestConfig;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasPagination()
+    {
+        return $this->pagination !== null;
+    }
+
+    /**
      * @return Pagination
      */
     public function getPagination()
     {
+        if ($this->pagination === null) {
+            throw new UnexpectedValueException('ApplicationContext::$pagination is not initialized.');
+        }
         return $this->pagination;
     }
 

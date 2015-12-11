@@ -187,4 +187,14 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
             }
         }
     }
+
+    /**
+     * @return SearchParamsBuilder
+     */
+    public function getParamsBuilder()
+    {
+        return parent::getParamsBuilder();
+    }
+
+
 }

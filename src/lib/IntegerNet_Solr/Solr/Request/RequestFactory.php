@@ -67,7 +67,8 @@ abstract class RequestFactory
         $this->resource = $resource;
         $this->attributeRepository = $applicationContext->getAttributeRepository();
         $this->filterQueryBuilder = new FilterQueryBuilder($applicationContext->getResultsConfig());
-        $this->pagination = $applicationContext->getPagination();
+        $this->pagination = $applicationContext->hasPagination() ? $applicationContext->getPagination()
+            : new SinglePage($applicationContext->getAutosuggestConfig()->getMaxNumberProductSuggestions());
         $this->resultsConfig = $applicationContext->getResultsConfig();
         $this->logger = $applicationContext->getLogger();
         $this->eventDispatcher = $applicationContext->getEventDispatcher();

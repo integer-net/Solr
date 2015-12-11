@@ -10,7 +10,7 @@
 /**
  * @loadFixture config
  */
-class IntegerNet_Solr_Test_Controller_Configuration extends EcomDev_PHPUnit_Test_Case_Controller
+class IntegerNet_Solr_Test_Controller_Configuration extends IntegerNet_Solr_Test_Controller_Abstract
 {
     /**
      * @test

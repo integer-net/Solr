@@ -11,7 +11,7 @@
 /**
  * @loadFixture config
  */
-class IntegerNet_Solr_Test_Controller_Category extends EcomDev_PHPUnit_Test_Case_Controller
+class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Controller_Abstract
 {
     const CATEGORY_ID = 221;
 

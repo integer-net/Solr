@@ -13,8 +13,10 @@ use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Request\HasFilter;
+use IntegerNet\Solr\Request\HasPagination;
 
-abstract class AbstractParamsBuilder implements ParamsBuilder
+abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPagination
 {
     /**
      * @var $attributeRepository AttributeRepository
@@ -54,6 +56,8 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
     }
 
     /**
+     * Return filter query builder used to build the filter query paramter
+     *
      * @return FilterQueryBuilder
      */
     public function getFilterQueryBuilder()
@@ -84,6 +88,8 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
     }
 
     /**
+     * Return current page from pagination
+     *
      * @return int
      */
     public function getCurrentPage()
@@ -92,6 +98,8 @@ abstract class AbstractParamsBuilder implements ParamsBuilder
     }
 
     /**
+     * Return page size from pagination
+     *
      * @return int
      */
     public function getPageSize()

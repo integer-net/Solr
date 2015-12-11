@@ -42,4 +42,13 @@ final class CategoryQueryBuilder extends AbstractQueryBuilder
         return 'category_' . $this->categoryId . '_position_i:*';
     }
 
+    /**
+     * @return CategoryParamsBuilder
+     */
+    public function getParamsBuilder()
+    {
+        return parent::getParamsBuilder();
+    }
+
+
 }

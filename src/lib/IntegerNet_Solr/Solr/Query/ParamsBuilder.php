@@ -24,24 +24,7 @@ interface ParamsBuilder
      * @return mixed[]
      */
     public function buildAsArray();
-    /**
-     * Return filter query builder used to build the filter query paramter
-     *
-     * @return FilterQueryBuilder
-     */
-    public function getFilterQueryBuilder();
-    /**
-     * Return current page from pagination
-     *
-     * @return int
-     */
-    public function getCurrentPage();
-    /**
-     * Return page size from pagination
-     *
-     * @return int
-     */
-    public function getPageSize();
+
     /**
      * Return store id
      *

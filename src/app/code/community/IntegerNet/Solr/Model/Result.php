@@ -454,7 +454,6 @@ class IntegerNet_Solr_Model_Result
             $queryText = '';
 
             $attributes = Mage::helper('integernet_solr')->getSearchableAttributes();
-            $boost      = '';
             $isFirst    = true;
 
             foreach ($attributes as $attribute) {
@@ -482,6 +481,23 @@ class IntegerNet_Solr_Model_Result
                         }
                     }
                 }
+            }
+
+            $fieldName = 'category_name_t_mv';
+
+            $boost = '^' . floatval(Mage::getStoreConfig('integernet_solr/results/priority_categories'));
+
+            if ($this->_foundNoResults) {
+
+                foreach ($searchValue as $value) {
+                    $queryText .= ($isFirst) ? '' : ' ';
+                    $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
+                    $isFirst = false;
+                }
+
+            } else {
+                $queryText .= ($isFirst) ? '' : ' ';
+                $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
             }
         }
 

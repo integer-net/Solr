@@ -275,6 +275,11 @@ You can choose between *AND* and *OR*. The search operator is used if there is m
 When using *OR*, results which match only one of the search words will be displayed.
 In most cases, *AND* is the better setting.
 
+#### Solr Priority of Category Names
+
+Configure with which priority category names are handled in the Solr index. For example, if the search term "black shirts" should primarily return those products as search results which are contained in a category named "shirts", you might want to enter a higher value than 1.
+The default value is 1. If you enter a higher value, category names have a higher priority in the Solr index.
+
 #### Size of Price Steps
 
 This setting is used by the price filter. You can set the steps which are used for the single intervals. I.e. *10* leads to the intervals *0.00-10.00*, *10.00-20.00*, *20.00-30.00* and so on.

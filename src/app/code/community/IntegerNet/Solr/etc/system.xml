@@ -392,6 +392,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </search_operator>
+                        <priority_categories translate="label,comment">
+                            <label>Solr Priority of Category Names</label>
+                            <comment>1 is default, use higher numbers for higher priority.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </priority_categories>
                         <price_step_size translate="label,comment">
                             <label>Size of Price Steps</label>
                             <comment><![CDATA[i.e. 100]]></comment>

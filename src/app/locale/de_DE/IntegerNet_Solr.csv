@@ -25,6 +25,7 @@
 "Fuzzy Search","Unscharfe Suche"
 "Solr Boost","Solr Boost"
 "Solr Priority","Solr-Priorität"
+"Solr Priority of Category Names","Solr-Priorität von Kategorienamen"
 "1 is default, use higher numbers for higher priority.","1 ist Standard, höhere Werte für höhere Priorität"
 "Search Results","Suchergebnisse"
 "Use HTML from Solr Index","HTML vom Solr-Index verwenden"

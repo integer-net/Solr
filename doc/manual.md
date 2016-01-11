@@ -260,7 +260,7 @@ In case the entered value is 0 or empty, fuzzy search will always be performed.
 
 ### Search Results
 
-![Search Results](http://www.integer-net.com/download/solr/integernet-solr-config-results-en.png)
+![Search Results](http://www.integer-net.com/download/solr/integernet-solr-config-search-results-en.png)
 
 #### Use HTML from Solr Index
 

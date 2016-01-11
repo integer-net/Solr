@@ -263,7 +263,7 @@ Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche für Su
 
 ### Suchergebnisse
 
-![Suchergebnisse](http://www.integer-net.de/download/solr/integernet-solr-config-results-de.png)
+![Suchergebnisse](http://www.integer-net.de/download/solr/integernet-solr-config-search-results-de.png)
 
 #### HTML vom Solr-Index verwenden
 

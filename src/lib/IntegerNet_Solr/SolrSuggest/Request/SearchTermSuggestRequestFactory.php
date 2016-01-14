@@ -22,6 +22,10 @@ class SearchTermSuggestRequestFactory extends RequestFactory
      * @var HasUserQuery
      */
     private $query;
+    /**
+     * @var \IntegerNet\Solr\Config\AutosuggestConfig
+     */
+    private $autosuggestConfig;
 
     /**
      * @param ApplicationContext $applicationContext
@@ -32,6 +36,7 @@ class SearchTermSuggestRequestFactory extends RequestFactory
     {
         parent::__construct($applicationContext, $resource, $storeId);
         $this->query = $applicationContext->getQuery();
+        $this->autosuggestConfig = $applicationContext->getAutosuggestConfig();
     }
 
     protected function createQueryBuilder()
@@ -42,9 +47,7 @@ class SearchTermSuggestRequestFactory extends RequestFactory
     protected function createParamsBuilder()
     {
         return new SearchTermSuggestParamsBuilder(
-            new SearchString($this->query->getUserQueryText()),
-            $this->getAutosuggestConfig(), //TODO extend application context?
-            $this->getStoreId());
+            new SearchString($this->query->getUserQueryText()), $this->autosuggestConfig, $this->getStoreId());
     }
 
     /**
@@ -52,7 +55,12 @@ class SearchTermSuggestRequestFactory extends RequestFactory
      */
     public function createRequest()
     {
-        // TODO: Implement createRequest() method.
+        return new SearchTermSuggestRequest( //TODO right params
+            $this->getResource(),
+            $this->createQueryBuilder(),
+            $this->getEventDispatcher(),
+            $this->getLogger()
+        );
     }
 
 }

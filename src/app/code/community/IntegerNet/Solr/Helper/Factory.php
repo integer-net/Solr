@@ -13,6 +13,7 @@ use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
+use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 
@@ -55,7 +56,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
      *
      * @return \IntegerNet\Solr\Request\Request
      */
-    public function getSolrRequest()
+    public function getSolrRequest($isSearchtermSuggest = false)
     {
         $storeId = Mage::app()->getStore()->getId();
         $config = new IntegerNet_Solr_Model_Config_Store($storeId);
@@ -79,8 +80,14 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             $applicationContext->setPagination($pagination);
         }
         /** @var RequestFactory $factory */
-        if ($isCategoryPage) {
-            $factory = new CategoryRequestFactory($applicationContext,
+        if ($isSearchtermSuggest) {
+            $factory = new SearchTermSuggestRequestFactory(
+                $applicationContext,
+                $this->getSolrResource(),
+                $storeId);
+        } elseif ($isCategoryPage) {
+            $factory = new CategoryRequestFactory(
+                $applicationContext,
                 $this->getSolrResource(),
                 $storeId,
                 Mage::registry('current_category')->getId()

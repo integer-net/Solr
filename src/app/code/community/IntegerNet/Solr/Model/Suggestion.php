@@ -35,6 +35,8 @@ class IntegerNet_Solr_Model_Suggestion
      */
     public function getSolrSuggestion($storeId = null)
     {
+        //TODO return Mage::helper('integernet_solr/factory')->getSolrRequest(true)->doRequest();
+
         if (is_null($this->_solrSuggestion)) {
             if (is_null($storeId)) {
                 $storeId = Mage::app()->getStore()->getId();

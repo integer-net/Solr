@@ -12,7 +12,7 @@ namespace IntegerNet\SolrSuggest\Request;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Resource\SolrResponse;
 
-class SearchTermSuggestRequestt implements Request
+class SearchTermSuggestRequest implements Request
 {
     /**
      * @return SolrResponse

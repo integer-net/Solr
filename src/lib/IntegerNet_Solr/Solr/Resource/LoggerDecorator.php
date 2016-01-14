@@ -62,6 +62,16 @@ class LoggerDecorator implements LoggerInterface
     }
 
     /**
+     * @param SolrResponse $result
+     * @param int $time in microseconds
+     */
+    public function logSuggestion(SolrResponse $result, $time)
+    {
+        $this->logger->debug($result);
+        $this->logger->debug('Elapsed time: ' . $time . 's');
+    }
+
+    /**
      * System is unusable.
      *
      * @param string $message

@@ -36,10 +36,11 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     public function shouldShowAutosuggestBox()
     {
         $this->dispatch('catalogsearch/ajax/suggest', ['_query' => ['q' => 'war']]);
-        $this->assertResponseBodyContains('<ul class="searchwords">');
-        $this->assertResponseBodyContains('><span class="highlight">war</span>');
-        $this->assertResponseBodyContains('<div class="products-box">');
-        $this->assertResponseBodyContains("Herbert George Wells: The War of the Worlds");
-        $this->assertResponseBodyContains('<div class="categories-box">');
+        $this->assertResponseBodyContains('<ul class="searchwords">', 'Search term suggest container');
+        $this->assertResponseBodyContains('><span class="highlight">war</span> of the', 'Search term suggest content');
+        $this->assertResponseBodyContains('<div class="products-box">', 'Product suggest container');
+        $this->assertResponseBodyContains("Herbert George Wells: The War of the Worlds", 'Product suggest content');
+        $this->assertResponseBodyContains('<div class="categories-box">', 'Category suggest container');
+        $this->assertResponseBodyContains('Science-Fiction', 'Category suggest content');
     }
 }

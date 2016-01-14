@@ -101,7 +101,7 @@ class ResourceBuilder
             $path .= $core . '/';
         }
 
-        $builder = clone $this; //TODO clone
+        $builder = clone $this;
         return $builder->setHost($host)->setPort($port)->setPath($path)->setUseHttps($useHttps)
             ->setHttpTransportAdapter(self::getHttpTransportAdapter($serverConfig));
     }

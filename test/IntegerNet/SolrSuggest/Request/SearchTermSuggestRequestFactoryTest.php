@@ -43,6 +43,5 @@ class SearchTermSuggestRequestFactoryTest extends PHPUnit_Framework_TestCase
         $factoryUnderTest = new SearchTermSuggestRequestFactory($applicationContext, $resource, $storeId);
         $actualRequest = $factoryUnderTest->createRequest();
         $this->assertInstanceOf(SearchTermSuggestRequest::class, $actualRequest);
-        $this->markTestIncomplete();
     }
 }

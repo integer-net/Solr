@@ -31,6 +31,16 @@ final class IntegerNet_Solr_Helper_Log extends AbstractLogger
     protected $_file = 'solr.log';
 
     /**
+     * @param string $file
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->_file = $file;
+        return $this;
+    }
+
+    /**
      * Logs with an arbitrary level.
      *
      * @param mixed $level

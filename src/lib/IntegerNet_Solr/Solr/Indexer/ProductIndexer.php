@@ -163,8 +163,7 @@ class ProductIndexer
             'id' => $product->getSolrId(), // primary identifier, must be unique
             'product_id' => $product->getId(),
             'category' => $categoryIds, // @todo get category ids from parent anchor categories as well
-            'category_name_s_mv' => $this->_categoryRepository->getCategoryNames($categoryIds, $product->getStoreId()),
-            'category_name_s_mv_boost' => 2,
+            'category_name_t_mv' => $this->_categoryRepository->getCategoryNames($categoryIds, $product->getStoreId()),
             'store_id' => $product->getStoreId(),
             'content_type' => 'product',
             'is_visible_in_catalog_i' => $product->isVisibleInCatalog(),

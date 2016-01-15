@@ -195,6 +195,7 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             $this->_results = new ResultsConfig(
                 $this->_getConfigFlag($prefix . 'use_html_from_solr'),
                 $this->_getConfig($prefix . 'search_operator'),
+                $this->_getConfig($prefix . 'priority_categories'),
                 $this->_getConfig($prefix . 'price_step_size'),
                 $this->_getConfig($prefix . 'max_price'),
                 $this->_getConfigFlag($prefix . 'use_custom_price_intervals'),

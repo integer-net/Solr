@@ -34,6 +34,11 @@ class SearchRequestFactory extends RequestFactory
     private $fuzzyConfig;
 
     /**
+     * @var $resultsConfig ResultsConfig
+     */
+    private $resultsConfig;
+
+    /**
      * @var HasUserQuery
      */
     private $query;
@@ -47,6 +52,7 @@ class SearchRequestFactory extends RequestFactory
     {
         parent::__construct($applicationContext, $resource, $storeId);
         $this->fuzzyConfig = $applicationContext->getFuzzyConfig();
+        $this->resultsConfig = $applicationContext->getResultsConfig();
         $this->query = $applicationContext->getQuery();
     }
 
@@ -54,8 +60,13 @@ class SearchRequestFactory extends RequestFactory
     {
         return new SearchQueryBuilder(
             new SearchString($this->getQuery()->getUserQueryText()),
-            $this->getFuzzyConfig(), $this->getAttributeRepository(), $this->getPagination(),
-            $this->createParamsBuilder(), $this->getStoreId(), $this->getEventDispatcher()
+            $this->getFuzzyConfig(), 
+            $this->getResultsConfig(), 
+            $this->getAttributeRepository(), 
+            $this->getPagination(),
+            $this->createParamsBuilder(), 
+            $this->getStoreId(), 
+            $this->getEventDispatcher()
         );
     }
 

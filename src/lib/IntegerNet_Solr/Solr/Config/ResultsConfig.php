@@ -24,6 +24,10 @@ final class ResultsConfig
     /**
      * @var float
      */
+    private $priorityCategories;
+    /**
+     * @var float
+     */
     private $priceStepSize;
     /**
      * @var float
@@ -42,15 +46,17 @@ final class ResultsConfig
      * IntegerNet\Solr\Config\ResultsConfig constructor.
      * @param bool $useHtmlFromSolr
      * @param string $searchOperator
+     * @param float $priorityCategories
      * @param float $priceStepSize
      * @param float $maxPrice
      * @param bool $useCustomPriceIntervals
      * @param float[] $customPriceIntervals
      */
-    public function __construct($useHtmlFromSolr, $searchOperator, $priceStepSize, $maxPrice, $useCustomPriceIntervals, array $customPriceIntervals)
+    public function __construct($useHtmlFromSolr, $searchOperator, $priorityCategories, $priceStepSize, $maxPrice, $useCustomPriceIntervals, array $customPriceIntervals)
     {
         $this->useHtmlFromSolr = $useHtmlFromSolr;
         $this->searchOperator = $searchOperator;
+        $this->priorityCategories = $priorityCategories;
         $this->priceStepSize = $priceStepSize;
         $this->maxPrice = $maxPrice;
         $this->useCustomPriceIntervals = $useCustomPriceIntervals;
@@ -71,6 +77,14 @@ final class ResultsConfig
     public function getSearchOperator()
     {
         return $this->searchOperator;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriorityCategories()
+    {
+        return $this->priorityCategories;
     }
 
     /**

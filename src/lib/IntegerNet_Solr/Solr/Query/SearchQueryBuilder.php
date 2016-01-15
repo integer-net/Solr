@@ -10,6 +10,7 @@
 namespace IntegerNet\Solr\Query;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
@@ -22,21 +23,30 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
      * @var $searchString SearchString
      */
     private $searchString;
+
     /**
      * @var bool
      */
     private $broaden = false;
+
     /**
      * @var bool
      */
     private $allowFuzzy = true;
+
     /**
      * @var $fuzzyConfig FuzzyConfig
      */
     private $fuzzyConfig;
 
     /**
+     * @var $resultsConfig ResultsConfig
+     */
+    private $resultsConfig;
+
+    /**
      * @param FuzzyConfig $fuzzyConfig
+     * @param ResultsConfig $resultsConfig
      * @param AttributeRepository $attributeRepository
      * @param Pagination $pagination
      * @param ParamsBuilder $paramsBuilder
@@ -44,10 +54,11 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
      * @param EventDispatcher $eventDispatcher
      * @todo params builder initialization?
      */
-    public function __construct(SearchString $searchString, FuzzyConfig $fuzzyConfig, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
+    public function __construct(SearchString $searchString, FuzzyConfig $fuzzyConfig, ResultsConfig $resultsConfig, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
     {
         parent::__construct($attributeRepository, $pagination, $paramsBuilder, $storeId, $eventDispatcher);
         $this->fuzzyConfig = $fuzzyConfig;
+        $this->resultsConfig = $resultsConfig;
         $this->searchString = $searchString;
     }
 
@@ -80,12 +91,21 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
         $this->searchString = $searchString;
         return $this;
     }
+    
     /**
      * @return FuzzyConfig
      */
     protected function getFuzzyConfig()
     {
         return $this->fuzzyConfig;
+    }
+    
+    /**
+     * @return ResultsConfig
+     */
+    protected function getResultsConfig()
+    {
+        return $this->resultsConfig;
     }
 
     /**
@@ -143,6 +163,23 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
                         }
                     }
                 }
+            }
+            
+            $fieldName = 'category_name_t_mv';
+
+            $boost = '^' . floatval($this->getResultsConfig()->getPriorityCategories());
+
+            if ($this->broaden) {
+
+                foreach ($searchValue as $value) {
+                    $queryText .= ($isFirst) ? '' : ' ';
+                    $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
+                    $isFirst = false;
+                }
+
+            } else {
+                $queryText .= ($isFirst) ? '' : ' ';
+                $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
             }
         }
         return $queryText;

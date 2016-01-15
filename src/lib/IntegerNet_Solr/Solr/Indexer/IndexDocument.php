@@ -19,6 +19,9 @@ class IndexDocument extends \ArrayObject
         if ($key === null) {
             return $this->getArrayCopy();
         }
+        if (!isset($this[$key])) {
+            return null;
+        }
         return $this[$key];
     }
     public function hasData($key)

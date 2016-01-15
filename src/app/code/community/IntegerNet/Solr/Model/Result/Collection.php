@@ -102,7 +102,12 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
      */
     public function addCategoryFilter(Mage_Catalog_Model_Category $category)
     {
-        Mage::getSingleton('integernet_solr/result')->addCategoryFilter($category);
+        $categoryFilters = Mage::registry('category_filters');
+        if (!is_array($categoryFilters)) {
+            $categoryFilters = array();
+        }
+        $categoryFilters[] = $category;
+        Mage::register('category_filters', $categoryFilters);
         return $this;
     }
 

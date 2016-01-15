@@ -31,6 +31,8 @@ class IntegerNet_Solr_Model_Result
         $this->_solrRequest = Mage::helper('integernet_solr/factory')->getSolrRequest();
         if ($this->_solrRequest instanceof HasFilter) {
             $this->_filterQueryBuilder = $this->_solrRequest->getFilterQueryBuilder();
+            $this->_addCategoryFilters();
+            $this->_addAttributeFilters();
         }
     }
 
@@ -82,6 +84,32 @@ class IntegerNet_Solr_Model_Result
     public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = null)
     {
         $this->_filterQueryBuilder->addPriceRangeFilterByMinMax($minPrice, $maxPrice);
+    }
+
+    /**
+     * Store category filters in registry until request is done
+     */
+    private function _addCategoryFilters()
+    {
+        $categoryFilters = Mage::registry('category_filters');
+        if (is_array($categoryFilters)) {
+            foreach ($categoryFilters as $category) {
+                $this->addCategoryFilter($category);
+            }
+        }
+    }
+
+    /**
+     * Store category filters in registry until request is done
+     */
+    private function _addAttributeFilters()
+    {
+        $attributeFilters = Mage::registry('attribute_filters');
+        if (is_array($attributeFilters)) {
+            foreach ($attributeFilters as $attributeFilter) {
+                $this->addAttributeFilter($attributeFilter['attribute'], $attributeFilter['value']);
+            }
+        }
     }
 
 }

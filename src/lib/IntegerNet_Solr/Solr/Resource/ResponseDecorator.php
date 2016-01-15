@@ -133,14 +133,14 @@ class ResponseDecorator implements SolrResponse
                 $facetCounts = (array)$facetCounts->counts;
 
                 if (!isset($this->facet_counts)) {
-                    $this->facet_counts = new stdClass();
+                    $this->facet_counts = new \stdClass();
                 }
                 if (!isset($this->facet_counts->facet_ranges)) {
-                    $this->facet_counts->facet_ranges = new stdClass();
+                    $this->facet_counts->facet_ranges = new \stdClass();
                 }
                 if (!isset($this->facet_counts->facet_ranges->$facetName)) {
-                    $this->facet_counts->facet_ranges->$facetName = new stdClass();
-                    $this->facet_counts->facet_ranges->$facetName->counts = new stdClass();
+                    $this->facet_counts->facet_ranges->$facetName = new \stdClass();
+                    $this->facet_counts->facet_ranges->$facetName->counts = new \stdClass();
                 }
 
                 foreach ($facetCounts as $facetId => $facetCount) {
@@ -164,13 +164,13 @@ class ResponseDecorator implements SolrResponse
                 $facetCounts = (array)$facetCounts;
 
                 if (!isset($this->facet_counts)) {
-                    $this->facet_counts = new stdClass();
+                    $this->facet_counts = new \stdClass();
                 }
                 if (!isset($this->facet_counts->facet_intervals)) {
-                    $this->facet_counts->facet_intervals = new stdClass();
+                    $this->facet_counts->facet_intervals = new \stdClass();
                 }
                 if (!isset($this->facet_counts->facet_intervals->$facetName)) {
-                    $this->facet_counts->facet_intervals->$facetName = new stdClass();
+                    $this->facet_counts->facet_intervals->$facetName = new \stdClass();
                 }
 
                 foreach ($facetCounts as $facetId => $facetCount) {
@@ -203,13 +203,13 @@ class ResponseDecorator implements SolrResponse
         foreach($statsFields as $fieldName => $fieldData) {
 
             if (!isset($this->stats)) {
-                $this->stats = new stdClass();
+                $this->stats = new \stdClass();
             }
             if (!isset($this->stats->stats_fields)) {
-                $this->stats->stats_fields = new stdClass();
+                $this->stats->stats_fields = new \stdClass();
             }
             if (!isset($this->stats->stats_fields->$fieldName)) {
-                $this->stats->stats_fields->$fieldName = new stdClass();
+                $this->stats->stats_fields->$fieldName = new \stdClass();
             }
 
             $fieldData = (array)$fieldData;

@@ -80,6 +80,11 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
     {
         $magentoAttribute = Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getMagentoAttribute($attribute);
         $value = trim(strip_tags($magentoAttribute->getFrontend()->getValue($this->_product)));
+        if ($magentoAttribute->getData('backend_type') == 'int' 
+            && $magentoAttribute->getData('frontend_input') == 'select' 
+            && $value == 0) {
+            return null;
+        }
         if (! empty($value) && $attribute->getFacetType() == Attribute::FACET_TYPE_MULTISELECT) {
             $value = array_map('trim', explode(',', $value));
         }

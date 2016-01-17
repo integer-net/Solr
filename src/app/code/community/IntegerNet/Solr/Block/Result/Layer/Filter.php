@@ -17,6 +17,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     
     protected $_categoryFilterItems = null;
 
+    protected $_currentCategory = null;
+
     /**
      * @return Mage_Catalog_Model_Entity_Attribute
      */
@@ -131,14 +133,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getCurrentChildrenCategories()
     {
-        if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
-            /** @var Mage_Catalog_Model_Category $currentCategory */
-            $currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
-        } else {
-            /** @var Mage_Catalog_Model_Category $currentCategory */
-            $currentCategory = Mage::registry('current_category');
-        }
-        
+        $currentCategory = $this->_getCurrentCategory();
+
         $childrenCategories = Mage::getResourceModel('catalog/category_collection')
             ->setStore(Mage::app()->getStore())
             ->addAttributeToSelect('name')
@@ -268,6 +264,14 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 if (!$optionCount) {
                     continue;
                 }
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $currentCategory = $this->_getCurrentCategory();
+                if (!$currentCategory) {
+                    $removedFilterAttributeCodes = explode(',', $currentCategory->getData('solr_remove_filters'));
+                    if (in_array($this->getAttribute()->getAttributeCode(), $removedFilterAttributeCodes)) {
+                        continue;
+                    }
+                }
                 $item = new Varien_Object();
                 $item->setCount($optionCount);
                 $item->setLabel($this->getAttribute()->getSource()->getOptionText($optionId));
@@ -277,5 +281,26 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         }
 
         return $items;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Category|false
+     */
+    protected function _getCurrentCategory()
+    {
+        if (is_null($this->_currentCategory)) {
+            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
+            } else {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::registry('current_category');
+                if (is_null($this->_currentCategory)) {
+                    $this->_currentCategory = false;
+                }
+            }
+        }
+
+        return $this->_currentCategory;
     }
 }

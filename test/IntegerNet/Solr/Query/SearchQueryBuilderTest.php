@@ -49,7 +49,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
         $attributeRepositoryStub = new AttributeRepositoryStub();
         $paramsBuilder = new SearchParamsBuilder($attributeRepositoryStub, $filterQueryBuilder, $paginationStub,
             $resultsConfig, $fuzzyConfig, $storeId);
-        $searchQueryBuilder = new SearchQueryBuilder($searchString, $fuzzyConfig, $attributeRepositoryStub, $paginationStub,
+        $searchQueryBuilder = new SearchQueryBuilder($searchString, $fuzzyConfig, $resultsConfig, $attributeRepositoryStub, $paginationStub,
             $paramsBuilder, $storeId, $eventDispatcherMock);
         $actualQuery = $searchQueryBuilder->build();
         $this->assertEquals($expectedQuery, $actualQuery);
@@ -87,7 +87,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
             ],
             'alternative' => [1, ResultConfigBuilder::alternativeConfig()->build(), FuzzyConfigBuilder::inactiveConfig()->build(),
                 FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
-                new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0', 0, 24, [
+                new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0 category_name_t_mv:""foo bar""~100^1', 0, 24, [
                         'q.op' => ResultsConfig::SEARCH_OPERATOR_OR,
                         'fq' => "store_id:1 AND is_visible_in_search_i:1",
                         'sort' => 'attribute1_s desc',

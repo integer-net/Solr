@@ -79,10 +79,17 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
 
         $this->setChild('toolbar', $toolbar);
 
-        if (!Mage::getStoreConfigFlag('integernet_solr/results/use_html_from_solr')) {
-            $collection->setCurPage(1);
+        if (! Mage::getStoreConfigFlag('integernet_solr/results/use_html_from_solr')) {
+            // disable pagination for collection loading because we select ids based on solr result
+            // FS: the previous solution had a bug where the pagination toolbar always showed "Item(s) 1-X of Y"
+            $_pageSize = $collection->getPageSize();
+            $collection->setPageSize(false);
+            $collection->load();
+            $collection->setPageSize($_pageSize);
+        } else {
+            $collection->load();
         }
-        $collection->load();
+
 
         return $this;
     }

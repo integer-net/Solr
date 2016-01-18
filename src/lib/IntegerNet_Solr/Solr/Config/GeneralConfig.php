@@ -25,6 +25,8 @@ final class GeneralConfig
 
     /**
      * @param bool $active
+     * @param string $licenseKey
+     * @param bool $log
      */
     public function __construct($active, $licenseKey, $log)
     {

@@ -45,7 +45,8 @@ $installer->addAttribute('catalog_category', 'solr_exclude_children', array(
 $installer->addAttribute('catalog_category', 'solr_remove_filters', array(
     'type'              => 'text',
     'input'             => 'multiselect',
-    'source'            => 'integernet_solr/source_filterableAttribute',
+    'source'            => 'integernet_solr/eav_source_filterableAttribute',
+    'backend'           => 'integernet_solr/eav_backend_filterableAttribute',
     'label'             => Mage::helper('integernet_solr')->__('Remove Filters'),
     'note'              => Mage::helper('integernet_solr')->__('Hold the CTRL key to select multiple filters'),
     'required'          => 0,

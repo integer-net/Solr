@@ -8,7 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 
-class IntegerNet_Solr_Model_Source_FilterableAttribute extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
+class IntegerNet_Solr_Model_Eav_Source_FilterableAttribute extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
 {
     /**
      * Options getter

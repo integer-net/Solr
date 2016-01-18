@@ -19,7 +19,8 @@ $autoloader->createAndRegister();
 $installer->addAttribute('catalog_category', 'solr_remove_filters', array(
     'type'              => 'text',
     'input'             => 'multiselect',
-    'source'            => 'integernet_solr/source_filterableAttribute',
+    'source'            => 'integernet_solr/eav_source_filterableAttribute',
+    'backend'           => 'integernet_solr/eav_backend_filterableAttribute',
     'label'             => 'Remove Filters',
     'note'              => 'Hold the CTRL key to select multiple filters',
     'required'          => 0,

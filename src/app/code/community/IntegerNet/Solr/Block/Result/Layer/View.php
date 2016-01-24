@@ -52,6 +52,16 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
             foreach (Mage::helper('integernet_solr')->getFilterableAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $currentCategory = $this->_getCurrentCategory();
+                if ($currentCategory) {
+                    $removedFilterAttributeCodes = $currentCategory->getData('solr_remove_filters');
+                    
+                    if (is_array($removedFilterAttributeCodes) && in_array($attribute->getAttributeCode(), $removedFilterAttributeCodes)) {
+                        continue;
+                    }
+                }
+
                 $attributeCodeFacetName = $attribute->getAttributeCode() . '_facet';
                 if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
 
@@ -170,5 +180,26 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     public function getLayer()
     {
         return $this->getLayout()->createBlock('integernet_solr/result_layer');
+    }
+    
+    /**
+     * @return Mage_Catalog_Model_Category|false
+     */
+    protected function _getCurrentCategory()
+    {
+        if (is_null($this->_currentCategory)) {
+            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
+            } else {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::registry('current_category');
+                if (is_null($this->_currentCategory)) {
+                    $this->_currentCategory = false;
+                }
+            }
+        }
+
+        return $this->_currentCategory;
     }
 }

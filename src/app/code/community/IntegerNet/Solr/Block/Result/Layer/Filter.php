@@ -266,9 +266,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 }
                 /** @var Mage_Catalog_Model_Category $currentCategory */
                 $currentCategory = $this->_getCurrentCategory();
-                if (!$currentCategory) {
-                    $removedFilterAttributeCodes = explode(',', $currentCategory->getData('solr_remove_filters'));
-                    if (in_array($this->getAttribute()->getAttributeCode(), $removedFilterAttributeCodes)) {
+                if ($currentCategory) {
+                    $removedFilterAttributeCodes = $currentCategory->getData('solr_remove_filters');
+                    if (is_array($removedFilterAttributeCodes) && in_array($this->getAttribute()->getAttributeCode(), $removedFilterAttributeCodes)) {
                         continue;
                     }
                 }

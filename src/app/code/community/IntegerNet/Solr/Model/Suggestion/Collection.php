@@ -9,7 +9,6 @@
  */ 
 class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
 {
-    protected $_storeId = null;
 
     /**
      * Collection constructor
@@ -20,21 +19,24 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
     {}
 
     /**
+     * @deprecated was not used in the module anyway
      * @param int $storeId
      * @return IntegerNet_Solr_Model_Suggestion_Collection
      */
     public function setStoreId($storeId)
     {
-        $this->_storeId = $storeId;
+        Mage::log(__METHOD__ . ' not supported.', Zend_Log::WARN);
         return $this;
     }
 
     /**
+     * @deprecated was not used in the module anyway
      * @param string $queryText
      * @return IntegerNet_Solr_Model_Suggestion_Collection
      */
     public function setQueryFilter($queryText)
     {
+        Mage::log(__METHOD__ . ' not supported.', Zend_Log::WARN);
         return $this;
     }
 
@@ -102,6 +104,6 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
      */
     protected function _getSolrSuggestion()
     {
-        return Mage::getSingleton('integernet_solr/suggestion')->getSolrSuggestion($this->_storeId);
+        return Mage::getSingleton('integernet_solr/suggestion')->getSolrSuggestion();
     }
 }

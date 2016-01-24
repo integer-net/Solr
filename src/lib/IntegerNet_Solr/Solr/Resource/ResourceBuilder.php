@@ -14,6 +14,8 @@ use Apache_Solr_HttpTransport_Abstract;
 use Apache_Solr_HttpTransport_Curl;
 use Apache_Solr_HttpTransport_FileGetContents;
 use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\SolrCategories\Resource\ServiceCategories;
+use IntegerNet\SolrSuggest\Resource\ServiceSuggest;
 
 class ResourceBuilder
 {
@@ -52,8 +54,18 @@ class ResourceBuilder
      */
     public function build()
     {
-        return new ServiceBase($this->host, $this->port, $this->path,
+        $service = new ServiceBase(
+            $this->host, $this->port, $this->path,
             $this->httpTransportAdapter, $this->compatibilityLayer, $this->useHttps);
+        $service->appendService(new ServiceCategories(
+                $this->host, $this->port, $this->path,
+                $this->httpTransportAdapter, $this->compatibilityLayer, $this->useHttps)
+        );
+        $service->appendService(new ServiceSuggest(
+                $this->host, $this->port, $this->path,
+                $this->httpTransportAdapter, $this->compatibilityLayer, $this->useHttps)
+        );
+        return $service;
     }
     /**
      * Returns new instance with default values for method chaining
@@ -101,7 +113,7 @@ class ResourceBuilder
             $path .= $core . '/';
         }
 
-        $builder = clone $this; //TODO clone
+        $builder = clone $this;
         return $builder->setHost($host)->setPort($port)->setPath($path)->setUseHttps($useHttps)
             ->setHttpTransportAdapter(self::getHttpTransportAdapter($serverConfig));
     }

@@ -14,6 +14,7 @@ use IntegerNet\Solr\Query\SearchString;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\SolrSuggest\Query\SearchTermSuggestParamsBuilder;
 use IntegerNet\SolrSuggest\Query\SearchTermSuggestQueryBuilder;
 
 class SearchTermSuggestRequestFactory extends RequestFactory
@@ -55,7 +56,7 @@ class SearchTermSuggestRequestFactory extends RequestFactory
      */
     public function createRequest()
     {
-        return new SearchTermSuggestRequest( //TODO right params
+        return new SearchTermSuggestRequest(
             $this->getResource(),
             $this->createQueryBuilder(),
             $this->getEventDispatcher(),

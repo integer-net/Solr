@@ -132,14 +132,14 @@ class SearchRequest implements Request, HasFilter
      * Remove all but last page from multipage result
      *
      * @param SolrResponse $result
-     * @return Apache_Solr_Response
+     * @return SolrResponse
      */
     private function sliceResult(SolrResponse $result)
     {
         $pageSize = $this->getParamsBuilder()->getPageSize();
         $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;
         if ($firstItemNumber > 0) {
-            $result->response->docs = array_slice($result->response->docs, $firstItemNumber, $pageSize);
+            $result->slice($firstItemNumber, $pageSize);
         }
         return $result;
     }

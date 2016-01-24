@@ -97,6 +97,7 @@ class IntegerNet_Solr_Model_Result
                 $this->addCategoryFilter($category);
             }
         }
+        Mage::unregister('attribute_filters');
     }
 
     /**
@@ -110,6 +111,7 @@ class IntegerNet_Solr_Model_Result
                 $this->addAttributeFilter($attributeFilter['attribute'], $attributeFilter['value']);
             }
         }
+        Mage::unregister('attribute_filters');
     }
 
 }

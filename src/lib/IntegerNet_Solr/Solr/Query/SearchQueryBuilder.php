@@ -52,7 +52,6 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
      * @param ParamsBuilder $paramsBuilder
      * @param int $storeId
      * @param EventDispatcher $eventDispatcher
-     * @todo params builder initialization?
      */
     public function __construct(SearchString $searchString, FuzzyConfig $fuzzyConfig, ResultsConfig $resultsConfig, AttributeRepository $attributeRepository, Pagination $pagination, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
     {

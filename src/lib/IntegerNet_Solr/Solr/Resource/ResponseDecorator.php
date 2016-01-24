@@ -222,4 +222,18 @@ class ResponseDecorator implements SolrResponse
         }
     }
 
+    /**
+     * Returns new result with slice from item number $from until item number $from + $length
+     *
+     * @param $from
+     * @param $length
+     * @return SolrResponse
+     */
+    public function slice($from, $length)
+    {
+        $result = clone $this;
+        $result->response->docs = array_slice($this->response->docs, $from, $length);
+        return $result;
+    }
+
 }

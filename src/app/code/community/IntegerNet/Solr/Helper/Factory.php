@@ -54,6 +54,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
+     * @param bool $isSearchtermSuggest
      * @return \IntegerNet\Solr\Request\Request
      */
     public function getSolrRequest($isSearchtermSuggest = false)
@@ -62,6 +63,9 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         $config = new IntegerNet_Solr_Model_Config_Store($storeId);
         if ($config->getGeneralConfig()->isLog()) {
             $logger = Mage::helper('integernet_solr/log');
+            if ($logger instanceof IntegerNet_Solr_Helper_Log) {
+                $logger->setFile($isSearchtermSuggest ? 'solr_suggest.log' : 'solr.log');
+            }
         } else {
             $logger = new NullLogger;
         }
@@ -81,6 +85,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         }
         /** @var RequestFactory $factory */
         if ($isSearchtermSuggest) {
+            $applicationContext->setQuery(Mage::helper('integernet_solr/searchterm'));
             $factory = new SearchTermSuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),

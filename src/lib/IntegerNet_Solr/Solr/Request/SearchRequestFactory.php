@@ -10,21 +10,13 @@
 namespace IntegerNet\Solr\Request;
 
 use IntegerNet\Solr\Config\FuzzyConfig;
-use IntegerNet\Solr\Config\ResultsConfig;
-use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Implementor\HasUserQuery;
-use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
-use IntegerNet\Solr\Query\QueryBuilder;
 use IntegerNet\Solr\Query\SearchQueryBuilder;
 use IntegerNet\Solr\Query\SearchString;
-use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use Psr\Log\LoggerInterface;
 use IntegerNet\Solr\Query\SearchParamsBuilder;
-use IntegerNet\Solr\Request\SearchRequest;
 
 class SearchRequestFactory extends RequestFactory
 {

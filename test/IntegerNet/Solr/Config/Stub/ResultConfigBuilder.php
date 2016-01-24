@@ -15,6 +15,7 @@ class ResultConfigBuilder
 {
     const DEFAULT_MAX_PRICE = 50;
     const DEFAULT_STEP_SIZE = 10;
+    const DEFAULT_PRIORITY_CATEGORIES = 1;
     /**
      * @var bool
      */
@@ -23,6 +24,10 @@ class ResultConfigBuilder
      * @var string {and,or}
      */
     private $searchOperator = ResultsConfig::SEARCH_OPERATOR_AND;
+    /**
+     * @var int
+     */
+    private $priorityCategories = self::DEFAULT_PRIORITY_CATEGORIES;
     /**
      * @var float
      */
@@ -114,7 +119,7 @@ class ResultConfigBuilder
 
     public function build()
     {
-        return new ResultsConfig($this->useCustomPriceIntervals, $this->searchOperator, $this->priceStepSize,
+        return new ResultsConfig($this->useCustomPriceIntervals, $this->searchOperator, $this->priorityCategories, $this->priceStepSize,
             $this->maxPrice, $this->useCustomPriceIntervals, $this->customPriceIntervals);
     }
 }

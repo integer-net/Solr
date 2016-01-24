@@ -43,4 +43,11 @@ class SearchTermSuggestQueryBuilder implements QueryBuilder
         return new Query($this->storeId, '*', 0, 0, $this->paramsBuilder->buildAsArray());
     }
 
+    /**
+     * @return ParamsBuilder
+     */
+    public function getParamsBuilder()
+    {
+        return $this->paramsBuilder;
+    }
 }

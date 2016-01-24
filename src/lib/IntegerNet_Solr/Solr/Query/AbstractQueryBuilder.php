@@ -36,6 +36,10 @@ abstract class AbstractQueryBuilder implements QueryBuilder
      * @var $eventDispatcher EventDispatcher
      */
     private $eventDispatcher;
+    /**
+     * @var $attributetoReset string
+     */
+    private $attributetoReset;
 
     /**
      * @param AttributeRepository $attributeRepository
@@ -53,13 +57,20 @@ abstract class AbstractQueryBuilder implements QueryBuilder
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function setAttributeToReset($attributeToReset)
+    {
+        $this->attributetoReset = $attributeToReset;
+        return $this;
+    }
 
     public function build()
     {
         return new Query(
-            $this->storeId, $this->getQueryText(),
-            0, $this->pagination->getPageSize() * $this->pagination->getCurrentPage(),
-            $this->paramsBuilder->buildAsArray()
+            $this->storeId, 
+            $this->getQueryText(),
+            0, 
+            $this->pagination->getPageSize() * $this->pagination->getCurrentPage(),
+            $this->paramsBuilder->buildAsArray($this->attributetoReset)
         );
     }
 

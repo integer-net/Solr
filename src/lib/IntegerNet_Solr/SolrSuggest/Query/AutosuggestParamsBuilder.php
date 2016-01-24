@@ -13,9 +13,9 @@ use IntegerNet\Solr\Query\AbstractParamsBuilder;
 
 final class AutosuggestParamsBuilder extends AbstractParamsBuilder
 {
-    public function buildAsArray()
+    public function buildAsArray($attributeToReset = '')
     {
-        $params = parent::buildAsArray();
+        $params = parent::buildAsArray($attributeToReset);
         $params['rows'] = $this->pagination->getPageSize();
 
         return $params;

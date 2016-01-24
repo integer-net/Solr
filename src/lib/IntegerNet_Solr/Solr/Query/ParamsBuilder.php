@@ -21,9 +21,10 @@ interface ParamsBuilder
     /**
      * Return parameters as array as expected by solr service
      *
+     * @param string $attributeToReset
      * @return mixed[]
      */
-    public function buildAsArray();
+    public function buildAsArray($attributeToReset = '');
 
     /**
      * Return store id

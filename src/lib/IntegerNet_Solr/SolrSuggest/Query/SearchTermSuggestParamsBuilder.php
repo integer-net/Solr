@@ -44,9 +44,10 @@ class SearchTermSuggestParamsBuilder implements ParamsBuilder
     /**
      * Return parameters as array as expected by solr service
      *
+     * @param string $attributeToReset
      * @return mixed[]
      */
-    public function buildAsArray()
+    public function buildAsArray($attributeToReset = '')
     {
         $params = array(
             'fq' => 'store_id:' . $this->getStoreId(),

@@ -148,9 +148,10 @@ class FilterQueryBuilder
 
     /**
      * @param int $storeId
+     * @param string $attributeToReset
      * @return string
      */
-    public function buildFilterQuery($storeId)
+    public function buildFilterQuery($storeId, $attributeToReset = '')
     {
             $filterQuery = 'store_id:' . $storeId;
             if ($this->isCategoryPage) {
@@ -160,6 +161,9 @@ class FilterQueryBuilder
             }
 
             foreach($this->filters as $attributeCode => $value) {
+                if ($attributeCode == $attributeToReset) {
+                    continue;
+                }
                 if (is_array($value)) {
                     $filterQuery .= ' AND (';
                     $filterQueryParts = array();

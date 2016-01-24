@@ -65,11 +65,18 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
         return $this->filterQueryBuilder;
     }
 
-    public function buildAsArray()
+    /**
+     * @param string $attributeToReset
+     * @return array
+     */
+    public function buildAsArray($attributeToReset = '')
     {
+        if ($attributeToReset) {
+            $attributeToReset .= '_facet';
+        }
         $params = array(
             'q.op' => $this->resultsConfig->getSearchOperator(),
-            'fq' => $this->getFilterQuery(),
+            'fq' => $this->getFilterQuery($attributeToReset),
             'fl' => 'result_html_autosuggest_nonindex,score,sku_s,name_s,product_id',
             'sort' => $this->getSortParam(),
             'facet' => 'true',
@@ -131,11 +138,12 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
     }
 
     /**
+     * @param string $attributeToReset
      * @return string
      */
-    private function getFilterQuery()
+    private function getFilterQuery($attributeToReset = '')
     {
-        return $this->filterQueryBuilder->buildFilterQuery($this->getStoreId());
+        return $this->filterQueryBuilder->buildFilterQuery($this->getStoreId(), $attributeToReset);
     }
 
     /**

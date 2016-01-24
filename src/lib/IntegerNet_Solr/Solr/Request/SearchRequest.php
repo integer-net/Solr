@@ -111,7 +111,7 @@ class SearchRequest implements Request, HasFilter
             $numberResults = sizeof($result->response->docs);
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                $fuzzyResult = $this->getResultFromRequest( $pageSize, true);
+                $fuzzyResult = $this->getResultFromRequest($pageSize, true);
                 $result = $result->merge($fuzzyResult, $pageSize);
             }
 
@@ -122,7 +122,6 @@ class SearchRequest implements Request, HasFilter
                     $result = $this->getResultFromRequest($pageSize, false);
                 }
                 $this->foundNoResults = false;
-                return $this->sliceResult($result);
             }
             return $this->sliceResult($result);
         }
@@ -155,11 +154,16 @@ class SearchRequest implements Request, HasFilter
     /**
      * @param int $pageSize
      * @param boolean $fuzzy
+     * @param string $attributeToReset
      * @return SolrResponse
      */
-    private function getResultFromRequest($pageSize, $fuzzy = true)
+    private function getResultFromRequest($pageSize, $fuzzy = true, $attributeToReset = 'color')
     {
-        $query = $this->queryBuilder->setAllowFuzzy($fuzzy)->setBroaden($this->foundNoResults)->build();
+        $query = $this->queryBuilder
+            ->setAllowFuzzy($fuzzy)
+            ->setBroaden($this->foundNoResults)
+            ->setAttributeToReset('')
+            ->build();
         $transportObject = new Transport(array(
             'store_id' => $this->getParamsBuilder()->getStoreId(),
             'query_text' => $query->getQueryText(),
@@ -186,8 +190,35 @@ class SearchRequest implements Request, HasFilter
         $this->logger->debug('Query over all searchable fields: ' . $transportObject['query_text']);
         $this->logger->debug('Filter Query: ' . $transportObject['params']['fq']);
 
-        $this->eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));
+        if ($attributeToReset) {
 
+            $query = $this->queryBuilder
+                ->setAllowFuzzy($fuzzy)
+                ->setBroaden($this->foundNoResults)
+                ->setAttributeToReset($attributeToReset)
+                ->build();
+
+            $transportObject = new Transport(array(
+                'store_id' => $this->getParamsBuilder()->getStoreId(),
+                'query_text' => $query->getQueryText(),
+                'start_item' => 0,
+                'page_size' => $pageSize,
+                'params' => $query->getParams(),
+            ));
+
+            $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
+
+            $parentResult = $this->getResource()->search(
+                $transportObject->getStoreId(),
+                $transportObject->getQueryText(),
+                $transportObject->getStartItem(), // Start item
+                $transportObject->getPageSize(), // Items per page
+                $transportObject->getParams()
+            );
+
+            /** @todo merge facet results */
+        }
+        $this->eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));
         return $result;
     }
 

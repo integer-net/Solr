@@ -27,53 +27,56 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                 $this->_activeFilters[] = $filter;
             }
 
-            foreach (Mage::helper('integernet_solr')->getFilterableAttributes(false) as $attribute) {
+            foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes(false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 $optionLabel = '';
-                if ($optionId = Mage::app()->getRequest()->getParam($attribute->getAttributeCode())) {
-                    if ($attribute->getFrontendInput() == 'price') {
-                        if (strpos($optionId, '-') !== false) {
-                            list($fromPrice, $toPrice) = explode('-', $optionId);
-                            $toPrice -= 0.01;
-                            if ($toPrice <= 0) {
-                                $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                if ($optionIds = Mage::app()->getRequest()->getParam($attribute->getAttributeCode())) {
+                    foreach(explode(',', $optionIds) as $optionId) {
+                        if ($attribute->getFrontendInput() == 'price') {
+                            if (strpos($optionId, '-') !== false) {
+                                list($fromPrice, $toPrice) = explode('-', $optionId);
+                                $toPrice -= 0.01;
+                                if ($toPrice <= 0) {
+                                    $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
+                                } else {
+                                    $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice), $store->formatPrice($toPrice));
+                                }
                             } else {
-                                $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($fromPrice), $store->formatPrice($toPrice));
+                                list($index, $stepSize) = explode(',', $optionId);
+                                if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
+                                    && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')
+                                ) {
+                                    $lowerBorder = 0;
+                                    $i = 1;
+                                    foreach (explode(',', $customPriceIntervals) as $upperBorder) {
+                                        if ($i == $index) {
+                                            $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                                            break;
+                                        }
+
+                                        $i++;
+                                        $lowerBorder = $upperBorder;
+                                    }
+                                    if (!$optionLabel) {
+                                        $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($lowerBorder));
+                                    }
+                                } else {
+                                    $lowerBorder = ($index - 1) * $stepSize;
+                                    $upperBorder = ($index) * $stepSize;
+                                    $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                                }
                             }
                         } else {
-                            list($index, $stepSize) = explode(',', $optionId);
-                            if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
-                                && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
-                                $lowerBorder = 0;
-                                $i = 1;
-                                foreach (explode(',', $customPriceIntervals) as $upperBorder) {
-                                    if ($i == $index) {
-                                        $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
-                                        break;
-                                    }
-
-                                    $i++;
-                                    $lowerBorder = $upperBorder;
-                                }
-                                if (!$optionLabel) {
-                                    $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($lowerBorder));
-                                }
-                            } else {
-                                $lowerBorder = ($index - 1) * $stepSize;
-                                $upperBorder = ($index) * $stepSize;
-                                $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));                                
-                            }
+                            $optionLabel = $attribute->getSource()->getOptionText($optionId);
                         }
-                    } else {
-                        $optionLabel = $attribute->getSource()->getOptionText($optionId);
+                        $filter = new Varien_Object();
+                        $filter->setAttribute($attribute);
+                        $filter->setName($attribute->getStoreLabel());
+                        $filter->setLabel($optionLabel);
+                        $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode()));
+                        $this->_activeFilters[] = $filter;
                     }
-                    $filter = new Varien_Object();
-                    $filter->setAttribute($attribute);
-                    $filter->setName($attribute->getStoreLabel());
-                    $filter->setLabel($optionLabel);
-                    $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode()));
-                    $this->_activeFilters[] = $filter;
                 }
             }
         }

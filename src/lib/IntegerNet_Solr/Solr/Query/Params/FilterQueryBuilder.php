@@ -66,6 +66,14 @@ class FilterQueryBuilder
      */
     public function addAttributeFilter(Attribute $attribute, $value)
     {
+        if (isset($this->filters[$attribute->getAttributeCode() . '_facet'])) {
+            $currentValue = $this->filters[$attribute->getAttributeCode() . '_facet'];
+            if (!is_array($currentValue)) {
+                $currentValue = array($currentValue);
+            }
+            $currentValue[] = $value;
+            $value = $currentValue;
+        }
         $this->filters[$attribute->getAttributeCode() . '_facet'] = $value;
         return $this;
     }

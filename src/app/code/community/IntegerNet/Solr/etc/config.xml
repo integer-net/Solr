@@ -26,6 +26,7 @@
             <catalogsearch>
                 <rewrite>
                     <layer>IntegerNet_Solr_Model_CatalogSearch_Layer</layer>
+                    <layer_filter_attribute>IntegerNet_Solr_Model_CatalogSearch_Layer_Filter_Attribute</layer_filter_attribute>
                 </rewrite>
             </catalogsearch>
 
@@ -33,6 +34,7 @@
                 <rewrite>
                     <layer>IntegerNet_Solr_Model_Catalog_Layer</layer>
                     <layer_filter_price>IntegerNet_Solr_Model_Catalog_Layer_Filter_Price</layer_filter_price>
+                    <layer_filter_attribute>IntegerNet_Solr_Model_Catalog_Layer_Filter_Attribute</layer_filter_attribute>
                 </rewrite>
             </catalog>
         </models>

@@ -37,6 +37,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
             'attribute' => $bridgeAttribute,
             'value' => $value,
         );
+        Mage::unregister('attribute_filters');
         Mage::register('attribute_filters', $attributeFilters);
 
         return $this;

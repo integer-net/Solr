@@ -14,8 +14,9 @@ use IntegerNet\Solr\Resource\SolrResponse;
 interface Request
 {
     /**
+     * @param string[] $activeFilterAttributeCodes
      * @return SolrResponse
      */
-    public function doRequest();
+    public function doRequest($activeFilterAttributeCodes = array());
 
 }

@@ -26,6 +26,8 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_solrResult = null;
 
+    protected $activeFilterAttributeCodes = array();
+
     function __construct()
     {
         $this->_solrRequest = Mage::helper('integernet_solr/factory')->getSolrRequest();
@@ -44,7 +46,7 @@ class IntegerNet_Solr_Model_Result
     public function getSolrResult()
     {
         if (is_null($this->_solrResult)) {
-            $this->_solrResult = $this->_solrRequest->doRequest();
+            $this->_solrResult = $this->_solrRequest->doRequest($this->activeFilterAttributeCodes);
         }
 
         return $this->_solrResult;
@@ -58,6 +60,7 @@ class IntegerNet_Solr_Model_Result
     public function addAttributeFilter($attribute, $value)
     {
         $this->_filterQueryBuilder->addAttributeFilter($attribute, $value);
+        $this->activeFilterAttributeCodes[] = $attribute->getAttributeCode();
     }
 
     /**
@@ -66,6 +69,7 @@ class IntegerNet_Solr_Model_Result
     public function addCategoryFilter($category)
     {
         $this->_filterQueryBuilder->addCategoryFilter($category->getId());
+        $this->activeFilterAttributeCodes[] = 'category';
     }
 
     /**
@@ -75,6 +79,7 @@ class IntegerNet_Solr_Model_Result
     public function addPriceRangeFilterByIndex($range, $index)
     {
         $this->_filterQueryBuilder->addPriceRangeFilterByConfiguration($range, $index);
+        $this->activeFilterAttributeCodes[] = 'price';
     }
 
     /**
@@ -84,6 +89,7 @@ class IntegerNet_Solr_Model_Result
     public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = null)
     {
         $this->_filterQueryBuilder->addPriceRangeFilterByMinMax($minPrice, $maxPrice);
+        $this->activeFilterAttributeCodes[] = 'price';
     }
 
     /**

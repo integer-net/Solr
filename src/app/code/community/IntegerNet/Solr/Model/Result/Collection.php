@@ -107,7 +107,8 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
             $categoryFilters = array();
         }
         $categoryFilters[] = $category;
-        Mage::register('category_filters', $categoryFilters);
+        Mage::unregister('category_filters');
+        Mage::register('category_filters', $categoryFilters, true);
         return $this;
     }
 

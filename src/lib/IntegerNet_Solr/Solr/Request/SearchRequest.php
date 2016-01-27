@@ -95,23 +95,24 @@ class SearchRequest implements Request, HasFilter
     }
 
     /**
+     * @param string[] $activeFilterAttributeCodes
      * @return SolrResponse
      */
-    public function doRequest()
+    public function doRequest($activeFilterAttributeCodes = array())
     {
         $pageSize = $this->getParamsBuilder()->getPageSize() * $this->getParamsBuilder()->getCurrentPage();
         $isFuzzyActive = $this->fuzzyConfig->isActive();
         $minimumResults = $this->fuzzyConfig->getMinimumResults();
         if ($this->getCurrentSort() != 'position') {
-            $result = $this->getResultFromRequest($pageSize, $isFuzzyActive);
+            $result = $this->getResultFromRequest($pageSize, $isFuzzyActive, $activeFilterAttributeCodes);
             return $this->sliceResult($result);
         } else {
-            $result = $this->getResultFromRequest($pageSize, false);
+            $result = $this->getResultFromRequest($pageSize, false, $activeFilterAttributeCodes);
 
             $numberResults = sizeof($result->response->docs);
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                $fuzzyResult = $this->getResultFromRequest($pageSize, true);
+                $fuzzyResult = $this->getResultFromRequest($pageSize, true, $activeFilterAttributeCodes);
                 $result = $result->merge($fuzzyResult, $pageSize);
             }
 
@@ -119,7 +120,7 @@ class SearchRequest implements Request, HasFilter
                 $this->foundNoResults = true;
                 $check = explode(' ', $this->queryBuilder->getSearchString()->getRawString());
                 if (count($check) > 1) {
-                    $result = $this->getResultFromRequest($pageSize, false);
+                    $result = $this->getResultFromRequest($pageSize, false, $activeFilterAttributeCodes);
                 }
                 $this->foundNoResults = false;
             }
@@ -154,10 +155,10 @@ class SearchRequest implements Request, HasFilter
     /**
      * @param int $pageSize
      * @param boolean $fuzzy
-     * @param string $attributeToReset
+     * @param string() $activeFilterAttributeCodes
      * @return SolrResponse
      */
-    private function getResultFromRequest($pageSize, $fuzzy = true, $attributeToReset = '')
+    private function getResultFromRequest($pageSize, $fuzzy = true, $activeFilterAttributeCodes = array())
     {
         $query = $this->queryBuilder
             ->setAllowFuzzy($fuzzy)
@@ -190,12 +191,12 @@ class SearchRequest implements Request, HasFilter
         $this->logger->debug('Query over all searchable fields: ' . $transportObject['query_text']);
         $this->logger->debug('Filter Query: ' . $transportObject['params']['fq']);
 
-        if ($attributeToReset) {
+        foreach ($activeFilterAttributeCodes as $attributeCode) {
 
             $query = $this->queryBuilder
                 ->setAllowFuzzy($fuzzy)
                 ->setBroaden($this->foundNoResults)
-                ->setAttributeToReset($attributeToReset)
+                ->setAttributeToReset($attributeCode)
                 ->build();
 
             $transportObject = new Transport(array(
@@ -216,9 +217,16 @@ class SearchRequest implements Request, HasFilter
                 $transportObject->getParams()
             );
 
-            $result->facet_counts->facet_fields->{$attributeToReset . '_facet'} = $parentResult->facet_counts->facet_fields->{$attributeToReset . '_facet'};
-
-            /** @todo merge facet results */
+            switch ($attributeCode) {
+                case 'category':
+                    $facetCode = $attributeCode;
+                    break;
+                default:
+                    $facetCode = $attributeCode . '_facet';
+            }
+            if (isset($parentResult->facet_counts->facet_fields->{$facetCode})) {
+                $result->facet_counts->facet_fields->{$facetCode} = $parentResult->facet_counts->facet_fields->{$facetCode};
+            }
         }
         $this->eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));
         return $result;

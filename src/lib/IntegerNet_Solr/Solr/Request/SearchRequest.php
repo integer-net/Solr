@@ -157,7 +157,7 @@ class SearchRequest implements Request, HasFilter
      * @param string $attributeToReset
      * @return SolrResponse
      */
-    private function getResultFromRequest($pageSize, $fuzzy = true, $attributeToReset = 'color')
+    private function getResultFromRequest($pageSize, $fuzzy = true, $attributeToReset = '')
     {
         $query = $this->queryBuilder
             ->setAllowFuzzy($fuzzy)
@@ -215,6 +215,8 @@ class SearchRequest implements Request, HasFilter
                 $transportObject->getPageSize(), // Items per page
                 $transportObject->getParams()
             );
+
+            $result->facet_counts->facet_fields->{$attributeToReset . '_facet'} = $parentResult->facet_counts->facet_fields->{$attributeToReset . '_facet'};
 
             /** @todo merge facet results */
         }

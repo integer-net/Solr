@@ -76,7 +76,9 @@ class CategoryRequest implements Request, HasFilter
      */
     public function doRequest($activeFilterAttributeCodes = array())
     {
-        $query = $this->queryBuilder->build();
+        $query = $this->queryBuilder
+            ->setAttributeToReset('')
+            ->build();
         $transportObject = new Transport(array(
             'store_id' => $this->getParamsBuilder()->getStoreId(),
             'query_text' => $query->getQueryText(),
@@ -98,6 +100,48 @@ class CategoryRequest implements Request, HasFilter
         );
 
         $this->logger->logResult($result, microtime(true) - $startTime);
+
+        foreach ($activeFilterAttributeCodes as $attributeCode) {
+
+            $query = $this->queryBuilder
+                ->setAttributeToReset($attributeCode)
+                ->build();
+
+            $transportObject = new Transport(array(
+                'store_id' => $this->getParamsBuilder()->getStoreId(),
+                'query_text' => $query->getQueryText(),
+                'start_item' => 0,
+                'page_size' => 0,
+                'params' => $query->getParams(),
+            ));
+
+            $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
+
+            $parentResult = $this->getResource()->search(
+                $transportObject->getStoreId(),
+                $transportObject->getQueryText(),
+                $transportObject->getStartItem(), // Start item
+                $transportObject->getPageSize(), // Items per page
+                $transportObject->getParams()
+            );
+
+            switch ($attributeCode) {
+                case 'category':
+                    $facetCode = $attributeCode;
+                    break;
+                default:
+                    $facetCode = $attributeCode . '_facet';
+            }
+            if (isset($parentResult->facet_counts->facet_fields->{$facetCode})) {
+                $result->facet_counts->facet_fields->{$facetCode} = $parentResult->facet_counts->facet_fields->{$facetCode};
+            }
+            if ($attributeCode == 'price' && isset($parentResult->facet_counts->facet_ranges->price_f)) {
+                $result->facet_counts->facet_ranges->price_f = $parentResult->facet_counts->facet_ranges->price_f;
+            }
+            if ($attributeCode == 'price' && isset($parentResult->facet_counts->facet_intervals->price_f)) {
+                $result->facet_counts->facet_intervals->price_f = $parentResult->facet_counts->facet_intervals->price_f;
+            }
+        }
 
         $this->eventDispatcher->dispatch('integernet_solr_after_category_request', array('result' => $result));
 

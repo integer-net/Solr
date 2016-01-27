@@ -2,7 +2,7 @@
 <config>
     <sections>
         <integernet_solr translate="label" module="integernet_solr">
-            <label>Solr</label>
+            <label>IntegerNet_Solr</label>
             <tab>service</tab>
             <class>integernet-solr-tab</class>
             <sort_order>28</sort_order>

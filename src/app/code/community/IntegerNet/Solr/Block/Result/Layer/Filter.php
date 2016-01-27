@@ -196,7 +196,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 if ($rangeEnd == 0) {
                     $label = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($rangeStart));
                 } else {
-                    $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd - 0.01));
+                    $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd));
                 }
 
                 $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . $label);
@@ -214,7 +214,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . Mage::helper('catalog')->__(
                     '%s - %s',
                     $store->formatPrice($rangeStart),
-                    $store->formatPrice($rangeEnd - 0.01)
+                    $store->formatPrice($rangeEnd)
                 ));
                 $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
                 $items[] = $item;

@@ -38,7 +38,6 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                         if ($attribute->getFrontendInput() == 'price') {
                             if (strpos($optionId, '-') !== false) {
                                 list($fromPrice, $toPrice) = explode('-', $optionId);
-                                $toPrice -= 0.01;
                                 if ($toPrice <= 0) {
                                     $optionLabel = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($fromPrice));
                                 } else {
@@ -53,7 +52,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                                     $i = 1;
                                     foreach (explode(',', $customPriceIntervals) as $upperBorder) {
                                         if ($i == $index) {
-                                            $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                                            $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder));
                                             break;
                                         }
 
@@ -66,7 +65,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                                 } else {
                                     $lowerBorder = ($index - 1) * $stepSize;
                                     $upperBorder = ($index) * $stepSize;
-                                    $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
+                                    $optionLabel = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder));
                                 }
                             }
                         } else {

@@ -203,7 +203,7 @@ class SearchRequest implements Request, HasFilter
                 'store_id' => $this->getParamsBuilder()->getStoreId(),
                 'query_text' => $query->getQueryText(),
                 'start_item' => 0,
-                'page_size' => $pageSize,
+                'page_size' => 0,
                 'params' => $query->getParams(),
             ));
 

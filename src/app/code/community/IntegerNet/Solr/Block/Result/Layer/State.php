@@ -17,14 +17,16 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
             $store = Mage::app()->getStore();
             $this->_activeFilters = array();
 
-            if ($categoryId = Mage::app()->getRequest()->getParam('cat')) {
-                $optionLabel = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore());
-                $filter = new Varien_Object();
-                $filter->setIsCategory(true);
-                $filter->setName(Mage::helper('catalog')->__('Category'));
-                $filter->setLabel($optionLabel);
-                $filter->setRemoveUrl($this->_getRemoveUrl('cat', $categoryId));
-                $this->_activeFilters[] = $filter;
+            if ($categoryIds = Mage::app()->getRequest()->getParam('cat')) {
+                foreach(explode(',', $categoryIds) as $categoryId) {
+                    $optionLabel = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($categoryId, 'name', Mage::app()->getStore());
+                    $filter = new Varien_Object();
+                    $filter->setIsCategory(true);
+                    $filter->setName(Mage::helper('catalog')->__('Category'));
+                    $filter->setLabel($optionLabel);
+                    $filter->setRemoveUrl($this->_getRemoveUrl('cat', $categoryId));
+                    $this->_activeFilters[] = $filter;
+                }
             }
 
             foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes(false) as $attribute) {

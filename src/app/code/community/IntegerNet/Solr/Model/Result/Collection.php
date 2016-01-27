@@ -108,7 +108,7 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
         }
         $categoryFilters[] = $category;
         Mage::unregister('category_filters');
-        Mage::register('category_filters', $categoryFilters, true);
+        Mage::register('category_filters', $categoryFilters);
         return $this;
     }
 
@@ -141,5 +141,6 @@ class IntegerNet_Solr_Model_Result_Collection extends Varien_Data_Collection
         return Mage::getSingleton('integernet_solr/result')->getSolrResult();
     }
 
-    public function getLoadedIds () {}
+    public function getLoadedIds ()
+    {}
 }

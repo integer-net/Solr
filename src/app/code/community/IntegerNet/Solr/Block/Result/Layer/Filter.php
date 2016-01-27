@@ -145,7 +145,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                         if (isset($categoryFacets->{$childCategoryId})) {
                             $item = new Varien_Object();
                             $item->setCount($categoryFacets->{$childCategoryId});
-                            $item->setLabel($childCategory->getName());
+                            $item->setLabel($this->_getCheckboxHtml('cat', $childCategoryId) . ' ' . $childCategory->getName());
                             $item->setUrl($this->_getUrl($childCategoryId));
                             $this->_categoryFilterItems[] = $item;
                         }
@@ -156,7 +156,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     foreach ((array)$categoryFacets as $optionId => $optionCount) {
                         $item = new Varien_Object();
                         $item->setCount($optionCount);
-                        $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                        $item->setLabel($this->_getCheckboxHtml('cat', $optionId) . ' ' . Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
                         $item->setUrl($this->_getUrl($optionId));
                         $this->_categoryFilterItems[] = $item;
                     }

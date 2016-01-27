@@ -35,6 +35,7 @@
                     <layer>IntegerNet_Solr_Model_Catalog_Layer</layer>
                     <layer_filter_price>IntegerNet_Solr_Model_Catalog_Layer_Filter_Price</layer_filter_price>
                     <layer_filter_attribute>IntegerNet_Solr_Model_Catalog_Layer_Filter_Attribute</layer_filter_attribute>
+                    <layer_filter_category>IntegerNet_Solr_Model_Catalog_Layer_Filter_Category</layer_filter_category>
                 </rewrite>
             </catalog>
         </models>

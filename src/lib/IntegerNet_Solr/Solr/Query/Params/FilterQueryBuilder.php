@@ -121,7 +121,7 @@ class FilterQueryBuilder
         foreach (explode(',', $customPriceIntervals) as $upperBorder) {
             if ($i == $index) {
                 $this->filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
-                return;
+                return $this;
             }
             $i++;
             $lowerBorder = $upperBorder;

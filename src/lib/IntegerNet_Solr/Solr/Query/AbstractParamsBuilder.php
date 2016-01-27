@@ -72,7 +72,15 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
     public function buildAsArray($attributeToReset = '')
     {
         if ($attributeToReset) {
-            $attributeToReset .= '_facet';
+            switch($attributeToReset) {
+                case 'category';
+                    break;
+                case 'price':
+                    $attributeToReset .= '_f';
+                    break;
+                default:
+                    $attributeToReset .= '_facet';
+            }
         }
         $params = array(
             'q.op' => $this->resultsConfig->getSearchOperator(),

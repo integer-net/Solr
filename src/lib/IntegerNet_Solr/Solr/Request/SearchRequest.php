@@ -155,7 +155,7 @@ class SearchRequest implements Request, HasFilter
     /**
      * @param int $pageSize
      * @param boolean $fuzzy
-     * @param string() $activeFilterAttributeCodes
+     * @param string[] $activeFilterAttributeCodes
      * @return SolrResponse
      */
     private function getResultFromRequest($pageSize, $fuzzy = true, $activeFilterAttributeCodes = array())
@@ -226,6 +226,12 @@ class SearchRequest implements Request, HasFilter
             }
             if (isset($parentResult->facet_counts->facet_fields->{$facetCode})) {
                 $result->facet_counts->facet_fields->{$facetCode} = $parentResult->facet_counts->facet_fields->{$facetCode};
+            }
+            if ($attributeCode == 'price' && isset($parentResult->facet_counts->facet_ranges->price_f)) {
+                $result->facet_counts->facet_ranges->price_f = $parentResult->facet_counts->facet_ranges->price_f;
+            }
+            if ($attributeCode == 'price' && isset($parentResult->facet_counts->facet_intervals->price_f)) {
+                $result->facet_counts->facet_intervals->price_f = $parentResult->facet_counts->facet_intervals->price_f;
             }
         }
         $this->eventDispatcher->dispatch('integernet_solr_after_search_request', array('result' => $result));

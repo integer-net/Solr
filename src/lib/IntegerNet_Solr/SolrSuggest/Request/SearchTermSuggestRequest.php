@@ -53,9 +53,10 @@ class SearchTermSuggestRequest implements Request
 
 
     /**
+     * @param string[] $activeFilterAttributeCodes
      * @return SolrResponse
      */
-    public function doRequest()
+    public function doRequest($activeFilterAttributeCodes = array())
     {
         $startTime = microtime(true);
         $query = $this->queryBuilder->build();

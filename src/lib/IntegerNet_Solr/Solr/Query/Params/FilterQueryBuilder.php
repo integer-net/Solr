@@ -66,15 +66,7 @@ class FilterQueryBuilder
      */
     public function addAttributeFilter(Attribute $attribute, $value)
     {
-        if (isset($this->filters[$attribute->getAttributeCode() . '_facet'])) {
-            $currentValue = $this->filters[$attribute->getAttributeCode() . '_facet'];
-            if (!is_array($currentValue)) {
-                $currentValue = array($currentValue);
-            }
-            $currentValue[] = $value;
-            $value = $currentValue;
-        }
-        $this->filters[$attribute->getAttributeCode() . '_facet'] = $value;
+        $this->_addFilter($attribute->getAttributeCode() . '_facet', $value);
         return $this;
     }
 
@@ -85,7 +77,7 @@ class FilterQueryBuilder
      */
     public function addCategoryFilter($categoryId)
     {
-        $this->filters['category'] = $categoryId;
+        $this->_addFilter('category', $categoryId);
         return $this;
     }
 
@@ -113,7 +105,7 @@ class FilterQueryBuilder
     {
         $maxPrice = $index * $range;
         $minPrice = $maxPrice - $range;
-        $this->filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+        $this->_addFilter('price_f', sprintf('[%f TO %f]', $minPrice, $maxPrice));
         return $this;
     }
 
@@ -128,14 +120,14 @@ class FilterQueryBuilder
         $i = 1;
         foreach (explode(',', $customPriceIntervals) as $upperBorder) {
             if ($i == $index) {
-                $this->filters['price_f'] = sprintf('[%f TO %f]', $lowerBorder, $upperBorder);
+                $this->_addFilter('price_f', sprintf('[%f TO %f]', $lowerBorder, $upperBorder));
                 return $this;
             }
             $i++;
             $lowerBorder = $upperBorder;
             continue;
         }
-        $this->filters['price_f'] = sprintf('[%f TO %s]', $lowerBorder, '*');
+        $this->_addFilter('price_f', sprintf('[%f TO %f]', $lowerBorder, '*'));
         return $this;
     }
 
@@ -147,9 +139,9 @@ class FilterQueryBuilder
     public function addPriceRangeFilterByMinMax($minPrice, $maxPrice = 0.0)
     {
         if ($maxPrice) {
-            $this->filters['price_f'] = sprintf('[%f TO %f]', $minPrice, $maxPrice);
+            $this->_addFilter('price_f', sprintf('[%f TO %f]', $minPrice, $maxPrice));
         } else {
-            $this->filters['price_f'] = sprintf('[%f TO *]', $minPrice);
+            $this->_addFilter('price_f',sprintf('[%f TO *]', $minPrice));
         }
         return $this;
     }
@@ -186,6 +178,25 @@ class FilterQueryBuilder
             }
 
         return $filterQuery;
+    }
+
+    /**
+     * Add new filter without overwriting existing filters
+     *
+     * @param string $facetName
+     * @param string|int $value
+     */
+    protected function _addFilter($facetName, $value)
+    {
+        if (isset($this->filters[$facetName])) {
+            $currentValue = $this->filters[$facetName];
+            if (!is_array($currentValue)) {
+                $currentValue = array($currentValue);
+            }
+            $currentValue[] = $value;
+            $value = $currentValue;
+        }
+        $this->filters[$facetName] = $value;
     }
 
 }

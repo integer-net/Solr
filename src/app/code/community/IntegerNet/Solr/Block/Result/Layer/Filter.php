@@ -81,25 +81,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRangeUrl($rangeStart, $rangeEnd)
     {
-        $query = array(
-            $this->getAttribute()->getAttributeCode() => floatval($rangeStart) . '-' . floatval($rangeEnd),
-            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-        );
-        return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
-    }
-
-    /**
-     * Get filter item url
-     *
-     * @param int $index
-     * @return string
-     */
-    protected function _getIntervalUrl($index)
-    {
-        $query = array(
-            $this->getAttribute()->getAttributeCode() => $index . ',' . Mage::getStoreConfig('integernet_solr/results/price_step_size'),
-            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-        );
+        $identifier = 'price';
+        $query = $this->_getQuery($identifier, floatval($rangeStart) . '-' . floatval($rangeEnd));
         return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
     }
 
@@ -216,12 +199,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd - 0.01));
                 }
 
-                $item->setLabel($label);
-                if (version_compare(Mage::getVersion(), '1.7.0.0') >= 0) {
-                    $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
-                } else {
-                    $item->setUrl($this->_getIntervalUrl($i));
-                }
+                $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . $label);
+                $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
                 $items[] = $item;
             }
         } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
@@ -232,7 +211,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item = new Varien_Object();
                 $item->setCount($rangeCount);
                 $rangeEnd = $rangeStart + $attributeFacetData['gap'];
-                $item->setLabel(Mage::helper('catalog')->__(
+                $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . Mage::helper('catalog')->__(
                     '%s - %s',
                     $store->formatPrice($rangeStart),
                     $store->formatPrice($rangeEnd - 0.01)

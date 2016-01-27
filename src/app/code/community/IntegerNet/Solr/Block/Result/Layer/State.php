@@ -23,7 +23,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                 $filter->setIsCategory(true);
                 $filter->setName(Mage::helper('catalog')->__('Category'));
                 $filter->setLabel($optionLabel);
-                $filter->setRemoveUrl($this->_getRemoveUrl('cat'));
+                $filter->setRemoveUrl($this->_getRemoveUrl('cat', $categoryId));
                 $this->_activeFilters[] = $filter;
             }
 
@@ -74,7 +74,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                         $filter->setAttribute($attribute);
                         $filter->setName($attribute->getStoreLabel());
                         $filter->setLabel($optionLabel);
-                        $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode()));
+                        $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode(), $optionId));
                         $this->_activeFilters[] = $filter;
                     }
                 }
@@ -87,16 +87,40 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
     /**
      * Get url for remove item from filter
      *
+     * @param string $attributeCode
+     * @param int $optionId
      * @return string
      */
-    protected function _getRemoveUrl($attributeCode)
+    protected function _getRemoveUrl($attributeCode, $optionId)
     {
-        $query = array($attributeCode => null);
+        $currentParamValue = $this->_getCurrentParamValue($attributeCode);
+        if (strlen($currentParamValue)) {
+            $selectedOptionIds = explode(',', $currentParamValue);
+        } else {
+            $selectedOptionIds = array();
+        }
+        $newParamValues = array_diff($selectedOptionIds, array($optionId));
+        if (sizeof($newParamValues)) {
+            $newParamValues = implode(',', $newParamValues);
+        } else {
+            $newParamValues = null;
+        }
+
+        $query = array($attributeCode => $newParamValues);
         $params['_current']     = true;
         $params['_use_rewrite'] = true;
         $params['_query']       = $query;
         $params['_escape']      = true;
         return Mage::getUrl('*/*/*', $params);
+    }
+
+    /**
+     * @param $identifier
+     * @return mixed
+     */
+    protected function _getCurrentParamValue($identifier)
+    {
+        return Mage::app()->getRequest()->getParam($identifier);
     }
 
     /**

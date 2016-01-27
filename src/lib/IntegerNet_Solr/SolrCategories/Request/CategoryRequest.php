@@ -71,9 +71,10 @@ class CategoryRequest implements Request, HasFilter
 
 
     /**
+     * @param string[] $activeFilterAttributeCodes
      * @return SolrResponse
      */
-    public function doRequest()
+    public function doRequest($activeFilterAttributeCodes = array())
     {
         $query = $this->queryBuilder->build();
         $transportObject = new Transport(array(

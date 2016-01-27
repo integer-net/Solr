@@ -35,6 +35,7 @@ class IntegerNet_Solr_Model_Result
             $this->_filterQueryBuilder = $this->_solrRequest->getFilterQueryBuilder();
             $this->_addCategoryFilters();
             $this->_addAttributeFilters();
+            $this->_addPriceFilters();
         }
     }
 
@@ -118,6 +119,20 @@ class IntegerNet_Solr_Model_Result
             }
         }
         Mage::unregister('attribute_filters');
+    }
+
+    /**
+     * Store category filters in registry until request is done
+     */
+    private function _addPriceFilters()
+    {
+        $priceFilters = Mage::registry('price_filters');
+        if (is_array($priceFilters)) {
+            foreach ($priceFilters as $priceFilter) {
+                $this->addPriceRangeFilterByMinMax($priceFilter['min'], $priceFilter['max']);
+            }
+        }
+        Mage::unregister('price_filters');
     }
 
 }

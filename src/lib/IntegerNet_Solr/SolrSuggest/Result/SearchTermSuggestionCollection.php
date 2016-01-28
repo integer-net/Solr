@@ -1,9 +1,4 @@
 <?php
-namespace IntegerNet\SolrSuggest\Result;
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
-
 /**
  * integer_net Magento Module
  *
@@ -12,6 +7,13 @@ use IteratorAggregate;
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+namespace IntegerNet\SolrSuggest\Result;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use IntegerNet\Solr\Resource\SolrResponse;
+use IntegerNet\Solr\Implementor\HasUserQuery;
 
 class SearchTermSuggestionCollection implements IteratorAggregate, Countable
 {
@@ -22,19 +24,20 @@ class SearchTermSuggestionCollection implements IteratorAggregate, Countable
     /**
      * @var \IntegerNet\Solr\Implementor\HasUserQuery
      */
-    private $searchTerm;
+    private $userQuery;
     /**
      * @var null|ArrayIterator
      */
     private $loadedIterator;
 
     /**
-     * @param \IntegerNet\Solr\Resource\SolrResponse $response
+     * @param SolrResponse $response
+     * @param HasUserQuery $userQuery
      */
-    public function __construct(\IntegerNet\Solr\Resource\SolrResponse $response, \IntegerNet\Solr\Implementor\HasUserQuery $searchTerm)
+    public function __construct(SolrResponse $response, HasUserQuery $userQuery)
     {
         $this->response = $response;
-        $this->searchTerm = $searchTerm;
+        $this->userQuery = $userQuery;
     }
 
     /**
@@ -68,7 +71,7 @@ class SearchTermSuggestionCollection implements IteratorAggregate, Countable
             $suggestions = (array)$this->getResponse()->facet_counts->facet_fields->text_autocomplete;
 
             foreach ($suggestions as $suggestion => $numResults) {
-                $items[] = new \IntegerNet\SolrSuggest\Result\SearchTermSuggestion($suggestion, $numResults);
+                $items[] = new SearchTermSuggestion($suggestion, $numResults);
             }
 
 
@@ -76,13 +79,13 @@ class SearchTermSuggestionCollection implements IteratorAggregate, Countable
         } else if (isset($this->getResponse()->spellcheck->suggestions)) {
 
             $spellchecker = (array)$this->getResponse()->spellcheck->suggestions;
-            $queryText = $this->searchTerm->getUserQueryText();
+            $queryText = $this->userQuery->getUserQueryText();
 
             foreach ($spellchecker AS $word => $query) {
                 $suggestions = (array)$query->suggestion;
 
                 foreach ($suggestions as $suggestion) {
-                    $items[] = new \IntegerNet\SolrSuggest\Result\SearchTermSuggestion(
+                    $items[] = new SearchTermSuggestion(
                         str_replace($word, $suggestion->word, $queryText), $suggestion->freq
                     );
                 }
@@ -103,7 +106,7 @@ class SearchTermSuggestionCollection implements IteratorAggregate, Countable
     }
 
     /**
-     * @return \IntegerNet\Solr\Resource\SolrResponse
+     * @return SolrResponse
      */
     private function getResponse()
     {

@@ -7,7 +7,10 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Factory;
+use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use Psr\Log\NullLogger;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
@@ -17,7 +20,7 @@ use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 
-class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
+class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
 {
 
     /**
@@ -144,4 +147,19 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         return new IntegerNet_Solr_Model_Config_Store(Mage::app()->getStore()->getId());
     }
 
+    public function getAutosuggestResult()
+    {
+        $storeConfig = $this->getCurrentStoreConfig();
+        return new AutosuggestResult(
+            Mage::app()->getStore()->getId(),
+            $storeConfig->getGeneralConfig(),
+            $storeConfig->getAutosuggestConfig(),
+            Mage::helper('integernet_solr/searchterm'),
+            Mage::helper('integernet_solr'),
+            Mage::getModel('integernet_solr/bridge_categoryRepository'),
+            Mage::getModel('integernet_solr/bridge_attributeRepository'),
+            $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+        );
+    }
 }

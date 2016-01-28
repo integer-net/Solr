@@ -7,13 +7,15 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+namespace IntegerNet\Solr\Implementor;
+
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Request\Request;
 
 /**
- * Interface for factory helper
+ * Interface for factory helper. Starting point for implementation
  */
-interface IntegerNet_Solr_Interface_Factory
+interface Factory
 {
     const REQUEST_MODE_AUTODETECT = 0;
     const REQUEST_MODE_SEARCH = 1;

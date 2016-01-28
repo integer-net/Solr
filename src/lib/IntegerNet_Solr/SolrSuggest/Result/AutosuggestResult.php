@@ -1,7 +1,4 @@
 <?php
-use IntegerNet\SolrSuggest\Result\SearchTermSuggestionCollection;
-use IntegerNet\Solr\Implementor\Category;
-
 /**
  * integer_net Magento Module
  *
@@ -10,7 +7,22 @@ use IntegerNet\Solr\Implementor\Category;
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Autosuggest_Result
+
+namespace IntegerNet\SolrSuggest\Result;
+
+use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\CategoryRepository;
+use IntegerNet\Solr\Implementor\Category;
+use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Implementor\Factory;
+use IntegerNet\Solr\Implementor\HasUserQuery;
+use IntegerNet\Solr\Request\Request;
+use IntegerNet\SolrSuggest\Implementor\SearchUrl;
+use IntegerNet_Solr_Autosuggest_Template;
+
+class AutosuggestResult
 {
     /**
      * @var \IntegerNet\Solr\Config\GeneralConfig
@@ -41,9 +53,13 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     private $categoryRepository;
     /**
-     * @var \IntegerNet\Solr\Request\Request
+     * @var Request
      */
-    private $solrRequest;
+    private $searchRequest;
+    /**
+     * @var Request
+     */
+    private $searchTermSuggestRequest;
     /**
      * @var $solrResult null|\IntegerNet\Solr\Resource\SolrResponse
      */
@@ -53,23 +69,22 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     private $storeId;
 
-    public function __construct()
+    public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
+                                HasUserQuery $userQuery, SearchUrl $searchUrl, CategoryRepository $categoryRepository,
+                                AttributeRepository $attributeRepository, Request $searchRequest,
+                                Request $searchTermSuggestRequest)
     {
-        $this->storeId = Mage::app()->getStore()->getId();
-        $storeConfig = Mage::helper('integernet_solr/factory')->getCurrentStoreConfig();
-        $this->generalConfig = $storeConfig->getGeneralConfig();
-        $this->autosuggestConfig = $storeConfig->getAutosuggestConfig();
-        $this->userQuery = Mage::helper('integernet_solr/searchterm');
-        $this->searchUrl = Mage::helper('integernet_solr');
+        $this->storeId = $storeId;
+        $this->generalConfig = $generalConfig;
+        $this->autosuggestConfig = $autosuggestConfig;
+        $this->userQuery = $userQuery;
+        $this->searchUrl = $searchUrl;
+        $this->categoryRepository = $categoryRepository;
+        $this->searchRequest = $searchRequest;
+        $this->searchTermSuggestRequest = $searchTermSuggestRequest;
+        $this->attributeRepository = $attributeRepository;
+        //TODO extract template functionality (only for plain PHP version)
         $this->template = new IntegerNet_Solr_Autosuggest_Template();
-        $this->categoryRepository = Mage::getModel('integernet_solr/bridge_categoryRepository');
-        $this->solrRequest = Mage::helper('integernet_solr/factory')
-            ->getSolrRequest(IntegerNet_Solr_Interface_Factory::REQUEST_MODE_AUTOSUGGEST);
-        if (Mage::app() instanceof Mage_Core_Model_App) {
-            $this->attributeRepository = Mage::getModel('integernet_solr/bridge_attributeRepository');
-        } else {
-            $this->attributeRepository = new IntegerNet_Solr_Autosuggest_Helper();
-        }
     }
 
     /**
@@ -83,9 +98,7 @@ class IntegerNet_Solr_Autosuggest_Result
             return array();
         }
 
-        $solrResponse = Mage::helper('integernet_solr/factory')
-            ->getSolrRequest(IntegerNet_Solr_Interface_Factory::REQUEST_MODE_SEARCHTERM_SUGGEST)
-            ->doRequest();
+        $solrResponse = $this->searchTermSuggestRequest->doRequest();
         $collection = new SearchTermSuggestionCollection($solrResponse, $this->userQuery);
         $query = $this->getQuery();
         $counter = 1;
@@ -128,8 +141,7 @@ class IntegerNet_Solr_Autosuggest_Result
 
             if ($item->getQueryText() == $query) {
                 array_unshift($data, $_data);
-            }
-            else {
+            } else {
                 $data[] = $_data;
             }
         }
@@ -163,8 +175,8 @@ class IntegerNet_Solr_Autosuggest_Result
 
         $categoryIds = (array)$this->getSolrResult()->facet_counts->facet_fields->category;
         $categories = $this->categoryRepository->findActiveCategoriesByIds($categoryIds);
-        
-        foreach($categoryIds as $categoryId => $numResults) {
+
+        foreach ($categoryIds as $categoryId => $numResults) {
             if (isset($categories[$categoryId])) {
                 if (++$counter > $maxNumberCategories) {
                     break;
@@ -198,13 +210,13 @@ class IntegerNet_Solr_Autosuggest_Result
         $attributesConfig = $this->_getSortedAttributesConfig($attributesConfig);
         $attributeSuggestions = array();
 
-        foreach($attributesConfig as $attributeConfig) {
+        foreach ($attributesConfig as $attributeConfig) {
             $attributeCode = $attributeConfig['attribute_code'];
             $optionIds = (array)$this->getSolrResult()->facet_counts->facet_fields->{$attributeCode . '_facet'};
 
             $maxNumberAttributeValues = intval($attributeConfig['max_number_suggestions']);
             $counter = 0;
-            foreach($optionIds as $optionId => $numResults) {
+            foreach ($optionIds as $optionId => $numResults) {
                 $attributeSuggestions[$attributeCode][] = array(
                     'title' => $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
                     'row_class' => '',
@@ -224,7 +236,7 @@ class IntegerNet_Solr_Autosuggest_Result
 
     /**
      * @param string $attributeCode
-     * @return Mage_Catalog_Model_Entity_Attribute
+     * @return Attribute
      */
     public function getAttribute($attributeCode)
     {
@@ -250,11 +262,12 @@ class IntegerNet_Solr_Autosuggest_Result
      * @param array $matches
      * @return string
      */
-    protected function _checkOpenTag($matches) {
+    protected function _checkOpenTag($matches)
+    {
         if (strpos($matches[0], '<') === false) {
             return $matches[0];
         } else {
-            return '<span class="highlight">'.$matches[1].'</span>'.$matches[2];
+            return '<span class="highlight">' . $matches[1] . '</span>' . $matches[2];
         }
     }
 
@@ -327,7 +340,7 @@ class IntegerNet_Solr_Autosuggest_Result
     protected function _getCategoryUrl(Category $category)
     {
         $linkType = $this->autosuggestConfig->getCategoryLinkType();
-        if ($linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+        if ($linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
             return $this->searchUrl->getUrl($this->getQuery(), array('cat' => $category->getId()));
         }
 
@@ -337,10 +350,10 @@ class IntegerNet_Solr_Autosuggest_Result
     /**
      * Return category name or complete path, depending on what is configured
      *
-     * @param Mage_Catalog_Model_Category $category
+     * @param Category $category
      * @return string
      */
-    protected function _getCategoryTitle($category)
+    protected function _getCategoryTitle(Category $category)
     {
         if ($this->autosuggestConfig->isShowCompleteCategoryPath() && !empty($category->getPathIds())) {
             $categoryPathIds = $category->getPathIds();
@@ -361,7 +374,7 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     public function printHtml()
     {
-        if (! $this->generalConfig->isActive()) {
+        if (!$this->generalConfig->isActive()) {
             return;
         }
 
@@ -397,7 +410,7 @@ class IntegerNet_Solr_Autosuggest_Result
     public function getSolrResult()
     {
         if (is_null($this->solrResult)) {
-            $this->solrResult = $this->solrRequest->doRequest();
+            $this->solrResult = $this->searchRequest->doRequest();
         }
         return $this->solrResult;
     }

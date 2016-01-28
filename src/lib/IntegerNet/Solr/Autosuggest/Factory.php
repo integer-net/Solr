@@ -7,12 +7,14 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Factory;
+use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
  * This class is a low weight replacement for the factory helper class in autosuggest calls
  */
-final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Interface_Factory
+final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFactory
 {
     /**
      * Returns new configured Solr recource
@@ -39,5 +41,15 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
         // TODO: Implement getSolrRequest() method.
         // not used as long as autosuggest lib uses its own result model
     }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Result\AutosuggestResult
+     */
+    public function getAutosuggestResult()
+    {
+        //TODO implement
+        // $attributeRepository = new IntegerNet_Solr_Autosuggest_Helper()
+    }
+
 
 }

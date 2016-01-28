@@ -14,8 +14,8 @@ final class AutosuggestConfig
     const USE_PHP_FILE_WITHOUT_MAGENTO = 1;
     const USE_PHP_FILE_WITH_MAGENTO = 2;
 
-    const CATEGORY_LINK_FILTER = 'selected';
-    const CATEGORY_LINK_DIRECT = 'direct';
+    const CATEGORY_LINK_TYPE_FILTER = 'filter';
+    const CATEGORY_LINK_TYPE_DIRECT = 'direct';
     /**
      * @var bool
      */

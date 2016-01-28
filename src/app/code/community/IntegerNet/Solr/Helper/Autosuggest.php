@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\AutosuggestConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -174,7 +176,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     protected function _getCategoryUrl($category)
     {
         $linkType = Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type');
-        if (false && $linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+        if (false && $linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
             return Mage::getUrl('catalogsearch/result', array(
                 '_query' => array(
                     'q' => $this->escapeHtml($this->getQuery()),

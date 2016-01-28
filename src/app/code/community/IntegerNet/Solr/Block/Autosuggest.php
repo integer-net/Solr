@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+
 /**
  * integer_net Magento Module
  *
@@ -20,12 +22,12 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     }
 
     /**
-     * @return IntegerNet_Solr_Autosuggest_Result
+     * @return AutosuggestResult
      */
     protected function _getResult()
     {
         if (is_null($this->_result)) {
-            $this->_result = new IntegerNet_Solr_Autosuggest_Result();
+            $this->_result = Mage::helper('integernet_solr/factory')->getAutosuggestResult();
         }
 
         return $this->_result;

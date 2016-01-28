@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\AutosuggestConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -10,9 +12,6 @@
 
 class IntegerNet_Solr_Model_Source_CategoryLinkType
 {
-    const CATEGORY_LINK_TYPE_FILTER = 'filter';
-    const CATEGORY_LINK_TYPE_DIRECT = 'direct';
-    
     /**
      * Options getter
      *
@@ -22,11 +21,11 @@ class IntegerNet_Solr_Model_Source_CategoryLinkType
     {
         return array(
             array(
-                'value' => self::CATEGORY_LINK_TYPE_FILTER, 
+                'value' => AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER,
                 'label' => Mage::helper('integernet_solr')->__('Search result page with set category filter')
             ),
             array(
-                'value' => self::CATEGORY_LINK_TYPE_DIRECT, 
+                'value' => AutosuggestConfig::CATEGORY_LINK_TYPE_DIRECT,
                 'label' => Mage::helper('integernet_solr')->__('Category page')
             ),
         );

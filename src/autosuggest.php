@@ -41,7 +41,7 @@ class IntegerNet_Solr_Autosuggest
             die('Query not given.');
         }
 
-        $block = new IntegerNet_Solr_Autosuggest_Result();
+        $block = Mage::helper('integernet_solr/factory')->getAutosuggestResult();
 
         return $block->printHtml();
     }

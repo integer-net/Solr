@@ -40,5 +40,4 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
         // not used as long as autosuggest lib uses its own result model
     }
 
-
 }

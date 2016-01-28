@@ -35,4 +35,5 @@ interface IntegerNet_Solr_Interface_Factory
      * @return Request
      */
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT);
+
 }

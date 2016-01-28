@@ -166,4 +166,26 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements CategoryReposit
 
         return $adapter->fetchAll($select);
     }
+
+    /**
+     * @param int[] $categoryIds
+     * @return \IntegerNet\Solr\Implementor\Category[]
+     */
+    public function findActiveCategoriesByIds($categoryIds)
+    {
+        /** @var Mage_Catalog_Model_Resource_Category_Collection $categoryCollection */
+        $categoryCollection = Mage::getResourceModel('catalog/category_collection');
+        $categoryCollection
+            ->addAttributeToSelect(array('name', 'url_key'))
+            ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('include_in_menu', 1)
+            ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
+        return array_map(
+            function(Mage_Catalog_Model_Category $c) {
+                return new IntegerNet_Solr_Model_Bridge_Category($c);
+            },
+            $categoryCollection->getItems()
+        );
+    }
+
 }

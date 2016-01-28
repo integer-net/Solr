@@ -1,5 +1,6 @@
 <?php
 use IntegerNet\SolrSuggest\Result\SearchTermSuggestionCollection;
+use IntegerNet\Solr\Implementor\Category;
 
 /**
  * integer_net Magento Module
@@ -82,10 +83,10 @@ class IntegerNet_Solr_Autosuggest_Result
             return array();
         }
 
-        $collection = new SearchTermSuggestionCollection(
-            Mage::getSingleton('integernet_solr/suggestion')->getSolrSuggestion(),
-            Mage::helper('integernet_solr/searchterm')
-        );
+        $solrResponse = Mage::helper('integernet_solr/factory')
+            ->getSolrRequest(IntegerNet_Solr_Interface_Factory::REQUEST_MODE_SEARCHTERM_SUGGEST)
+            ->doRequest();
+        $collection = new SearchTermSuggestionCollection($solrResponse, $this->userQuery);
         $query = $this->getQuery();
         $counter = 1;
         mb_internal_encoding('UTF-8');
@@ -161,46 +162,22 @@ class IntegerNet_Solr_Autosuggest_Result
         $counter = 0;
 
         $categoryIds = (array)$this->getSolrResult()->facet_counts->facet_fields->category;
-
-        //TODO extract the category fetching to category repository (implementations for Magento and Plain PHP)
-        if (Mage::app() instanceof Mage_Core_Model_App) {
-
-            $categories = Mage::getResourceModel('catalog/category_collection')
-                ->addAttributeToSelect(array('name', 'url_key'))
-                ->addAttributeToFilter('is_active', 1)
-                ->addAttributeToFilter('include_in_menu', 1)
-                ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
-
-            foreach($categoryIds as $categoryId => $numResults) {
-                if ($category = $categories->getItemById($categoryId)) {
-                    if (++$counter > $maxNumberCategories) {
-                        break;
-                    }
-
-                    $categorySuggestions[] = array(
-                        'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
-                        'row_class' => '',
-                        'num_of_results' => $numResults,
-                        'url' => $this->_getCategoryUrl($category),
-                    );
-
+        $categories = $this->categoryRepository->findActiveCategoriesByIds($categoryIds);
+        
+        foreach($categoryIds as $categoryId => $numResults) {
+            if (isset($categories[$categoryId])) {
+                if (++$counter > $maxNumberCategories) {
+                    break;
                 }
-            }
-        } else {
 
-            foreach($categoryIds as $categoryId => $numResults) {
-                if ($categoryData = Mage::getStoreConfig('categories/' . $categoryId)) {
-                    if (++$counter > $maxNumberCategories) {
-                        break;
-                    }
+                $category = $categories[$categoryId];
+                $categorySuggestions[] = array(
+                    'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                    'row_class' => '',
+                    'num_of_results' => $numResults,
+                    'url' => $this->_getCategoryUrl($category),
+                );
 
-                    $categorySuggestions[] = array(
-                        'title' => $categoryData['title'],
-                        'row_class' => '',
-                        'num_of_results' => $numResults,
-                        'url' => $this->_getCategoryUrl($categoryData),
-                    );
-                }
             }
         }
 
@@ -344,17 +321,17 @@ class IntegerNet_Solr_Autosuggest_Result
     }
 
     /**
-     * @param array $categoryData
+     * @param Category $category
      * @return string
      */
-    protected function _getCategoryUrl($categoryData)
+    protected function _getCategoryUrl(Category $category)
     {
         $linkType = $this->autosuggestConfig->getCategoryLinkType();
         if ($linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
-            return $this->searchUrl->getUrl($this->getQuery(), array('cat' => $categoryData['id']));
+            return $this->searchUrl->getUrl($this->getQuery(), array('cat' => $category->getId()));
         }
 
-        return $categoryData['url'];
+        return $category->getUrl();
     }
 
     /**
@@ -365,7 +342,7 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     protected function _getCategoryTitle($category)
     {
-        if ($this->autosuggestConfig->isShowCompleteCategoryPath()) {
+        if ($this->autosuggestConfig->isShowCompleteCategoryPath() && !empty($category->getPathIds())) {
             $categoryPathIds = $category->getPathIds();
             array_shift($categoryPathIds);
             array_shift($categoryPathIds);

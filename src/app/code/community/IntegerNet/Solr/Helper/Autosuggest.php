@@ -159,7 +159,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         foreach($categories as $category) {
             $config[$store->getId()]['categories'][$category->getId()] = array(
                 'id' => $category->getId(),
-                'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                'title' => $this->_getCategoryTitle($category),
                 'url' => $category->getUrl(),
             );
         }

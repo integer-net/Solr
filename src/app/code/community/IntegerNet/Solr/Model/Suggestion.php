@@ -21,7 +21,9 @@ class IntegerNet_Solr_Model_Suggestion
     public function getSolrSuggestion()
     {
         if (is_null($this->_solrSuggestion)) {
-            $this->_solrSuggestion = Mage::helper('integernet_solr/factory')->getSolrRequest(true)->doRequest();
+            $this->_solrSuggestion = Mage::helper('integernet_solr/factory')
+                ->getSolrRequest(IntegerNet_Solr_Interface_Factory::REQUEST_MODE_SEARCHTERM_SUGGEST)
+                ->doRequest();
         }
 
         return $this->_solrSuggestion;

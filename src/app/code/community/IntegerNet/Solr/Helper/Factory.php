@@ -19,6 +19,7 @@ use IntegerNet\Solr\Indexer\ProductIndexer;
 
 class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factory
 {
+
     /**
      * Returns new configured Solr recource. Instantiation separate from RequestFactory
      * for easy mocking in integration tests
@@ -54,23 +55,24 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
     /**
      * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
-     * @param bool $isSearchtermSuggest
+     * @param int $requestMode
      * @return \IntegerNet\Solr\Request\Request
      */
-    public function getSolrRequest($isSearchtermSuggest = false)
+    public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
         $storeId = Mage::app()->getStore()->getId();
         $config = new IntegerNet_Solr_Model_Config_Store($storeId);
         if ($config->getGeneralConfig()->isLog()) {
             $logger = Mage::helper('integernet_solr/log');
             if ($logger instanceof IntegerNet_Solr_Helper_Log) {
-                $logger->setFile($isSearchtermSuggest ? 'solr_suggest.log' : 'solr.log');
+                $logger->setFile(
+                    $requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST ? 'solr_suggest.log' : 'solr.log'
+                );
             }
         } else {
             $logger = new NullLogger;
         }
 
-        $isAutosuggest = Mage::registry('is_autosuggest');
         $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
         $applicationContext = new ApplicationContext(
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
@@ -84,7 +86,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
             $applicationContext->setPagination($pagination);
         }
         /** @var RequestFactory $factory */
-        if ($isSearchtermSuggest) {
+        if ($requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST) {
             $applicationContext->setQuery(Mage::helper('integernet_solr/searchterm'));
             $factory = new SearchTermSuggestRequestFactory(
                 $applicationContext,
@@ -97,7 +99,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
                 $storeId,
                 Mage::registry('current_category')->getId()
             );
-        } elseif ($isAutosuggest) {
+        } elseif ($requestMode === self::REQUEST_MODE_AUTOSUGGEST) {
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzyAutosuggestConfig())
                 ->setQuery(Mage::helper('integernet_solr'));

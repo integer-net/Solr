@@ -15,6 +15,12 @@ use IntegerNet\Solr\Request\Request;
  */
 interface IntegerNet_Solr_Interface_Factory
 {
+    const REQUEST_MODE_AUTODETECT = 0;
+    const REQUEST_MODE_SEARCH = 1;
+    const REQUEST_MODE_SEARCHTERM_SUGGEST = 2;
+    const REQUEST_MODE_AUTOSUGGEST = 3;
+    const REQUEST_MODE_CATEGORY = 4;
+
     /**
      * Returns new configured Solr recource
      *
@@ -23,9 +29,10 @@ interface IntegerNet_Solr_Interface_Factory
     public function getSolrResource();
 
     /**
-     * Returns new Solr result wrapper
+     * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
+     * @param int $requestMode
      * @return Request
      */
-    public function getSolrRequest();
+    public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT);
 }

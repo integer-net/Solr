@@ -34,7 +34,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
      *
      * @return \IntegerNet\Solr\Request\Request
      */
-    public function getSolrRequest()
+    public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
         // TODO: Implement getSolrRequest() method.
         // not used as long as autosuggest lib uses its own result model

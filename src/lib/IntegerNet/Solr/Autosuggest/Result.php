@@ -52,7 +52,6 @@ class IntegerNet_Solr_Autosuggest_Result
 
     public function __construct()
     {
-        Mage::register('is_autosuggest', true);
         $this->storeId = Mage::app()->getStore()->getId();
         $storeConfig = Mage::helper('integernet_solr/factory')->getCurrentStoreConfig();
         $this->generalConfig = $storeConfig->getGeneralConfig();
@@ -61,7 +60,8 @@ class IntegerNet_Solr_Autosuggest_Result
         $this->searchUrl = Mage::helper('integernet_solr');
         $this->template = new IntegerNet_Solr_Autosuggest_Template();
         $this->categoryRepository = Mage::getModel('integernet_solr/bridge_categoryRepository');
-        $this->solrRequest = Mage::helper('integernet_solr/factory')->getSolrRequest();
+        $this->solrRequest = Mage::helper('integernet_solr/factory')
+            ->getSolrRequest(IntegerNet_Solr_Interface_Factory::REQUEST_MODE_AUTOSUGGEST);
         if (Mage::app() instanceof Mage_Core_Model_App) {
             $this->attributeRepository = Mage::getModel('integernet_solr/bridge_attributeRepository');
         } else {

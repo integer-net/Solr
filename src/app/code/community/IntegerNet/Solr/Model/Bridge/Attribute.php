@@ -100,7 +100,7 @@ final class IntegerNet_Solr_Model_Bridge_Attribute implements Attribute
      */
     function __call($name, $arguments)
     {
-        return call_user_func_array([$this->_attribute, $name], $arguments);
+        return call_user_func_array(array($this->_attribute, $name), $arguments);
     }
 
 

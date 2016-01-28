@@ -43,6 +43,6 @@ class IntegerNet_Solr_Model_Bridge_Source implements Source
      */
     function __call($name, $arguments)
     {
-        return call_user_func_array([$this->_source, $name], $arguments);
+        return call_user_func_array(array($this->_source, $name), $arguments);
     }
 }

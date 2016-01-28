@@ -167,6 +167,6 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
      */
     public function __call($method, $args)
     {
-        return call_user_func_array([$this->_product, $method], $args);
+        return call_user_func_array(array($this->_product, $method), $args);
     }
 }

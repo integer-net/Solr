@@ -132,17 +132,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     }
 
     /**
-     * @return IntegerNet_Solr_Autosuggest_Custom
-     */
-    public function getCustomHelper()
-    {
-        if (is_null($this->_customHelper)) {
-            $this->_customHelper = new IntegerNet_Solr_Autosuggest_Custom();
-        }
-        return $this->_customHelper;
-    }
-
-    /**
      * @return string
      */
     protected function _getFallbackHtml()

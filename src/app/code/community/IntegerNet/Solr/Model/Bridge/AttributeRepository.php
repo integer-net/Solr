@@ -182,6 +182,18 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $this->_searchableAttributes->getColumnValues('attribute_code')
         );
     }
+
+    /**
+     * @param string $attributeCode
+     * @return Attribute
+     */
+    public function getAttributeByCode($attributeCode)
+    {
+        $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+        $attribute->setStoreId(Mage::app()->getStore()->getId());
+        return $this->_registerAttribute($attribute);
+    }
+
     /**
      * @param $useAlphabeticalSearch
      */

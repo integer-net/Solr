@@ -208,6 +208,15 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
     }
 
     /**
+     * @param string $attributeCode
+     * @return Attribute
+     */
+    public function getAttributeByCode($attributeCode)
+    {
+        return new IntegerNet_Solr_Autosuggest_Attribute(Mage::getStoreConfig('attribute/' . $attributeCode));;
+    }
+
+    /**
      * Dispatch event
      *
      * @param string $eventName

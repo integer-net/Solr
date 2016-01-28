@@ -22,7 +22,7 @@ class IntegerNet_Solr_Model_Result
      */
     protected $_filterQueryBuilder;
     /**
-     * @var $_solrResult null|Apache_Solr_Response
+     * @var $_solrResult null|\IntegerNet\Solr\Resource\SolrResponse
      */
     protected $_solrResult = null;
 
@@ -42,7 +42,7 @@ class IntegerNet_Solr_Model_Result
     /**
      * Call Solr server twice: Once without fuzzy search, once with (if configured)
      *
-     * @return Apache_Solr_Response
+     * @return \IntegerNet\Solr\Resource\SolrResponse
      */
     public function getSolrResult()
     {

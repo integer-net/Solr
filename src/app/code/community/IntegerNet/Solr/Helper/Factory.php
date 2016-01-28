@@ -134,5 +134,12 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
         return $storeConfig;
     }
 
+    /**
+     * @return IntegerNet_Solr_Model_Config_Store
+     */
+    public function getCurrentStoreConfig()
+    {
+        return new IntegerNet_Solr_Model_Config_Store(Mage::app()->getStore()->getId());
+    }
 
 }

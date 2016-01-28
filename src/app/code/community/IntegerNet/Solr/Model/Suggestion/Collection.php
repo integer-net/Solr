@@ -6,7 +6,9 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
+
+//TODO remove varien dependency, move to lib
 class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
 {
 

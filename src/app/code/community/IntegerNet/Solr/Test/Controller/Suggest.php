@@ -35,6 +35,11 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      */
     public function shouldShowAutosuggestBox()
     {
+        $this->setCurrentStore('default');
+        // We need to reload the attribute config in store scope, has been loaded during reindex,
+        // in admin scope, so that attribute labels are missing
+        Mage::unregister('_singleton/eav/config');
+
         $this->dispatch('catalogsearch/ajax/suggest', ['_query' => ['q' => 'war']]);
         $this->assertResponseBodyContains('<ul class="searchwords">', 'Search term suggest container');
         $this->assertResponseBodyContains('><span class="highlight">war</span> of the', 'Search term suggest content');
@@ -42,5 +47,8 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
         $this->assertResponseBodyContains("Herbert George Wells: The War of the Worlds", 'Product suggest content');
         $this->assertResponseBodyContains('<div class="categories-box">', 'Category suggest container');
         $this->assertResponseBodyContains('Science-Fiction', 'Category suggest content');
+        $this->assertResponseBodyContains('<div class="attributes-box">', 'Attribute container');
+        $this->assertResponseBodyContains('<strong>Manufacturer</strong>', 'Attribute container content');
+        $this->assertResponseBodyContains('/catalogsearch/result/?manufacturer=5&amp;q=war">Herbert George Wells</a>', 'Link to attribute search');
     }
 }

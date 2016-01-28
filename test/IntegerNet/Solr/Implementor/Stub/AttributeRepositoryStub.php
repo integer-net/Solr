@@ -70,4 +70,13 @@ class AttributeRepositoryStub implements AttributeRepository
         throw new BadMethodCallException('not used in query builder');
     }
 
+    /**
+     * @param string $attributeCode
+     * @return Attribute
+     */
+    public function getAttributeByCode($attributeCode)
+    {
+        throw new BadMethodCallException('not used in query builder');
+    }
+
 }

@@ -97,7 +97,7 @@
                     <li>
                         <?php $items = array() ?>
                         <?php foreach ($attributeSuggestionsByAttribute as $index => $item): ?>
-                            <?php $items[] = '<a href="' . $item['url'] . '">' . $this->highlight($item['title'], $this->getQuery()) . '</a>' ?>
+                            <?php $items[] = '<a href="' . htmlspecialchars($item['url']) . '">' . $this->highlight($item['title'], $this->getQuery()) . '</a>' ?>
                         <?php endforeach ?>
                         <?php echo implode(', ', $items) ?>
                     </li>

@@ -6,6 +6,15 @@ tables:
     - option_id: 4
       attribute_id: 92
       sort_order: 0
+    - option_id: 5
+      attribute_id: 81
+      sort_order: 0
+    - option_id: 6
+      attribute_id: 81
+      sort_order: 0
+    - option_id: 7
+      attribute_id: 81
+      sort_order: 0
   eav_attribute_option_value:
     - value_id: 3
       option_id: 3
@@ -15,7 +24,15 @@ tables:
       option_id: 4
       store_id: 0
       value: blue
-
+    - value_id: 5
+      option_id: 5
+      value: Herbert George Wells
+    - value_id: 6
+      option_id: 6
+      value: Jack Williamson
+    - value_id: 7
+      option_id: 7
+      value: Viktor Yanukovych
 # Thanks to https://github.com/EcomDev/EcomDev_UrlRewrite
 eav:
   catalog_category:
@@ -157,6 +174,7 @@ eav:
       name: "Viktor Yanukovych: Autobiography"
       short_description: "Viktor Yanukovych: Autobiography"
       description: "Viktor Yanukovych: Autobiography"
+      manufacturer: 7
       stock:
         qty: 100000000.00
         is_in_stock: 1
@@ -175,6 +193,7 @@ eav:
       name: "Herbert George Wells: The War of the Worlds"
       short_description: "Herbert George Wells: The War of the Worlds"
       description: "Herbert George Wells: The War of the Worlds"
+      manufacturer: 5
       stock:
         qty: 100000000.00
         is_in_stock: 1
@@ -193,6 +212,7 @@ eav:
       name: "Jack Williamson: The Humanoids: A Novel"
       short_description: "Jack Williamson: The Humanoids: A Novel"
       description: "Jack Williamson: The Humanoids: A Novel"
+      manufacturer: 6
       stock:
         qty: 100000000.00
         is_in_stock: 1
@@ -211,6 +231,7 @@ eav:
       name: "Wells, H.G. 1898. The Time Machine"
       short_description: "Wells, H.G. 1898. The Time Machine"
       description: "Wells, H.G. 1898. The Time Machine"
+      manufacturer: 5
       stock:
         qty: 100000000.00
         is_in_stock: 1

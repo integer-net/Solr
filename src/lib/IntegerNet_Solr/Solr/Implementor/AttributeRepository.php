@@ -56,4 +56,10 @@ interface AttributeRepository
      * @return string[]
      */
     public function getAttributeCodesToIndex();
+
+    /**
+     * @param string $attributeCode
+     * @return Attribute
+     */
+    public function getAttributeByCode($attributeCode);
 }

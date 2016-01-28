@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\SolrSuggest\Result\SearchTermSuggestionCollection;
+
 /**
  * integer_net Magento Module
  *
@@ -80,8 +82,10 @@ class IntegerNet_Solr_Autosuggest_Result
             return array();
         }
 
-        //TODO extract suggestion collection to lib
-        $collection = Mage::getModel('integernet_solr/suggestion_collection');
+        $collection = new SearchTermSuggestionCollection(
+            Mage::getSingleton('integernet_solr/suggestion')->getSolrSuggestion(),
+            Mage::helper('integernet_solr/searchterm')
+        );
         $query = $this->getQuery();
         $counter = 1;
         mb_internal_encoding('UTF-8');

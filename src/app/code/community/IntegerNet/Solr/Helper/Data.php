@@ -186,7 +186,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      * @param array $data
      * @return void
      */
-    public function dispatch($eventName, array $data = [])
+    public function dispatch($eventName, array $data = array())
     {
         Mage::dispatchEvent($eventName, $data);
     }

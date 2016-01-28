@@ -35,7 +35,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
     public function getAttributeCodesToIndex()
     {
         // not used in autosuggest
-        return [];
+        return array();
     }
 
     /**
@@ -194,7 +194,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
         // not used in autosuggest
-        return [];
+        return array();
     }
 
     /**
@@ -204,7 +204,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
         // not used in autosuggest
-        return [];
+        return array();
     }
 
     /**
@@ -214,7 +214,7 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
      * @param array $data
      * @return void
      */
-    public function dispatch($eventName, array $data = [])
+    public function dispatch($eventName, array $data = array())
     {
         Mage::dispatchEvent($eventName, $data);
     }

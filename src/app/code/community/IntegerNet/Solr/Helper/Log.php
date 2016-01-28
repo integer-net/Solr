@@ -15,7 +15,7 @@ final class IntegerNet_Solr_Helper_Log extends AbstractLogger
     /**
      * @var array
      */
-    protected static $_levelMapping = [
+    protected static $_levelMapping = array(
         LogLevel::ALERT     => Zend_Log::ALERT,
         LogLevel::CRITICAL  => Zend_Log::CRIT,
         LogLevel::DEBUG     => Zend_Log::DEBUG,
@@ -24,7 +24,7 @@ final class IntegerNet_Solr_Helper_Log extends AbstractLogger
         LogLevel::INFO      => Zend_Log::INFO,
         LogLevel::NOTICE    => Zend_Log::NOTICE,
         LogLevel::WARNING   => Zend_Log::WARN,
-    ];
+    );
     /**
      * @var string
      */

@@ -48,7 +48,7 @@ class ResourceFacade
     /**
      * @param Config[] $storeConfig
      */
-    public function __construct(array $storeConfig = [])
+    public function __construct(array $storeConfig = array())
     {
         $this->_config = $storeConfig;
         $this->resourceBuilder = ResourceBuilder::defaultResource();

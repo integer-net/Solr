@@ -124,7 +124,7 @@ class IntegerNet_Solr_Helper_Factory implements IntegerNet_Solr_Interface_Factor
      */
     public function getStoreConfig()
     {
-        $storeConfig = [];
+        $storeConfig = array();
         foreach (Mage::app()->getStores(true) as $store) {
             /** @var Mage_Core_Model_Store $store */
             if ($store->getIsActive()) {

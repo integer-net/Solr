@@ -22,9 +22,9 @@ final class IntegerNet_Solr_Autosuggest_Factory implements IntegerNet_Solr_Inter
     public function getSolrResource()
     {
         $store = IntegerNet_Solr_Autosuggest_Mage::app()->getStore();
-        $storeConfig = [
+        $storeConfig = array(
             $store->getId() => new IntegerNet_Solr_Model_Config_Store($store->getId())
-        ];
+        );
 
         return new ResourceFacade($storeConfig);
     }

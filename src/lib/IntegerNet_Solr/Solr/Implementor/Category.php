@@ -22,12 +22,13 @@ interface Category
     public function getUrl();
 
     /**
-     * @return int[]
-     */
-    public function getPathIds();
-
-    /**
      * @return string
      */
     public function getName();
+
+    /**
+     * @param string $separator
+     * @return string
+     */
+    public function getPath($separator);
 }

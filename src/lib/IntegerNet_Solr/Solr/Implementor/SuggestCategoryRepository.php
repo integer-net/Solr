@@ -9,8 +9,7 @@
  */
 namespace IntegerNet\Solr\Implementor;
 
-//TODO split into CategoryIndexRepository + CategoryRepository ?
-interface CategoryRepository
+interface SuggestCategoryRepository
 {
     /**
      * @param int [] $categoryIds
@@ -18,21 +17,6 @@ interface CategoryRepository
      * @return array
      */
     public function getCategoryNames($categoryIds, $storeId);
-
-    /**
-     * Get category ids of assigned categories and all parents
-     *
-     * @param Product $product
-     * @return int[]
-     */
-    public function getCategoryIds($product);
-    /**
-     * Retrieve product category identifiers
-     *
-     * @param Product $product
-     * @return array
-     */
-    public function getCategoryPositions($product);
 
     /**
      * @param int[] $categoryIds

@@ -10,15 +10,11 @@
 use IntegerNet\Solr\Implementor\Category;
 class IntegerNet_Solr_Autosuggest_Category implements Category
 {
-    /**
-     * @var array
-     */
     private $id;
     private $title;
     private $url;
 
     /**
-     * IntegerNet_Solr_Autosuggets_Category constructor.
      * @param array $id
      * @param $title
      * @param $url
@@ -47,17 +43,24 @@ class IntegerNet_Solr_Autosuggest_Category implements Category
     }
 
     /**
-     * @return int[]
-     */
-    public function getPathIds()
-    {
-        return array();
-    }
-
-    /**
+     * Title is the name or full path, depends how it has been stored.
+     * Only one of getName() or getPath() will be called
+     *
      * @return string
      */
     public function getName()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Title is the name or full path, depends how it has been stored
+     * Only one of getName() or getPath() will be called
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function getPath($separator)
     {
         return $this->title;
     }

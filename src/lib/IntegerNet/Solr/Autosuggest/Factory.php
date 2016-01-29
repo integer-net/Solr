@@ -91,7 +91,6 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
             $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
         );
-        //TODO implement
     }
 
 

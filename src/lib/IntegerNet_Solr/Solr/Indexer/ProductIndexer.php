@@ -17,7 +17,7 @@ use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductIterator;
 use IntegerNet\Solr\Implementor\ProductRepository;
-use IntegerNet\Solr\Implementor\CategoryRepository;
+use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 
 class ProductIndexer
 {
@@ -54,7 +54,7 @@ class ProductIndexer
      * @param ProductRenderer $_renderer
      */
     public function __construct($defaultStoreId, array $_config, ResourceFacade $_resource, EventDispatcher $_eventDispatcher,
-                                AttributeRepository $_attributeRepository, CategoryRepository $_categoryRepository,
+                                AttributeRepository $_attributeRepository, IndexCategoryRepository $_categoryRepository,
                                 ProductRepository $_productRepository, ProductRenderer $_renderer)
     {
         $this->_defaultStoreId = $defaultStoreId;

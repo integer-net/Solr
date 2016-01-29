@@ -12,7 +12,7 @@ namespace IntegerNet\SolrSuggest\Result;
 
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
-use IntegerNet\Solr\Implementor\CategoryRepository;
+use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
 use IntegerNet\Solr\Implementor\Category;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\AutosuggestConfig;
@@ -49,7 +49,7 @@ class AutosuggestResult
      */
     private $attributeRepository;
     /**
-     * @var \IntegerNet\Solr\Implementor\CategoryRepository
+     * @var \IntegerNet\Solr\Implementor\SuggestCategoryRepository
      */
     private $categoryRepository;
     /**
@@ -70,7 +70,7 @@ class AutosuggestResult
     private $storeId;
 
     public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
-                                HasUserQuery $userQuery, SearchUrl $searchUrl, CategoryRepository $categoryRepository,
+                                HasUserQuery $userQuery, SearchUrl $searchUrl, SuggestCategoryRepository $categoryRepository,
                                 AttributeRepository $attributeRepository, Request $searchRequest,
                                 Request $searchTermSuggestRequest)
     {
@@ -355,15 +355,8 @@ class AutosuggestResult
      */
     protected function _getCategoryTitle(Category $category)
     {
-        if ($this->autosuggestConfig->isShowCompleteCategoryPath() && !empty($category->getPathIds())) {
-            $categoryPathIds = $category->getPathIds();
-            array_shift($categoryPathIds);
-            array_shift($categoryPathIds);
-            array_pop($categoryPathIds);
-
-            $categoryPathNames = $this->categoryRepository->getCategoryNames($categoryPathIds, $this->storeId);
-            $categoryPathNames[] = $category->getName();
-            return implode(' > ', $categoryPathNames);
+        if ($this->autosuggestConfig->isShowCompleteCategoryPath()) {
+            return $category->getPath(' > ');
         }
         return $category->getName();
     }

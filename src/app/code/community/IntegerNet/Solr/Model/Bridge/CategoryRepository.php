@@ -8,9 +8,10 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Implementor\Product;
-use IntegerNet\Solr\Implementor\CategoryRepository;
+use IntegerNet\Solr\Implementor\IndexCategoryRepository;
+use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
 
-class IntegerNet_Solr_Model_Bridge_CategoryRepository implements CategoryRepository
+class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRepository, SuggestCategoryRepository
 {
     protected $_pathCategoryIds = array();
     protected $_excludedCategoryIds = array();
@@ -181,8 +182,16 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements CategoryReposit
             ->addAttributeToFilter('include_in_menu', 1)
             ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
         return array_map(
-            function(Mage_Catalog_Model_Category $c) {
-                return new IntegerNet_Solr_Model_Bridge_Category($c);
+            function(Mage_Catalog_Model_Category $category) {
+                $categoryPathIds = $category->getPathIds();
+                array_shift($categoryPathIds);
+                array_shift($categoryPathIds);
+                array_pop($categoryPathIds);
+
+                $categoryPathNames = $this->getCategoryNames($categoryPathIds, 0);
+                $categoryPathNames[] = $category->getName();
+
+                return new IntegerNet_Solr_Model_Bridge_Category($category, $categoryPathNames);
             },
             $categoryCollection->getItems()
         );

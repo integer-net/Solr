@@ -160,7 +160,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
 
         Mage::getModel('tax/observer')->addTaxPercentToProductCollection($observer);
 
-        //TODO load
+        $productCollection->load();
 
         Mage::dispatchEvent('integernet_solr_product_collection_load_after', array(
             'collection' => $productCollection

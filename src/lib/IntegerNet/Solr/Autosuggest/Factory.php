@@ -10,7 +10,10 @@
 use IntegerNet\Solr\Implementor\Factory;
 use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
-
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
+use IntegerNet\Solr\Request\SearchRequestFactory;
+use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 /**
  * This class is a low weight replacement for the factory helper class in autosuggest calls
  */
@@ -38,8 +41,35 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
      */
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
-        // TODO: Implement getSolrRequest() method.
-        // not used as long as autosuggest lib uses its own result model
+        $store = IntegerNet_Solr_Autosuggest_Mage::app()->getStore();
+        $storeConfig = new IntegerNet_Solr_Model_Config_Store($store->getId());
+        $helper = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr');
+        if ($storeConfig->getGeneralConfig()->isLog()) {
+            $logger = Mage::helper('integernet_solr/log');
+            if ($logger instanceof IntegerNet_Solr_Helper_Log) {
+                $logger->setFile(
+                    $requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST ? 'solr_suggest.log' : 'solr.log'
+                );
+            }
+        } else {
+            $logger = new \Psr\Log\NullLogger();
+        }
+        $applicationContext = new \IntegerNet\Solr\Request\ApplicationContext(
+            $helper, $storeConfig->getResultsConfig(), $storeConfig->getAutosuggestConfig(), $helper, $logger
+        );
+        switch ($requestMode) {
+            case self::REQUEST_MODE_SEARCHTERM_SUGGEST:
+                $applicationContext->setQuery(Mage::helper('integernet_solr/searchterm'));
+                $factory = new SearchTermSuggestRequestFactory($applicationContext, $this->getSolrResource(), $store->getId());
+                break;
+            default:
+            case self::REQUEST_MODE_AUTOSUGGEST:
+                $applicationContext
+                    ->setFuzzyConfig($storeConfig->getFuzzyAutosuggestConfig())
+                    ->setQuery(Mage::helper('integernet_solr'));
+                $factory = new AutosuggestRequestFactory($applicationContext, $this->getSolrResource(), $store->getId());
+        }
+        return $factory->createRequest();
     }
 
     /**
@@ -47,8 +77,21 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
      */
     public function getAutosuggestResult()
     {
+        $store = IntegerNet_Solr_Autosuggest_Mage::app()->getStore();
+        $storeConfig = new IntegerNet_Solr_Model_Config_Store($store->getId());
+        $helper = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr');
+        return new AutosuggestResult(
+            $store->getId(),
+            $storeConfig->getGeneralConfig(),
+            $storeConfig->getAutosuggestConfig(),
+            $helper,
+            $helper,
+            new IntegerNet_Solr_Autosuggest_CategoryRepository(),
+            $helper,
+            $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+        );
         //TODO implement
-        // $attributeRepository = new IntegerNet_Solr_Autosuggest_Helper()
     }
 
 

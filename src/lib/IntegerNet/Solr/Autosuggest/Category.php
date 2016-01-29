@@ -23,7 +23,7 @@ class IntegerNet_Solr_Autosuggest_Category implements Category
      * @param $title
      * @param $url
      */
-    public function __construct(array $id, $title, $url)
+    public function __construct($id, $title, $url)
     {
         $this->id = $id;
         $this->title = $title;

@@ -10,15 +10,28 @@
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use \IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\HasUserQuery;
+use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 
 /**
  * This class is a low weight replacement for the "Mage_Core_Model_Store" class in autosuggest calls
  *
  * Class IntegerNet_Solr_Autosuggest_Helper
  */
-final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, EventDispatcher
+final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, EventDispatcher, HasUserQuery, SearchUrl
 {
     protected $_query;
+
+    /**
+     * Returns query as entered by user
+     *
+     * @return string
+     */
+    public function getUserQueryText()
+    {
+        return $_GET['q'];
+    }
+
 
     public function getQuery()
     {
@@ -228,5 +241,17 @@ final class IntegerNet_Solr_Autosuggest_Helper implements AttributeRepository, E
         Mage::dispatchEvent($eventName, $data);
     }
 
+    /**
+     * Returns search URL for given user query text
+     *
+     * @param string $queryText
+     * @param string[] $additionalParameters
+     * @return string
+     */
+    public function getUrl($queryText, array $additionalParameters = array())
+    {
+        return Mage::getUrl('catalogsearch/result',
+            array('_query' => array_merge(array('q' => $queryText), $additionalParameters)));
+    }
 
 }

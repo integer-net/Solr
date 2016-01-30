@@ -18,7 +18,7 @@
  */
 ?>
 
-<?php if ($searchwordSuggestions = $this->getSearchTermSuggestions()): ?>
+<?php if ($searchwordSuggestions = $this->getResult()->getSearchTermSuggestions()): ?>
 
     <ul class="searchwords">
 
@@ -32,7 +32,7 @@
     
 <?php endif ?>
 
-<?php $productSuggestions = $this->getProductSuggestions() ?>
+<?php $productSuggestions = $this->getResult()->getProductSuggestions() ?>
 <?php if (sizeof($productSuggestions)): ?>
 
     <div class="products-box">
@@ -57,8 +57,8 @@
 <?php endif ?>
 
 
-<?php $categorySuggestions = $this->getCategorySuggestions() ?>
-<?php $attributeSuggestions = $this->getAttributeSuggestions() ?>
+<?php $categorySuggestions = $this->getResult()->getCategorySuggestions() ?>
+<?php $attributeSuggestions = $this->getResult()->getAttributeSuggestions() ?>
 
 <?php if (sizeof($categorySuggestions) || sizeof($attributeSuggestions)): ?>
 

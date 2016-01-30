@@ -37,13 +37,21 @@ class IntegerNet_Solr_Autosuggest
     
     public function printHtml()
     {
-        if (!isset($_GET['q'])) {
-            die('Query not given.');
+        $config = new IntegerNet_Solr_Model_Config_Store(null);
+        $factory = new IntegerNet_Solr_Autosuggest_Factory();
+        $template = new IntegerNet_Solr_Autosuggest_Template();
+        $highlighter = new \IntegerNet\SolrSuggest\Util\HtmlStringHighlighter();
+        $block = new IntegerNet\SolrSuggest\Plain\Block\Autosuggest($factory, $template, $highlighter);
+
+        $controller = new \IntegerNet\SolrSuggest\Plain\AutosuggestController(
+            $config->getGeneralConfig(), $block
+        );
+        $response = $controller->process(\IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET));
+
+        if (function_exists('http_response_code')) {
+            \http_response_code($response->getStatus());
         }
-
-        $block = Mage::helper('integernet_solr/factory')->getAutosuggestResult();
-
-        return $block->toHtml();
+        echo $response->getBody();
     }
 
     /**

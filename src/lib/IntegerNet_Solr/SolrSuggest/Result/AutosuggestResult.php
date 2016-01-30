@@ -16,7 +16,6 @@ use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
 use IntegerNet\Solr\Implementor\Category;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\AutosuggestConfig;
-use IntegerNet\Solr\Implementor\Factory;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\SolrSuggest\Block\AttributeOptionSuggestion;
@@ -24,11 +23,10 @@ use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
 use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
-use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
-use IntegerNet_Solr_Autosuggest_Template;
+use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
-class AutosuggestResult implements AutosuggestBlock
+class AutosuggestResult
 {
     /**
      * @var \IntegerNet\Solr\Config\GeneralConfig
@@ -46,10 +44,6 @@ class AutosuggestResult implements AutosuggestBlock
      * @var \IntegerNet\SolrSuggest\Implementor\SearchUrl
      */
     private $searchUrl;
-    /**
-     * @var \IntegerNet\SolrSuggest\Implementor\Template
-     */
-    private $template;
     /**
      * @var \IntegerNet\Solr\Implementor\AttributeRepository
      */
@@ -75,6 +69,10 @@ class AutosuggestResult implements AutosuggestBlock
      */
     private $searchTermSuggestResult;
     /**
+     * @var StringHighlighter
+     */
+    private $highlighter;
+    /**
      * @var int
      */
     private $storeId;
@@ -82,7 +80,7 @@ class AutosuggestResult implements AutosuggestBlock
     public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
                                 HasUserQuery $userQuery, SearchUrl $searchUrl, SuggestCategoryRepository $categoryRepository,
                                 AttributeRepository $attributeRepository, Request $searchRequest,
-                                Request $searchTermSuggestRequest)
+                                Request $searchTermSuggestRequest, StringHighlighter $highlighter)
     {
         $this->storeId = $storeId;
         $this->generalConfig = $generalConfig;
@@ -93,9 +91,19 @@ class AutosuggestResult implements AutosuggestBlock
         $this->searchRequest = $searchRequest;
         $this->searchTermSuggestRequest = $searchTermSuggestRequest;
         $this->attributeRepository = $attributeRepository;
-        //TODO extract template functionality (only for plain PHP version)
-        $this->template = new IntegerNet_Solr_Autosuggest_Template();
+        $this->highlighter = $highlighter;
     }
+
+    /**
+     * Lazy loading the Solr result
+     *
+     * @return AutosuggestResult
+     */
+    public function getResult()
+    {
+        return $this;
+    }
+
 
     /**
      * @return SearchTermSuggestion[]
@@ -255,37 +263,9 @@ class AutosuggestResult implements AutosuggestBlock
      * @param string $attributeCode
      * @return Attribute
      */
-    public function getAttribute($attributeCode)
+    private function getAttribute($attributeCode)
     {
         return $this->attributeRepository->getAttributeByCode($attributeCode);
-    }
-
-    /**
-     * @param string $resultText
-     * @param string $query
-     * @return string
-     */
-    public function highlight($resultText, $query)
-    {
-        if (strpos($resultText, '<') === false) {
-            return preg_replace('/(' . trim($query) . ')/i', '<span class="highlight">$1</span>', $resultText);
-        }
-        return preg_replace_callback('/(' . trim($query) . ')(.*?>)/i',
-            array($this, '_checkOpenTag'),
-            $resultText);
-    }
-
-    /**
-     * @param array $matches
-     * @return string
-     */
-    protected function _checkOpenTag($matches)
-    {
-        if (strpos($matches[0], '<') === false) {
-            return $matches[0];
-        } else {
-            return '<span class="highlight">' . $matches[1] . '</span>' . $matches[2];
-        }
     }
 
     /**
@@ -379,17 +359,6 @@ class AutosuggestResult implements AutosuggestBlock
     }
 
     protected $_suggestData = null;
-
-    /**
-     */
-    public function toHtml()
-    {
-        if (!$this->generalConfig->isActive()) {
-            return;
-        }
-
-        include($this->template->getFilename());
-    }
 
     /**
      * Replacement for original translation function

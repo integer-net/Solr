@@ -9,10 +9,7 @@
  */
 
 namespace IntegerNet\SolrSuggest\Implementor;
-use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
-use IntegerNet\SolrSuggest\Block\CategorySuggestion;
-use IntegerNet\SolrSuggest\Block\ProductSuggestion;
-use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 
 /**
  * Interface for autosuggest block, with all methods used by the autosuggest.phtml template
@@ -22,9 +19,11 @@ use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 interface AutosuggestBlock
 {
     /**
-     * @return SearchTermSuggestion[]
+     * Lazy loading the Solr result
+     *
+     * @return AutosuggestResult
      */
-    public function getSearchTermSuggestions();
+    public function getResult();
     /**
      * @param string $resultText
      * @param string $query
@@ -35,18 +34,6 @@ interface AutosuggestBlock
      * @return string
      */
     public function getQuery();
-    /**
-     * @return ProductSuggestion[]
-     */
-    public function getProductSuggestions();
-    /**
-     * @return CategorySuggestion[]
-     */
-    public function getCategorySuggestions();
-    /**
-     * @return AttributeSuggestion[]
-     */
-    public function getAttributeSuggestions();
     /**
      * Translation
      *

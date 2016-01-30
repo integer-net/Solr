@@ -14,6 +14,8 @@ use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
+use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
+
 /**
  * This class is a low weight replacement for the factory helper class in autosuggest calls
  */
@@ -42,7 +44,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
         $store = IntegerNet_Solr_Autosuggest_Mage::app()->getStore();
-        $storeConfig = new IntegerNet_Solr_Model_Config_Store($store->getId());
+        $storeConfig = $this->getStoreConfig($store->getId());
         $helper = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr');
         if ($storeConfig->getGeneralConfig()->isLog()) {
             $logger = Mage::helper('integernet_solr/log');
@@ -78,7 +80,7 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
     public function getAutosuggestResult()
     {
         $store = IntegerNet_Solr_Autosuggest_Mage::app()->getStore();
-        $storeConfig = new IntegerNet_Solr_Model_Config_Store($store->getId());
+        $storeConfig = $this->getStoreConfig($store->getId());
         $helper = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr');
         return new AutosuggestResult(
             $store->getId(),
@@ -89,8 +91,19 @@ final class IntegerNet_Solr_Autosuggest_Factory implements Factory, SuggestFacto
             new IntegerNet_Solr_Autosuggest_CategoryRepository(),
             $helper,
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
+            new HtmlStringHighlighter()
         );
+    }
+
+    /**
+     * @param int $storeId
+     * @return IntegerNet_Solr_Model_Config_Store
+     */
+    public function getStoreConfig($storeId)
+    {
+        $storeConfig = new IntegerNet_Solr_Model_Config_Store($storeId);
+        return $storeConfig;
     }
 
 

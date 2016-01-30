@@ -20,6 +20,6 @@ final class IntegerNet_Solr_Autosuggest_Source implements Source
     
     public function getOptionText($optionId)
     {
-        return $this->_options[$optionId];
+        return isset($this->_options[$optionId]) ? $this->_options[$optionId] : '';
     }
 }

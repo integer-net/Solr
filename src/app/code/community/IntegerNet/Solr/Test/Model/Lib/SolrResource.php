@@ -96,6 +96,8 @@ class IntegerNet_Solr_Test_Model_Lib_SolrResource extends PHPUnit_Framework_Test
     }
 }
 
+// test classes from library not available in Magento autoloader
+
 class IntegerNet_Solr_Config_General_Builder
 {
     /*
@@ -105,9 +107,11 @@ class IntegerNet_Solr_Config_General_Builder
         $licenseKey = '',
         $log = true,
         $debug = false;
+
     private function __construct()
     {
     }
+
     public static function defaultConfig()
     {
         return new static;

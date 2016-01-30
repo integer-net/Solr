@@ -8,12 +8,11 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
-use IntegerNet\SolrSuggest\Block\CategorySuggestion;
-use IntegerNet\SolrSuggest\Block\ProductSuggestion;
-use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
+use IntegerNet\SolrSuggest\Implementor\Factory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
+use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
+use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
 class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template implements AutosuggestBlock
 {
@@ -21,63 +20,34 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     protected $_result = null;
     protected $_customHelper;
     protected $_suggestData;
+    /**
+     * @var Factory
+     */
+    private $suggestFactory;
+    /**
+     * @var StringHighlighter
+     */
+    private $highlighter;
 
     protected function _construct()
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
+        $this->highlighter = new HtmlStringHighlighter();
+        $this->_factory = Mage::helper('integernet_solr/factory');
     }
 
     /**
+     * Lazy loading the Solr result
+     *
      * @return AutosuggestResult
      */
-    protected function _getResult()
+    public function getResult()
     {
         if (is_null($this->_result)) {
-            $this->_result = Mage::helper('integernet_solr/factory')->getAutosuggestResult();
+            $this->_result = $this->_factory->getAutosuggestResult();
         }
 
         return $this->_result;
-    }
-
-    /**
-     * @return SearchTermSuggestion[]
-     */
-    public function getSearchTermSuggestions()
-    {
-        return $this->_getResult()->getSearchTermSuggestions();
-    }
-
-    /**
-     * @return ProductSuggestion[]
-     */
-    public function getProductSuggestions()
-    {
-        return $this->_getResult()->getProductSuggestions();
-    }
-
-    /**
-     * @return CategorySuggestion[]
-     */
-    public function getCategorySuggestions()
-    {
-        return $this->_getResult()->getCategorySuggestions();
-    }
-
-    /**
-     * @return AttributeSuggestion[]
-     */
-    public function getAttributeSuggestions()
-    {
-        return $this->_getResult()->getAttributeSuggestions();
-    }
-
-    /**
-     * @param string $attributeCode
-     * @return Mage_Catalog_Model_Entity_Attribute
-     */
-    public function getAttribute($attributeCode)
-    {
-        return $this->_getResult()->getAttribute($attributeCode);
     }
 
     /**
@@ -87,7 +57,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
      */
     public function highlight($resultText, $query)
     {
-        return $this->_getResult()->highlight($resultText, $query);
+        return $this->highlighter->highlight($resultText, $query);
     }
 
     /**
@@ -95,7 +65,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
      */
     public function getQuery()
     {
-        return $this->_getResult()->getQuery();
+        return $this->getResult()->getQuery();
     }
 
     /**

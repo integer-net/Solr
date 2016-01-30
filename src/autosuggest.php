@@ -43,7 +43,7 @@ class IntegerNet_Solr_Autosuggest
 
         $block = Mage::helper('integernet_solr/factory')->getAutosuggestResult();
 
-        return $block->printHtml();
+        return $block->toHtml();
     }
 
     /**

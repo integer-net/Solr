@@ -13,8 +13,8 @@
 /**
  * Autosuggest box template
  *
- * @see IntegerNet_Solr_Block_Autosuggest
- * @var $this IntegerNet_Solr_Block_Autosuggest
+ * @see \IntegerNet\SolrSuggest\Implementor\AutosuggestBlock
+ * @var $this \IntegerNet\SolrSuggest\Implementor\AutosuggestBlock
  */
 ?>
 
@@ -89,6 +89,7 @@
             <div class="attributes-box">
 
                 <h3>
+                    //TODO move getStoreLabel() to new AttributeSuggestion class
                     <strong><?php echo $this->getAttribute($attributeCode)->getStoreLabel() ?></strong>
                 </h3>
 

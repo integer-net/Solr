@@ -1,6 +1,4 @@
 <?php
-use IntegerNet\SolrSuggest\Result\AutosuggestResult;
-
 /**
  * integer_net Magento Module
  *
@@ -9,7 +7,11 @@ use IntegerNet\SolrSuggest\Result\AutosuggestResult;
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
+
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
+
+class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template implements AutosuggestBlock
 {
     protected $_attributes = array();
     protected $_result = null;

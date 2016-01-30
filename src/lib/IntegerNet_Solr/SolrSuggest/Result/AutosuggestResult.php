@@ -19,10 +19,11 @@ use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Implementor\Factory;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Request\Request;
+use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 use IntegerNet_Solr_Autosuggest_Template;
 
-class AutosuggestResult
+class AutosuggestResult implements AutosuggestBlock
 {
     /**
      * @var \IntegerNet\Solr\Config\GeneralConfig
@@ -61,9 +62,13 @@ class AutosuggestResult
      */
     private $searchTermSuggestRequest;
     /**
-     * @var $solrResult null|\IntegerNet\Solr\Resource\SolrResponse
+     * @var $searchResult null|\IntegerNet\Solr\Resource\SolrResponse
      */
-    private $solrResult = null;
+    private $searchResult;
+    /**
+     * @var $searchTermSuggestResult null|\IntegerNet\Solr\Resource\SolrResponse
+     */
+    private $searchTermSuggestResult;
     /**
      * @var int
      */
@@ -98,7 +103,7 @@ class AutosuggestResult
             return array();
         }
 
-        $solrResponse = $this->searchTermSuggestRequest->doRequest();
+        $solrResponse = $this->getSearchTermSuggestResult();
         $collection = new SearchTermSuggestionCollection($solrResponse, $this->userQuery);
         $query = $this->getQuery();
         $counter = 1;
@@ -158,7 +163,7 @@ class AutosuggestResult
      */
     public function getProductSuggestions()
     {
-        $products = $this->getSolrResult()->response->docs;
+        $products = $this->getSearchRequestResult()->response->docs;
 
         return $products;
     }
@@ -173,7 +178,7 @@ class AutosuggestResult
         $categorySuggestions = array();
         $counter = 0;
 
-        $categoryIds = (array)$this->getSolrResult()->facet_counts->facet_fields->category;
+        $categoryIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->category;
         $categories = $this->categoryRepository->findActiveCategoriesByIds($categoryIds);
 
         foreach ($categoryIds as $categoryId => $numResults) {
@@ -212,7 +217,7 @@ class AutosuggestResult
 
         foreach ($attributesConfig as $attributeConfig) {
             $attributeCode = $attributeConfig['attribute_code'];
-            $optionIds = (array)$this->getSolrResult()->facet_counts->facet_fields->{$attributeCode . '_facet'};
+            $optionIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->{$attributeCode . '_facet'};
 
             $maxNumberAttributeValues = intval($attributeConfig['max_number_suggestions']);
             $counter = 0;
@@ -365,7 +370,7 @@ class AutosuggestResult
 
     /**
      */
-    public function printHtml()
+    public function toHtml()
     {
         if (!$this->generalConfig->isActive()) {
             return;
@@ -387,25 +392,25 @@ class AutosuggestResult
     }
 
     /**
-     * Wrapper for standart strip_tags() function with extra functionality for html entities
-     *
-     * @param string $data
-     * @param string $allowableTags
-     * @param bool $escape
-     * @return string
+     * @return \IntegerNet\Solr\Resource\SolrResponse
      */
-    public function stripTags($data, $allowableTags = null, $escape = false)
+    private function getSearchRequestResult()
     {
-        $result = strip_tags($data, $allowableTags);
-        return $escape ? $this->escapeHtml($result, $allowableTags) : $result;
+        if (is_null($this->searchResult)) {
+            $this->searchResult = $this->searchRequest->doRequest();
+        }
+        return $this->searchResult;
     }
 
-    public function getSolrResult()
+    /**
+     * @return \IntegerNet\Solr\Resource\SolrResponse
+     */
+    private function getSearchTermSuggestResult()
     {
-        if (is_null($this->solrResult)) {
-            $this->solrResult = $this->searchRequest->doRequest();
+        if (is_null($this->searchTermSuggestResult)) {
+            $this->searchTermSuggestResult = $this->searchTermSuggestRequest->doRequest();
         }
-        return $this->solrResult;
+        return $this->searchTermSuggestResult;
     }
 
 }

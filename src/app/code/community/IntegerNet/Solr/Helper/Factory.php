@@ -147,6 +147,9 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
         return new IntegerNet_Solr_Model_Config_Store(Mage::app()->getStore()->getId());
     }
 
+    /**
+     * @return AutosuggestResult
+     */
     public function getAutosuggestResult()
     {
         $storeConfig = $this->getCurrentStoreConfig();

@@ -19,6 +19,11 @@ use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Implementor\Factory;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Request\Request;
+use IntegerNet\SolrSuggest\Block\AttributeOptionSuggestion;
+use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
+use IntegerNet\SolrSuggest\Block\CategorySuggestion;
+use IntegerNet\SolrSuggest\Block\ProductSuggestion;
+use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 use IntegerNet_Solr_Autosuggest_Template;
@@ -93,9 +98,9 @@ class AutosuggestResult implements AutosuggestBlock
     }
 
     /**
-     * @return array
+     * @return SearchTermSuggestion[]
      */
-    public function getSearchwordSuggestions()
+    public function getSearchTermSuggestions()
     {
         $maxNumberSearchwordSuggestions = $this->autosuggestConfig->getMaxNumberSearchwordSuggestions();
 
@@ -109,13 +114,13 @@ class AutosuggestResult implements AutosuggestBlock
         $counter = 1;
         mb_internal_encoding('UTF-8');
         $title = mb_strtolower(trim($query));
-        $data = array(
-            array(
-                'title' => $title,
-                'row_class' => 'odd',
-                'num_of_results' => '',
-                'url' => $this->searchUrl->getUrl($query)
-            )
+        /** @var SearchTermSuggestion[] $suggestions */
+        $suggestions = array();
+        $suggestions[]= new SearchTermSuggestion(
+            $title,
+            'odd',
+            null,
+            $this->searchUrl->getUrl($query)
         );
 
         $titles = array($title);
@@ -133,41 +138,44 @@ class AutosuggestResult implements AutosuggestBlock
             $titles[] = $title;
             $counter++;
 
-            $_data = array(
-                'title' => $title,
-                'row_class' => $counter % 2 ? 'odd' : 'even',
-                'num_of_results' => $item->getNumResults(),
-                'url' => $this->searchUrl->getUrl($this->escapeHtml($item->getQueryText()))
+            $_suggestion = new SearchTermSuggestion(
+                $title,
+                ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
+                $item->getNumResults(),
+                $this->searchUrl->getUrl($this->escapeHtml($item->getQueryText()))
             );
 
-            if ($counter == 1) {
-                $_data['row_class'] .= ' first';
-            }
-
             if ($item->getQueryText() == $query) {
-                array_unshift($data, $_data);
+                array_unshift($suggestions, $_suggestion);
             } else {
-                $data[] = $_data;
+                $suggestions[] = $_suggestion;
             }
         }
 
-        if (sizeof($data)) {
-            $data[max(array_keys($data))]['row_class'] .= ' last';
+        if (sizeof($suggestions)) {
+            $lastKey = max(array_keys($suggestions));
+            $suggestions[$lastKey] = $suggestions[$lastKey]->appendRowClass('last');
         }
 
-        return $data;
+        return $suggestions;
     }
 
     /**
-     * @return array
+     * @return ProductSuggestion[]
      */
     public function getProductSuggestions()
     {
-        $products = $this->getSearchRequestResult()->response->docs;
+        $products = array();
+        foreach ($this->getSearchRequestResult()->response->docs as $doc) {
+            $products[] = new ProductSuggestion($doc->result_html_autosuggest_nonindex);
+        }
 
         return $products;
     }
 
+    /**
+     * @return CategorySuggestion[]
+     */
     public function getCategorySuggestions()
     {
         $maxNumberCategories = $this->autosuggestConfig->getMaxNumberCategorySuggestions();
@@ -188,11 +196,10 @@ class AutosuggestResult implements AutosuggestBlock
                 }
 
                 $category = $categories[$categoryId];
-                $categorySuggestions[] = array(
-                    'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
-                    'row_class' => '',
-                    'num_of_results' => $numResults,
-                    'url' => $this->_getCategoryUrl($category),
+                $categorySuggestions[] = new CategorySuggestion(
+                    $this->escapeHtml($this->_getCategoryTitle($category)),
+                    $numResults,
+                    $this->_getCategoryUrl($category)
                 );
 
             }
@@ -221,18 +228,23 @@ class AutosuggestResult implements AutosuggestBlock
 
             $maxNumberAttributeValues = intval($attributeConfig['max_number_suggestions']);
             $counter = 0;
+            $optionSuggestions = array();
             foreach ($optionIds as $optionId => $numResults) {
-                $attributeSuggestions[$attributeCode][] = array(
-                    'title' => $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
-                    'row_class' => '',
-                    'option_id' => $optionId,
-                    'num_of_results' => $numResults,
-                    'url' => $this->searchUrl->getUrl($this->getQuery(), array($attributeCode => $optionId))
+                $optionSuggestions[] = new AttributeOptionSuggestion(
+                    $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
+                    $numResults,
+                    $this->searchUrl->getUrl($this->getQuery(), array($attributeCode => $optionId))
                 );
 
                 if (++$counter >= $maxNumberAttributeValues && $maxNumberAttributeValues > 0) {
                     break;
                 }
+            }
+            if (sizeof($optionSuggestions)) {
+                $attributeSuggestions[] = new AttributeSuggestion(
+                    $attributeCode,
+                    $this->getAttribute($attributeCode)->getStoreLabel(),
+                    $optionSuggestions);
             }
         }
 

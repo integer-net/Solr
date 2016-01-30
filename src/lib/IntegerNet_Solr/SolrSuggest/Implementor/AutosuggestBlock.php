@@ -9,6 +9,10 @@
  */
 
 namespace IntegerNet\SolrSuggest\Implementor;
+use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
+use IntegerNet\SolrSuggest\Block\CategorySuggestion;
+use IntegerNet\SolrSuggest\Block\ProductSuggestion;
+use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 
 /**
  * Interface for autosuggest block, with all methods used by the autosuggest.phtml template
@@ -18,10 +22,9 @@ namespace IntegerNet\SolrSuggest\Implementor;
 interface AutosuggestBlock
 {
     /**
-     * @return array
-     * @todo convert to SearchTermSuggestionCollection (add more data to SearchTermSuggestion class)
+     * @return SearchTermSuggestion[]
      */
-    public function getSearchwordSuggestions();
+    public function getSearchTermSuggestions();
     /**
      * @param string $resultText
      * @param string $query
@@ -33,18 +36,15 @@ interface AutosuggestBlock
      */
     public function getQuery();
     /**
-     * @return array
-     * @todo convert to array of ProductSuggestion (new class) or a collection
+     * @return ProductSuggestion[]
      */
     public function getProductSuggestions();
     /**
-     * @return array
-     * @todo convert to array of CategorySuggestion (new class) or a collection
+     * @return CategorySuggestion[]
      */
     public function getCategorySuggestions();
     /**
-     * @return array
-     * @todo convert to array of AttributeSuggestion (new class) or a collection
+     * @return AttributeSuggestion[]
      */
     public function getAttributeSuggestions();
     /**

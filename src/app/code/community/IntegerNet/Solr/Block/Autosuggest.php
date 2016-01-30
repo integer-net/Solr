@@ -8,6 +8,10 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
+use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
+use IntegerNet\SolrSuggest\Block\CategorySuggestion;
+use IntegerNet\SolrSuggest\Block\ProductSuggestion;
+use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 
@@ -36,15 +40,15 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     }
 
     /**
-     * @return array
+     * @return SearchTermSuggestion[]
      */
-    public function getSearchwordSuggestions()
+    public function getSearchTermSuggestions()
     {
-        return $this->_getResult()->getSearchwordSuggestions();
+        return $this->_getResult()->getSearchTermSuggestions();
     }
 
     /**
-     * @return array
+     * @return ProductSuggestion[]
      */
     public function getProductSuggestions()
     {
@@ -52,7 +56,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     }
 
     /**
-     * @return array
+     * @return CategorySuggestion[]
      */
     public function getCategorySuggestions()
     {
@@ -60,7 +64,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     }
 
     /**
-     * @return array
+     * @return AttributeSuggestion[]
      */
     public function getAttributeSuggestions()
     {

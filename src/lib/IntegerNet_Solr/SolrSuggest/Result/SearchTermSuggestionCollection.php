@@ -15,6 +15,11 @@ use IteratorAggregate;
 use IntegerNet\Solr\Resource\SolrResponse;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 
+/**
+ * Load response data into SearchTermSuggestion objects
+ *
+ * @package IntegerNet\SolrSuggest\Result
+ */
 class SearchTermSuggestionCollection implements IteratorAggregate, Countable
 {
     /**

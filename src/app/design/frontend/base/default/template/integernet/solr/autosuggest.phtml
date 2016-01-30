@@ -18,13 +18,13 @@
  */
 ?>
 
-<?php if ($searchwordSuggestions = $this->getSearchwordSuggestions()): ?>
+<?php if ($searchwordSuggestions = $this->getSearchTermSuggestions()): ?>
 
     <ul class="searchwords">
 
     <?php foreach ($searchwordSuggestions as $index => $item): ?>
         <li>
-            <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>&hellip;
+            <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>&hellip;
         </li>
     <?php endforeach ?>
 
@@ -46,7 +46,7 @@
 
         <?php foreach ($productSuggestions as $index => $item): ?>
             <li>
-                <?php echo $this->highlight($item->result_html_autosuggest_nonindex, $this->getQuery()) ?>
+                <?php echo $this->highlight($item->getHtml(), $this->getQuery()) ?>
             </li>
         <?php endforeach ?>
 
@@ -76,7 +76,7 @@
 
                 <?php foreach ($categorySuggestions as $index => $item): ?>
                     <li>
-                        <a href="<?php echo $item['url'] ?>"><?php echo $this->highlight($item['title'], $this->getQuery()) ?></a>
+                        <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>
                     </li>
                 <?php endforeach ?>
                 </ul>
@@ -84,21 +84,19 @@
             </div>
         <?php endif ?>
 
-        <?php foreach($attributeSuggestions as $attributeCode => $attributeSuggestionsByAttribute): ?>
+        <?php foreach($attributeSuggestions as $attributeSuggestion): ?>
 
             <div class="attributes-box">
 
                 <h3>
-                    //TODO move getStoreLabel() to new AttributeSuggestion class
-                    <strong><?php echo $this->getAttribute($attributeCode)->getStoreLabel() ?></strong>
+                    <strong><?php echo $attributeSuggestion->getLabel() ?></strong>
                 </h3>
 
                 <ul class="attributes">
-
                     <li>
                         <?php $items = array() ?>
-                        <?php foreach ($attributeSuggestionsByAttribute as $index => $item): ?>
-                            <?php $items[] = '<a href="' . htmlspecialchars($item['url']) . '">' . $this->highlight($item['title'], $this->getQuery()) . '</a>' ?>
+                        <?php foreach ($attributeSuggestion->getOptions() as $item): ?>
+                            <?php $items[] = '<a href="' . htmlspecialchars($item->getUrl()) . '">' . $this->highlight($item->getTitle(), $this->getQuery()) . '</a>' ?>
                         <?php endforeach ?>
                         <?php echo implode(', ', $items) ?>
                     </li>

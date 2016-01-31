@@ -14,24 +14,18 @@ class IntegerNet_Solr_Autosuggest
 {
     public function __construct()
     {
-        if (!isset($_GET['store_id'])) {
-            die('Store ID not given.');
-        }
-
+        // AutosuggestRequest not instantiated yet, needs autoloader
         $storeId = intval($_GET['store_id']);
-
         $config = $this->_getConfig($storeId);
 
         if (!class_exists('Mage')) {
+            // still needed for: IntegerNet_Solr_Model_Config_Store (getStoreConfig(), getStoreConfigFlag())
             require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Mage.php');
             class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
         }
         IntegerNet_Solr_Autosuggest_Mage::setConfig($config);
         IntegerNet_Solr_Helper_Autoloader::createAndRegister();
 
-/*        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);*/
     }
     
     public function printHtml()

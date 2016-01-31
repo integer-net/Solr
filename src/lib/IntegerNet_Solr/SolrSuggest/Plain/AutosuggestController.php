@@ -48,6 +48,9 @@ class AutosuggestController
         if ($request->getQuery() === '') {
             return new AutosuggestResponse(400, 'Bad Request: Query missing');
         }
+        if ($request->getStoreId() === 0) {
+            return new AutosuggestResponse(400, 'Bad Request: Store ID missing');
+        }
         return new AutosuggestResponse(200, $this->block->toHtml());
     }
 }

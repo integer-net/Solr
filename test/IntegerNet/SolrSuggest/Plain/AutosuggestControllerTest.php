@@ -49,9 +49,21 @@ class AutosuggestControllerTest extends \PHPUnit_Framework_TestCase
         $defaultConfig = GeneralConfigBuilder::defaultConfig()->build();
         $this->blockMock->expects($this->never())->method($this->anything());
         $controller = new AutosuggestController($defaultConfig, $this->blockMock);
-        $response = $controller->process(new AutosuggestRequest('', 0));
+        $response = $controller->process(new AutosuggestRequest('', 1));
         $this->assertEquals(400, $response->getStatus(), 'Status should be 400 (Bad Request)');
         $this->assertEquals('Bad Request: Query missing', $response->getBody());
+    }
+    /**
+     * @test
+     */
+    public function shouldShowErrorIfStoreIdEmpty()
+    {
+        $defaultConfig = GeneralConfigBuilder::defaultConfig()->build();
+        $this->blockMock->expects($this->never())->method($this->anything());
+        $controller = new AutosuggestController($defaultConfig, $this->blockMock);
+        $response = $controller->process(new AutosuggestRequest('foo', 0));
+        $this->assertEquals(400, $response->getStatus(), 'Status should be 400 (Bad Request)');
+        $this->assertEquals('Bad Request: Store ID missing', $response->getBody());
     }
     /**
      * @test
@@ -62,7 +74,7 @@ class AutosuggestControllerTest extends \PHPUnit_Framework_TestCase
         $defaultConfig = GeneralConfigBuilder::defaultConfig()->build();
         $this->blockMock->expects($this->once())->method('toHtml')->willReturn($dummyResponse);
         $controller = new AutosuggestController($defaultConfig, $this->blockMock);
-        $response = $controller->process(new AutosuggestRequest('foo', 0));
+        $response = $controller->process(new AutosuggestRequest('foo', 1));
         $this->assertEquals(200, $response->getStatus(), 'Status should be 200 (OK)');
         $this->assertEquals($dummyResponse, $response->getBody());
     }

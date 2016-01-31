@@ -16,7 +16,7 @@ class ConfigReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestIncomplete('This is just a draft for the plain client config load workflow');
 
-        $factory = new \IntegerNet_Solr_Autosuggest_Factory();
+        $factory = new \IntegerNet\SolrSuggest\Plain\Factory();
         try {
             $factory->getStoreConfig(0);
         } catch (ConfigReadException $e) {

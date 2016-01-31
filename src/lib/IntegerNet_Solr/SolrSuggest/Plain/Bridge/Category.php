@@ -7,8 +7,11 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\Implementor\Category;
-class IntegerNet_Solr_Autosuggest_Category implements Category
+namespace IntegerNet\SolrSuggest\Plain\Bridge;
+
+use IntegerNet\Solr\Implementor\Category as CategoryInterface;
+
+class Category implements CategoryInterface
 {
     private $id;
     private $title;

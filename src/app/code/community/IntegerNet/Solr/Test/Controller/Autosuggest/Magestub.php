@@ -30,7 +30,8 @@ class IntegerNet_Solr_Test_Controller_Autosuggest_Magestub extends EcomDev_PHPUn
      */
     public function shouldCreateSolrResourceWithFactoryHelper()
     {
-        $resource = IntegerNet_Solr_Autosuggest_Mage::helper('integernet_solr/factory')->getSolrResource();
+        $factory = new \IntegerNet\SolrSuggest\Plain\Factory();
+        $resource = $factory->getSolrResource();
         $this->assertInstanceOf(ResourceFacade::class, $resource);
         $defaultStoreConfig = $resource->getStoreConfig(1);
         $this->assertInstanceOf(Config::class, $defaultStoreConfig);

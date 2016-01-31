@@ -160,6 +160,7 @@ class IntegerNet_Solr_Helper_Autoloader
 
     public static function createAndRegister()
     {
+        //TODO depend on GeneralConfig and take libBaseDir as constructor argument
         static $registered = false;
         if (!$registered && Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
             $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');

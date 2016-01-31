@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\SolrSuggest\Plain\Factory;
+
 /**
  * integer_net Magento Module
  *
@@ -23,10 +25,8 @@ class IntegerNet_Solr_Autosuggest
         if (!class_exists('Mage')) {
             require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Mage.php');
             class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
-            Mage::setConfig($config);
+            IntegerNet_Solr_Autosuggest_Mage::setConfig($config);
 
-            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Empty.php');
-            class_alias('IntegerNet_Solr_Autosuggest_Empty', 'Mage_Core_Model_Resource_Abstract');
         }
         IntegerNet_Solr_Helper_Autoloader::createAndRegister();
 
@@ -37,8 +37,10 @@ class IntegerNet_Solr_Autosuggest
     
     public function printHtml()
     {
+        $request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
+        $factory = new Factory($request);
+
         $config = new IntegerNet_Solr_Model_Config_Store(null);
-        $factory = new IntegerNet_Solr_Autosuggest_Factory();
         $template = new IntegerNet_Solr_Autosuggest_Template();
         $highlighter = new \IntegerNet\SolrSuggest\Util\HtmlStringHighlighter();
         $block = new IntegerNet\SolrSuggest\Plain\Block\Autosuggest($factory, $template, $highlighter);
@@ -46,7 +48,7 @@ class IntegerNet_Solr_Autosuggest
         $controller = new \IntegerNet\SolrSuggest\Plain\AutosuggestController(
             $config->getGeneralConfig(), $block
         );
-        $response = $controller->process(\IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET));
+        $response = $controller->process($request);
 
         if (function_exists('http_response_code')) {
             \http_response_code($response->getStatus());

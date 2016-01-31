@@ -8,6 +8,8 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
+use IntegerNet\SolrSuggest\Plain\Factory;
+
 define('DS', DIRECTORY_SEPARATOR);
 define('PS', PATH_SEPARATOR);
 define('BP', pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
@@ -44,15 +46,6 @@ final class IntegerNet_Solr_Autosuggest_Mage
 {
     /** @var IntegerNet_Solr_Autosuggest_Config */
     static private $_config;
-
-    /** @var IntegerNet_Solr_Autosuggest_App */
-    static private $_app;
-
-    /** @var IntegerNet_Solr_Autosuggest_Helper */
-    static private $_helper;
-
-    /** @var  IntegerNet_Solr_Autosuggest_Factory */
-    static private $_factory;
 
     /** @var array */
     static private $_registry = array();
@@ -194,122 +187,6 @@ final class IntegerNet_Solr_Autosuggest_Mage
             return self::$_registry[$key];
         }
         return null;
-    }
-
-    /**
-     * log facility (??)
-     *
-     * @param string $message
-     * @param integer $level
-     * @param string $file
-     * @param bool $forceLog
-     */
-    public static function log($message, $level = null, $file = '', $forceLog = false)
-    {
-        $level  = is_null($level) ? Zend_Log::DEBUG : $level;
-        $file = empty($file) ? 'system.log' : $file;
-
-        try {
-            if (!isset($loggers[$file])) {
-                $logDir  = 'var' . DS . 'log';
-                $logFile = $logDir . DS . $file;
-
-                if (!is_dir($logDir)) {
-                    mkdir($logDir);
-                    chmod($logDir, 0777);
-                }
-
-                if (!file_exists($logFile)) {
-                    file_put_contents($logFile, '');
-                    chmod($logFile, 0777);
-                }
-
-                $format = '%timestamp% %priorityName% (%priority%): %message%' . PHP_EOL;
-                $formatter = new Zend_Log_Formatter_Simple($format);
-                $writer = new Zend_Log_Writer_Stream($logFile);
-                $writer->setFormatter($formatter);
-                $loggers[$file] = new Zend_Log($writer);
-            }
-
-            if (is_array($message) || is_object($message)) {
-                $message = print_r($message, true);
-            }
-
-            $loggers[$file]->log($message, $level);
-        }
-        catch (Exception $e) {
-        }
-    }
-
-    /**
-     * Get lightweight app object for autosuggest
-     * 
-     * @return IntegerNet_Solr_Autosuggest_App
-     */
-    public static function app()
-    {
-        if (is_null(self::$_app)) {
-            self::$_app = new IntegerNet_Solr_Autosuggest_App(self::$_config->getStoreId());
-        }
-        return self::$_app;
-    }
-
-    /**
-     * Get lightweight general helper mock for autosuggest
-     * 
-     * @param string $identifier
-     * @return IntegerNet_Solr_Autosuggest_Helper
-     */
-    public static function helper($identifier)
-    {
-        if ($identifier === 'integernet_solr/factory') {
-            if (is_null(self::$_factory)) {
-                self::$_factory = new IntegerNet_Solr_Autosuggest_Factory();
-            }
-            return self::$_factory;
-        } elseif ($identifier === 'integernet_solr/log') {
-            return new IntegerNet_Solr_Helper_Log();
-        }
-        if (is_null(self::$_helper)) {
-            self::$_helper = new IntegerNet_Solr_Autosuggest_Helper();
-        }
-        return self::$_helper;
-    }
-
-    /**
-     * @param string $name
-     * @param array $data
-     */
-    public static function dispatchEvent($name, array $data = array())
-    {
-    }
-
-    /**
-     * Generate url by route and parameters
-     *
-     * @param   string $route
-     * @param   array $params
-     * @return  string
-     */
-    public static function getUrl($route = '', $params = array())
-    {
-        $url = self::getStoreConfig('base_url');
-        $url = str_replace('autosuggest.php', 'index.php', $url);
-        $url .= $route;
-        $isFirstParam = true;
-        if (isset($params['_query']) && is_array($params['_query'])) {
-            foreach($params['_query'] as $key => $value) {
-                if ($isFirstParam) {
-                    $url .= '?';
-                    $isFirstParam = false;
-                } else {
-                    $url .= '&';
-                }
-                $url .= $key . '=' . urlencode($value);
-            }
-        }
-        
-        return $url;
     }
 
     /**

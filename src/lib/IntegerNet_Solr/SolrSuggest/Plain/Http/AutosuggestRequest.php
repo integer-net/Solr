@@ -10,7 +10,9 @@
 
 namespace IntegerNet\SolrSuggest\Plain\Http;
 
-final class AutosuggestRequest
+use IntegerNet\Solr\Implementor\HasUserQuery;
+
+final class AutosuggestRequest implements HasUserQuery
 {
     /**
      * @var string
@@ -58,4 +60,15 @@ final class AutosuggestRequest
     {
         return $this->storeId;
     }
+
+    /**
+     * Returns query as entered by user
+     *
+     * @return string
+     */
+    public function getUserQueryText()
+    {
+        return $this->getQuery();
+    }
+
 }

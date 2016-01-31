@@ -7,8 +7,11 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+namespace IntegerNet\SolrSuggest\Plain\Bridge;
+
 use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
-class IntegerNet_Solr_Autosuggest_CategoryRepository implements SuggestCategoryRepository
+
+class CategoryRepository implements SuggestCategoryRepository
 {
     /**
      * @param int [] $categoryIds
@@ -28,9 +31,9 @@ class IntegerNet_Solr_Autosuggest_CategoryRepository implements SuggestCategoryR
     public function findActiveCategoriesByIds($categoryIds)
     {
         $categories = array();
-        foreach($categoryIds as $categoryId) {
-            if ($categoryData = Mage::getStoreConfig('categories/' . $categoryId)) {
-                $categories[$categoryData['id']] = new IntegerNet_Solr_Autosuggest_Category(
+        foreach ($categoryIds as $categoryId) {
+            if ($categoryData = \IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('categories/' . $categoryId)) {
+                $categories[$categoryData['id']] = new Category(
                     $categoryData['id'], $categoryData['title'], $categoryData['url']);
             }
         }

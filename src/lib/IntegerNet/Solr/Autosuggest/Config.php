@@ -41,22 +41,6 @@ namespace {
             return $config;
         }
 
-        public function getModelClassname($identifier)
-        {
-            if (isset($this->_config['model'][$identifier])) {
-                return $this->_config['model'][$identifier];
-            }
-            return '';
-        }
-
-        public function getResourceModelClassname($identifier)
-        {
-            if (isset($this->_config['resource_model'][$identifier])) {
-                return $this->_config['resource_model'][$identifier];
-            }
-            return '';
-        }
-
         /**
          * @param $storeId
          * @return bool|mixed
@@ -86,11 +70,6 @@ namespace {
             return $config;
         }
 
-        protected function _getModelConfig()
-        {
-
-        }
-
         /**
          * @param $storeId
          */
@@ -112,13 +91,12 @@ namespace {
  */
 namespace IntegerNet\Solr\Implementor {
     if (! interface_exists('IntegerNet\\Solr\\Implementor\\Attribute', false)) {
-        interface Attribute {}
-        interface AttributeRepository {}
+        interface HasUserQuery {}
         interface EventDispatcher {}
     }
 }
-namespace IntegerNet\Solr\Implementor {
-    if (! interface_exists('IntegerNet\\Solr\\Implementor\\Config', false)) {
-        interface Config {}
+namespace IntegerNet\SolrSuggest\Implementor {
+    if (! interface_exists('IntegerNet\\SolrSuggest\\Implementor\\SearchUrl', false)) {
+        interface SearchUrl {}
     }
 }

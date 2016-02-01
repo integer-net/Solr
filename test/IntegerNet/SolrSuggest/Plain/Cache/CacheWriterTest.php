@@ -87,9 +87,9 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
         $this->attributeCacheMock->expects($this->exactly(count($storeConfigs)))
             ->method('writeAttributeCache')
             ->withConsecutive([1], [3]);
-        $this->categoryCacheMock->expects($this->exactly(count($storeConfigs)))
+        $this->categoryCacheMock->expects($this->exactly(1))
             ->method('writeCategoryCache')
-            ->withConsecutive([1], [3]);
+            ->withConsecutive([1]);
         $this->configCacheMock->expects($this->exactly(count($storeConfigs)))
             ->method('writeStoreConfig')
             ->withConsecutive([1, $storeConfigs[1], $templates[1]], [3, $storeConfigs[3], $templates[3]]);
@@ -127,7 +127,7 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 GeneralConfigBuilder::defaultConfig()->build(),
                 ServerConfigBuilder::defaultConfig()->build(),
                 IndexingConfigBuilder::defaultConfig()->build(),
-                AutosuggestConfigBuilder::defaultConfig()->build(),
+                AutosuggestConfigBuilder::defaultConfig()->withMaxNumberCategorySuggestions(0)->build(),
                 FuzzyConfigBuilder::inactiveConfig()->build(),
                 FuzzyConfigBuilder::defaultConfig()->build(),
                 ResultConfigBuilder::alternativeConfig()->build()

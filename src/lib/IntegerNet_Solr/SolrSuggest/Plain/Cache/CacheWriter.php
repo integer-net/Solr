@@ -55,7 +55,6 @@ class CacheWriter
     private $customCache;
 
     /**
-     * CacheWriter constructor.
      * @param \IntegerNet\Solr\Implementor\Config[] $storeConfigs
      * @param EventDispatcher $eventDispatcher
      * @param Template[] $templates
@@ -77,7 +76,9 @@ class CacheWriter
         $this->customCache = $customCache;
     }
 
-
+    /**
+     * write cache
+     */
     public function write()
     {
         foreach ($this->storeConfigs as $storeId => $config) {
@@ -86,7 +87,9 @@ class CacheWriter
                 array('store_id' => $storeId, 'transport' => $transport));
             $this->configCache->writeStoreConfig($storeId, $config, $this->templates[$storeId]);
             $this->attributeCache->writeAttributeCache($storeId);
-            $this->categoryCache->writeCategoryCache($storeId);
+            if ($config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() > 0) {
+                $this->categoryCache->writeCategoryCache($storeId);
+            }
             $this->customCache->writeCustomCache($storeId, $transport);
         }
     }

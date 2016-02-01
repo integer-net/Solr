@@ -33,7 +33,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
         $this->highlighter = new HtmlStringHighlighter();
-        $this->_factory = Mage::helper('integernet_solr/factory');
+        $this->suggestFactory = Mage::helper('integernet_solr/factory');
     }
 
     /**
@@ -44,7 +44,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     public function getResult()
     {
         if (is_null($this->_result)) {
-            $this->_result = $this->_factory->getAutosuggestResult();
+            $this->_result = $this->suggestFactory->getAutosuggestResult();
         }
 
         return $this->_result;
@@ -144,5 +144,16 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
         $html .= '</ul>';
 
         return $html;
+    }
+
+    /**
+     * @return IntegerNet_Solr_Autosuggest_Custom
+     * @deprecated only here for backwards compatibility in Magento mode
+     */
+    public function getCustomHelper()
+    {
+        if (class_exists('IntegerNet_Solr_Autosuggest_Custom')) {
+            return new IntegerNet_Solr_Autosuggest_Custom();
+        }
     }
 }

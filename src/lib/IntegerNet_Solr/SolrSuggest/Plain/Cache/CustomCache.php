@@ -11,12 +11,13 @@
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 
+use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrSuggest\Implementor\Template;
 use Psr\Cache\CacheItemPoolInterface;
 
-class ConfigCache
+class CustomCache
 {
     /**
      * @var CacheItemPoolInterface
@@ -33,35 +34,23 @@ class ConfigCache
     }
 
     /**
-     * @param int $storeId       The store id
-     * @param Config $config     The store configuration for $storeId
-     * @param Template $template The (generated) template file
+     * @param int $storeId  The store id
+     * @param Transport $data Custom data (key => value) for $storeId
      */
-    public function writeStoreConfig($storeId, Config $config, Template $template)
+    public function writeCustomCache($storeId, Transport $data)
     {
-        $configCacheItem = $this->cachePool->getItem("store_{$storeId}.config");
-        $configCacheItem->set($config);
+        $configCacheItem = $this->cachePool->getItem("store_{$storeId}.custom");
+        $configCacheItem->set($data);
         $this->cachePool->saveDeferred($configCacheItem);
-        $templateCacheItem = $this->cachePool->getItem("store_{$storeId}.template");
-        $templateCacheItem->set($template->getFilename());
-        $this->cachePool->saveDeferred($templateCacheItem);
     }
 
     /**
-     * @param $storeId
-     * @return Config
+     * @param string $path
+     * @return mixed
      */
-    public function getConfig($storeId)
+    public function getData($path)
     {
         //TODO implement
     }
 
-    /**
-     * @param $storeId
-     * @return Template
-     */
-    public function getTemplate($storeId)
-    {
-        //TODO implement
-    }
 }

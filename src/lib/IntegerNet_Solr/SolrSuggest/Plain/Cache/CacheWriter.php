@@ -9,11 +9,12 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
-use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
-use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -23,6 +24,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CacheWriter
 {
+    const EVENT_CUSTOM_CONFIG = 'integernet_solr_autosuggest_config';
     /**
      * @var Config[]
      */
@@ -32,21 +34,9 @@ class CacheWriter
      */
     private $eventDispatcher;
     /**
-     * @var Template
+     * @var Template[]
      */
-    private $template;
-    /**
-     * @var CategoryRepository
-     */
-    private $categoryRepository;
-    /**
-     * @var AttributeRepository
-     */
-    private $attributeRepository;
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cachePool;
+    private $templates;
     /**
      * @var AttributeCache
      */
@@ -59,11 +49,45 @@ class CacheWriter
      * @var ConfigCache
      */
     private $configCache;
+    /**
+     * @var CustomCache
+     */
+    private $customCache;
 
+    /**
+     * CacheWriter constructor.
+     * @param \IntegerNet\Solr\Implementor\Config[] $storeConfigs
+     * @param EventDispatcher $eventDispatcher
+     * @param Template[] $templates
+     * @param AttributeCache $attributeCache
+     * @param CategoryCache $categoryCache
+     * @param ConfigCache $configCache
+     * @param CustomCache $customCache
+     */
+    public function __construct(array $storeConfigs, EventDispatcher $eventDispatcher, array $templates,
+                                AttributeCache $attributeCache, CategoryCache $categoryCache, ConfigCache $configCache,
+                                CustomCache $customCache)
+    {
+        $this->storeConfigs = $storeConfigs;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->templates = $templates;
+        $this->attributeCache = $attributeCache;
+        $this->categoryCache = $categoryCache;
+        $this->configCache = $configCache;
+        $this->customCache = $customCache;
+    }
 
 
     public function write()
     {
-        //TODO write caches for each store
+        foreach ($this->storeConfigs as $storeId => $config) {
+            $transport = new Transport();
+            $this->eventDispatcher->dispatch(self::EVENT_CUSTOM_CONFIG,
+                array('store_id' => $storeId, 'transport' => $transport));
+            $this->configCache->writeStoreConfig($storeId, $config, $this->templates[$storeId]);
+            $this->attributeCache->writeAttributeCache($storeId);
+            $this->categoryCache->writeCategoryCache($storeId);
+            $this->customCache->writeCustomCache($storeId, $transport);
+        }
     }
 }

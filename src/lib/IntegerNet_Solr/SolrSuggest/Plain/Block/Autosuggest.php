@@ -98,4 +98,10 @@ class Autosuggest implements AutosuggestBlock
     {
         include($this->template->getFilename());
     }
+
+    public function getCustomHelper()
+    {
+        //TODO find different way to inject additional functions
+        throw new \BadMethodCallException('custom helper functionality not implemented in plain PHP mode');
+    }
 }

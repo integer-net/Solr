@@ -9,16 +9,16 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\Solr\Implementor\Category as CategoryInterface;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
 
-class Category implements CategoryInterface
+class Category implements SerializableCategory
 {
     private $id;
     private $title;
     private $url;
 
     /**
-     * @param array $id
+     * @param $id
      * @param $title
      * @param $url
      */

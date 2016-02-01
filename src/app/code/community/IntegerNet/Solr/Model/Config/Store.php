@@ -13,6 +13,7 @@ use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
+use IntegerNet\Solr\Config\StoreConfig;
 use IntegerNet\Solr\Implementor\Config;
 
 /**
@@ -59,6 +60,16 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
     public function __construct($_storeId)
     {
         $this->_storeId = $_storeId;
+    }
+
+    /**
+     * Returns required module independent store configuration
+     *
+     * @return StoreConfig
+     */
+    public function getStoreConfig()
+    {
+        return new StoreConfig(Mage::app()->getStore($this->_storeId)->getBaseUrl());
     }
 
     /**
@@ -214,6 +225,24 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
     protected function _getConfigFlag($path)
     {
         return Mage::getStoreConfigFlag($path, $this->_storeId);
+    }
+
+    /**
+     * @todo invert: move to ConfigContainer as fromConfig, move/copy ConfigContainer to SolrSuggest (Plain\Config)
+     * @return \IntegerNet\Solr\Implementor\SerializableConfig
+     */
+    public function toSerializableConfig()
+    {
+        return new \IntegerNet\Solr\Config\ConfigContainer(
+            $this->getStoreConfig(),
+            $this->getGeneralConfig(),
+            $this->getServerConfig(),
+            $this->getIndexingConfig(),
+            $this->getAutosuggestConfig(),
+            $this->getFuzzySearchConfig(),
+            $this->getFuzzyAutosuggestConfig(),
+            $this->getResultsConfig()
+        );
     }
 
 }

@@ -12,7 +12,7 @@ namespace IntegerNet\SolrSuggest\Result;
 
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
-use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\Solr\Implementor\Category;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\AutosuggestConfig;
@@ -49,7 +49,7 @@ class AutosuggestResult
      */
     private $attributeRepository;
     /**
-     * @var \IntegerNet\Solr\Implementor\SuggestCategoryRepository
+     * @var \IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository
      */
     private $categoryRepository;
     /**

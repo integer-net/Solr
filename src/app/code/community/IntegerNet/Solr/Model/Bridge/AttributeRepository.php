@@ -186,6 +186,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /**
      * @param string $attributeCode
      * @return Attribute
+     * @deprecated not part of AttributeRepository interface anymore, should not be needed
      */
     public function getAttributeByCode($attributeCode)
     {

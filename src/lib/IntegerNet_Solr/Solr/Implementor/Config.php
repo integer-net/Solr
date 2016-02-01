@@ -15,6 +15,7 @@ use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Config\StoreConfig;
 
 /**
  * Interface for configuration reader. One instance per store.
@@ -22,16 +23,22 @@ use IntegerNet\Solr\Config\ServerConfig;
 interface Config
 {
     /**
+     * Returns required module independent store configuration
+     *
+     * @return StoreConfig
+     */
+    public function getStoreConfig();
+    /**
      * Returns general Solr module configuration
      *
-     * @return \IntegerNet\Solr\Config\GeneralConfig
+     * @return GeneralConfig
      */
     public function getGeneralConfig();
 
     /**
      * Returns Solr server configuration
      *
-     * @return \IntegerNet\Solr\Config\ServerConfig
+     * @return ServerConfig
      */
     public function getServerConfig();
 
@@ -45,7 +52,7 @@ interface Config
     /**
      * Returns autosuggest configuration
      *
-     * @return \IntegerNet\Solr\Config\AutosuggestConfig
+     * @return AutosuggestConfig
      */
     public function getAutosuggestConfig();
 
@@ -69,4 +76,9 @@ interface Config
      * @return ResultsConfig
      */
     public function getResultsConfig();
+
+    /**
+     * @return SerializableConfig
+     */
+    public function toSerializableConfig();
 }

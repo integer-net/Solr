@@ -9,7 +9,7 @@
  */
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\IndexCategoryRepository;
-use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 
 class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRepository, SuggestCategoryRepository
 {
@@ -196,5 +196,15 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
             $categoryCollection->getItems()
         );
     }
+
+    /**
+     * @param int $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
+     */
+    public function findActiveCategories($storeId)
+    {
+        // TODO: Implement findActiveCategories() method.
+    }
+
 
 }

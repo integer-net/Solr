@@ -51,4 +51,38 @@ class IntegerNet_Solr_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Confi
     {
         $this->assertConfigNodeValue('global/index/indexer/integernet_solr/model', 'integernet_solr/indexer');
     }
+
+    /**
+     * @test
+     */
+    public function storeConfigShouldContainBaseUrl()
+    {
+        $config = Mage::getModel('integernet_solr/config_store', 1);
+        $this->assertEquals(Mage::app()->getStore(1)->getBaseUrl(), $config->getStoreConfig()->getBaseUrl());
+    }
+
+    /**
+     * @test
+     */
+    public function configShouldBeSerializable()
+    {
+        // use different fuzzy config for search and autosuggest to make sure, both are serialized independently
+        Mage::app()->getStore(1)->setConfig('integernet_solr/fuzzy/is_active', '1');
+        Mage::app()->getStore(1)->setConfig('integernet_solr/fuzzy/is_active_autosuggest', '0');
+
+        /**
+         * @var $configFromSerialized IntegerNet\Solr\Implementor\Config
+         */
+        $config = Mage::getModel('integernet_solr/config_store', 1);
+        $configFromSerialized = unserialize(serialize($config->toSerializableConfig()));
+
+        $this->assertInstanceOf(\IntegerNet\Solr\Config\ConfigContainer::class, $configFromSerialized);
+        $this->assertEquals($config->getStoreConfig(), $configFromSerialized->getStoreConfig());
+        $this->assertEquals($config->getGeneralConfig(), $configFromSerialized->getGeneralConfig());
+        $this->assertEquals($config->getResultsConfig(), $configFromSerialized->getResultsConfig());
+        $this->assertEquals($config->getFuzzyAutosuggestConfig(), $configFromSerialized->getFuzzyAutosuggestConfig());
+        $this->assertEquals($config->getFuzzySearchConfig(), $configFromSerialized->getFuzzySearchConfig());
+        $this->assertEquals($config->getIndexingConfig(), $configFromSerialized->getIndexingConfig());
+        $this->assertEquals($config->getServerConfig(), $configFromSerialized->getServerConfig());
+    }
 }

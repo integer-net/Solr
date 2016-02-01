@@ -49,7 +49,7 @@ class ProductIndexer
      * @param ResourceFacade $_resource
      * @param EventDispatcher $_eventDispatcher
      * @param AttributeRepository $_attributeRepository
-     * @param CategoryRepository $_categoryRepository
+     * @param IndexCategoryRepository $_categoryRepository
      * @param ProductRepository $_productRepository
      * @param ProductRenderer $_renderer
      */

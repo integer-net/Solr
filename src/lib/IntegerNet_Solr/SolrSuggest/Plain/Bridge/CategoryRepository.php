@@ -9,7 +9,8 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\Solr\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 
 class CategoryRepository implements SuggestCategoryRepository
 {
@@ -26,7 +27,7 @@ class CategoryRepository implements SuggestCategoryRepository
 
     /**
      * @param int[] $categoryIds
-     * @return \IntegerNet\Solr\Implementor\Category[]
+     * @return Category[]
      */
     public function findActiveCategoriesByIds($categoryIds)
     {
@@ -38,6 +39,16 @@ class CategoryRepository implements SuggestCategoryRepository
             }
         }
         return $categories;
+    }
+
+    /**
+     * @param int $storeId
+     * @return SerializableCategory[]
+     */
+    public function findActiveCategories($storeId)
+    {
+        // not used
+        return array();
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
 
 /**
  * integer_net Magento Module
@@ -11,7 +11,7 @@ use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-final class Attribute implements AttributeInterface
+final class Attribute implements SerializableAttribute
 {
     protected $_attributeConfig = null;
     protected $_source = null;

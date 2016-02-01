@@ -13,6 +13,8 @@ spl_autoload_register(function($className)
         $className = str_replace('IntegerNet\Solr', 'IntegerNet_Solr\Solr', $className);
     } elseif (strpos($className, 'Psr\Log') === 0) {
         $className = str_replace('Psr\Log', 'IntegerNet_Solr\Psr_Log', $className);
+    } elseif (strpos($className, 'Psr\Cache') === 0) {
+        $className = str_replace('Psr\Cache', 'IntegerNet_Solr\Psr_Cache', $className);
     } elseif (strpos($className, 'Apache_Solr') === 0) {
         $className = str_replace('_', '\\', $className);
         $className = str_replace('Apache\Solr', 'IntegerNet_Solr\Apache_Solr', $className);

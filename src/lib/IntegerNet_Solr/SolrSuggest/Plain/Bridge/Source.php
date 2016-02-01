@@ -1,7 +1,7 @@
 <?php
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\Solr\Implementor\Source as SourceInterface;
+use IntegerNet\SolrSuggest\Implementor\SerializableSource;
 
 /**
  * integer_net Magento Module
@@ -11,7 +11,7 @@ use IntegerNet\Solr\Implementor\Source as SourceInterface;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-final class Source implements SourceInterface
+final class Source implements SerializableSource
 {
     protected $_options = null;
 

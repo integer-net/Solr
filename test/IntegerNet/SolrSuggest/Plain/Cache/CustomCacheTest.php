@@ -21,6 +21,7 @@ use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -50,25 +51,32 @@ class CustomCacheTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dataWriteConfig
      * @param int $storeId
      * @param mixed[] $data
+     * @param CustomHelperFactory $customHelperFactory
      */
-    public function shouldStoreConfig($storeId, array $data)
+    public function shouldStoreCustomData($storeId, array $data, CustomHelperFactory $customHelperFactory)
     {
-        $cacheKey = "store_{$storeId}.custom";
+        $dataCacheKey = "store_{$storeId}.custom";
+        $helperCacheKey = "store_{$storeId}.customHelper";
 
-        $cacheItemMock = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMock->expects($this->once())
+        $cacheItemMocks = [];
+        $cacheItemMocks[$dataCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
+        $cacheItemMocks[$dataCacheKey]->expects($this->once())
             ->method('set')
             ->with(new Transport($data));
+        $cacheItemMocks[$helperCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
+        $cacheItemMocks[$helperCacheKey]->expects($this->once())
+            ->method('set')
+            ->with($customHelperFactory);
 
-        $this->cachePoolMock->expects($this->once())
+        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
             ->method('getItem')
-            ->with($cacheKey)
-            ->willReturn($cacheItemMock);
-        $this->cachePoolMock->expects($this->once())
+            ->withConsecutive([$dataCacheKey], [$helperCacheKey])
+            ->willReturnCallback(function($key) use ($cacheItemMocks) { return $cacheItemMocks[$key];});
+        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
             ->method('saveDeferred')
-            ->with($cacheItemMock)
+            ->withConsecutive([$cacheItemMocks[$dataCacheKey]], $cacheItemMocks[$helperCacheKey])
             ->willReturn(true);
-        $this->customCache->writeCustomCache($storeId, new Transport($data));
+        $this->customCache->writeCustomCache($storeId, new Transport($data), $customHelperFactory);
     }
 
     /**
@@ -77,7 +85,7 @@ class CustomCacheTest extends \PHPUnit_Framework_TestCase
     public static function dataWriteConfig()
     {
         return [
-            [1, ['foo' => 'bar', 'baz' => [1, 2, 3]]]
+            [1, ['foo' => 'bar', 'baz' => [1, 2, 3]], new CustomHelperFactory('/path/to/Custom/Helper.php', 'Custom_Helper')]
         ];
     }
 }

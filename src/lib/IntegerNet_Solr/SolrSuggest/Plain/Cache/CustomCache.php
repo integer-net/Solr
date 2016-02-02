@@ -12,9 +12,8 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 
 use IntegerNet\Solr\Event\Transport;
-use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
 class CustomCache
@@ -37,11 +36,14 @@ class CustomCache
      * @param int $storeId  The store id
      * @param Transport $data Custom data (key => value) for $storeId
      */
-    public function writeCustomCache($storeId, Transport $data)
+    public function writeCustomCache($storeId, Transport $data, CustomHelperFactory $customHelperFactory)
     {
         $configCacheItem = $this->cachePool->getItem("store_{$storeId}.custom");
         $configCacheItem->set($data);
         $this->cachePool->saveDeferred($configCacheItem);
+        $helperCacheItem = $this->cachePool->getItem("store_{$storeId}.customHelper");
+        $helperCacheItem->set($customHelperFactory);
+        $this->cachePool->saveDeferred($helperCacheItem);
     }
 
     /**

@@ -9,6 +9,7 @@
  */
 
 namespace IntegerNet\SolrSuggest\Implementor;
+use IntegerNet\SolrSuggest\Block\AbstractCustomHelper;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 
 /**
@@ -46,4 +47,11 @@ interface AutosuggestBlock
      * @return string
      */
     public function toHtml();
+
+    /**
+     * Returns custom helper, used to extend the autosuggest block
+     *
+     * @return AbstractCustomHelper
+     */
+    public function getCustomHelper();
 }

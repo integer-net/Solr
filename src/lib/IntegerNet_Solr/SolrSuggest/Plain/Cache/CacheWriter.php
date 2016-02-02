@@ -15,6 +15,7 @@ use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -38,6 +39,10 @@ class CacheWriter
      */
     private $templates;
     /**
+     * @var CustomHelperFactory
+     */
+    private $customHelperFactory;
+    /**
      * @var AttributeCache
      */
     private $attributeCache;
@@ -58,18 +63,21 @@ class CacheWriter
      * @param \IntegerNet\Solr\Implementor\Config[] $storeConfigs
      * @param EventDispatcher $eventDispatcher
      * @param Template[] $templates
+     * @param CustomHelperFactory $customHelperFactory
      * @param AttributeCache $attributeCache
      * @param CategoryCache $categoryCache
      * @param ConfigCache $configCache
      * @param CustomCache $customCache
      */
     public function __construct(array $storeConfigs, EventDispatcher $eventDispatcher, array $templates,
+                                CustomHelperFactory $customHelperFactory,
                                 AttributeCache $attributeCache, CategoryCache $categoryCache, ConfigCache $configCache,
                                 CustomCache $customCache)
     {
         $this->storeConfigs = $storeConfigs;
         $this->eventDispatcher = $eventDispatcher;
         $this->templates = $templates;
+        $this->customHelperFactory = $customHelperFactory;
         $this->attributeCache = $attributeCache;
         $this->categoryCache = $categoryCache;
         $this->configCache = $configCache;
@@ -90,7 +98,7 @@ class CacheWriter
             if ($config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() > 0) {
                 $this->categoryCache->writeCategoryCache($storeId);
             }
-            $this->customCache->writeCustomCache($storeId, $transport);
+            $this->customCache->writeCustomCache($storeId, $transport, $this->customHelperFactory);
         }
     }
 }

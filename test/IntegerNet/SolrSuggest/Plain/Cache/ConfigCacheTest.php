@@ -59,7 +59,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $templateStub = $this->getMockForAbstractClass(Template::class);
         $templateStub->expects($this->any())->method('getFilename')->willReturn($templateFile);
 
-        $cacheItemMocks = array();
+        $cacheItemMocks = [];
         $cacheItemMocks[$configCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
         $cacheItemMocks[$configCacheKey]->expects($this->once())
             ->method('set')

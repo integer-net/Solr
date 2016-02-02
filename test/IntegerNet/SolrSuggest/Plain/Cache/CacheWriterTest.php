@@ -22,6 +22,7 @@ use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -64,7 +65,8 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
         $this->configCacheMock = $this->getMockBuilder(ConfigCache::class)->disableOriginalConstructor()->getMock();
         $this->customCacheMock = $this->getMockBuilder(CustomCache::class)->disableOriginalConstructor()->getMock();
 
-        $this->cacheWriter = new CacheWriter(self::storeConfigs(), $this->eventDispatcherMock, self::templates(),
+        $this->cacheWriter = new CacheWriter(
+            self::storeConfigs(), $this->eventDispatcherMock, self::templates(), self::customHelperFactory(),
             $this->attributeCacheMock, $this->categoryCacheMock, $this->configCacheMock, $this->customCacheMock);
     }
 
@@ -98,18 +100,20 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 [1, $this->callback(function($data) use (&$transportObjects) {
                     $this->assertSame($transportObjects[1], $data);
                     return true;
-                })],
+                }), self::customHelperFactory()],
                 [3, $this->callback(function($data) use (&$transportObjects) {
                     $this->assertSame($transportObjects[3], $data);
                     return true;
-                })]);
+                })], self::customHelperFactory());
         $this->cacheWriter->write();
     }
 
     /**
-     * data provider
+     * parameter for cache writer
+     *
+     * @return ConfigContainer[]
      */
-    public static function storeConfigs()
+    private static function storeConfigs()
     {
         return [
             1 => new ConfigContainer(
@@ -136,13 +140,25 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * data provider
+     * parameter for cache writer
+     *
+     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Template[]
      */
-    public static function templates()
+    private static function templates()
     {
         return [
             1 => new \IntegerNet\SolrSuggest\Plain\Bridge\Template('var/generated/integernet_solr/store_1/autosuggest.phtml'),
             3 => new \IntegerNet\SolrSuggest\Plain\Bridge\Template('var/generated/integernet_solr/store_3/autosuggest.phtml'),
         ];
+    }
+
+    /**
+     * parameter for cache writer
+     *
+     * @return CustomHelperFactory
+     */
+    private static function customHelperFactory()
+    {
+        return new CustomHelperFactory('path/to/Custom/Helper.php', 'Custom_Helper');
     }
 }

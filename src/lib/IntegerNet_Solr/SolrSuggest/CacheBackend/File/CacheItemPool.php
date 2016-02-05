@@ -78,7 +78,11 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
-        // TODO: Implement getItems() method.
+        $items = array();
+        foreach ($keys as $key) {
+            $items[$key] = $this->getItem($key);
+        }
+        return $items;
     }
 
     /**
@@ -112,7 +116,16 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function clear()
     {
-        // TODO: Implement clear() method.
+        foreach (scandir($this->rootDir, SCANDIR_SORT_NONE) as $cacheFile) {
+            $cacheFilePath = $this->rootDir . DIRECTORY_SEPARATOR . $cacheFile;
+            if (! is_file($cacheFilePath)) {
+                continue;
+            }
+            if (! unlink($cacheFilePath)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -177,7 +190,9 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        // TODO: Implement saveDeferred() method.
+        // deferred functionality is not used
+        $this->save($item);
+        return true;
     }
 
     /**
@@ -188,7 +203,7 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        return true;
     }
 
     /**

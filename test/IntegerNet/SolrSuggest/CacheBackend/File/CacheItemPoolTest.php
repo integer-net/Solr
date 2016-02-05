@@ -27,18 +27,23 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->vfsRoot = vfsStream::setup(self::CACHE_ROOT);
+        if (! $this->hasDependencies()) {
+            $this->vfsRoot = vfsStream::setup(self::CACHE_ROOT);
+        }
     }
 
     /**
+     * Tast case for basic functionality
+     *
      * @test
      */
-    public function testWriteAndReadSerializedObjects()
+    public function shouldWriteAndReadSerializedObjects()
     {
         $inputObject = (object)['someKey' => 'someValue'];
         $inputKey = 'item-1';
+        $input = [$inputKey => $inputObject];
 
-        $writeCacheItemPool = new CacheItemPool(vfsStream::url(self::CACHE_ROOT));
+        $writeCacheItemPool = $this->setUpCacheItemPool();
         $this->assertFalse($writeCacheItemPool->hasItem($inputKey), 'has item should return false');
         $newItem = $writeCacheItemPool->getItem($inputKey);
         $this->assertInstanceOf(CacheItem::class, $newItem);
@@ -47,29 +52,78 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($writeCacheItemPool->save($newItem), 'save successful');
         $this->assertTrue($this->vfsRoot->hasChild('item-1'));
 
-        $readCacheItemPool = new CacheItemPool(vfsStream::url(self::CACHE_ROOT));
+        $readCacheItemPool = $this->setUpCacheItemPool();
         $this->assertTrue($readCacheItemPool->hasItem($inputKey), 'has item should return true');
         $loadedItem = $readCacheItemPool->getItem($inputKey);
         $this->assertInstanceOf(CacheItem::class, $loadedItem);
         $this->assertEquals($inputObject, $loadedItem->get());
         $this->assertEquals($inputKey, $loadedItem->getKey());
         $this->assertTrue($loadedItem->isHit(), 'cache hit');
+
+        return $input;
+    }
+
+    /**
+     * Our implementation does not use deferred saving
+     *
+     * ("A Pool object MAY delay persisting a deferred cache item")
+     *
+     * @test
+     */
+    public function shouldWriteOnSaveDeferred()
+    {
+        $input = ['item-1' => 23, 'item-2' => 42, 'item-3' => 1337];
+        $writeCacheItemPool = $this->setUpCacheItemPool();
+        foreach ($input as $inputKey => $inputData) {
+            $this->assertFalse($writeCacheItemPool->hasItem($inputKey), 'has item should return false');
+            $cacheItem = $writeCacheItemPool->getItem($inputKey);
+            $cacheItem->set($inputData);
+            $writeCacheItemPool->saveDeferred($cacheItem);
+        }
+        $cacheItem->set('changed the last one afterwards');
+        $readCacheItemPool = $this->setUpCacheItemPool();
+        foreach ($input as $inputKey => $inputData) {
+            $this->assertTrue($readCacheItemPool->hasItem($inputKey), 'deferred save should have effect after commit');
+            $this->assertEquals($inputData, $readCacheItemPool->getItem($inputKey)->get());
+        }
+        return $input;
     }
 
     /**
      * @test
+     * @depends shouldWriteOnSaveDeferred
      */
-    public function testSaveDeferredAndReadMultipleItems()
+    public function shouldReadMultipleItems($input)
     {
-        $this->markTestIncomplete();
+        $cacheItemPool = $this->setUpCacheItemPool();
+        $existentAndNonexistentKeys = array_merge(array_keys($input), ['new-item']);
+        $actualItems = $cacheItemPool->getItems($existentAndNonexistentKeys);
+        $this->assertCount(count($existentAndNonexistentKeys), $actualItems, 'item count should equal input size');
+        foreach ($existentAndNonexistentKeys as $expectedKey) {
+            $this->assertArrayHasKey($expectedKey, $actualItems);
+            $this->assertInstanceOf(CacheItem::class, $actualItems[$expectedKey]);
+            if (array_key_exists($expectedKey, $input)) {
+                $this->assertTrue($actualItems[$expectedKey]->isHit(), 'existent key => hit');
+            } else {
+                $this->assertFalse($actualItems[$expectedKey]->isHit(), 'nonexistent key => no hit');
+            }
+        }
     }
 
     /**
      * @test
+     * @depends shouldWriteAndReadSerializedObjects
      */
-    public function testClear()
+    public function testClear($input)
     {
-        $this->markTestIncomplete();
+        $cacheItemPool = $this->setUpCacheItemPool();
+        foreach ($input as $inputKey => $inputData) {
+            $this->assertTrue($cacheItemPool->hasItem($inputKey), 'item should be present before clear');
+        }
+        $cacheItemPool->clear();
+        foreach ($input as $inputKey => $inputData) {
+            $this->assertFalse($cacheItemPool->hasItem($inputKey), 'item should be gone after clear');
+        }
     }
 
     /**
@@ -80,7 +134,7 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
     {
         $inputData = 42;
 
-        $writeCacheItemPool = new CacheItemPool(vfsStream::url(self::CACHE_ROOT));
+        $writeCacheItemPool = $this->setUpCacheItemPool();
         $newItem = $writeCacheItemPool->getItem($inputKey);
         $this->assertInstanceOf(CacheItem::class, $newItem);
         $this->assertFalse($newItem->isHit(), 'no cache hit');
@@ -116,7 +170,7 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldThrowExceptionOnInvalidKeys($inputKey)
     {
-        $writeCacheItemPool = new CacheItemPool(vfsStream::url(self::CACHE_ROOT));
+        $writeCacheItemPool = $this->setUpCacheItemPool();
         $writeCacheItemPool->getItem($inputKey);
     }
     /**
@@ -136,5 +190,14 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
             ['.\\.'],
             ['\\\\.'], // works on some file systems but we don't allow it to be sure (and because vfsStream does not like it)
         ];
+    }
+
+    /**
+     * @return CacheItemPool
+     */
+    private function setUpCacheItemPool()
+    {
+        $writeCacheItemPool = new CacheItemPool(vfsStream::url(self::CACHE_ROOT));
+        return $writeCacheItemPool;
     }
 }

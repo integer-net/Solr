@@ -24,7 +24,6 @@ use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
-use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
 class AutosuggestResult
 {
@@ -69,10 +68,6 @@ class AutosuggestResult
      */
     private $searchTermSuggestResult;
     /**
-     * @var StringHighlighter
-     */
-    private $highlighter;
-    /**
      * @var int
      */
     private $storeId;
@@ -80,7 +75,7 @@ class AutosuggestResult
     public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
                                 HasUserQuery $userQuery, SearchUrl $searchUrl, SuggestCategoryRepository $categoryRepository,
                                 AttributeRepository $attributeRepository, Request $searchRequest,
-                                Request $searchTermSuggestRequest, StringHighlighter $highlighter)
+                                Request $searchTermSuggestRequest)
     {
         $this->storeId = $storeId;
         $this->generalConfig = $generalConfig;
@@ -91,7 +86,6 @@ class AutosuggestResult
         $this->searchRequest = $searchRequest;
         $this->searchTermSuggestRequest = $searchTermSuggestRequest;
         $this->attributeRepository = $attributeRepository;
-        $this->highlighter = $highlighter;
     }
 
     /**

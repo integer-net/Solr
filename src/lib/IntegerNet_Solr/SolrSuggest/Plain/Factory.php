@@ -103,8 +103,7 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
             new CategoryRepository(),
             new AttributeRepository(),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
-            new HtmlStringHighlighter()
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
         );
     }
 

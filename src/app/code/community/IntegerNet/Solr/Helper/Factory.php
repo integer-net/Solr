@@ -163,8 +163,7 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
             Mage::getModel('integernet_solr/bridge_categoryRepository'),
             Mage::getModel('integernet_solr/bridge_attributeRepository'),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
-            new HtmlStringHighlighter()
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
         );
     }
 }

@@ -30,9 +30,9 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $configCache;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheItemPoolInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|Cache
      */
-    private $cachePoolMock;
+    private $cacheMock;
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -40,50 +40,34 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cachePoolMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
-        $this->configCache = new ConfigCache($this->cachePoolMock);
+        $this->cacheMock = $this->getMockForAbstractClass(Cache::class);
+        $this->configCache = new ConfigCache($this->cacheMock);
     }
 
     /**
      * @test
-     * @dataProvider dataWriteConfig
+     * @dataProvider dataConfig
      * @param int $storeId
      * @param SerializableConfig $config
      * @param string $templateFile
      */
     public function shouldStoreConfig($storeId, SerializableConfig $config, $templateFile)
     {
-        $configCacheKey = "store_{$storeId}.config";
-        $templateCacheKey = "store_{$storeId}.template";
-
         $templateStub = $this->getMockForAbstractClass(Template::class);
         $templateStub->expects($this->any())->method('getFilename')->willReturn($templateFile);
 
-        $cacheItemMocks = [];
-        $cacheItemMocks[$configCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$configCacheKey]->expects($this->once())
-            ->method('set')
-            ->with($config);
-        $cacheItemMocks[$templateCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$templateCacheKey]->expects($this->once())
-            ->method('set')
-            ->with($templateFile);
-
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('getItem')
-            ->withConsecutive([$configCacheKey], [$templateCacheKey])
-            ->willReturnCallback(function($key) use ($cacheItemMocks) { return $cacheItemMocks[$key];});
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('saveDeferred')
-            ->withConsecutive([$cacheItemMocks[$configCacheKey]], [$cacheItemMocks[$templateCacheKey]])
-            ->willReturn(true);
+        $this->cacheMock->expects($this->exactly(2))
+            ->method('save')
+            ->withConsecutive(
+                [$this->getConfigCacheKey($storeId), $config],
+                [$this->getTemplateCacheKey($storeId), $templateFile]);
         $this->configCache->writeStoreConfig($storeId, $config, $templateStub);
     }
 
     /**
      * data provider
      */
-    public static function dataWriteConfig()
+    public static function dataConfig()
     {
         $defaultStoreId = 1;
         $defaultConfig = new ConfigContainer(
@@ -100,4 +84,62 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             [$defaultStoreId, $defaultConfig, '/path/to/magento/var/generated/integernet_solr/template.phtml']
         ];
     }
+
+    /**
+     * @test
+     * @dataProvider dataConfig
+     * @param int $storeId
+     * @param SerializableConfig $config
+     * @param string $templateFile
+     */
+    public function shouldReadConfig($storeId, SerializableConfig $config, $templateFile)
+    {
+        $this->cacheMock->expects($this->once())
+            ->method('load')
+            ->with($this->getConfigCacheKey($storeId))
+            ->willReturn($config);
+
+        $actualConfig = $this->configCache->getConfig($storeId);
+        $this->assertInstanceOf(ConfigContainer::class, $actualConfig);
+        $this->assertEquals($config, $actualConfig);
+    }
+    /**
+     * @test
+     * @dataProvider dataConfig
+     * @param int $storeId
+     * @param SerializableConfig $config
+     * @param string $templateFile
+     */
+    public function shouldReadTemplate($storeId, SerializableConfig $config, $templateFile)
+    {
+        $this->cacheMock->expects($this->once())
+            ->method('load')
+            ->with($this->getTemplateCacheKey($storeId))
+            ->willReturn($templateFile);
+
+        $actualTemplate = $this->configCache->getTemplate($storeId);
+        $this->assertInstanceOf(Template::class, $actualTemplate);
+        $this->assertEquals($templateFile, $actualTemplate->getFilename());
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getConfigCacheKey($storeId)
+    {
+        $configCacheKey = "store_{$storeId}.config";
+        return $configCacheKey;
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getTemplateCacheKey($storeId)
+    {
+        $templateCacheKey = "store_{$storeId}.template";
+        return $templateCacheKey;
+    }
+
 }

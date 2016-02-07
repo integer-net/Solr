@@ -18,10 +18,9 @@ use Psr\Cache\CacheItemPoolInterface;
 class AttributeCache
 {
     /**
-     * @var CacheItemPoolInterface
+     * @var Cache
      */
-    private $cachePool;
-
+    private $cache;
     /**
      * @var SuggestAttributeRepository
      */
@@ -29,26 +28,22 @@ class AttributeCache
 
     /**
      * CategoryCache constructor.
-     * @param CacheItemPoolInterface $cachePool
+     * @param Cache $cache
      * @param SuggestAttributeRepository $attributeRepository
      */
-    public function __construct(CacheItemPoolInterface $cachePool, SuggestAttributeRepository $attributeRepository)
+    public function __construct(Cache $cache, SuggestAttributeRepository $attributeRepository)
     {
-        $this->cachePool = $cachePool;
+        $this->cache = $cache;
         $this->attributeRepository = $attributeRepository;
     }
 
     public function writeAttributeCache($storeId)
     {
         $attributes = $this->attributeRepository->findFilterableInSearchAttributes($storeId);
-        $attributesCacheItem = $this->cachePool->getItem("store_{$storeId}.attributes");
-        $attributesCacheItem->set($attributes);
-        $this->cachePool->saveDeferred($attributesCacheItem);
+        $this->cache->save($this->getAttributesCacheKey($storeId), $attributes);
 
         $searchableAttributes = $this->attributeRepository->findSearchableAttributes($storeId);
-        $searchableAttributesCacheItem = $this->cachePool->getItem("store_{$storeId}.searchable_attributes");
-        $searchableAttributesCacheItem->set($searchableAttributes);
-        $this->cachePool->saveDeferred($searchableAttributesCacheItem);
+        $this->cache->save($this->getSearchableAttributesCacheKey($storeId), $searchableAttributes);
     }
 
     /**
@@ -67,6 +62,24 @@ class AttributeCache
     public function getSearchableAttributes($storeId)
     {
         //TODO implement (to be used by Plain\Bridge\AttributeRepository)
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getAttributesCacheKey($storeId)
+    {
+        return "store_{$storeId}.attributes";
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getSearchableAttributesCacheKey($storeId)
+    {
+        return "store_{$storeId}.searchable_attributes";
     }
 
 }

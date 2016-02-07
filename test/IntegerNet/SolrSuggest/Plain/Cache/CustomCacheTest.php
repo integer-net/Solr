@@ -32,9 +32,9 @@ class CustomCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $customCache;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheItemPoolInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|Cache
      */
-    private $cachePoolMock;
+    private $cacheMock;
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -42,8 +42,8 @@ class CustomCacheTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cachePoolMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
-        $this->customCache = new CustomCache($this->cachePoolMock);
+        $this->cacheMock = $this->getMockForAbstractClass(Cache::class);
+        $this->customCache = new CustomCache($this->cacheMock);
     }
 
     /**
@@ -58,24 +58,12 @@ class CustomCacheTest extends \PHPUnit_Framework_TestCase
         $dataCacheKey = "store_{$storeId}.custom";
         $helperCacheKey = "store_{$storeId}.customHelper";
 
-        $cacheItemMocks = [];
-        $cacheItemMocks[$dataCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$dataCacheKey]->expects($this->once())
-            ->method('set')
-            ->with(new Transport($data));
-        $cacheItemMocks[$helperCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$helperCacheKey]->expects($this->once())
-            ->method('set')
-            ->with($customHelperFactory);
-
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('getItem')
-            ->withConsecutive([$dataCacheKey], [$helperCacheKey])
-            ->willReturnCallback(function($key) use ($cacheItemMocks) { return $cacheItemMocks[$key];});
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('saveDeferred')
-            ->withConsecutive([$cacheItemMocks[$dataCacheKey]], $cacheItemMocks[$helperCacheKey])
-            ->willReturn(true);
+        $this->cacheMock->expects($this->exactly(2))
+            ->method('save')
+            ->withConsecutive(
+                [$dataCacheKey, new Transport($data)],
+                [$helperCacheKey, $customHelperFactory]
+            );
         $this->customCache->writeCustomCache($storeId, new Transport($data), $customHelperFactory);
     }
 

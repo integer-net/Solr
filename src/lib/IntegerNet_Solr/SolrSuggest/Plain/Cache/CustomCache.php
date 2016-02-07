@@ -19,17 +19,17 @@ use Psr\Cache\CacheItemPoolInterface;
 class CustomCache
 {
     /**
-     * @var CacheItemPoolInterface
+     * @var Cache
      */
-    private $cachePool;
+    private $cache;
 
     /**
      * ConfigCache constructor.
-     * @param CacheItemPoolInterface $cachePool
+     * @param Cache $cache
      */
-    public function __construct(CacheItemPoolInterface $cachePool)
+    public function __construct(Cache $cache)
     {
-        $this->cachePool = $cachePool;
+        $this->cache = $cache;
     }
 
     /**
@@ -38,12 +38,8 @@ class CustomCache
      */
     public function writeCustomCache($storeId, Transport $data, CustomHelperFactory $customHelperFactory)
     {
-        $configCacheItem = $this->cachePool->getItem("store_{$storeId}.custom");
-        $configCacheItem->set($data);
-        $this->cachePool->saveDeferred($configCacheItem);
-        $helperCacheItem = $this->cachePool->getItem("store_{$storeId}.customHelper");
-        $helperCacheItem->set($customHelperFactory);
-        $this->cachePool->saveDeferred($helperCacheItem);
+        $this->cache->save($this->getCustomDataCacheKey($storeId), $data);
+        $this->cache->save($this->getCustomHelperCacheKey($storeId), $customHelperFactory);
     }
 
     /**
@@ -53,6 +49,24 @@ class CustomCache
     public function getData($path)
     {
         //TODO implement
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getCustomDataCacheKey($storeId)
+    {
+        return "store_{$storeId}.custom";
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getCustomHelperCacheKey($storeId)
+    {
+        return "store_{$storeId}.customHelper";
     }
 
 }

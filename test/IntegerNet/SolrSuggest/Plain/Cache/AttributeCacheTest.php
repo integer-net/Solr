@@ -25,9 +25,9 @@ class AttributeCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $attributeRepositoryStub;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheItemPoolInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|Cache
      */
-    private $cachePoolMock;
+    private $cacheMock;
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -35,9 +35,9 @@ class AttributeCacheTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cachePoolMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
+        $this->cacheMock = $this->getMockForAbstractClass(Cache::class);
         $this->attributeRepositoryStub = $this->getMockForAbstractClass(SuggestAttributeRepository::class);
-        $this->attributeCache = new AttributeCache($this->cachePoolMock, $this->attributeRepositoryStub);
+        $this->attributeCache = new AttributeCache($this->cacheMock, $this->attributeRepositoryStub);
     }
     /**
      * @test
@@ -65,24 +65,12 @@ class AttributeCacheTest extends \PHPUnit_Framework_TestCase
             ->with($storeId)
             ->willReturn($dataSearchableAttributeArray);
 
-        $cacheItemMocks = array();
-        $cacheItemMocks[$attributesCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$attributesCacheKey]->expects($this->once())
-            ->method('set')
-            ->with($dataAttributeArray);
-        $cacheItemMocks[$searchableAttributesCacheKey] = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMocks[$searchableAttributesCacheKey]->expects($this->once())
-            ->method('set')
-            ->with($dataSearchableAttributeArray);
-
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('getItem')
-            ->withConsecutive([$attributesCacheKey], [$searchableAttributesCacheKey])
-            ->willReturnCallback(function($key) use ($cacheItemMocks) { return $cacheItemMocks[$key];});
-        $this->cachePoolMock->expects($this->exactly(count($cacheItemMocks)))
-            ->method('saveDeferred')
-            ->withConsecutive([$cacheItemMocks[$attributesCacheKey]], [$cacheItemMocks[$searchableAttributesCacheKey]])
-            ->willReturn(true);
+        $this->cacheMock->expects($this->exactly(2))
+            ->method('save')
+            ->withConsecutive(
+                [$attributesCacheKey, $dataAttributeArray],
+                [$searchableAttributesCacheKey, $dataSearchableAttributeArray]
+            );
 
         $this->attributeCache->writeAttributeCache($storeId);
     }

@@ -13,38 +13,34 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\Template;
-use Psr\Cache\CacheItemPoolInterface;
+use IntegerNet\SolrSuggest\Plain\Bridge\Template as PlainTemplate;
 
 class ConfigCache
 {
     /**
-     * @var CacheItemPoolInterface
+     * @var Cache
      */
-    private $cachePool;
+    private $cache;
 
     /**
-     * ConfigCache constructor.
-     * @param CacheItemPoolInterface $cachePool
+     * @param Cache $cache
      */
-    public function __construct(CacheItemPoolInterface $cachePool)
+    public function __construct(Cache $cache)
     {
-        $this->cachePool = $cachePool;
+        $this->cache = $cache;
     }
 
     /**
-     * @param int $storeId       The store id
-     * @param Config $config     The store configuration for $storeId
-     * @param Template $template The (generated) template file
+     * @param int                $storeId       The store id
+     * @param SerializableConfig $config     The store configuration for $storeId
+     * @param Template           $template The (generated) template file
      */
-    public function writeStoreConfig($storeId, Config $config, Template $template)
+    public function writeStoreConfig($storeId, SerializableConfig $config, Template $template)
     {
-        $configCacheItem = $this->cachePool->getItem("store_{$storeId}.config");
-        $configCacheItem->set($config);
-        $this->cachePool->saveDeferred($configCacheItem);
-        $templateCacheItem = $this->cachePool->getItem("store_{$storeId}.template");
-        $templateCacheItem->set($template->getFilename());
-        $this->cachePool->saveDeferred($templateCacheItem);
+        $this->cache->save($this->getConfigCacheKey($storeId), $config);
+        $this->cache->save($this->getTemplateCacheKey($storeId), $template->getFilename());
     }
 
     /**
@@ -53,7 +49,7 @@ class ConfigCache
      */
     public function getConfig($storeId)
     {
-        //TODO implement
+        return $this->cache->load($this->getConfigCacheKey($storeId));
     }
 
     /**
@@ -62,6 +58,27 @@ class ConfigCache
      */
     public function getTemplate($storeId)
     {
-        //TODO implement
+        return new PlainTemplate(
+            $this->cache->load($this->getTemplateCacheKey($storeId))
+        );
     }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getConfigCacheKey($storeId)
+    {
+        return "store_{$storeId}.config";
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getTemplateCacheKey($storeId)
+    {
+        return "store_{$storeId}.template";
+    }
+
 }

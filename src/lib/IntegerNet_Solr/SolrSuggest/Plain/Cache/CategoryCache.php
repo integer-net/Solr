@@ -18,9 +18,9 @@ use Psr\Cache\CacheItemPoolInterface;
 class CategoryCache
 {
     /**
-     * @var CacheItemPoolInterface
+     * @var Cache
      */
-    private $cachePool;
+    private $cache;
 
     /**
      * @var CategoryRepository
@@ -29,12 +29,12 @@ class CategoryCache
 
     /**
      * CategoryCache constructor.
-     * @param CacheItemPoolInterface $cachePool
+     * @param Cache $cache
      * @param SuggestCategoryRepository $categoryRepository
      */
-    public function __construct(CacheItemPoolInterface $cachePool, SuggestCategoryRepository $categoryRepository)
+    public function __construct(Cache $cache, SuggestCategoryRepository $categoryRepository)
     {
-        $this->cachePool = $cachePool;
+        $this->cache = $cache;
         $this->categoryRepository = $categoryRepository;
     }
 
@@ -42,9 +42,7 @@ class CategoryCache
     public function writeCategoryCache($storeId)
     {
         $categories = $this->categoryRepository->findActiveCategories($storeId);
-        $categoryCacheItem = $this->cachePool->getItem("store_{$storeId}.categories");
-        $categoryCacheItem->set($categories);
-        $this->cachePool->saveDeferred($categoryCacheItem);
+        $this->cache->save($this->getActiveCategoriesCacheKey($storeId), $categories);
     }
 
     /**
@@ -54,5 +52,14 @@ class CategoryCache
     public function getActiveCategories($storeId)
     {
         //TODO implement (to be used by Plain\Bridge\CategoryRepository)
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    private function getActiveCategoriesCacheKey($storeId)
+    {
+        return "store_{$storeId}.categories";
     }
 }

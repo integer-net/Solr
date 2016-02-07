@@ -12,6 +12,7 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
@@ -27,7 +28,7 @@ class CacheWriter
 {
     const EVENT_CUSTOM_CONFIG = 'integernet_solr_autosuggest_config';
     /**
-     * @var Config[]
+     * @var SerializableConfig[]
      */
     private $storeConfigs;
     /**
@@ -60,7 +61,7 @@ class CacheWriter
     private $customCache;
 
     /**
-     * @param \IntegerNet\Solr\Implementor\Config[] $storeConfigs
+     * @param \IntegerNet\Solr\Implementor\SerializableConfig[] $storeConfigs
      * @param EventDispatcher $eventDispatcher
      * @param Template[] $templates
      * @param CustomHelperFactory $customHelperFactory

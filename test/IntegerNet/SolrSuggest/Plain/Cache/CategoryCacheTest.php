@@ -25,9 +25,9 @@ class CategoryCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $categoryRepositoryStub;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheItemPoolInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|Cache
      */
-    private $cachePoolMock;
+    private $cacheMock;
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -35,9 +35,9 @@ class CategoryCacheTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cachePoolMock = $this->getMockForAbstractClass(CacheItemPoolInterface::class);
+        $this->cacheMock = $this->getMockForAbstractClass(Cache::class);
         $this->categoryRepositoryStub = $this->getMockForAbstractClass(SuggestCategoryRepository::class);
-        $this->categoryCache = new CategoryCache($this->cachePoolMock, $this->categoryRepositoryStub);
+        $this->categoryCache = new CategoryCache($this->cacheMock, $this->categoryRepositoryStub);
     }
     /**
      * @test
@@ -54,19 +54,9 @@ class CategoryCacheTest extends \PHPUnit_Framework_TestCase
             ->with($storeId)
             ->willReturn($dataCategoryArray);
 
-        $cacheItemMock = $this->getMockForAbstractClass(CacheItemInterface::class);
-        $cacheItemMock->expects($this->once())
-            ->method('set')
-            ->with($dataCategoryArray);
-
-        $this->cachePoolMock->expects($this->once())
-            ->method('getItem')
-            ->with($categoryCacheKey)
-            ->willReturn($cacheItemMock);
-        $this->cachePoolMock->expects($this->once())
-            ->method('saveDeferred')
-            ->with($cacheItemMock)
-            ->willReturn(true);
+        $this->cacheMock->expects($this->once())
+            ->method('save')
+            ->with($categoryCacheKey, $dataCategoryArray);
 
         $this->categoryCache->writeCategoryCache($storeId);
     }

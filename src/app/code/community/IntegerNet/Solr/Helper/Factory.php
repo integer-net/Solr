@@ -8,18 +8,21 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\Solr\Implementor\Factory;
-use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
-use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\SolrSuggest\Result\AutosuggestResult;
-use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
-use Psr\Log\NullLogger;
+use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
-use IntegerNet\Solr\Request\ApplicationContext;
-use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
+use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
+use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
+use Psr\Log\NullLogger;
 
 class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
 {
@@ -50,7 +53,7 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
             $this->getSolrResource(),
             Mage::helper('integernet_solr'),
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
-            Mage::getModel('integernet_solr/bridge_categoryRepository'),
+            $this->_getIndexCategoryRepository(),
             Mage::getModel('integernet_solr/bridge_productRepository'),
             Mage::getModel('integernet_solr/bridge_productRenderer')
         );
@@ -160,10 +163,59 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
             $storeConfig->getAutosuggestConfig(),
             Mage::helper('integernet_solr/searchterm'),
             Mage::helper('integernet_solr'),
-            Mage::getModel('integernet_solr/bridge_categoryRepository'),
-            Mage::getModel('integernet_solr/bridge_attributeRepository'),
+            $this->_getSuggestCategoryRepository(),
+            $this->_getAttributeRepository(),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
             $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
         );
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheWriter
+     */
+    public function getCacheWriter()
+    {
+        $customHelper = Mage::helper('integernet_solr/custom');
+        $customHelperClass = new ReflectionClass($customHelper);
+        return new CacheWriter(
+            $this->_getCacheStorage(),
+            $this->_getAttributeRepository(),
+            $this->_getSuggestCategoryRepository(),
+            new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
+            Mage::helper('integernet_solr'),
+            Mage::helper('integernet_solr/autosuggest')
+        );
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheStorage
+     */
+    protected function _getCacheStorage()
+    {
+        return new PsrCache(new FileCacheBackend(Mage::getBaseDir('var') . DS . 'cache' . DS . 'integernet_solr'));
+    }
+
+    /**
+     * @return \IntegerNet\Solr\Implementor\AttributeRepository
+     */
+    protected function _getAttributeRepository()
+    {
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Model_Bridge_CategoryRepository
+     */
+    protected function _getIndexCategoryRepository()
+    {
+        return Mage::getSingleton('integernet_solr/bridge_categoryRepository');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Model_Bridge_CategoryRepository
+     */
+    protected function _getSuggestCategoryRepository()
+    {
+        return Mage::getSingleton('integernet_solr/bridge_categoryRepository');
     }
 }

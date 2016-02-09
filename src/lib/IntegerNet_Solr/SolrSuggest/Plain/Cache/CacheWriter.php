@@ -77,12 +77,12 @@ class CacheWriter
     /**
      * Write everything to cache
      *
-     * @param \IntegerNet\Solr\Implementor\SerializableConfig[] $storeConfigs
+     * @param \IntegerNet\Solr\Implementor\Config[] $storeConfigs
      */
     public function write(array $storeConfigs)
     {
         foreach ($storeConfigs as $storeId => $config) {
-            $this->writeStoreConfig($storeId, $config);
+            $this->writeStoreConfig($storeId, $config->toSerializableConfig());
             $this->writeAttributeCache($storeId);
             $this->writeCustomCache($storeId);
             $doNotCacheCategories = $config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() == 0;

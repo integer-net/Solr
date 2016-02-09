@@ -9,6 +9,9 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
+/**
+ * @todo rename to TemplateFactory? Implementation generates templates...
+ */
 interface TemplateRepository
 {
     /**

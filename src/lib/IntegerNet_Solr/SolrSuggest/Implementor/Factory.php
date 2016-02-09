@@ -9,10 +9,17 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
+use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
+
 interface Factory
 {
     /**
      * @return \IntegerNet\SolrSuggest\Result\AutosuggestResult
      */
     public function getAutosuggestResult();
+
+    /**
+     * @return CacheWriter
+     */
+    public function getCacheWriter();
 }

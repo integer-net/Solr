@@ -12,6 +12,9 @@ namespace IntegerNet\SolrSuggest\Plain\Bridge;
 use IntegerNet\Solr\Exception;
 use IntegerNet\SolrSuggest\Implementor\Template;
 
+/**
+ * @todo remove if not used
+ */
 class TemplateRepository implements \IntegerNet\SolrSuggest\Implementor\TemplateRepository
 {
     /**

@@ -27,6 +27,7 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      * @singleton customer/session
      * @singleton reports/session
      * @singleton integernet_solr/bridge_attributeRepository
+     * @singleton integernet_solr/bridge_categoryRepository
      * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @helper catalogsearch

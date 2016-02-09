@@ -9,8 +9,9 @@
  */
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 
-class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
+class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository, SuggestAttributeRepository
 {
     /**
      * Holds attribute instances with their Magento attributes as attached data
@@ -246,4 +247,29 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $collection->getItems()
         );
     }
+
+    /*
+     * SuggestAttributeRepository implementation
+     * =========================================
+     */
+
+    /**
+     * @param int $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
+     */
+    public function findFilterableInSearchAttributes($storeId)
+    {
+        return $this->getFilterableInSearchAttributes();
+    }
+
+    /**
+     * @param $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
+     */
+    public function findSearchableAttributes($storeId)
+    {
+        return $this->getSearchableAttributes();
+    }
+
+
 }

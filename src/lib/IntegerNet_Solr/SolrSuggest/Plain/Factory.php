@@ -16,6 +16,8 @@ use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\Logger;
 use IntegerNet\SolrSuggest\Plain\Bridge\NullEventDispatcher;
 use IntegerNet\SolrSuggest\Plain\Bridge\SearchUrl;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
@@ -30,14 +32,19 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
      * @var AutosuggestRequest
      */
     private $request;
+    /**
+     * @var CacheStorage
+     */
+    private $cacheStorage;
 
     /**
-     * Factory constructor.
      * @param AutosuggestRequest $request
+     * @param CacheStorage $cacheStorage
      */
-    public function __construct(AutosuggestRequest $request)
+    public function __construct(AutosuggestRequest $request, CacheStorage $cacheStorage)
     {
         $this->request = $request;
+        $this->cacheStorage = $cacheStorage;
     }
 
     /**
@@ -57,6 +64,7 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
     /**
      * Returns new Solr result wrapper
      *
+     * @param int $requestMode
      * @return \IntegerNet\Solr\Request\Request
      */
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
@@ -108,14 +116,19 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
     /**
-     * @param int $storeId
-     * @return IntegerNet_Solr_Model_Config_Store
+     * @param $storeId
+     * @return \IntegerNet\Solr\Implementor\Config
      */
     public function getStoreConfig($storeId)
     {
-        $storeConfig = new IntegerNet_Solr_Model_Config_Store($storeId);
+        //$storeConfig = new IntegerNet_Solr_Model_Config_Store($storeId);
+        $storeConfig = $this->getCacheReader()->getConfig($storeId);
         return $storeConfig;
     }
 
+    public function getCacheReader()
+    {
+        return new CacheReader($this->cacheStorage);
+    }
 
 }

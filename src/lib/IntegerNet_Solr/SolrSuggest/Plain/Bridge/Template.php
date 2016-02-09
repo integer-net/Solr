@@ -9,6 +9,9 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
+/**
+ * @todo move, this can be a generic implementation, no need for a bridge (there is TemplateRepository now)
+ */
 class Template implements \IntegerNet\SolrSuggest\Implementor\Template
 {
     /**

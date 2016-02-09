@@ -31,6 +31,7 @@ class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Cont
      * @singleton customer/session
      * @singleton reports/session
      * @singleton integernet_solr/bridge_attributeRepository
+     * @singleton integernet_solr/bridge_categoryRepository
      * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @loadFixture catalog
@@ -55,6 +56,7 @@ class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Cont
      * @singleton customer/session
      * @singleton reports/session
      * @singleton integernet_solr/bridge_attributeRepository
+     * @singleton integernet_solr/bridge_categoryRepository
      * @singleton integernet_solr/result
      * @singleton integernet_solr/result_collection
      * @loadFixture catalog

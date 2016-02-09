@@ -10,96 +10,127 @@
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Event\Transport;
-use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
-use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
-use Psr\Cache\CacheItemPoolInterface;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomHelperCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\FilterableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\SearchableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\TemplateCacheItem;
 
 /**
  * Takes data from application and stores it in own cache
- *
- * @package IntegerNet\SolrSuggest\Plain\Cache
  */
 class CacheWriter
 {
     const EVENT_CUSTOM_CONFIG = 'integernet_solr_autosuggest_config';
     /**
-     * @var SerializableConfig[]
+     * @var CacheStorage
      */
-    private $storeConfigs;
+    protected $cache;
     /**
-     * @var EventDispatcher
+     * @var SuggestAttributeRepository
      */
-    private $eventDispatcher;
+    private $attributeRepository;
     /**
-     * @var Template[]
+     * @var SuggestCategoryRepository
      */
-    private $templates;
+    private $categoryRepository;
     /**
      * @var CustomHelperFactory
      */
     private $customHelperFactory;
     /**
-     * @var AttributeCache
+     * @var EventDispatcher
      */
-    private $attributeCache;
+    private $eventDispatcher;
     /**
-     * @var CategoryCache
+     * @var TemplateRepository
      */
-    private $categoryCache;
-    /**
-     * @var ConfigCache
-     */
-    private $configCache;
-    /**
-     * @var CustomCache
-     */
-    private $customCache;
+    private $templateRepository;
 
     /**
-     * @param \IntegerNet\Solr\Implementor\SerializableConfig[] $storeConfigs
-     * @param EventDispatcher $eventDispatcher
-     * @param Template[] $templates
+     * @param CacheStorage $cache
+     * @param SuggestAttributeRepository $attributeRepository
+     * @param SuggestCategoryRepository $categoryRepository
      * @param CustomHelperFactory $customHelperFactory
-     * @param AttributeCache $attributeCache
-     * @param CategoryCache $categoryCache
-     * @param ConfigCache $configCache
-     * @param CustomCache $customCache
+     * @param EventDispatcher $eventDispatcher
+     * @param TemplateRepository $templates
      */
-    public function __construct(array $storeConfigs, EventDispatcher $eventDispatcher, array $templates,
-                                CustomHelperFactory $customHelperFactory,
-                                AttributeCache $attributeCache, CategoryCache $categoryCache, ConfigCache $configCache,
-                                CustomCache $customCache)
+    public function __construct(CacheStorage $cache, SuggestAttributeRepository $attributeRepository,
+                                SuggestCategoryRepository $categoryRepository, CustomHelperFactory $customHelperFactory,
+                                EventDispatcher $eventDispatcher, TemplateRepository $templates)
     {
-        $this->storeConfigs = $storeConfigs;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->templates = $templates;
+        $this->cache = $cache;
+        $this->attributeRepository = $attributeRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->customHelperFactory = $customHelperFactory;
-        $this->attributeCache = $attributeCache;
-        $this->categoryCache = $categoryCache;
-        $this->configCache = $configCache;
-        $this->customCache = $customCache;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->templateRepository = $templates;
     }
-
     /**
-     * write cache
+     * Write everything to cache
+     *
+     * @param \IntegerNet\Solr\Implementor\SerializableConfig[] $storeConfigs
      */
-    public function write()
+    public function write(array $storeConfigs)
     {
-        foreach ($this->storeConfigs as $storeId => $config) {
-            $transport = new Transport();
-            $this->eventDispatcher->dispatch(self::EVENT_CUSTOM_CONFIG,
-                array('store_id' => $storeId, 'transport' => $transport));
-            $this->configCache->writeStoreConfig($storeId, $config, $this->templates[$storeId]);
-            $this->attributeCache->writeAttributeCache($storeId);
+        foreach ($storeConfigs as $storeId => $config) {
+            $this->writeStoreConfig($storeId, $config);
+            $this->writeAttributeCache($storeId);
+            $this->writeCustomCache($storeId);
             if ($config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() > 0) {
-                $this->categoryCache->writeCategoryCache($storeId);
+                $this->writeCategoryCache($storeId);
             }
-            $this->customCache->writeCustomCache($storeId, $transport, $this->customHelperFactory);
         }
     }
+
+    /**
+     * @param $storeId
+     */
+    private function writeAttributeCache($storeId)
+    {
+        $attributes = $this->attributeRepository->findFilterableInSearchAttributes($storeId);
+        $this->cache->save(new FilterableAttributesCacheItem($storeId, $attributes));
+
+        $searchableAttributes = $this->attributeRepository->findSearchableAttributes($storeId);
+        $this->cache->save(new SearchableAttributesCacheItem($storeId, $searchableAttributes));
+    }
+
+    /**
+     * @param $storeId
+     */
+    private function writeCategoryCache($storeId)
+    {
+        $categories = $this->categoryRepository->findActiveCategories($storeId);
+        $this->cache->save(new ActiveCategoriesCacheItem($storeId, $categories));
+    }
+
+    /**
+     * @param int                $storeId       The store id
+     * @param SerializableConfig $config     The store configuration for $storeId
+     */
+    private function writeStoreConfig($storeId, SerializableConfig $config)
+    {
+        $this->cache->save(new ConfigCacheItem($storeId, $config));
+        $this->cache->save(new TemplateCacheItem($storeId, $this->templateRepository->getTemplateByStoreId($storeId)));
+    }
+    /**
+     * @param int $storeId  The store id
+     */
+    private function writeCustomCache($storeId)
+    {
+        $transport = new Transport();
+        $this->eventDispatcher->dispatch(self::EVENT_CUSTOM_CONFIG,
+            array('store_id' => $storeId, 'transport' => $transport));
+        $this->cache->save(new CustomDataCacheItem($storeId, $transport));
+        $this->cache->save(new CustomHelperCacheItem($storeId, $this->customHelperFactory));
+    }
+
 }

@@ -9,18 +9,20 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
-interface Cache
+/**
+ * Simple read/write interface for cache
+ */
+interface CacheStorage
 {
     /**
-     * @param $key
-     * @param $value
+     * @param CacheItem $item
      */
-    public function save($key, $value);
+    public function save(CacheItem $item);
 
     /**
-     * @param $key
-     * @return mixed
-     * @throw CacheItemNotFoundException
+     * @param CacheItem $item
+     * @return CacheItem
+     * @throws CacheItemNotFoundException
      */
-    public function load($key);
+    public function load(CacheItem $item);
 }

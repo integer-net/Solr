@@ -15,12 +15,11 @@ use IntegerNet\Solr\Exception;
 use IntegerNet\SolrSuggest\Block\AbstractCustomHelper;
 use IntegerNet\SolrSuggest\Block\DefaultCustomHelper;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
-use IntegerNet\SolrSuggest\Plain\Cache\CustomCache;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
 /**
  * Factory for custom helper, configured with include path and class name. Can be serialized in custom cache
  *
- * @see CustomCache
  * @package IntegerNet\SolrSuggest\Plain\Block
  */
 class CustomHelperFactory
@@ -49,14 +48,14 @@ class CustomHelperFactory
      * Instantiate custom helper with given parameters
      *
      * @param AutosuggestBlock $block
-     * @param CustomCache $customCache
+     * @param CacheReader $cacheReader
      * @return AbstractCustomHelper
      * @throws Exception
      */
-    public function getCustomHelper(AutosuggestBlock $block, CustomCache $customCache)
+    public function getCustomHelper(AutosuggestBlock $block, CacheReader $cacheReader)
     {
         if ($this->className == '') {
-            return new DefaultCustomHelper($block, $customCache);
+            return new DefaultCustomHelper($block, $cacheReader);
         }
         $fileIncluded = false;
         if (file_exists($this->pathToClassFile) || stream_resolve_include_path($this->pathToClassFile)) {
@@ -65,7 +64,7 @@ class CustomHelperFactory
         }
         if (class_exists($this->className)) {
             $class = $this->className;
-            return new $class($block, $customCache);
+            return new $class($block, $cacheReader);
         } else {
             $message = "Custom helper {$this->className} not found.";
             if ($fileIncluded) {
@@ -76,4 +75,21 @@ class CustomHelperFactory
             throw new Exception($message);
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getPathToClassFile()
+    {
+        return $this->pathToClassFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->className;
+    }
+
 }

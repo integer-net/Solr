@@ -3,120 +3,190 @@
  * integer_net Magento Module
  *
  * @category   IntegerNet
- * @package    IntegerNet_SolrSuggest
+ * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
-use IntegerNet\Solr\Config\ConfigContainer;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
 use IntegerNet\Solr\Config\Stub\GeneralConfigBuilder;
 use IntegerNet\Solr\Config\Stub\IndexingConfigBuilder;
 use IntegerNet\Solr\Config\Stub\ResultConfigBuilder;
 use IntegerNet\Solr\Config\Stub\ServerConfigBuilder;
 use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
+use IntegerNet\Solr\Config\ConfigContainer;
+use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
+use IntegerNet\SolrSuggest\Plain\Bridge\Category;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomHelperCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\FilterableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\SearchableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\TemplateCacheItem;
+
 
 class CacheWriterTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $defaultStoreId = 1;
     /**
      * @var CacheWriter
      */
-    private $cacheWriter;
+    protected $cacheWriter;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SuggestAttributeRepository
+     */
+    protected $attributeRepositoryStub;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CacheStorage
+     */
+    protected $cacheMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SuggestCategoryRepository
+     */
+    protected $categoryRepositoryStub;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TemplateRepository
+     */
+    protected $templateRepositoryStub;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CustomHelperFactory
+     */
+    protected $customHelperFactoryStub;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
      */
-    private $eventDispatcherMock;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AttributeCache
-     */
-    private $attributeCacheMock;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CategoryCache
-     */
-    private $categoryCacheMock;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigCache
-     */
-    private $configCacheMock;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CustomCache
-     */
-    private $customCacheMock;
-    /**
-     * Sets up the fixture, for example, open a network connection.
-     * This method is called before a test is executed.
-     *
-     */
+    protected $eventDispatcherMock;
+
     protected function setUp()
     {
-        $this->attributeCacheMock = $this->getMockBuilder(AttributeCache::class)->disableOriginalConstructor()->getMock();
-        $this->categoryCacheMock = $this->getMockBuilder(CategoryCache::class)->disableOriginalConstructor()->getMock();
+        $this->cacheMock = $this->getMockForAbstractClass(CacheStorage::class);
+        $this->attributeRepositoryStub = $this->getMockForAbstractClass(SuggestAttributeRepository::class);
+        $this->categoryRepositoryStub = $this->getMockForAbstractClass(SuggestCategoryRepository::class);
+        $this->templateRepositoryStub = $this->getMockForAbstractClass(TemplateRepository::class);
+        $this->customHelperFactoryStub = new CustomHelperFactory('/path/to/Custom/Helper.php', 'Custom_Helper'); // global values
         $this->eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);
-        $this->configCacheMock = $this->getMockBuilder(ConfigCache::class)->disableOriginalConstructor()->getMock();
-        $this->customCacheMock = $this->getMockBuilder(CustomCache::class)->disableOriginalConstructor()->getMock();
 
-        $this->cacheWriter = new CacheWriter(
-            self::storeConfigs(), $this->eventDispatcherMock, self::templates(), self::customHelperFactory(),
-            $this->attributeCacheMock, $this->categoryCacheMock, $this->configCacheMock, $this->customCacheMock);
+        $this->cacheWriter = new CacheWriter($this->cacheMock,
+            $this->attributeRepositoryStub,
+            $this->categoryRepositoryStub,
+            $this->customHelperFactoryStub,
+            $this->eventDispatcherMock,
+            $this->templateRepositoryStub);
     }
 
     /**
+     * @dataProvider dataStoreConfigs
+     * @param CacheWriterTestParameters[] $storeParameters
      * @test
      */
-    public function shouldWriteAllCachesForAllStores()
+    public function shouldWriteEverythingToCache(array $storeParameters)
     {
-        $storeConfigs = self::storeConfigs();
-        $templates = self::templates();
-        $transportObjects = [];
-        $this->eventDispatcherMock->expects($this->exactly(count($storeConfigs)))
-            ->method('dispatch')
-            ->with('integernet_solr_autosuggest_config', $this->callback(function ($data) use (&$transportObjects) {
-                    $this->assertArrayHasKey('transport', $data);
-                $this->assertArrayHasKey('store_id', $data);
-                $transportObjects[$data['store_id']] = $data['transport'];
-                return true;
-            }));
-        $this->attributeCacheMock->expects($this->exactly(count($storeConfigs)))
-            ->method('writeAttributeCache')
-            ->withConsecutive([1], [3]);
-        $this->categoryCacheMock->expects($this->exactly(1))
-            ->method('writeCategoryCache')
-            ->withConsecutive([1]);
-        $this->configCacheMock->expects($this->exactly(count($storeConfigs)))
-            ->method('writeStoreConfig')
-            ->withConsecutive([1, $storeConfigs[1], $templates[1]], [3, $storeConfigs[3], $templates[3]]);
-        $this->customCacheMock->expects($this->exactly(count($storeConfigs)))
-            ->method('writeCustomCache')->withConsecutive(
-                [1, $this->callback(function($data) use (&$transportObjects) {
-                    $this->assertSame($transportObjects[1], $data);
+        $inputStoreConfigs = [];
+        $expectedCacheSaveCalls = [];
+        $index = 0;
+        foreach ($storeParameters as $parameters) {
+            $storeId = $parameters->getStoreId();
+            $inputStoreConfigs[$storeId] = $parameters->getConfig();
+
+            $templateStub = $this->prepareStubsByParametersAndReturnTemplateStub($index, $parameters);
+            $transportObject =& $this->mockEventDispatcherAndReturnTransportReference(
+                $parameters->getCustomData(), $index
+            );
+
+            $expectedCacheSaveCalls = array_merge($expectedCacheSaveCalls, [
+                new ConfigCacheItem($parameters->getStoreId(), $parameters->getConfig()),
+                new TemplateCacheItem($parameters->getStoreId(), $templateStub),
+                new FilterableAttributesCacheItem($parameters->getStoreId(), $parameters->getFilterableAttributes()),
+                new SearchableAttributesCacheItem($parameters->getStoreId(), $parameters->getSearchableAttributes()),
+                $this->callback(function (CustomDataCacheItem $item) use (&$transportObject, $storeId) {
+                    $this->assertContains((string)$storeId, $item->getKey(), 'Cache key should contain store id');
+                    $data = $item->getValue();
+                    $this->assertSame($transportObject, $data);
                     return true;
-                }), self::customHelperFactory()],
-                [3, $this->callback(function($data) use (&$transportObjects) {
-                    $this->assertSame($transportObjects[3], $data);
+                }),
+                new CustomHelperCacheItem($parameters->getStoreId(), $this->customHelperFactoryStub)
+            ]);
+            $categories = $parameters->getActiveCategories();
+            if (! empty($categories)) {
+                $expectedCacheSaveCalls[] = new ActiveCategoriesCacheItem($parameters->getStoreId(), $categories);
+            }
+            ++$index;
+        }
+
+        $this->cacheMock->expects($this->exactly(count($expectedCacheSaveCalls)))->method('save');
+        foreach ($expectedCacheSaveCalls as $index => $expectedCacheSaveCall) {
+            $this->cacheMock->expects($this->at($index))
+                ->method('save')
+                ->with($this->callback(function(CacheItem $item) use ($expectedCacheSaveCall) {
+                    if ($expectedCacheSaveCall instanceof \PHPUnit_Framework_Constraint) {
+                        $expectedCacheSaveCall->evaluate($item);
+                        return true;
+                    }
+                    $this->assertEquals($expectedCacheSaveCall, $item);
                     return true;
-                })], self::customHelperFactory());
-        $this->cacheWriter->write();
+                }));
+        }
+
+        $this->cacheWriter->write($inputStoreConfigs);
     }
 
+
+
+
     /**
-     * parameter for cache writer
-     *
-     * @return ConfigContainer[]
+     * @return Transport
      */
-    private static function storeConfigs()
+    protected function &mockEventDispatcherAndReturnTransportReference(array $dataToAdd, $callIndex)
     {
-        return [
-            1 => new ConfigContainer(
+        $transportObject = null;
+        $this->eventDispatcherMock->expects($this->at($callIndex))
+            ->method('dispatch')
+        ->with('integernet_solr_autosuggest_config', $this->callback(function ($data) use (&$transportObject, $dataToAdd) {
+            $this->assertArrayHasKey('transport', $data);
+                $this->assertArrayHasKey('store_id', $data);
+                $this->assertInstanceOf(Transport::class, $data['transport']);
+                foreach ($dataToAdd as $key => $value) {
+                    $data['transport']->setData($key, $value);
+                }
+                $transportObject = $data['transport'];
+                return true;
+            }));
+        return $transportObject;
+    }
+
+
+
+    /**
+     * data provider
+     *
+     * @return CacheWriterTestParameters[][]
+     */
+    public static function dataStoreConfigs()
+    {
+        $filterableAttributes = [
+            new Attribute(['code' => 'color', 'label' => 'Color', 'options' => [90 => 'red', 91 => 'blue']]),
+            new Attribute(['code' => 'size', 'label' => 'Size', 'options' => [92 => 'S', 93 => 'M', 94 => 'L']]),
+        ];
+        $searchableAttributes = [
+            new Attribute(['code' => 'color', 'label' => 'Color', 'solr_boost' => 1.5, 'used_for_sortby' => true]),
+        ];
+        $categories = [new Category(1, 'Books', 'books.html'), new Category(2, 'DVDs', 'dvds.html')];
+
+
+        $parameters = [];
+        $parameters[] = new CacheWriterTestParameters(1,
+            new ConfigContainer(
                 StoreConfigBuilder::defaultConfig()->build(),
                 GeneralConfigBuilder::defaultConfig()->build(),
                 ServerConfigBuilder::defaultConfig()->build(),
@@ -126,7 +196,16 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 FuzzyConfigBuilder::defaultConfig()->build(),
                 ResultConfigBuilder::defaultConfig()->build()
             ),
-            3 => new ConfigContainer(
+            '/path/to/magento/var/generated/integernet_solr/template.phtml',
+            $filterableAttributes,
+            $searchableAttributes,
+            $categories,
+            ['foo' => 'bar', 'baz' => [1, 2, 3]],
+            '/path/to/Custom/Helper.php',
+            'Custom_Helper'
+        );
+        $parameters[] = new CacheWriterTestParameters(3,
+            new ConfigContainer(
                 StoreConfigBuilder::defaultConfig()->build(),
                 GeneralConfigBuilder::defaultConfig()->build(),
                 ServerConfigBuilder::defaultConfig()->build(),
@@ -135,30 +214,145 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 FuzzyConfigBuilder::inactiveConfig()->build(),
                 FuzzyConfigBuilder::defaultConfig()->build(),
                 ResultConfigBuilder::alternativeConfig()->build()
-            )
-        ];
+            ),
+            '/path/to/magento/var/generated/integernet_solr/store_3/template.phtml',
+            $filterableAttributes,
+            $searchableAttributes,
+            [], // no categories if category suggestions feature is disabled
+            ['foo' => 'bistro', 'baz' => [3, 2, 1]],
+            '/path/to/Custom/Helper.php',
+            'Custom_Helper'
+        );
+
+        return [[$parameters]];
     }
 
     /**
-     * parameter for cache writer
-     *
-     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Template[]
+     * @param $index
+     * @param $parameters
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private static function templates()
+    private function prepareStubsByParametersAndReturnTemplateStub($index, $parameters)
     {
-        return [
-            1 => new \IntegerNet\SolrSuggest\Plain\Bridge\Template('var/generated/integernet_solr/store_1/autosuggest.phtml'),
-            3 => new \IntegerNet\SolrSuggest\Plain\Bridge\Template('var/generated/integernet_solr/store_3/autosuggest.phtml'),
-        ];
+        $storeId = $parameters->getStoreId();
+        $templateStub = $this->getMockForAbstractClass(Template::class);
+        $templateStub->expects($this->any())->method('getFilename')->willReturn($parameters->getTemplateFile());
+        $this->templateRepositoryStub->expects($this->at($index))
+            ->method('getTemplateByStoreId')
+            ->with($storeId)
+            ->willReturn($templateStub);
+
+        $this->attributeRepositoryStub->expects($this->at($index * 2))
+            ->method('findFilterableInSearchAttributes')
+            ->with($storeId)
+            ->willReturn($parameters->getFilterableAttributes());
+        $this->attributeRepositoryStub->expects($this->at($index * 2 + 1))
+            ->method('findSearchableAttributes')
+            ->with($storeId)
+            ->willReturn($parameters->getSearchableAttributes());
+
+        if (count($parameters->getActiveCategories())) {
+            $this->categoryRepositoryStub->expects($this->at($index))
+                ->method('findActiveCategories')
+                ->with($storeId)
+                ->willReturn($parameters->getActiveCategories());
+            return $templateStub;
+        }
+        return $templateStub;
+    }
+}
+class CacheWriterTestParameters
+{
+    /** @var  int */
+    private $storeId;
+    /** @var  ConfigContainer */
+    private $config;
+    /** @var  string */
+    private $templateFile;
+    /** @var  Attribute[] */
+    private $filterableAttributes;
+    /** @var  Attribute[] */
+    private $searchableAttributes;
+    /** @var  Category[] */
+    private $activeCategories;
+    /** @var  mixed[] */
+    private $customData;
+
+    /**
+     * @param int $storeId
+     * @param ConfigContainer $config
+     * @param string $templateFile
+     * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $filterableAttributes
+     * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $searchableAttributes
+     * @param \IntegerNet\SolrSuggest\Plain\Bridge\Category[] $activeCategories
+     * @param array $customData
+     */
+    public function __construct($storeId, ConfigContainer $config, $templateFile, array $filterableAttributes,
+                                array $searchableAttributes, array $activeCategories, array $customData)
+    {
+        $this->storeId = $storeId;
+        $this->config = $config;
+        $this->templateFile = $templateFile;
+        $this->filterableAttributes = $filterableAttributes;
+        $this->searchableAttributes = $searchableAttributes;
+        $this->activeCategories = $activeCategories;
+        $this->customData = $customData;
     }
 
     /**
-     * parameter for cache writer
-     *
-     * @return CustomHelperFactory
+     * @return int
      */
-    private static function customHelperFactory()
+    public function getStoreId()
     {
-        return new CustomHelperFactory('path/to/Custom/Helper.php', 'Custom_Helper');
+        return $this->storeId;
     }
+
+    /**
+     * @return ConfigContainer
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateFile()
+    {
+        return $this->templateFile;
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[]
+     */
+    public function getFilterableAttributes()
+    {
+        return $this->filterableAttributes;
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[]
+     */
+    public function getSearchableAttributes()
+    {
+        return $this->searchableAttributes;
+    }
+
+    /**
+     * @return Category[]
+     */
+    public function getActiveCategories()
+    {
+        return $this->activeCategories;
+    }
+
+    /**
+     * @return \mixed[]
+     */
+    public function getCustomData()
+    {
+        return $this->customData;
+    }
+
 }

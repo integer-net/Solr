@@ -9,14 +9,13 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\SolrSuggest\Plain\Cache\CacheItem;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Adapter for PSR-6 cache backends
- *
- * @package IntegerNet\SolrSuggest\Plain\Cache
  */
-final class PsrCache implements Cache
+final class PsrCache implements CacheStorage
 {
     /**
      * @var CacheItemPoolInterface
@@ -33,26 +32,27 @@ final class PsrCache implements Cache
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param CacheItem $item
      */
-    public function save($key, $value)
+    public function save(CacheItem $item)
     {
-        $item = $this->cachePool->getItem($key);
-        $item->set($value);
-        $this->cachePool->saveDeferred($item);
+        $cacheItem = $this->cachePool->getItem($item->getKey());
+        $cacheItem->set($item->getValueForCache());
+        $this->cachePool->saveDeferred($cacheItem);
     }
 
     /**
-     * @param $key
-     * @return mixed
+     * @param CacheItem $item
+     * @return CacheItem
+     * @throws CacheItemNotFoundException
      */
-    public function load($key)
+    public function load(CacheItem $item)
     {
+        $key = $item->getKey();
         if (!$this->cachePool->hasItem($key)) {
             throw new CacheItemNotFoundException("Cache item {$key} not found");
         }
-        $item = $this->cachePool->getItem($key);
-        return $item->get();
+        $cacheItem = $this->cachePool->getItem($key);
+        return $item->withValueFromCache($cacheItem->get());
     }
 }

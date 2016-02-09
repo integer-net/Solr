@@ -11,7 +11,7 @@ namespace IntegerNet\SolrSuggest\Plain\Block;
 
 use IntegerNet\SolrSuggest\Block\DefaultCustomHelper;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
-use IntegerNet\SolrSuggest\Plain\Cache\CustomCache;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use org\bovigo\vfs\vfsStream;
 
@@ -54,7 +54,7 @@ PHP;
     {
         $this->resultStub = $this->getMockBuilder(AutosuggestResult::class)->disableOriginalConstructor()->getMock();
         $this->blockMock = $this->getMockForAbstractClass(AutosuggestBlock::class);
-        $this->cacheMock = $this->getMockBuilder(CustomCache::class)->disableOriginalConstructor()->getMock();
+        $this->cacheMock = $this->getMockBuilder(CacheReader::class)->disableOriginalConstructor()->getMock();
     }
 
 
@@ -68,7 +68,7 @@ PHP;
         $cacheDataPath = 'foo/bar';
         $cacheData = 'The foo is bar';
         $this->blockMock->expects($this->once())->method('getResult')->willReturn($this->resultStub);
-        $this->cacheMock->expects($this->once())->method('getData')->with($cacheDataPath)->willReturn($cacheData);
+        $this->cacheMock->expects($this->once())->method('getCustomData')->with($cacheDataPath)->willReturn($cacheData);
 
         $customHelperFactory = new CustomHelperFactory(vfsStream::url('var/helper.php'), $className);
         $customHelper = $customHelperFactory->getCustomHelper($this->blockMock, $this->cacheMock);
@@ -87,7 +87,7 @@ PHP;
         $cacheDataPath = 'foo/bar';
         $cacheData = 'The foo is bar';
         $this->blockMock->expects($this->once())->method('getResult')->willReturn($this->resultStub);
-        $this->cacheMock->expects($this->once())->method('getData')->with($cacheDataPath)->willReturn($cacheData);
+        $this->cacheMock->expects($this->once())->method('getCustomData')->with($cacheDataPath)->willReturn($cacheData);
 
         $customHelperFactory = new CustomHelperFactory(vfsStream::url('var/helper.php'), '');
         $customHelper = $customHelperFactory->getCustomHelper($this->blockMock, $this->cacheMock);

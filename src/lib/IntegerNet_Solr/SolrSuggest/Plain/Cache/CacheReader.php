@@ -9,39 +9,151 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomHelperCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\FilterableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\SearchableAttributesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\TemplateCacheItem;
+
 class CacheReader
 {
+    private $loadedSearchableAttributes;
+    private $loadedActiveCategories;
+    private $loadedTemplate;
+    private $loadedCustomHelperFactory;
     /**
-     * @var AttributeCache
+     * @var CacheStorage
      */
-    private $attributeCache;
-    /**
-     * @var CategoryCache
-     */
-    private $categoryCache;
-    /**
-     * @var ConfigCache
-     */
-    private $configCache;
-    /**
-     * @var CustomCache
-     */
-    private $customCache;
+    private $cache;
+
+    private $loadedConfig = array();
+    private $loadedFilterableAttributes = array();
+    private $loadedCustomData = array();
 
     /**
-     * CacheReader constructor.
-     * @param AttributeCache $attributeCache
-     * @param CategoryCache $categoryCache
-     * @param ConfigCache $configCache
-     * @param CustomCache $customCache
+     * @param CacheStorage $cache
      */
-    public function __construct(AttributeCache $attributeCache, CategoryCache $categoryCache, ConfigCache $configCache, CustomCache $customCache)
+    public function __construct(CacheStorage $cache)
     {
-        $this->attributeCache = $attributeCache;
-        $this->categoryCache = $categoryCache;
-        $this->configCache = $configCache;
-        $this->customCache = $customCache;
+        $this->cache = $cache;
     }
 
+    /**
+     * Load all required items for given store from cache
+     *
+     * @throws CacheItemNotFoundException if any cache item is not found
+     */
+    public function load($storeId)
+    {
+        $this->getConfig($storeId);
+        $this->getTemplate($storeId);
+        $this->getFilterableAttributes($storeId);
+        $this->getSearchableAttributes($storeId);
+        $this->getActiveCategories($storeId);
+        $this->getCustomData($storeId);
+        $this->getCustomHelperFactory($storeId);
+    }
 
+    /**
+     * @param $storeId
+     * @return Attribute[]
+     * @throws CacheItemNotFoundException
+     */
+    public function getFilterableAttributes($storeId)
+    {
+        if (! isset($this->loadedFilterableAttributes[$storeId])) {
+            $this->loadedFilterableAttributes[$storeId] = $this->cache->load(FilterableAttributesCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedFilterableAttributes[$storeId];
+    }
+
+    /**
+     * @param $storeId
+     * @return Attribute[]
+     * @throws CacheItemNotFoundException
+     */
+    public function getSearchableAttributes($storeId)
+    {
+        if (! isset($this->loadedSearchableAttributes[$storeId])) {
+            $this->loadedSearchableAttributes[$storeId] = $this->cache->load(SearchableAttributesCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedSearchableAttributes[$storeId];
+    }
+    /**
+     * @param $storeId
+     * @return Category[]
+     * @throws CacheItemNotFoundException
+     */
+    public function getActiveCategories($storeId)
+    {
+        if (! isset($this->loadedActiveCategories[$storeId])) {
+            $this->loadedActiveCategories[$storeId] = $this->cache->load(ActiveCategoriesCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedActiveCategories[$storeId];
+    }
+
+    /**
+     * @param $storeId
+     * @return Config
+     * @throws CacheItemNotFoundException
+     */
+    public function getConfig($storeId)
+    {
+        if (! isset($this->loadedConfig[$storeId])) {
+            $this->loadedConfig[$storeId] = $this->cache->load(ConfigCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedConfig[$storeId];
+    }
+
+    /**
+     * @param $storeId
+     * @return Template
+     * @throws CacheItemNotFoundException
+     */
+    public function getTemplate($storeId)
+    {
+        if (! isset($this->loadedTemplate[$storeId])) {
+            $this->loadedTemplate[$storeId] = $this->cache->load(TemplateCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedTemplate[$storeId];
+    }
+
+    /**
+     * @param string $path
+     * @return mixed
+     * @throws CacheItemNotFoundException
+     */
+    public function getCustomData($storeId, $path = null)
+    {
+        if (! isset($this->loadedCustomData[$storeId])) {
+            $this->loadedCustomData[$storeId] = $this->cache->load(CustomDataCacheItem::createEmpty($storeId));
+        }
+        $result = $this->loadedCustomData[$storeId];
+        foreach (array_filter(explode('/', $path)) as $pathElement) {
+            if ((is_array($result) || $result instanceof \ArrayAccess) && isset ($result[$pathElement])) {
+                $result = $result[$pathElement];
+            } else {
+                throw new CacheItemNotFoundException("Custom data {$path} not found in cache");
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $storeId
+     * @return CustomHelperFactory
+     * @throws CacheItemNotFoundException
+     */
+    public function getCustomHelperFactory($storeId)
+    {
+        if (! isset($this->loadedCustomHelperFactory[$storeId])) {
+            $this->loadedCustomHelperFactory[$storeId] = $this->cache->load(CustomHelperCacheItem::createEmpty($storeId));
+        }
+        return $this->loadedCustomHelperFactory[$storeId];
+    }
 }

@@ -13,7 +13,7 @@ namespace IntegerNet\SolrSuggest\Block;
 
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 use IntegerNet\SolrSuggest\Implementor\CustomHelper;
-use IntegerNet\SolrSuggest\Plain\Cache\CustomCache;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 
 abstract class AbstractCustomHelper implements CustomHelper
@@ -24,19 +24,19 @@ abstract class AbstractCustomHelper implements CustomHelper
     private $block;
 
     /**
-     * @var CustomCache
+     * @var CacheReader
      */
-    private $customCache;
+    private $cacheReader;
 
     /**
      * AbstractCustomHelper constructor.
      * @param AutosuggestBlock $block
-     * @param CustomCache $customCache
+     * @param CacheReader $cacheReader
      */
-    public function __construct(AutosuggestBlock $block, CustomCache $customCache)
+    public function __construct(AutosuggestBlock $block, CacheReader $cacheReader)
     {
         $this->block = $block;
-        $this->customCache = $customCache;
+        $this->cacheReader = $cacheReader;
     }
 
 
@@ -61,7 +61,7 @@ abstract class AbstractCustomHelper implements CustomHelper
      */
     public function getCacheData($path)
     {
-        return $this->customCache->getData($path);
+        return $this->cacheReader->getCustomData($path);
     }
 
 }

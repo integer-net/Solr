@@ -36,6 +36,19 @@ class PsrCacheTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $key
+     * @param $value
+     * @return \PHPUnit_Framework_MockObject_MockObject|CacheItem
+     */
+    private function getItemStub($key, $value = null)
+    {
+        $stub = $this->getMockForAbstractClass(CacheItem::class);
+        $stub->expects($this->any())->method('getKey')->willReturn($key);
+        $stub->expects($this->any())->method('getValueForCache')->willReturn($value);
+        return $stub;
+    }
+
+    /**
      * @test
      */
     public function shouldSaveValueToCache()
@@ -54,7 +67,7 @@ class PsrCacheTest extends \PHPUnit_Framework_TestCase
             ->with($cacheItemMock)
             ->willReturn(true);
 
-        $this->cache->save(self::A_KEY, self::A_VALUE);
+        $this->cache->save($this->getItemStub(self::A_KEY, self::A_VALUE));
     }
 
     /**
@@ -69,7 +82,7 @@ class PsrCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->mockRead(self::A_KEY, true, $cacheItemMock);
 
-        $this->cache->load(self::A_KEY);
+        $this->cache->load($this->getItemStub(self::A_KEY));
     }
 
     /**
@@ -80,7 +93,7 @@ class PsrCacheTest extends \PHPUnit_Framework_TestCase
         $this->mockRead(self::A_KEY, false);
 
         $this->setExpectedException(CacheItemNotFoundException::class, "Cache item " . self::A_KEY . " not found");
-        $this->cache->load(self::A_KEY);
+        $this->cache->load($this->getItemStub(self::A_KEY));
 
     }
     /**

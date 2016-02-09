@@ -13,11 +13,16 @@ namespace IntegerNet\SolrSuggest\Plain\Block;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
 use IntegerNet\SolrSuggest\Implementor\Factory;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
 class Autosuggest implements AutosuggestBlock
 {
+    /**
+     * @var int
+     */
+    private $storeId;
     /**
      * @var Factory
      */
@@ -27,9 +32,9 @@ class Autosuggest implements AutosuggestBlock
      */
     private $result;
     /**
-     * @var Template
+     * @var TemplateRepository
      */
-    private $template;
+    private $templateRepository;
     /**
      * @var StringHighlighter
      */
@@ -37,13 +42,14 @@ class Autosuggest implements AutosuggestBlock
 
     /**
      * @param Factory $resultFactory
-     * @param Template $template
+     * @param TemplateRepository $templateRepository
      * @param StringHighlighter $highlighter
      */
-    public function __construct(Factory $resultFactory, Template $template, StringHighlighter $highlighter)
+    public function __construct($storeId, Factory $resultFactory, TemplateRepository $templateRepository, StringHighlighter $highlighter)
     {
+        $this->storeId = $storeId;
         $this->resultFactory = $resultFactory;
-        $this->template = $template;
+        $this->templateRepository = $templateRepository;
         $this->highlighter = $highlighter;
     }
 
@@ -96,7 +102,7 @@ class Autosuggest implements AutosuggestBlock
      */
     public function toHtml()
     {
-        include($this->template->getFilename());
+        include $this->templateRepository->getTemplateByStoreId($this->storeId)->getFilename();
     }
 
     public function getCustomHelper()

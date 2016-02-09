@@ -8,10 +8,25 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
+use IntegerNet\Solr\Config\StoreConfig;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl as SearchUrlInterface;
 
 class SearchUrl implements SearchUrlInterface
 {
+    /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+
+    /**
+     * SearchUrl constructor.
+     * @param StoreConfig $storeConfig
+     */
+    public function __construct(StoreConfig $storeConfig)
+    {
+        $this->storeConfig = $storeConfig;
+    }
+
     /**
      * Returns search URL for given user query text
      *
@@ -24,7 +39,7 @@ class SearchUrl implements SearchUrlInterface
         $route = 'catalogsearch/result';
         $params = array_merge(array('q' => $queryText), $additionalParameters);
 
-        $url = \IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('base_url');
+        $url = $this->storeConfig->getBaseUrl();
         $url = str_replace('autosuggest.php', 'index.php', $url);
         $url .= $route;
         $isFirstParam = true;

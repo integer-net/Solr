@@ -34,10 +34,10 @@ class IntegerNet_Solr_Autosuggest
         $factory = new Factory($request, new \IntegerNet\SolrSuggest\Plain\Cache\PsrCache(
             new \IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool('var/cache/integernet_solr')));
 
+        //TODO extract everything below into factory & controller
+
         $config = new IntegerNet_Solr_Model_Config_Store(null);
-        $template = new IntegerNet_Solr_Autosuggest_Template();
-        $highlighter = new \IntegerNet\SolrSuggest\Util\HtmlStringHighlighter();
-        $block = new IntegerNet\SolrSuggest\Plain\Block\Autosuggest($factory, $template, $highlighter);
+        $block = $factory->getAutosuggestBlock();
 
         $controller = new \IntegerNet\SolrSuggest\Plain\AutosuggestController(
             $config->getGeneralConfig(), $block

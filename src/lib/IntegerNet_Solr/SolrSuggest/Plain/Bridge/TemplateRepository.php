@@ -9,30 +9,33 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\Solr\Exception;
 use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
-/**
- * @todo remove if not used
- */
 class TemplateRepository implements \IntegerNet\SolrSuggest\Implementor\TemplateRepository
 {
     /**
-     * @var Template[]
+     * @var CacheReader
      */
-    private $templates;
+    private $cacheReader;
+
+    /**
+     * @param CacheReader $cacheReader
+     */
+    public function __construct(CacheReader $cacheReader)
+    {
+        $this->cacheReader = $cacheReader;
+    }
 
     /**
      * @param int $storeId
      * @return Template
-     * @throws Exception
+     * @throws CacheItemNotFoundException
      */
     public function getTemplateByStoreId($storeId)
     {
-        if (! array_key_exists($storeId, $this->templates)) {
-            throw new Exception('No template registered for store id ' . $storeId);
-        }
-        return $this->templates[$storeId];
+        return $this->cacheReader->getTemplate($storeId);
     }
 
 

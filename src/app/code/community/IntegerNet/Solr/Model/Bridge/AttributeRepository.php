@@ -9,9 +9,9 @@
  */
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
-use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
 
-class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository, SuggestAttributeRepository
+class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
 {
     /**
      * Holds attribute instances with their Magento attributes as attached data
@@ -247,40 +247,5 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $collection->getItems()
         );
     }
-
-    /*
-     * SuggestAttributeRepository implementation
-     * =========================================
-     */
-
-    protected $_attributeConfig = array();
-    /**
-     * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
-     */
-    public function findFilterableInSearchAttributes($storeId)
-    {
-        if (! isset($this->_attributeConfig[$storeId])) {
-            Mage::helper('integernet_solr/autosuggest')->_addAttributeData($this->_attributeConfig, $storeId);
-        }
-        return array_map(function(array $attributeConfig) {
-            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
-        }, $this->_attributeConfig[$storeId]['attribute']);
-    }
-
-    /**
-     * @param $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
-     */
-    public function findSearchableAttributes($storeId)
-    {
-        if (! isset($this->_attributeConfig[$storeId])) {
-            Mage::helper('integernet_solr/autosuggest')->_addAttributeData($this->_attributeConfig, $storeId);
-        }
-        return array_map(function(array $attributeConfig) {
-            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
-        }, $this->_attributeConfig[$storeId]['searchable_attribute']);
-    }
-
 
 }

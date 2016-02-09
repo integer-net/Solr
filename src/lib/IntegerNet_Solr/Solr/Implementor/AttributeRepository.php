@@ -9,9 +9,7 @@
  */
 namespace IntegerNet\Solr\Implementor;
 
-use IntegerNet\Solr\Implementor\Attribute;
-use Mage_Catalog_Model_Entity_Attribute;
-use Mage_Catalog_Model_Resource_Product_Attribute_Collection;
+use IntegerNet\Solr\Exception;
 
 /**
  * integer_net Magento Module
@@ -57,4 +55,10 @@ interface AttributeRepository
      */
     public function getAttributeCodesToIndex();
 
+    /**
+     * @param string $attributeCode
+     * @return Attribute
+     * @throws Exception
+     */
+    public function getAttributeByCode($attributeCode);
 }

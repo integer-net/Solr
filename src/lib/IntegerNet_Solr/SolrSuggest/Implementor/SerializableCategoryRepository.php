@@ -9,14 +9,14 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
-use IntegerNet\Solr\Implementor\Category;
-
-interface SuggestCategoryRepository
+/**
+ * Retrieves serielizable categories for cache
+ */
+interface SerializableCategoryRepository
 {
     /**
      * @param int $storeId
-     * @param int[] $categoryIds
-     * @return Category[]
+     * @return SerializableCategory[]
      */
-    public function findActiveCategoriesByIds($storeId, $categoryIds);
+    public function findActiveCategories($storeId);
 }

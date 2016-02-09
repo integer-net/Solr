@@ -10,7 +10,9 @@ use IntegerNet\Solr\Config\AutosuggestConfig;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
-    implements \IntegerNet\SolrSuggest\Implementor\TemplateRepository
+    implements \IntegerNet\SolrSuggest\Implementor\TemplateRepository,
+    \IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository,
+    \IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository
 {
     protected $_modelIdentifiers = array(
         'integernet_solr/suggestion_collection',
@@ -92,7 +94,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      * @param array $config
      * @param $storeId
      */
-    public function _addAttributeData(&$config, $storeId)
+    protected function _addAttributeData(&$config, $storeId)
     {
         $autosuggestAttributeConfig = unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
         $allowedAttributeCodes = array();
@@ -127,9 +129,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param array $config
-     * @param Mage_Core_Model_Store $store
+     * @param $storeId
      */
-    protected function _addCategoriesData(&$config, $store)
+    public function _addCategoriesData(&$config, $storeId)
     {
         $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
         if (!$maxNumberCategories) {
@@ -142,7 +144,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             ->addAttributeToFilter('include_in_menu', 1);
 
         foreach($categories as $category) {
-            $config[$store->getId()]['categories'][$category->getId()] = array(
+            $config[$storeId]['categories'][$category->getId()] = array(
                 'id' => $category->getId(),
                 'title' => $this->_getCategoryTitle($category),
                 'url' => $category->getUrl(),
@@ -288,4 +290,50 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         $this->_emulateStore($initialStoreId);
         $this->_stopStoreEmulation();
     }
+
+
+    protected $_configForCache = array();
+    /**
+     * @param int $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
+     */
+    public function findFilterableInSearchAttributes($storeId)
+    {
+        if (! isset($this->_configForCache[$storeId]['attribute'])) {
+            $this->_addAttributeData($this->_configForCache, $storeId);
+        }
+        return array_map(function(array $attributeConfig) {
+            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+        }, $this->_configForCache[$storeId]['attribute']);
+    }
+
+    /**
+     * @param $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
+     */
+    public function findSearchableAttributes($storeId)
+    {
+        if (! isset($this->_configForCache[$storeId]['searchable_attribute'])) {
+            $this->_addAttributeData($this->_configForCache, $storeId);
+        }
+        return array_map(function(array $attributeConfig) {
+            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+        }, $this->_configForCache[$storeId]['searchable_attribute']);
+    }
+
+
+    /**
+     * @param int $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
+     */
+    public function findActiveCategories($storeId)
+    {
+        if (! isset($this->_configForCache[$storeId]['categories'])) {
+            $this->_addCategoriesData($this->_configForCache, $storeId);
+        }
+        return array_map(function(array $categoryConfig) {
+            return new \IntegerNet\SolrSuggest\Plain\Bridge\Category($categoryConfig['id'], $categoryConfig['title'], $categoryConfig['url']);
+        }, $this->_configForCache[$storeId]['categories']);
+    }
+
 }

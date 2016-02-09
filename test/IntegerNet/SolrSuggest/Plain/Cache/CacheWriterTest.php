@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\Solr\Config\ConfigContainer;
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
 use IntegerNet\Solr\Config\Stub\GeneralConfigBuilder;
@@ -16,22 +17,21 @@ use IntegerNet\Solr\Config\Stub\IndexingConfigBuilder;
 use IntegerNet\Solr\Config\Stub\ResultConfigBuilder;
 use IntegerNet\Solr\Config\Stub\ServerConfigBuilder;
 use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
-use IntegerNet\Solr\Config\ConfigContainer;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
-use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\Template;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomHelperCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\FilterableAttributesCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\SearchableAttributesCacheItem;
-use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
-use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\TemplateCacheItem;
 
 
@@ -43,7 +43,7 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
      */
     protected $cacheWriter;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SuggestAttributeRepository
+     * @var \PHPUnit_Framework_MockObject_MockObject|SerializableAttributeRepository
      */
     protected $attributeRepositoryStub;
     /**
@@ -51,7 +51,7 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
      */
     protected $cacheMock;
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SuggestCategoryRepository
+     * @var \PHPUnit_Framework_MockObject_MockObject|SerializableCategoryRepository
      */
     protected $categoryRepositoryStub;
     /**
@@ -71,8 +71,8 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->cacheMock = $this->getMockForAbstractClass(CacheStorage::class);
-        $this->attributeRepositoryStub = $this->getMockForAbstractClass(SuggestAttributeRepository::class);
-        $this->categoryRepositoryStub = $this->getMockForAbstractClass(SuggestCategoryRepository::class);
+        $this->attributeRepositoryStub = $this->getMockForAbstractClass(SerializableAttributeRepository::class);
+        $this->categoryRepositoryStub = $this->getMockForAbstractClass(SerializableCategoryRepository::class);
         $this->templateRepositoryStub = $this->getMockForAbstractClass(TemplateRepository::class);
         $this->customHelperFactoryStub = new CustomHelperFactory('/path/to/Custom/Helper.php', 'Custom_Helper'); // global values
         $this->eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);

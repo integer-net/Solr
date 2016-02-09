@@ -12,7 +12,9 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
-use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
@@ -35,11 +37,11 @@ class CacheWriter
      */
     protected $cache;
     /**
-     * @var SuggestAttributeRepository
+     * @var SerializableAttributeRepository
      */
     private $attributeRepository;
     /**
-     * @var SuggestCategoryRepository
+     * @var SerializableCategoryRepository
      */
     private $categoryRepository;
     /**
@@ -57,14 +59,14 @@ class CacheWriter
 
     /**
      * @param CacheStorage $cache
-     * @param SuggestAttributeRepository $attributeRepository
-     * @param SuggestCategoryRepository $categoryRepository
+     * @param SerializableAttributeRepository $attributeRepository
+     * @param SerializableCategoryRepository $categoryRepository
      * @param CustomHelperFactory $customHelperFactory
      * @param EventDispatcher $eventDispatcher
      * @param TemplateRepository $templates
      */
-    public function __construct(CacheStorage $cache, SuggestAttributeRepository $attributeRepository,
-                                SuggestCategoryRepository $categoryRepository, CustomHelperFactory $customHelperFactory,
+    public function __construct(CacheStorage $cache, SerializableAttributeRepository $attributeRepository,
+                                SerializableCategoryRepository $categoryRepository, CustomHelperFactory $customHelperFactory,
                                 EventDispatcher $eventDispatcher, TemplateRepository $templates)
     {
         $this->cache = $cache;

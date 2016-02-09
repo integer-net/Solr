@@ -11,44 +11,57 @@ namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
 use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
 class CategoryRepository implements SuggestCategoryRepository
 {
     /**
-     * @param int [] $categoryIds
-     * @param int $storeId
-     * @return array
+     * @var CacheReader
      */
-    public function getCategoryNames($categoryIds, $storeId)
-    {
-        // not used
-        return array();
-    }
+    private $cacheReader;
+    /**
+     * @var SerializableCategory[][]
+     */
+    private $activeCategories = array();
 
     /**
-     * @param int[] $categoryIds
-     * @return Category[]
+     * @param CacheReader $cacheReader
      */
-    public function findActiveCategoriesByIds($categoryIds)
+    public function __construct(CacheReader $cacheReader)
     {
-        $categories = array();
-        foreach ($categoryIds as $categoryId) {
-            if ($categoryData = \IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('categories/' . $categoryId)) {
-                $categories[$categoryData['id']] = new Category(
-                    $categoryData['id'], $categoryData['title'], $categoryData['url']);
-            }
-        }
-        return $categories;
+        $this->cacheReader = $cacheReader;
     }
 
     /**
      * @param int $storeId
      * @return SerializableCategory[]
      */
-    public function findActiveCategories($storeId)
+    private function findActiveCategories($storeId)
     {
-        // not used
-        return array();
+        if (! isset($this->activeCategories[$storeId])) {
+            $this->activeCategories[$storeId] = array();
+            foreach ($this->cacheReader->getActiveCategories($storeId) as $category) {
+                $this->activeCategories[$storeId][$category->getId()] = $category;
+            }
+        }
+        return $this->activeCategories[$storeId];
+    }
+
+    /**
+     * @paream int $storeId
+     * @param int[] $categoryIds
+     * @return Category[]
+     */
+    public function findActiveCategoriesByIds($storeId, $categoryIds)
+    {
+        $result = array();
+        $allActiveCategories = $this->findActiveCategories($storeId);
+        foreach ($categoryIds as $categoryId) {
+            if (isset($allActiveCategories[$categoryId])) {
+                $result[$categoryId] = $allActiveCategories[$categoryId];
+            }
+        }
+        return $result;
     }
 
 }

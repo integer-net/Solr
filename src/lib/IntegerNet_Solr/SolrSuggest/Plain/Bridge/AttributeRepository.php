@@ -12,10 +12,9 @@ use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
-use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
-class AttributeRepository implements SuggestAttributeRepository, AttributeRepositoryInterface
+class AttributeRepository implements AttributeRepositoryInterface
 {
     const DEFAULT_STORE_ID = 0;
     /**
@@ -39,7 +38,7 @@ class AttributeRepository implements SuggestAttributeRepository, AttributeReposi
      * @param int $storeId
      * @return SerializableAttribute[]
      */
-    public function findFilterableInSearchAttributes($storeId)
+    private function findFilterableInSearchAttributes($storeId)
     {
         if (! isset($this->filterableAttributes[$storeId])) {
             $this->filterableAttributes[$storeId] = array();
@@ -54,7 +53,7 @@ class AttributeRepository implements SuggestAttributeRepository, AttributeReposi
      * @param $storeId
      * @return SerializableAttribute[]
      */
-    public function findSearchableAttributes($storeId)
+    private function findSearchableAttributes($storeId)
     {
         return $this->cacheReader->getSearchableAttributes($storeId);
     }

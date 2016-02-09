@@ -190,8 +190,8 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
         $customHelperClass = new ReflectionClass($customHelper);
         return new CacheWriter(
             $this->_getCacheStorage(),
-            $this->_getAttributeRepository(),
-            $this->_getSuggestCategoryRepository(),
+            Mage::helper('integernet_solr/autosuggest'),
+            Mage::helper('integernet_solr/autosuggest'),
             new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
             Mage::helper('integernet_solr'),
             Mage::helper('integernet_solr/autosuggest')

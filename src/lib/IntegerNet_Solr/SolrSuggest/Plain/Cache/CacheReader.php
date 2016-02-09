@@ -11,6 +11,7 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
 use IntegerNet\SolrSuggest\Implementor\Template;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
@@ -87,7 +88,7 @@ class CacheReader
     }
     /**
      * @param $storeId
-     * @return Category[]
+     * @return SerializableCategory[]
      * @throws CacheItemNotFoundException
      */
     public function getActiveCategories($storeId)

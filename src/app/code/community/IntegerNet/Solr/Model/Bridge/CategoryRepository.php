@@ -169,14 +169,16 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
     }
 
     /**
+     * @prarm int $storeId
      * @param int[] $categoryIds
      * @return \IntegerNet\Solr\Implementor\Category[]
      */
-    public function findActiveCategoriesByIds($categoryIds)
+    public function findActiveCategoriesByIds($storeId, $categoryIds)
     {
         /** @var Mage_Catalog_Model_Resource_Category_Collection $categoryCollection */
         $categoryCollection = Mage::getResourceModel('catalog/category_collection');
         $categoryCollection
+            ->setStoreId($storeId)
             ->addAttributeToSelect(array('name', 'url_key'))
             ->addAttributeToFilter('is_active', 1)
             ->addAttributeToFilter('include_in_menu', 1)
@@ -195,15 +197,6 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
             },
             $categoryCollection->getItems()
         );
-    }
-
-    /**
-     * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
-     */
-    public function findActiveCategories($storeId)
-    {
-        // TODO: Implement findActiveCategories() method.
     }
 
 

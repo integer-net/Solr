@@ -9,14 +9,11 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
-interface SuggestAttributeRepository
+/**
+ * Retrieves serialized attributes for cache
+ */
+interface SerializableAttributeRepository
 {
-    /**
-     * @param string $attributeCode
-     * @return SerializableAttribute
-     */
-    public function getAttributeByCode($attributeCode);
-
     /**
      * @param int $storeId
      * @return SerializableAttribute[]

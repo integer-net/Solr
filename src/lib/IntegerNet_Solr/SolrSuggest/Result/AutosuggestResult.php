@@ -189,7 +189,7 @@ class AutosuggestResult
         $counter = 0;
 
         $categoryIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->category;
-        $categories = $this->categoryRepository->findActiveCategoriesByIds($categoryIds);
+        $categories = $this->categoryRepository->findActiveCategoriesByIds($this->storeId, $categoryIds);
 
         foreach ($categoryIds as $categoryId => $numResults) {
             if (isset($categories[$categoryId])) {

@@ -14,18 +14,26 @@ class IntegerNet_Solr_Autosuggest
 {
     public function __construct()
     {
-        // AutosuggestRequest not instantiated yet, needs autoloader
-        $storeId = intval($_GET['store_id']);
-        $config = $this->_getConfig($storeId);
+        // Varien_Autoload only as long as Logger uses Zend_Log
+        set_include_path(get_include_path() . PATH_SEPARATOR . realpath('lib'));
+        require_once 'lib/Varien/Autoload.php';
+        Varien_Autoload::register();
 
-        if (!class_exists('Mage')) {
-            // still needed for: IntegerNet_Solr_Model_Config_Store (getStoreConfig(), getStoreConfigFlag())
-            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Mage.php');
-            class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
-        }
-        IntegerNet_Solr_Autosuggest_Mage::setConfig($config);
-        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+        require_once 'app/code/community/IntegerNet/Solr/Helper/Autoloader.php';
+        IntegerNet_Solr_Helper_Autoloader::createAndRegisterWithBaseDir($this->getLibBaseDir());
+    }
 
+    /**
+     * Default lib base dir. Adjust it here if this is different, the Magento configuration cannot be
+     * loaded without initialized autoloader.
+     *
+     * @todo documentation: customize autosuggest.php
+     * @todo maybe add autosuggest.config.php[.dist] for base dir and cache
+     * @return string
+     */
+    protected function getLibBaseDir()
+    {
+        return __DIR__ . '/lib/IntegerNet_Solr';
     }
     
     public function printHtml()
@@ -36,7 +44,7 @@ class IntegerNet_Solr_Autosuggest
 
         //TODO extract everything below into factory & controller
 
-        $config = new IntegerNet_Solr_Model_Config_Store(null);
+        $config = $factory->getLoadedCacheReader($request->getStoreId())->getConfig($request->getStoreId());
         $block = $factory->getAutosuggestBlock();
 
         $controller = new \IntegerNet\SolrSuggest\Plain\AutosuggestController(
@@ -50,14 +58,6 @@ class IntegerNet_Solr_Autosuggest
         echo $response->getBody();
     }
 
-    /**
-     * @return IntegerNet_Solr_Autosuggest_Config
-     */
-    protected function _getConfig($storeId)
-    {
-        require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Config.php');
-        return new IntegerNet_Solr_Autosuggest_Config($storeId);
-    }
 }
 
 $autosuggest = new IntegerNet_Solr_Autosuggest();

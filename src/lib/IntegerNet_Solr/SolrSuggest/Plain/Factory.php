@@ -10,10 +10,11 @@
 namespace IntegerNet\SolrSuggest\Plain;
 
 use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
-use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Autosuggest as AutosuggestBlock;
 use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
+use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\Logger;
 use IntegerNet\SolrSuggest\Plain\Bridge\NullEventDispatcher;
 use IntegerNet\SolrSuggest\Plain\Bridge\SearchUrl;
@@ -22,12 +23,10 @@ use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
-use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
-use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
-use IntegerNet_Solr_Model_Config_Store;
 
 final class Factory implements FactoryInterface, SuggestFactoryInterface
 {
@@ -62,8 +61,9 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
      */
     public function getSolrResource()
     {
+        $storeId = $this->request->getStoreId();
         $storeConfig = array(
-            $this->request->getStoreId() => new IntegerNet_Solr_Model_Config_Store($this->request->getStoreId())
+            $storeId => $this->getLoadedCacheReader($storeId)->getConfig($storeId)
         );
 
         return new ResourceFacade($storeConfig);

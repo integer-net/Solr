@@ -66,6 +66,36 @@ class IntegerNet_Solr_Helper_Autoloader
         return $this;
     }
 
+    public static function createAndRegister()
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
+            $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
+            if ($libBaseDir[0] !== '/') {
+                $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
+            }
+            self::createAndRegisterWithBaseDir($libBaseDir);
+        }
+    }
+    /**
+     * @param $libBaseDir
+     */
+    public static function createAndRegisterWithBaseDir($libBaseDir)
+    {
+        static $registered = false;
+        if (!$registered) {
+            $autoloader = new self;
+            $autoloader
+                ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
+                ->addNamespace('IntegerNet\SolrCategories', $libBaseDir . '/SolrCategories')
+                ->addNamespace('IntegerNet\SolrSuggest', $libBaseDir . '/SolrSuggest')
+                ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
+                ->addNamespace('Psr\Cache', $libBaseDir . '/Psr_Cache')
+                ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')
+                ->register();
+            $registered = true;
+        }
+    }
+
     /**
      * Loads the class file for a given class name.
      *
@@ -157,26 +187,4 @@ class IntegerNet_Solr_Helper_Autoloader
         return false;
     }
 
-
-    public static function createAndRegister()
-    {
-        //TODO depend on GeneralConfig and take libBaseDir as constructor argument
-        static $registered = false;
-        if (!$registered && Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
-            $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
-            if ($libBaseDir[0] !== '/') {
-                $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
-            }
-            $autoloader = new self;
-            $autoloader
-                ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
-                ->addNamespace('IntegerNet\SolrCategories', $libBaseDir . '/SolrCategories')
-                ->addNamespace('IntegerNet\SolrSuggest', $libBaseDir . '/SolrSuggest')
-                ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
-                ->addNamespace('Psr\Cache', $libBaseDir . '/Psr_Cache')
-                ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')
-                ->register();
-            $registered = true;
-        }
-    }
 }

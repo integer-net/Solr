@@ -85,9 +85,8 @@ class CacheWriter
             $this->writeStoreConfig($storeId, $config);
             $this->writeAttributeCache($storeId);
             $this->writeCustomCache($storeId);
-            if ($config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() > 0) {
-                $this->writeCategoryCache($storeId);
-            }
+            $doNotCacheCategories = $config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() == 0;
+            $this->writeCategoryCache($storeId, $doNotCacheCategories);
         }
     }
 
@@ -106,9 +105,12 @@ class CacheWriter
     /**
      * @param $storeId
      */
-    private function writeCategoryCache($storeId)
+    private function writeCategoryCache($storeId, $empty)
     {
-        $categories = $this->categoryRepository->findActiveCategories($storeId);
+        $categories = array();
+        if (! $empty) {
+            $categories = $this->categoryRepository->findActiveCategories($storeId);
+        }
         $this->cache->save(new ActiveCategoriesCacheItem($storeId, $categories));
     }
 

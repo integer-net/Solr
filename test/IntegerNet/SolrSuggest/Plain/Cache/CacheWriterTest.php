@@ -115,12 +115,9 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                     $this->assertSame($transportObject, $data);
                     return true;
                 }),
-                new CustomHelperCacheItem($parameters->getStoreId(), $this->customHelperFactoryStub)
+                new CustomHelperCacheItem($parameters->getStoreId(), $this->customHelperFactoryStub),
+                new ActiveCategoriesCacheItem($parameters->getStoreId(), $parameters->getActiveCategories())
             ]);
-            $categories = $parameters->getActiveCategories();
-            if (! empty($categories)) {
-                $expectedCacheSaveCalls[] = new ActiveCategoriesCacheItem($parameters->getStoreId(), $categories);
-            }
             ++$index;
         }
 

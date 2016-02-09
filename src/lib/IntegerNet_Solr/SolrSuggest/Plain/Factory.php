@@ -18,6 +18,7 @@ use IntegerNet\SolrSuggest\Plain\Bridge\NullEventDispatcher;
 use IntegerNet\SolrSuggest\Plain\Bridge\SearchUrl;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
@@ -79,7 +80,7 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
             $logger = new \Psr\Log\NullLogger();
         }
         $applicationContext = new \IntegerNet\Solr\Request\ApplicationContext(
-            new AttributeRepository(), $storeConfig->getResultsConfig(), $storeConfig->getAutosuggestConfig(), new NullEventDispatcher(), $logger
+            new AttributeRepository($this->getCacheReader()), $storeConfig->getResultsConfig(), $storeConfig->getAutosuggestConfig(), new NullEventDispatcher(), $logger
         );
         switch ($requestMode) {
             case self::REQUEST_MODE_SEARCHTERM_SUGGEST:
@@ -109,7 +110,7 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
             $this->request,
             new SearchUrl(),
             new CategoryRepository(),
-            new AttributeRepository(),
+            new AttributeRepository($this->getCacheReader()),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
             $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
         );
@@ -125,6 +126,15 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
         $storeConfig = $this->getCacheReader()->getConfig($storeId);
         return $storeConfig;
     }
+
+    /**
+     * @return CacheWriter
+     */
+    public function getCacheWriter()
+    {
+        //TODO instantiate Magento to write cache on the fly
+    }
+
 
     public function getCacheReader()
     {

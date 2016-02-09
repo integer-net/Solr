@@ -31,7 +31,8 @@ class IntegerNet_Solr_Autosuggest
     public function printHtml()
     {
         $request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
-        $factory = new Factory($request);
+        $factory = new Factory($request, new \IntegerNet\SolrSuggest\Plain\Cache\PsrCache(
+            new \IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool('var/cache/integernet_solr')));
 
         $config = new IntegerNet_Solr_Model_Config_Store(null);
         $template = new IntegerNet_Solr_Autosuggest_Template();

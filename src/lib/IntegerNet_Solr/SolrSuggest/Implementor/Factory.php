@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 
 interface Factory
@@ -22,4 +23,9 @@ interface Factory
      * @return CacheWriter
      */
     public function getCacheWriter();
+
+    /**
+     * @return CacheReader
+     */
+    public function getCacheReader();
 }

@@ -253,13 +253,19 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      * =========================================
      */
 
+    protected $_attributeConfig = array();
     /**
      * @param int $storeId
      * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
      */
     public function findFilterableInSearchAttributes($storeId)
     {
-        return $this->getFilterableInSearchAttributes();
+        if (! isset($this->_attributeConfig[$storeId])) {
+            Mage::helper('integernet_solr/autosuggest')->_addAttributeData($this->_attributeConfig, $storeId);
+        }
+        return array_map(function(array $attributeConfig) {
+            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+        }, $this->_attributeConfig[$storeId]['attribute']);
     }
 
     /**
@@ -268,7 +274,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function findSearchableAttributes($storeId)
     {
-        return $this->getSearchableAttributes();
+        if (! isset($this->_attributeConfig[$storeId])) {
+            Mage::helper('integernet_solr/autosuggest')->_addAttributeData($this->_attributeConfig, $storeId);
+        }
+        return array_map(function(array $attributeConfig) {
+            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+        }, $this->_attributeConfig[$storeId]['searchable_attribute']);
     }
 
 

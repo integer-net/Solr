@@ -10,6 +10,7 @@
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
 use IntegerNet\SolrSuggest\Implementor\Template;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
@@ -61,7 +62,7 @@ class CacheReader
 
     /**
      * @param $storeId
-     * @return Attribute[]
+     * @return SerializableAttribute[]
      * @throws CacheItemNotFoundException
      */
     public function getFilterableAttributes($storeId)
@@ -74,7 +75,7 @@ class CacheReader
 
     /**
      * @param $storeId
-     * @return Attribute[]
+     * @return SerializableAttribute[]
      * @throws CacheItemNotFoundException
      */
     public function getSearchableAttributes($storeId)

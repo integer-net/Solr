@@ -19,6 +19,7 @@ use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
@@ -171,10 +172,20 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
     }
 
     /**
+     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheReader
+     */
+    public function getCacheReader()
+    {
+        return new CacheReader($this->_getCacheStorage());
+    }
+
+    /**
      * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheWriter
      */
     public function getCacheWriter()
     {
+        //TODO need to extend AbstractCustomHelper and use cache reader
+        // ( see IntegerNet_Solr_Helper_Custom::getCacheData() )
         $customHelper = Mage::helper('integernet_solr/custom');
         $customHelperClass = new ReflectionClass($customHelper);
         return new CacheWriter(
@@ -188,6 +199,9 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
     }
 
     /**
+     * Override this if you want to use a different cache backend. It is important to use the same
+     * cache backend in the autosuggest.php bootstrap file
+     *
      * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheStorage
      */
     protected function _getCacheStorage()

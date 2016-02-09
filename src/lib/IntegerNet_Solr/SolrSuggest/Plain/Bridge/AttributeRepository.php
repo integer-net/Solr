@@ -8,22 +8,63 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
+use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\SolrSuggest\Implementor\SuggestAttributeRepository;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
-class AttributeRepository implements AttributeRepositoryInterface
+class AttributeRepository implements SuggestAttributeRepository, AttributeRepositoryInterface
 {
+    const DEFAULT_STORE_ID = 0;
+    /**
+     * @var CacheReader
+     */
+    private $cacheReader;
+    /**
+     * @var SerializableAttribute[][]
+     */
+    private $filterableAttributes = array();
+
+    /**
+     * @param CacheReader $cacheReader
+     */
+    public function __construct(CacheReader $cacheReader)
+    {
+        $this->cacheReader = $cacheReader;
+    }
+
+    /**
+     * @param int $storeId
+     * @return SerializableAttribute[]
+     */
+    public function findFilterableInSearchAttributes($storeId)
+    {
+        if (! isset($this->filterableAttributes[$storeId])) {
+            $this->filterableAttributes[$storeId] = array();
+            foreach ($this->cacheReader->getFilterableAttributes($storeId) as $attribute) {
+                $this->filterableAttributes[$storeId][$attribute->getAttributeCode()] = $attribute;
+            }
+        }
+        return $this->filterableAttributes[$storeId];
+    }
+
+    /**
+     * @param $storeId
+     * @return SerializableAttribute[]
+     */
+    public function findSearchableAttributes($storeId)
+    {
+        return $this->cacheReader->getSearchableAttributes($storeId);
+    }
+
     /**
      * @return AttributeInterface[]
      */
     public function getSearchableAttributes()
     {
-        $attributes = array();
-        foreach((array)\IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('searchable_attribute') as $attributeCode => $attributeConfig) {
-            $attributes[$attributeCode] = new Attribute($attributeConfig);
-        }
-
-        return $attributes;
+        return $this->findSearchableAttributes(self::DEFAULT_STORE_ID);
     }
 
     /**
@@ -39,12 +80,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
-        $attributes = array();
-        foreach((array)\IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('attribute') as $attributeCode => $attributeConfig) {
-            $attributes[$attributeCode] = new Attribute($attributeConfig);
-        }
-
-        return $attributes;
+        return $this->findFilterableInSearchAttributes(self::DEFAULT_STORE_ID);
     }
 
     /**
@@ -75,13 +111,19 @@ class AttributeRepository implements AttributeRepositoryInterface
         // not used in autosuggest
         return array();
     }
+
     /**
      * @param string $attributeCode
      * @return AttributeInterface
+     * @throws Exception
      */
     public function getAttributeByCode($attributeCode)
     {
-        return new Attribute(\IntegerNet_Solr_Autosuggest_Mage::getStoreConfig('attribute/' . $attributeCode));;
+        $attributes = $this->findFilterableInSearchAttributes(self::DEFAULT_STORE_ID);
+        if (! isset($attributes[$attributeCode])) {
+            throw new Exception('Attribute not found: ' . $attributeCode);
+        }
+        return $attributes[$attributeCode];
     }
 
 }

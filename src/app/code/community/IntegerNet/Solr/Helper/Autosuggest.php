@@ -90,9 +90,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param array $config
-     * @param Mage_Core_Model_Store $store
+     * @param $storeId
      */
-    protected function _addAttributeData(&$config, $store)
+    public function _addAttributeData(&$config, $storeId)
     {
         $autosuggestAttributeConfig = unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
         $allowedAttributeCodes = array();
@@ -108,7 +108,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             foreach ($attribute->getSource()->getAllOptions(false) as $option) {
                 $options[$option['value']] = $option['label'];
             }
-            $config[$store->getId()]['attribute'][$attribute->getAttributeCode()] = array(
+            $config[$storeId]['attribute'][$attribute->getAttributeCode()] = array(
                 'attribute_code' => $attribute->getAttributeCode(),
                 'label' => $attribute->getStoreLabel(),
                 'options' => $options,
@@ -116,7 +116,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         }
 
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
-            $config[$store->getId()]['searchable_attribute'][$attribute->getAttributeCode()] = array(
+            $config[$storeId]['searchable_attribute'][$attribute->getAttributeCode()] = array(
                 'attribute_code' => $attribute->getAttributeCode(),
                 'label' => $attribute->getStoreLabel(),
                 'solr_boost' => $attribute->getSolrBoost(),
@@ -263,7 +263,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $store->setConfig('template_filename', $templateFile);
             $config[$store->getId()]['base_url'] = Mage::getUrl();
 
-            $this->_addAttributeData($config, $store);
+            $this->_addAttributeData($config, $store->getId());
 
             $this->_addCategoriesData($config, $store);
 

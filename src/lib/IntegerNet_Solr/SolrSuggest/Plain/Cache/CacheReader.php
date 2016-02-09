@@ -67,7 +67,7 @@ class CacheReader
     public function getFilterableAttributes($storeId)
     {
         if (! isset($this->loadedFilterableAttributes[$storeId])) {
-            $this->loadedFilterableAttributes[$storeId] = $this->cache->load(FilterableAttributesCacheItem::createEmpty($storeId));
+            $this->loadedFilterableAttributes[$storeId] = $this->cache->load(FilterableAttributesCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedFilterableAttributes[$storeId];
     }
@@ -80,7 +80,7 @@ class CacheReader
     public function getSearchableAttributes($storeId)
     {
         if (! isset($this->loadedSearchableAttributes[$storeId])) {
-            $this->loadedSearchableAttributes[$storeId] = $this->cache->load(SearchableAttributesCacheItem::createEmpty($storeId));
+            $this->loadedSearchableAttributes[$storeId] = $this->cache->load(SearchableAttributesCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedSearchableAttributes[$storeId];
     }
@@ -92,7 +92,7 @@ class CacheReader
     public function getActiveCategories($storeId)
     {
         if (! isset($this->loadedActiveCategories[$storeId])) {
-            $this->loadedActiveCategories[$storeId] = $this->cache->load(ActiveCategoriesCacheItem::createEmpty($storeId));
+            $this->loadedActiveCategories[$storeId] = $this->cache->load(ActiveCategoriesCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedActiveCategories[$storeId];
     }
@@ -105,7 +105,7 @@ class CacheReader
     public function getConfig($storeId)
     {
         if (! isset($this->loadedConfig[$storeId])) {
-            $this->loadedConfig[$storeId] = $this->cache->load(ConfigCacheItem::createEmpty($storeId));
+            $this->loadedConfig[$storeId] = $this->cache->load(ConfigCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedConfig[$storeId];
     }
@@ -118,7 +118,7 @@ class CacheReader
     public function getTemplate($storeId)
     {
         if (! isset($this->loadedTemplate[$storeId])) {
-            $this->loadedTemplate[$storeId] = $this->cache->load(TemplateCacheItem::createEmpty($storeId));
+            $this->loadedTemplate[$storeId] = $this->cache->load(TemplateCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedTemplate[$storeId];
     }
@@ -131,7 +131,7 @@ class CacheReader
     public function getCustomData($storeId, $path = null)
     {
         if (! isset($this->loadedCustomData[$storeId])) {
-            $this->loadedCustomData[$storeId] = $this->cache->load(CustomDataCacheItem::createEmpty($storeId));
+            $this->loadedCustomData[$storeId] = $this->cache->load(CustomDataCacheItem::createEmpty($storeId))->getValue();
         }
         $result = $this->loadedCustomData[$storeId];
         foreach (array_filter(explode('/', $path)) as $pathElement) {
@@ -152,7 +152,7 @@ class CacheReader
     public function getCustomHelperFactory($storeId)
     {
         if (! isset($this->loadedCustomHelperFactory[$storeId])) {
-            $this->loadedCustomHelperFactory[$storeId] = $this->cache->load(CustomHelperCacheItem::createEmpty($storeId));
+            $this->loadedCustomHelperFactory[$storeId] = $this->cache->load(CustomHelperCacheItem::createEmpty($storeId))->getValue();
         }
         return $this->loadedCustomHelperFactory[$storeId];
     }

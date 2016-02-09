@@ -174,7 +174,11 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
                 // after loading: load configuration from other store
                 [new ConfigCacheItem($otherStoreId)]
             )
-            ->willReturnArgument(0);
+            ->willReturnCallback(function(CacheItem $item) {
+                $itemStub = $this->getMockForAbstractClass(CacheItem::class);
+                $itemStub->expects($this->any())->method('getValue')->willReturn('dummy');
+                return $itemStub;
+            });
         $this->cacheReader->getFilterableAttributes($storeId);
         $this->cacheReader->load($storeId);
         $this->cacheReader->getConfig($otherStoreId);
@@ -197,7 +201,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new ConfigCacheItem($storeId))
-            ->willReturn($config);
+            ->willReturn(new ConfigCacheItem($storeId, $config));
 
         $actualConfig = $this->cacheReader->getConfig($storeId);
         $this->assertInstanceOf(ConfigContainer::class, $actualConfig);
@@ -214,7 +218,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new TemplateCacheItem($storeId))
-            ->willReturn(new PlainTemplate($templateFile));
+            ->willReturn(new TemplateCacheItem($storeId, new PlainTemplate($templateFile)));
 
         $actualTemplate = $this->cacheReader->getTemplate($storeId);
         $this->assertInstanceOf(Template::class, $actualTemplate);
@@ -230,7 +234,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new FilterableAttributesCacheItem($storeId))
-            ->willReturn($attributes);
+            ->willReturn(new FilterableAttributesCacheItem($storeId, $attributes));
 
         $actualAttributes = $this->cacheReader->getFilterableAttributes($storeId);
         $this->assertEquals($attributes, $actualAttributes);
@@ -244,7 +248,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new SearchableAttributesCacheItem($storeId))
-            ->willReturn($attributes);
+            ->willReturn(new SearchableAttributesCacheItem($storeId, $attributes));
 
         $actualAttributes = $this->cacheReader->getSearchableAttributes($storeId);
         $this->assertEquals($attributes, $actualAttributes);
@@ -261,7 +265,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new ActiveCategoriesCacheItem($storeId))
-            ->willReturn($categories);
+            ->willReturn(new ActiveCategoriesCacheItem($storeId, $categories));
 
         $actualCategories = $this->cacheReader->getActiveCategories($storeId);
         $this->assertEquals($categories, $actualCategories);
@@ -281,7 +285,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new CustomDataCacheItem($storeId))
-            ->willReturn($customData);
+            ->willReturn(new CustomDataCacheItem($storeId, $customData));
 
         $actualCustomData = $this->cacheReader->getCustomData($storeId);
         foreach ($expectedValues as $inputPath => $expectedValue) {
@@ -309,7 +313,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new CustomHelperCacheItem($storeId))
-            ->willReturn($customHelperFactory);
+            ->willReturn(new CustomHelperCacheItem($storeId, $customHelperFactory));
 
         $actualCustomHelperFactory = $this->cacheReader->getCustomHelperFactory($storeId);
         $this->assertSame($customHelperFactory, $actualCustomHelperFactory);

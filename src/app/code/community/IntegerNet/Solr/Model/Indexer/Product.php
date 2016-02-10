@@ -59,6 +59,11 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
                 continue;
             }
 
+            $unsecureBaseConfig = Mage::getStoreConfig('web/unsecure', $storeId);
+            $store->setConfig('web/unsecure/base_skin_url', Mage::getStoreConfig('web/secure/base_skin_url', $storeId));
+            $store->setConfig('web/unsecure/base_media_url', Mage::getStoreConfig('web/secure/base_media_url', $storeId));
+            $store->setConfig('web/unsecure/base_js_url', Mage::getStoreConfig('web/secure/base_js_url', $storeId));
+
             if (is_null($productIds) && Mage::getStoreConfigFlag('integernet_solr/indexing/swap_cores', $storeId)) {
                 $this->getResource()->setUseSwapIndex();
             }
@@ -79,6 +84,10 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
             } while ($pageNumber <= $productCollection->getLastPageNumber());
 
             $this->getResource()->setUseSwapIndex(false);
+
+            $store->setConfig('web/unsecure/base_skin_url', $unsecureBaseConfig['base_skin_url']);
+            $store->setConfig('web/unsecure/base_media_url', $unsecureBaseConfig['base_media_url']);
+            $store->setConfig('web/unsecure/base_js_url', $unsecureBaseConfig['base_js_url']);
         }
 
         $this->_stopStoreEmulation();

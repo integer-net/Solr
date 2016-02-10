@@ -137,3 +137,4 @@
 "Path to IntegerNet_Solr library. Absolute path or relative to Magento base dir.","Pfad zur IntegerNet_Solr Bibliothek. Absoluter Pfad oder relativ zum Magento Basisverzeichnis."
 "Remove Filters","Filter entfernen"
 "Hold the CTRL key to select multiple filters","STRG-Taste gedrückt halten für mehrere Filter"
+"The module Aoe_LayoutConditions is not installed. Please get it from <a href=""%s"" target=""_blank"">%s</a>.","Das Modul Aoe_LayoutConditions ist nicht installiert. Bitte installieren Sie es von <a href=""%s"" target=""_blank"">%s</a>."

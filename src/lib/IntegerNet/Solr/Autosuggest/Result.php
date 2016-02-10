@@ -215,10 +215,11 @@ class IntegerNet_Solr_Autosuggest_Result
      */
     public function highlight($resultText, $query)
     {
+        $quotedQuery = preg_quote(trim($query), '/');
         if (strpos($resultText, '<') === false) {
-            return preg_replace('/(' . trim($query) . ')/i', '<span class="highlight">$1</span>', $resultText);
+            return preg_replace('/(' . $quotedQuery . ')/i', '<span class="highlight">$1</span>', $resultText);
         }
-        return preg_replace_callback('/(' . trim($query) . ')(.*?>)/i',
+        return preg_replace_callback('/(' . $quotedQuery . ')(.*?>)/i',
             array($this, '_checkOpenTag'),
             $resultText);
     }

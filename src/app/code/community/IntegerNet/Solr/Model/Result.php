@@ -64,8 +64,14 @@ class IntegerNet_Solr_Model_Result
             }
 
             $pageSize = $this->_getPageSize();
-            $firstItemNumber = $this->_getCurrentPage() * $pageSize;
-            $lastItemNumber = $firstItemNumber + $pageSize;
+
+            if (is_null($pageSize)) {
+                $firstItemNumber = 0;
+                $lastItemNumber = 1000;
+            } else {
+                $firstItemNumber = $this->_getCurrentPage() * $pageSize;
+                $lastItemNumber = $firstItemNumber + $pageSize;
+            }
 
             if (Mage::helper('integernet_solr')->isCategoryPage()) {
                 $result = $this->_getCategoryResultFromRequest($storeId, $lastItemNumber);
@@ -198,7 +204,11 @@ class IntegerNet_Solr_Model_Result
         if (!$this->_getToolbarBlock()) {
             return intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'));
         }
-        return $this->_getToolbarBlock()->getLimit();
+        $limit = $this->_getToolbarBlock()->getLimit();
+        if ($limit == 'all') {
+            return null;
+        }
+        return intval($limit);
     }
 
     /**

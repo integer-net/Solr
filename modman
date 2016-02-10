@@ -18,4 +18,5 @@ src/skin/frontend/default/modern/integernet/*                       skin/fronten
 src/skin/frontend/rwd/default/integernet/*                          skin/frontend/rwd/default/integernet/
 src/skin/adminhtml/default/default/integernet/*                     skin/adminhtml/default/default/integernet/
 src/autosuggest.php                                                 autosuggest.php
+src/autosuggest.config.php.dist                                     autosuggest.config.php.dist
 src/autosuggest-mage.php                                            autosuggest-mage.php

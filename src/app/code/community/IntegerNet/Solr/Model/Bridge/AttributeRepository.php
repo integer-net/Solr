@@ -33,7 +33,10 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     protected $_filterableInCatalogAttributes = null;
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
-    protected $_varcharAttributes = null;
+    protected $_varcharProductAttributes = null;
+
+    /** @var Mage_Eav_Model_Entity_Attribute[] */
+    protected $_varcharCategoryAttributes = null;
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
@@ -169,10 +172,10 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getVarcharProductAttributes($useAlphabeticalSearch = true)
     {
-        if (is_null($this->_varcharAttributes)) {
+        if (is_null($this->_varcharProductAttributes)) {
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_varcharAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_varcharProductAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addFieldToFilter('backend_type', array('in' => array('static', 'varchar')))
                 ->addFieldToFilter('frontend_input', 'text')
                 ->addFieldToFilter('attribute_code', array('nin' => array(
@@ -189,15 +192,15 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             ;
 
             if ($useAlphabeticalSearch) {
-                $this->_varcharAttributes
+                $this->_varcharProductAttributes
                     ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             } else {
-                $this->_varcharAttributes
+                $this->_varcharProductAttributes
                     ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             }
         }
 
-        return $this->_getAttributeArrayFromCollection($this->_varcharAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_varcharProductAttributes);
     }
 
     /**
@@ -277,7 +280,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')));
         }
     }
-    protected function _getAttributeArrayFromCollection(Mage_Catalog_Model_Resource_Product_Attribute_Collection $collection)
+    protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection)
     {
         $self = $this;
         return array_map(

@@ -4,15 +4,12 @@
  *
  * @category   IntegerNet
  * @package    IntegerNet_Solr
- * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
+ * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 
-class IntegerNet_Solr_Model_Source_VarcharAttribute
+class IntegerNet_Solr_Model_Source_VarcharProductAttribute
 {
-    const SEARCH_OPERATOR_AND = 'AND';
-    const SEARCH_OPERATOR_OR = 'OR';
-
     /**
      * Options getter
      *

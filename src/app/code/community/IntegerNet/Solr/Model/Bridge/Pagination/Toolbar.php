@@ -30,7 +30,11 @@ class IntegerNet_Solr_Model_Bridge_Pagination_Toolbar implements Pagination
      */
     public function getPageSize()
     {
-        return $this->_toolbarBlock->getLimit();
+        $limit = $this->_toolbarBlock->getLimit();
+        if ($limit == 'all') {
+            return 10000;
+        }
+        return $limit;
     }
 
     /**

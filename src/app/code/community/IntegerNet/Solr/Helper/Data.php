@@ -120,6 +120,15 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
+    public function isSearchPage()
+    {
+        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
+            && Mage::app()->getRequest()->getControllerName() == 'result';
+    }
+
+    /**
+     * @return bool
+     */
     public function isCategoryPage()
     {
         return Mage::app()->getRequest()->getModuleName() == 'catalog'

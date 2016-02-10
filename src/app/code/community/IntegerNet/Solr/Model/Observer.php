@@ -40,6 +40,7 @@ class IntegerNet_Solr_Model_Observer
     {
         $block = $observer->getBlock();
 
+        // Add "Solr Priority" column to attribute grid
         if ($block instanceof Mage_Adminhtml_Block_Catalog_Product_Attribute_Grid) {
 
             $block->addColumnAfter('solr_boost', array(
@@ -48,6 +49,10 @@ class IntegerNet_Solr_Model_Observer
                 'index' => 'solr_boost',
                 'type' => 'number',
             ), 'is_comparable');
+        }
+
+        if ($block instanceof Mage_Page_Block_Html_Head) {
+            $this->_adjustRobots($block);
         }
     }
 
@@ -282,5 +287,44 @@ class IntegerNet_Solr_Model_Observer
         }
 
         return false;
+    }
+
+    /**
+     * Set Robots to NOINDEX,NOFOLLOW depending on config
+     *
+     * @param Mage_Page_Block_Html_Head $block
+     */
+    protected function _adjustRobots($block)
+    {
+        /** @var $helper IntegerNet_Solr_Helper_Data */
+        $helper = Mage::helper('integernet_solr');
+        if (!$helper->isActive()) {
+            return;
+        }
+        $stateBlock = null;
+        $robotOptions = explode(',', Mage::getStoreConfig('integernet_solr/seo/hide_from_robots'));
+        if ($helper->isSearchPage()) {
+            if (in_array('search_results_all', $robotOptions)) {
+                $block->setData('robots', 'NOINDEX,NOFOLLOW');
+                return;
+            }
+            if (!in_array('search_results_filtered', $robotOptions)) {
+                return;
+            }
+            /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
+            $stateBlock = $block->getLayout()->getBlock('catalogsearch.layer.state');
+        } elseif ($helper->isCategoryPage() && $helper->isCategoryDisplayActive()) {
+            if (!in_array('categories_filtered', $robotOptions)) {
+                return;
+            }
+            /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
+            $stateBlock = $block->getLayout()->getBlock('catalog.layer.state');
+        }
+        if ($stateBlock instanceof IntegerNet_Solr_Block_Result_Layer_State) {
+            $activeFilters = $stateBlock->getActiveFilters();
+            if (is_array($activeFilters) && sizeof($activeFilters)) {
+                $block->setData('robots', 'NOINDEX,NOFOLLOW');
+            }
+        }
     }
 }

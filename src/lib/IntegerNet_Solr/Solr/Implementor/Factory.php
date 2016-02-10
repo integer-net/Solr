@@ -23,6 +23,7 @@ interface Factory
     const REQUEST_MODE_AUTOSUGGEST = 3;
     const REQUEST_MODE_CATEGORY = 4;
 
+
     /**
      * Returns new configured Solr recource
      *

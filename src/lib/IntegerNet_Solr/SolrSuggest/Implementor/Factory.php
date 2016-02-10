@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
+use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 
@@ -29,4 +30,9 @@ interface Factory
      * @return CacheReader
      */
     public function getCacheReader();
+
+    /**
+     * @return Config[]
+     */
+    public function getStoreConfig();
 }

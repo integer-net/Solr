@@ -14,6 +14,8 @@
 
 /**
  * Class IntegerNet_Solr_Autosuggest_Config used for customization in autosuggest.config.php
+ *
+ * @todo make this file independent of Magento too
  */
 class IntegerNet_Solr_Autosuggest_Config
 {
@@ -21,24 +23,29 @@ class IntegerNet_Solr_Autosuggest_Config
     private $cacheBaseDir;
     /** @var  string */
     private $libBaseDir;
+    /** @var \Closure */
+    private $loadApplicationCallback;
 
     /**
      * @param string $libBaseDir
      * @param string $cacheBaseDir
+     * @param $loadApplicationCallback
      */
-    private function __construct($libBaseDir, $cacheBaseDir)
+    private function __construct($libBaseDir, $cacheBaseDir, $loadApplicationCallback)
     {
         $this->libBaseDir = $libBaseDir;
         $this->cacheBaseDir = $cacheBaseDir;
+        $this->loadApplicationCallback = $loadApplicationCallback;
     }
 
     public static function defaultConfig()
     {
-        // use real directory of current file in case of symlinks
         $libBaseDir = __DIR__ . '/lib/IntegerNet_Solr';
-        // use directory relative to cwd (Magento root)
-        $cacheBaseDir = 'var/cache/integernet_solr';
-        return new self($libBaseDir, $cacheBaseDir);
+        $cacheBaseDir = '/tmp/integernet_solr';
+        $loadApplicationCallback = function () {
+            throw new BadMethodCallException('Application cannot be instantiated');
+        };
+        return new self($libBaseDir, $cacheBaseDir, $loadApplicationCallback);
     }
 
     /**
@@ -62,6 +69,16 @@ class IntegerNet_Solr_Autosuggest_Config
         $config->cacheBaseDir = $cacheBaseDir;
         return $config;
     }
+    /**
+     * @param Closure $callback
+     * @return IntegerNet_Solr_Autosuggest_Config
+     */
+    public function withLoadApplicationCallback(Closure $callback)
+    {
+        $config = clone $this;
+        $config->loadApplicationCallback = $callback;
+        return $config;
+    }
 
     /**
      * @return string
@@ -82,6 +99,14 @@ class IntegerNet_Solr_Autosuggest_Config
         );
     }
 
+    /**
+     * @return Closure
+     */
+    public function getLoadApplicationCallback()
+    {
+        return $this->loadApplicationCallback;
+    }
+
 }
 class IntegerNet_Solr_Autosuggest
 {
@@ -99,6 +124,13 @@ class IntegerNet_Solr_Autosuggest
     protected function getCache()
     {
         return $this->config->getCache();
+    }
+    /**
+     * @return Closure
+     */
+    protected function getLoadApplicationCallback()
+    {
+        return $this->config->getLoadApplicationCallback();
     }
 
     public function __construct()
@@ -127,11 +159,15 @@ class IntegerNet_Solr_Autosuggest
 
     public function run()
     {
-        $request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
-        $factory = new \IntegerNet\SolrSuggest\Plain\Factory($request, $this->getCache());
-        $controller = $factory->getAutosuggestController();
+        try {
+            $request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
+            $factory = new \IntegerNet\SolrSuggest\Plain\Factory($request, $this->getCache(), $this->getLoadApplicationCallback());
+            $controller = $factory->getAutosuggestController();
 
-        $response = $controller->process($request);
+            $response = $controller->process($request);
+        } catch (\Exception $e) {
+            $response = new \IntegerNet\SolrSuggest\Plain\Http\AutosuggestResponse(500, 'Internal Server Error');
+        }
 
         if (function_exists('http_response_code')) {
             \http_response_code($response->getStatus());

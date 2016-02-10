@@ -130,7 +130,7 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
     }
 
     /**
-     * @return array
+     * @return \IntegerNet\Solr\Implementor\Config[]
      */
     public function getStoreConfig()
     {

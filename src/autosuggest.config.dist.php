@@ -2,12 +2,16 @@
 /**
  * integer_net Magento Module
  *
+ * DO NOT CHANGE THIS FILE! Copy it to autosuggest.config.php if you want to change the configuration
+ *
  * @category   IntegerNet
  * @package    IntegerNet_SolrSuggest
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-return IntegerNet_Solr_Autosuggest_Config::defaultConfig()
+use IntegerNet\SolrSuggest\Plain\AppConfig;
+
+return AppConfig::defaultConfig()
     /*
      * Callback that returns the application specific SolrSuggest Factory implementation
      *

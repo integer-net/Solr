@@ -55,14 +55,13 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
 
     /**
      * @param AutosuggestRequest $request
-     * @param CacheStorage $cacheStorage
-     * @param \Closure $loadApplicationCallback
+     * @param AppConfig $appConfig
      */
-    public function __construct(AutosuggestRequest $request, CacheStorage $cacheStorage, \Closure $loadApplicationCallback)
+    public function __construct(AutosuggestRequest $request, AppConfig $appConfig)
     {
         $this->request = $request;
-        $this->cacheStorage = $cacheStorage;
-        $this->loadApplicationCallback = $loadApplicationCallback;
+        $this->cacheStorage = $appConfig->getCache();
+        $this->loadApplicationCallback = $appConfig->getLoadApplicationCallback();
     }
 
     /**

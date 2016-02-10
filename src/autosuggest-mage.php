@@ -38,6 +38,6 @@ class IntegerNet_Solr_Autosuggest
 require_once 'app/Mage.php';
 umask(0);
 
-$autosuggest = new IntegerNet_Solr_Autosuggest();
+$autosuggest = new \IntegerNet\SolrSuggest\Plain\Bootstrap();
 
 echo $autosuggest->getHtml();

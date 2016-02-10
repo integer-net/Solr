@@ -3,21 +3,21 @@
  * integer_net Magento Module
  *
  * @category   IntegerNet
- * @package    IntegerNet_Solr
+ * @package    IntegerNet_SolrSuggest
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
+ *
  */
 
+namespace IntegerNet\SolrSuggest\Plain;
 /*
  * NO USE STATEMENTS BEFORE AUTOLOADER IS INITIALIZED!
  */
 
 /**
- * Class IntegerNet_Solr_Autosuggest_Config used for customization in autosuggest.config.php
- *
- * @todo make this file independent of Magento too
+ * Class used for customization in autosuggest.config.php
  */
-class IntegerNet_Solr_Autosuggest_Config
+class AppConfig
 {
     /** @var string */
     private $cacheBaseDir;
@@ -43,14 +43,14 @@ class IntegerNet_Solr_Autosuggest_Config
         $libBaseDir = __DIR__ . '/lib/IntegerNet_Solr';
         $cacheBaseDir = '/tmp/integernet_solr';
         $loadApplicationCallback = function () {
-            throw new BadMethodCallException('Application cannot be instantiated');
+            throw new \BadMethodCallException('Application cannot be instantiated');
         };
         return new self($libBaseDir, $cacheBaseDir, $loadApplicationCallback);
     }
 
     /**
      * @param string $libBaseDir
-     * @return IntegerNet_Solr_Autosuggest_Config
+     * @return AppConfig
      */
     public function withLibBaseDir($libBaseDir)
     {
@@ -59,9 +59,10 @@ class IntegerNet_Solr_Autosuggest_Config
         $config->libBaseDir = $libBaseDir;
         return $config;
     }
+
     /**
      * @param string $cacheBaseDir
-     * @return IntegerNet_Solr_Autosuggest_Config
+     * @return AppConfig
      */
     public function withCacheBaseDir($cacheBaseDir)
     {
@@ -69,11 +70,12 @@ class IntegerNet_Solr_Autosuggest_Config
         $config->cacheBaseDir = $cacheBaseDir;
         return $config;
     }
+
     /**
-     * @param Closure $callback
-     * @return IntegerNet_Solr_Autosuggest_Config
+     * @param \Closure $callback
+     * @return AppConfig
      */
-    public function withLoadApplicationCallback(Closure $callback)
+    public function withLoadApplicationCallback(\Closure $callback)
     {
         $config = clone $this;
         $config->loadApplicationCallback = $callback;
@@ -100,7 +102,7 @@ class IntegerNet_Solr_Autosuggest_Config
     }
 
     /**
-     * @return Closure
+     * @return \Closure
      */
     public function getLoadApplicationCallback()
     {
@@ -108,68 +110,63 @@ class IntegerNet_Solr_Autosuggest_Config
     }
 
 }
-class IntegerNet_Solr_Autosuggest
+
+class Bootstrap
 {
     /**
-     * @var IntegerNet_Solr_Autosuggest_Config
+     * @var \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest
+     */
+    private $request;
+    /**
+     * @var AppConfig
      */
     private $config;
-    protected function getLibBaseDir()
-    {
-        return $this->config->getLibBaseDir();
-    }
-    /**
-     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheStorage
-     */
-    protected function getCache()
-    {
-        return $this->config->getCache();
-    }
-    /**
-     * @return Closure
-     */
-    protected function getLoadApplicationCallback()
-    {
-        return $this->config->getLoadApplicationCallback();
-    }
 
     public function __construct()
     {
-        $this->initConfig();
-
-        // Varien_Autoload only as long as Logger uses Zend_Log
-        set_include_path(get_include_path() . PATH_SEPARATOR . realpath('lib'));
-        require_once 'lib/Varien/Autoload.php';
-        Varien_Autoload::register();
-
-        require_once 'app/code/community/IntegerNet/Solr/Helper/Autoloader.php';
-        IntegerNet_Solr_Helper_Autoloader::createAndRegisterWithBaseDir($this->getLibBaseDir());
+        $this->initAppConfig();
+        $this->initAutoload();
+        $this->initRequest();
     }
 
-    private function initConfig()
+    private function initAppConfig()
     {
-        if (file_exists(__DIR__ . '/autosuggest.config.php')) {
+        if (\file_exists(__DIR__ . '/autosuggest.config.php')) {
             $this->config = include __DIR__ . '/autosuggest.config.php';
-            if ($this->config instanceof IntegerNet_Solr_Autosuggest_Config) {
+            if ($this->config instanceof AppConfig) {
                 return;
             }
         }
         $this->config = include __DIR__ . '/autosuggest.config.dist.php';
     }
 
+    private function initAutoload()
+    {
+        // Varien_Autoload only as long as Logger uses Zend_Log
+        \set_include_path(\get_include_path() . PATH_SEPARATOR . \realpath('lib'));
+        require_once 'lib/Varien/Autoload.php';
+        \Varien_Autoload::register();
+
+        require_once 'app/code/community/IntegerNet/Solr/Helper/Autoloader.php';
+        \IntegerNet_Solr_Helper_Autoloader::createAndRegisterWithBaseDir($this->config->getLibBaseDir());
+    }
+
+    private function initRequest()
+    {
+        $this->request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
+    }
+
     public function run()
     {
         try {
-            $request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
-            $factory = new \IntegerNet\SolrSuggest\Plain\Factory($request, $this->getCache(), $this->getLoadApplicationCallback());
-            $controller = $factory->getAutosuggestController();
-
-            $response = $controller->process($request);
+            $factory = new \IntegerNet\SolrSuggest\Plain\Factory($this->request, $this->config);
+            $response = $factory->getAutosuggestController()->process($this->request);
         } catch (\Exception $e) {
+            // controller could not be initialized, need to craft own error response
             $response = new \IntegerNet\SolrSuggest\Plain\Http\AutosuggestResponse(500, 'Internal Server Error');
         }
 
-        if (function_exists('http_response_code')) {
+        if (\function_exists('http_response_code')) {
             \http_response_code($response->getStatus());
         }
         echo $response->getBody();
@@ -177,6 +174,7 @@ class IntegerNet_Solr_Autosuggest
 
 }
 
-$autosuggest = new IntegerNet_Solr_Autosuggest();
-
-$autosuggest->run();
+\call_user_func(function() {
+    $bootstrap = new Bootstrap();
+    $bootstrap->run();
+});

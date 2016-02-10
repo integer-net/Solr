@@ -12,6 +12,7 @@ namespace IntegerNet\SolrSuggest\Plain;
 use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
+use IntegerNet\SolrSuggest\Plain\AutosuggestController;
 use IntegerNet\SolrSuggest\Plain\Block\Autosuggest as AutosuggestBlock;
 use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
@@ -129,7 +130,7 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
      * @param $storeId
      * @return \IntegerNet\Solr\Implementor\Config
      */
-    public function getStoreConfig($storeId)
+    private function getStoreConfig($storeId)
     {
         $storeConfig = $this->getLoadedCacheReader($storeId)->getConfig($storeId);
         return $storeConfig;
@@ -152,8 +153,9 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
 
-    public function getLoadedCacheReader($storeId)
+    private function getLoadedCacheReader($storeId)
     {
+        //TODO in case of CacheItemNotFoundExcpetion trigger CacheWriter
         if ($this->loadedCacheReader === null) {
             $this->loadedCacheReader = $this->getCacheReader();
         }
@@ -161,11 +163,22 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
         return $this->loadedCacheReader;
     }
 
-    public function getAutosuggestBlock()
+    private function getAutosuggestBlock()
     {
         $storeId = $this->request->getStoreId();
         $highlighter = new HtmlStringHighlighter();
         $templateRepository = new TemplateRepository($this->getLoadedCacheReader($storeId));
         return new AutosuggestBlock($storeId, $this, $templateRepository, $highlighter);
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\AutosuggestController
+     */
+    public function getAutosuggestController()
+    {
+        return new AutosuggestController(
+            $this->getStoreConfig($this->request->getStoreId())->getGeneralConfig(),
+            $this->getAutosuggestBlock()
+        );
     }
 }

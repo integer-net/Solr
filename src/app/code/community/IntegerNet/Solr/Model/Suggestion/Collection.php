@@ -58,6 +58,10 @@ class IntegerNet_Solr_Model_Suggestion_Collection extends Varien_Data_Collection
             $suggestions = (array)$this->_getSolrSuggestion()->facet_counts->facet_fields->text_autocomplete;
 
             foreach ($suggestions as $suggestion => $numResults) {
+                if (!$numResults) {
+                    continue;
+                }
+
                 $this->_items[] = new Varien_Object(array(
                     'query_text' => $suggestion,
                     'num_of_results' => $numResults,

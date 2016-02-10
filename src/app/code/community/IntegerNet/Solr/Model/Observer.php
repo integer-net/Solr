@@ -89,6 +89,8 @@ class IntegerNet_Solr_Model_Observer
         }
 
         Mage::app()->getStore()->setConfig(Mage_Catalog_Model_Config::XML_PATH_LIST_DEFAULT_SORT_BY, 'position');
+
+        $this->_redirectOnQuery($action);
     }
 
     public function controllerActionPredispatchCatalogCategoryView(Varien_Event_Observer $observer)
@@ -191,5 +193,58 @@ class IntegerNet_Solr_Model_Observer
     public function checkSolrServerConnection()
     {
         Mage::getSingleton('integernet_solr/connectionCheck')->checkConnection();
+    }
+
+    /**
+     * Redirect to product page if search query matches one of the configured product attributes directly
+     *
+     * @param Mage_Core_Controller_Front_Action $action
+     */
+    protected function _redirectOnQuery($action)
+    {
+        if ($query = trim($action->getRequest()->getParam('q'))) {
+            $matchingProductAttributeCodes = explode(',', Mage::getStoreConfig('integernet_solr/results/product_attrbutes_redirect'));
+            if (!sizeof($matchingProductAttributeCodes)) {
+                return;
+            }
+            if (in_array('sku', $matchingProductAttributeCodes)) {
+                $product = Mage::getModel('catalog/product');
+                if ($productId = $product->getIdBySku($query)) {
+                    $product->load($productId);
+                    if ($product->isVisibleInSiteVisibility()) {
+                        $url = $product->getProductUrl();
+                        $action->getResponse()->setRedirect($url);
+                        $action->getResponse()->sendResponse();
+                        $action->setFlag($action->getRequest()->getActionName(), Mage_Core_Controller_Varien_Action::FLAG_NO_DISPATCH, true);
+                        return;
+                    }
+                }
+                $matchingProductAttributeCodes = array_diff($matchingProductAttributeCodes, array('sku'));
+            }
+
+            $filters = array();
+            foreach($matchingProductAttributeCodes as $attributeCode) {
+                $filters[] = array('attribute' => $attributeCode, 'eq' => $query);
+            }
+
+            /** @var Mage_Catalog_Model_Resource_Product_Collection $matchingProductCollection */
+            $matchingProductCollection = Mage::getResourceModel('catalog/product_collection');
+            $matchingProductCollection
+                ->addStoreFilter()
+                ->addAttributeToFilter($filters)
+                ->addAttributeToFilter('visibility', array('in' => Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds()))
+                ->addAttributeToSelect('url_key')
+            ;
+
+            if ($matchingProductCollection->getSize() == 1) {
+                /** @var Mage_Catalog_Model_Product $product */
+                $product = $matchingProductCollection->getFirstItem();
+                $url = $product->getProductUrl();
+                $action->getResponse()->setRedirect($url);
+                $action->getResponse()->sendResponse();
+                $action->setFlag($action->getRequest()->getActionName(), Mage_Core_Controller_Varien_Action::FLAG_NO_DISPATCH, true);
+                return;
+            }
+        }
     }
 }

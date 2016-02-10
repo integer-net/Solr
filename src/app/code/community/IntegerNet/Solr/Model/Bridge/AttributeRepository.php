@@ -33,6 +33,9 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     protected $_filterableInCatalogAttributes = null;
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
+    protected $_varcharAttributes = null;
+
+    /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_sortableAttributes = null;
 
     public function __construct()
@@ -158,6 +161,43 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
         }
 
         return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogAttributes);
+    }
+
+    /**
+     * @param bool $useAlphabeticalSearch
+     * @return Attribute[]
+     */
+    public function getVarcharProductAttributes($useAlphabeticalSearch = true)
+    {
+        if (is_null($this->_varcharAttributes)) {
+
+            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
+            $this->_varcharAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addFieldToFilter('backend_type', array('in' => array('static', 'varchar')))
+                ->addFieldToFilter('frontend_input', 'text')
+                ->addFieldToFilter('attribute_code', array('nin' => array(
+                    'url_path',
+                    'image_label',
+                    'small_image_label',
+                    'thumbnail_label',
+                    'category_ids',
+                    'required_options',
+                    'has_options',
+                    'created_at',
+                    'updated_at',
+                )))
+            ;
+
+            if ($useAlphabeticalSearch) {
+                $this->_varcharAttributes
+                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            } else {
+                $this->_varcharAttributes
+                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
+            }
+        }
+
+        return $this->_getAttributeArrayFromCollection($this->_varcharAttributes);
     }
 
     /**

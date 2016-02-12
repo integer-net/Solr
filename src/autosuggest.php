@@ -159,7 +159,11 @@ class Bootstrap
     public function run()
     {
         try {
-            $factory = new \IntegerNet\SolrSuggest\Plain\Factory($this->request, $this->config);
+            $factory = new \IntegerNet\SolrSuggest\Plain\Factory(
+                $this->request,
+                $this->config->getCache(),
+                $this->config->getLoadApplicationCallback()
+            );
             $response = $factory->getAutosuggestController()->process($this->request);
         } catch (\Exception $e) {
             // controller could not be initialized, need to craft own error response

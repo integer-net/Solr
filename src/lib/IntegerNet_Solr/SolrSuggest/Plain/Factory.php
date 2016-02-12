@@ -14,7 +14,6 @@ use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
-use IntegerNet\SolrSuggest\Plain\AutosuggestController;
 use IntegerNet\SolrSuggest\Plain\Block\Autosuggest as AutosuggestBlock;
 use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
@@ -31,8 +30,10 @@ use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
+use Psr\Log\LoggerInterface;
 
-final class Factory implements FactoryInterface, SuggestFactoryInterface
+// not final to allow partial mocking in integration test
+class Factory implements FactoryInterface, SuggestFactoryInterface
 {
     /**
      * @var AutosuggestRequest
@@ -55,13 +56,14 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
 
     /**
      * @param AutosuggestRequest $request
-     * @param AppConfig $appConfig
+     * @param CacheStorage $cacheStorage
+     * @param \Closure $loadApplicationCallback
      */
-    public function __construct(AutosuggestRequest $request, AppConfig $appConfig)
+    public function __construct(AutosuggestRequest $request, CacheStorage $cacheStorage, \Closure $loadApplicationCallback)
     {
         $this->request = $request;
-        $this->cacheStorage = $appConfig->getCache();
-        $this->loadApplicationCallback = $appConfig->getLoadApplicationCallback();
+        $this->cacheStorage = $cacheStorage;
+        $this->loadApplicationCallback = $loadApplicationCallback;
     }
 
     /**
@@ -191,15 +193,17 @@ final class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
     /**
-     * @return \IntegerNet\SolrSuggest\Plain\AutosuggestController
+     * @param LoggerInterface $customLogger
+     * @return AutosuggestController
      */
-    public function getAutosuggestController()
+    public function getAutosuggestController(LoggerInterface $customLogger = null)
     {
         $generalConfig = $this->getStoreConfigByStoreId($this->request->getStoreId())->getGeneralConfig();
+        $loggerFromConfig = $this->getLogger($generalConfig, 'solr.log');
         return new AutosuggestController(
             $generalConfig,
             $this->getAutosuggestBlock(),
-            $this->getLogger($generalConfig, 'solr.log')
+            $customLogger !== null ? $customLogger : $loggerFromConfig
         );
     }
 

@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Implementor\Template as TemplateInterface;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
@@ -30,7 +30,7 @@ class TemplateRepository implements \IntegerNet\SolrSuggest\Implementor\Template
 
     /**
      * @param int $storeId
-     * @return Template
+     * @return TemplateInterface
      * @throws CacheItemNotFoundException
      */
     public function getTemplateByStoreId($storeId)

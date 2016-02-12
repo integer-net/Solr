@@ -16,6 +16,9 @@
         <directory suffix=".php">test/IntegerNet/Solr</directory>
         <directory suffix=".php">test/IntegerNet/SolrSuggest</directory>
     </testsuite>
+    <testsuite name="integration">
+        <directory suffix=".php">test/IntegerNet/SolrSuggestIntegration</directory>
+    </testsuite>
    <filter>
        <whitelist>
            <directory suffix=".php">src/lib/IntegerNet_Solr/Solr</directory>

@@ -102,7 +102,9 @@ class Autosuggest implements AutosuggestBlock
      */
     public function toHtml()
     {
+        ob_start();
         include $this->templateRepository->getTemplateByStoreId($this->storeId)->getFilename();
+        return ob_get_clean();
     }
 
     public function getCustomHelper()

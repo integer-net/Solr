@@ -76,11 +76,14 @@ class SearchTermSuggestionCollection implements IteratorAggregate, Countable
             $suggestions = (array)$this->getResponse()->facet_counts->facet_fields->text_autocomplete;
 
             foreach ($suggestions as $suggestion => $numResults) {
+                if (! $numResults) {
+                    continue;
+                }
                 $items[] = new SearchTermSuggestion($suggestion, $numResults);
             }
 
 
-            // Spellchecker Search
+        // Spellchecker Search
         } else if (isset($this->getResponse()->spellcheck->suggestions)) {
 
             $spellchecker = (array)$this->getResponse()->spellcheck->suggestions;

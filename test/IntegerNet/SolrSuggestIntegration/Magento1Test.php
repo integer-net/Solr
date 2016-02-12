@@ -10,7 +10,6 @@
 namespace IntegerNet\SolrSuggest\Plain;
 
 use IntegerNet\Solr\Implementor\Config;
-use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
@@ -33,10 +32,15 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      * @var CacheStorage
      */
     private $cacheStorage;
+    /**
+     * @var int
+     */
+    public $counter;
 
     protected function setUp()
     {
         $this->cacheStorage = new PsrCache(new CacheItemPool($this->createVirtualCacheDir()));
+        $this->counter = 0;
     }
     /**
      * @test
@@ -70,7 +74,11 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     public static function dataSuggest()
     {
         return [
-            ['well', 1]
+            ['bath', 1],
+            ['bath', 2],
+            ['bath', 3],
+            ['Men', 1],
+            ['Blue Bracelets', 1],
         ];
     }
 
@@ -79,6 +87,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     protected function getLoadAppCallback()
     {
+        //TODO only use for mock generation, mock cache as well
         return function () {
             $root = \getenv('MAGENTO_ROOT') ?: '../../htdocs';
             require_once $root . '/app/Mage.php';
@@ -105,7 +114,11 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     private function setupMockDataGenerator($factory)
     {
         $factory->expects($this->any())->method('getSolrResource')->willReturnCallback(function () use ($factory) {
-            $resourceMock = new ResourceMockDataGenerator([1 => $factory->getCacheReader()->getConfig(1)], $this);
+            $resourceMock = new ResourceMockDataGenerator([
+                1 => $factory->getCacheReader()->getConfig(1),
+                2 => $factory->getCacheReader()->getConfig(2),
+                3 => $factory->getCacheReader()->getConfig(3),
+            ], $this);
             return $resourceMock;
         });
     }
@@ -121,11 +134,10 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
         $resourceMock->expects($this->any())
             ->method('search')
             ->willReturnCallback(function() {
-                static $i = 0;
-                $i++;
-                $expectedArgs = unserialize(file_get_contents($this->getFixtureDir() . "/args$i.txt"));
+                $this->counter++;
+                $expectedArgs = unserialize(file_get_contents($this->getFixtureDir() . "/args$this->counter.txt"));
                 $this->assertEquals($expectedArgs, func_get_args());
-                $result = unserialize(file_get_contents($this->getFixtureDir() . "/result$i.txt"));
+                $result = unserialize(file_get_contents($this->getFixtureDir() . "/result$this->counter.txt"));
                 return $result;
             });
         $factory->expects($this->any())
@@ -138,7 +150,11 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     public function getFixtureDir()
     {
-        return __DIR__ . "/fixtures";
+        $dir = __DIR__ . "/fixtures/" . preg_replace('{[^\w]}', '-', $this->getName());
+        if (! is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        return $dir;
     }
 }
 
@@ -160,11 +176,10 @@ class ResourceMockDataGenerator extends ResourceFacade
 
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
-        static $i = 0;
-        $i++;
-        file_put_contents($this->testCase->getFixtureDir() . "/args$i.txt", serialize(func_get_args()));
+        $this->testCase->counter++;
+        file_put_contents($this->testCase->getFixtureDir() . "/args{$this->testCase->counter}.txt", serialize(func_get_args()));
         $result = parent::search($storeId, $query, $offset, $limit, $params);
-        file_put_contents($this->testCase->getFixtureDir() . "/result$i.txt", serialize($result));
+        file_put_contents($this->testCase->getFixtureDir() . "/result{$this->testCase->counter}.txt", serialize($result));
         return $result;
     }
 

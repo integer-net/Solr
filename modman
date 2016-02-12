@@ -10,7 +10,6 @@ src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/d
 src/app/locale/de_DE/template/email/*                               app/locale/de_DE/template/email/
 src/app/locale/en_US/template/email/*                               app/locale/en_US/template/email/
 src/app/code/community/Apache/Solr                                  app/code/community/Apache/Solr
-src/lib/IntegerNet/Solr                                             lib/IntegerNet/Solr
 src/lib/IntegerNet_Solr                                             lib/IntegerNet_Solr
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
@@ -18,5 +17,5 @@ src/skin/frontend/default/modern/integernet/*                       skin/fronten
 src/skin/frontend/rwd/default/integernet/*                          skin/frontend/rwd/default/integernet/
 src/skin/adminhtml/default/default/integernet/*                     skin/adminhtml/default/default/integernet/
 src/autosuggest.php                                                 autosuggest.php
-src/autosuggest.config.php.dist                                     autosuggest.config.php.dist
+src/autosuggest.config.dist.php                                     autosuggest.config.dist.php
 src/autosuggest-mage.php                                            autosuggest-mage.php

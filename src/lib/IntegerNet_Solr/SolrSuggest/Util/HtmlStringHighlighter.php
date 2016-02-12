@@ -18,10 +18,11 @@ final class HtmlStringHighlighter implements StringHighlighter
      */
     public function highlight($haystack, $needle)
     {
+        $quotedNeedle = preg_quote(trim($needle), '/');
         if (strpos($haystack, '<') === false) {
-            return preg_replace('/(' . trim($needle) . ')/i', '<span class="highlight">$1</span>', $haystack);
+            return preg_replace('/(' . $quotedNeedle . ')/i', '<span class="highlight">$1</span>', $haystack);
         }
-        return preg_replace_callback('/(' . trim($needle) . ')(.*?>)/i',
+        return preg_replace_callback('/(' . $quotedNeedle . ')(.*?>)/i',
             array($this, 'checkOpenTag'),
             $haystack);
     }

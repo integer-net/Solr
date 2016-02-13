@@ -20,7 +20,6 @@ use Psr\Log\LoggerInterface;
 use \RecursiveDirectoryIterator;
 
 /**
- * @todo Find a way to replace absolute path names in cache fixture (template, custom helper)
  */
 class Magento1Test extends \PHPUnit_Framework_TestCase
 {
@@ -42,10 +41,10 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     }
     protected function tearDown()
     {
-        $this->vfsRoot = null;
         if ($this->generateMockData) {
             $this->copyFixtureToFilesystem();
         }
+        $this->vfsRoot = null;
     }
     private function copyFixtureToFilesystem()
     {
@@ -80,6 +79,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
         $query = 'something';
         $storeId = 1;
         $cacheDir = $this->createVirtualCacheDir();
+        $this->createCustomHelperInVirtualFilesystem();
         $this->assertFalse($this->vfsRoot->getChild($this->getRelativeCacheDir())->hasChildren(), 'Precondition: cache directory is empty');
         $response = $this->processAutosuggestRequest($query, $storeId, $cacheDir);
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
@@ -146,10 +146,14 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
             mkdir($solrCacheDir, 0777, true);
         }
         if ($asVirtualCopy) {
-            $this->vfsRoot = vfsStream::setup(self::VAR_ROOT);
+            if (is_null($this->vfsRoot)) {
+                $this->vfsRoot = vfsStream::setup(self::VAR_ROOT);
+            }
             $virtualCacheDir = $this->vfsRoot->url(self::VAR_ROOT) . '/cache/integernet_solr';
-            mkdir($virtualCacheDir, 0777, true);
-            vfsStream::copyFromFileSystem($solrCacheDir, $this->vfsRoot->getChild('/cache/integernet_solr'));
+            if (!is_dir($virtualCacheDir)) {
+                mkdir($virtualCacheDir, 0777, true);
+                vfsStream::copyFromFileSystem($solrCacheDir, $this->vfsRoot->getChild('/cache/integernet_solr'));
+            }
             return $virtualCacheDir;
         }
         return $solrCacheDir;
@@ -172,6 +176,17 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     private function hasVirtualCacheDir()
     {
         return $this->vfsRoot !== null;
+    }
+
+    private function createCustomHelperInVirtualFilesystem()
+    {
+        $helperFilename = vfsStream::url(self::VAR_ROOT) . '/helper.php';
+        $helperCode = <<<PHP
+<?php class IntegerNet_Solr_Helper_Custom {}
+PHP;
+        file_put_contents($helperFilename, $helperCode);;
+        include $helperFilename;
+        $this->assertTrue(class_exists('IntegerNet_Solr_Helper_Custom', false), 'Custom helper loaded from vfs');
     }
 
     /**

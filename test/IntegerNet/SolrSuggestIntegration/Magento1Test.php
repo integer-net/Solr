@@ -17,6 +17,7 @@ use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Psr\Log\LoggerInterface;
 
 class Magento1Test extends \PHPUnit_Framework_TestCase
@@ -37,23 +38,29 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     {
         $this->counter = 0;
     }
+    protected function tearDown()
+    {
+        $this->vfsRoot = null;
+    }
 
     /**
+     * Using the empty virtual cache dir, the Magento cache writer should be triggered.
+     *
+     * We don't test the exact output because it depends on the data from Magento.
+     *
+     * @see getLoadAppCallback()
      * @test
      */
     public function testWriteCacheFromMagento()
     {
-        $this->markTestSkipped();
         $query = 'something';
         $storeId = 1;
-
-        $logMock = $this->getLogMock();
-        $request = new AutosuggestRequest($query, $storeId);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Factory $factory */
-        $factory = $this->setupFactory($request);
-        $response = $factory->getAutosuggestController($logMock)->process($request);
+        $cacheDir = $this->createVirtualCacheDir();
+        $this->assertFalse($this->vfsRoot->getChild($this->getRelativeCacheDir())->hasChildren(), 'Precondition: cache directory is empty');
+        $response = $this->processAutosuggestRequest($query, $storeId, $cacheDir);
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
-
+        $this->assertContains('<ul class="searchwords">', $response->getBody(), 'Response body should contain at least search term suggestions');
+        $this->assertTrue($this->vfsRoot->getChild($this->getRelativeCacheDir())->hasChildren(), 'Postcondition: cache directory is not empty');
     }
     /**
      * @test
@@ -63,11 +70,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     public function testSuggestWithCachedConfig($query, $storeId)
     {
-        $logMock = $this->getLogMock();
-        $request = new AutosuggestRequest($query, $storeId);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Factory $factory */
-        $factory = $this->setupFactory($request);
-        $response = $factory->getAutosuggestController($logMock)->process($request);
+        $response = $this->processAutosuggestRequest($query, $storeId, $this->getFixtureCacheDir());
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
         if ($this->generateMockData) {
             file_put_contents($this->getFixtureDir() . "/out.html", $response->getBody());
@@ -93,11 +96,12 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     {
         return function () {
             $root = \getenv('MAGENTO_ROOT') ?: '../../htdocs';
-            if ($this->generateMockData) {
-                $varDir = __DIR__ . '/fixtures';
-                $this->getCacheDir();
-            } else {
+            if ($this->hasVirtualCacheDir()) {
                 $varDir = vfsStream::url(self::VAR_ROOT);
+            } else {
+                // will generate cache fixture
+                $varDir = __DIR__ . '/fixtures';
+                $this->getFixtureCacheDir();
             }
             require_once $root . '/app/Mage.php';
             \Mage::app();
@@ -109,7 +113,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     /**
      * @return string
      */
-    private function getCacheDir()
+    private function getFixtureCacheDir()
     {
         $varDir = __DIR__ . '/fixtures';
         $solrCacheDir = $varDir . '/cache/integernet_solr';
@@ -125,9 +129,17 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     private function createVirtualCacheDir()
     {
         $this->vfsRoot = vfsStream::setup(self::VAR_ROOT);
-        $virtualCacheDir = vfsStream::url(self::VAR_ROOT) . '/cache/integernet_solr';
+        $virtualCacheDir = vfsStream::url(self::VAR_ROOT) . '/' . $this->getRelativeCacheDir();
         \mkdir($virtualCacheDir, 0777, true);
         return $virtualCacheDir;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasVirtualCacheDir()
+    {
+        return $this->vfsRoot !== null;
     }
 
     /**
@@ -193,9 +205,9 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      * @param $request
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function setupFactory($request)
+    private function setupFactory($request, $cacheDir)
     {
-        $cacheStorage = $this->setupCacheStorage();
+        $cacheStorage = $this->setupCacheStorage($cacheDir);
         $factory = $this->getMockBuilder(Factory::class)
             ->setConstructorArgs([$request, $cacheStorage, $this->getLoadAppCallback()])
             ->setMethods(['getSolrResource'])
@@ -212,9 +224,34 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     /**
      * @return PsrCache
      */
-    private function setupCacheStorage()
+    private function setupCacheStorage($cacheDir)
     {
-        return new PsrCache(new CacheItemPool($this->getCacheDir()));
+        return new PsrCache(new CacheItemPool($cacheDir));
+    }
+
+    /**
+     * @param $query
+     * @param $storeId
+     * @param $cacheDir
+     * @return Http\AutosuggestResponse
+     */
+    private function processAutosuggestRequest($query, $storeId, $cacheDir)
+    {
+        $logMock = $this->getLogMock();
+        $request = new AutosuggestRequest($query, $storeId);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Factory $factory */
+        $factory = $this->setupFactory($request, $cacheDir);
+        $response = $factory->getAutosuggestController($logMock)->process($request);
+        return $response;
+    }
+
+    /**
+     * @return string
+     */
+    private function getRelativeCacheDir()
+    {
+        $virtualCacheDir = 'cache/integernet_solr';
+        return $virtualCacheDir;
     }
 }
 

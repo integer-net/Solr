@@ -10,12 +10,14 @@ In the root directory:
     
 # Integration Test Suite
 
-The SolrSuggest integration test suite requires a Magento installation to write the custom cache.
+The SolrSuggest integration test suite requires a Magento installation to test writing of the custom cache.
 By default it looks in `../../htdocs`, but you can specify the Magento root dir with
 
     export MAGENTO_ROOT=/path/to/magento
     
-Nothing will be written to filesystem and Magento database. Currently, Magento 1.9 sample data is required.
+Nothing will be written to filesystem and Magento database.
+
+Fixtures have been automatically generated with Magento 1.9 sample data.
 
 ## Run Tests:
 

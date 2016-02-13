@@ -206,7 +206,7 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
      */
     protected function _getCacheStorage()
     {
-        return new PsrCache(new FileCacheBackend(Mage::getBaseDir('var') . DS . 'cache' . DS . 'integernet_solr'));
+        return new PsrCache(new FileCacheBackend(Mage::getBaseDir('cache') . DS . 'integernet_solr'));
     }
 
     /**

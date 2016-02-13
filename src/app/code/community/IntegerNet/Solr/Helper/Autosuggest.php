@@ -78,7 +78,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         $templateContents = $this->_getTranslatedTemplate($templateContents);
 
-        $targetDirname = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
+        $targetDirname = Mage::getBaseDir('cache') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
         if (!is_dir($targetDirname)) {
             mkdir($targetDirname, 0777, true);
         }

@@ -184,10 +184,9 @@ class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
      */
     public function getCacheWriter()
     {
-        //TODO need to extend AbstractCustomHelper and use cache reader
-        // ( see IntegerNet_Solr_Helper_Custom::getCacheData() )
-        $customHelper = Mage::helper('integernet_solr/custom');
-        $customHelperClass = new ReflectionClass($customHelper);
+        $customHelperClass = new ReflectionClass(
+            Mage::getConfig()->getHelperClassName('integernet_solr/custom')
+        );
         return new CacheWriter(
             $this->_getCacheStorage(),
             Mage::helper('integernet_solr/autosuggest'),

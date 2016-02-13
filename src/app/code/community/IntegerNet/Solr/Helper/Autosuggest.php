@@ -100,6 +100,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $allowedAttributeCodes[] = $row['attribute_code'];
         }
 
+        $config[$storeId]['attribute'] = array();
         foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
             if (!in_array($attribute->getAttributeCode(), $allowedAttributeCodes)) {
                 continue;
@@ -115,6 +116,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             );
         }
 
+        $config[$storeId]['searchable_attribute'] = array();
         foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
             $config[$storeId]['searchable_attribute'][$attribute->getAttributeCode()] = array(
                 'attribute_code' => $attribute->getAttributeCode(),

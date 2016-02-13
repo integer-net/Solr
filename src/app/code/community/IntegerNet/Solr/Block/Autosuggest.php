@@ -157,6 +157,14 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
              */
             return new IntegerNet_Solr_Autosuggest_Custom();
         }
-        return Mage::helper('integernet_solr/custom')->setBlock($this);
+        $cacheReader = Mage::helper('integernet_solr/factory')->getCacheReader();
+        $storeId = Mage::app()->getStore()->getId();
+        try {
+            $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
+        } catch (\IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException $e) {
+            Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+            $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
+        }
+        return $customHelperFactory->getCustomHelper($this, $cacheReader);
     }
 }

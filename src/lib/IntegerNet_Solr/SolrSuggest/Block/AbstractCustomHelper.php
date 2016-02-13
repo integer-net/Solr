@@ -57,6 +57,14 @@ abstract class AbstractCustomHelper implements CustomHelper
     }
 
     /**
+     * @return CacheReader
+     */
+    protected function getCacheReader()
+    {
+        return $this->cacheReader;
+    }
+
+    /**
      * @return mixed
      */
     public function getCacheData($path)

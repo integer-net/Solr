@@ -1,8 +1,4 @@
 <?php
-//TODO write simple file based caching
-//  projects can replace it with any psr-6 implementation, like Symfony\Cache, and use other cache backends
-//  cache item pool will be initialized in bootstrap PHP file which can be replaced with custom version
-//TODO to make this possible, add "bootstrap_file" to dev config
 /**
  * integer_net Magento Module
  *

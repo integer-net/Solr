@@ -15,7 +15,7 @@ By default it looks in `../../htdocs`, but you can specify the Magento root dir 
 
     export MAGENTO_ROOT=/path/to/magento
     
-Nothing will be written to filesystem and Magento database.
+Nothing will be written to filesystem and Magento database. Currently, Magento 1.9 sample data is required.
 
 ## Run Tests:
 

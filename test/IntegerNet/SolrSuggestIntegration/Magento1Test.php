@@ -29,18 +29,31 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     private $vfsRoot;
     /**
-     * @var CacheStorage
-     */
-    private $cacheStorage;
-    /**
      * @var int
      */
     public $counter;
 
     protected function setUp()
     {
-        $this->cacheStorage = new PsrCache(new CacheItemPool($this->createVirtualCacheDir()));
         $this->counter = 0;
+    }
+
+    /**
+     * @test
+     */
+    public function testWriteCacheFromMagento()
+    {
+        $this->markTestSkipped();
+        $query = 'something';
+        $storeId = 1;
+
+        $logMock = $this->getLogMock();
+        $request = new AutosuggestRequest($query, $storeId);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Factory $factory */
+        $factory = $this->setupFactory($request);
+        $response = $factory->getAutosuggestController($logMock)->process($request);
+        $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
+
     }
     /**
      * @test
@@ -48,21 +61,12 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      * @param $query
      * @param $storeId
      */
-    public function testSuggest($query, $storeId)
+    public function testSuggestWithCachedConfig($query, $storeId)
     {
-        $logMock = $this->getMockForAbstractClass(LoggerInterface::class);
-        $logMock->expects($this->never())->method('error');
+        $logMock = $this->getLogMock();
         $request = new AutosuggestRequest($query, $storeId);
         /** @var \PHPUnit_Framework_MockObject_MockObject|Factory $factory */
-        $factory = $this->getMockBuilder(Factory::class)
-            ->setConstructorArgs([$request, $this->cacheStorage, $this->getLoadAppCallback()])
-            ->setMethods(['getSolrResource'])
-            ->getMock();
-        if ($this->generateMockData) {
-            $this->setupMockDataGenerator($factory);
-        } else {
-            $this->setupResourceMock($factory);
-        }
+        $factory = $this->setupFactory($request);
         $response = $factory->getAutosuggestController($logMock)->process($request);
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
         if ($this->generateMockData) {
@@ -87,14 +91,32 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     protected function getLoadAppCallback()
     {
-        //TODO only use for mock generation, mock cache as well
         return function () {
             $root = \getenv('MAGENTO_ROOT') ?: '../../htdocs';
+            if ($this->generateMockData) {
+                $varDir = __DIR__ . '/fixtures';
+                $this->getCacheDir();
+            } else {
+                $varDir = vfsStream::url(self::VAR_ROOT);
+            }
             require_once $root . '/app/Mage.php';
             \Mage::app();
-            \Mage::getConfig()->getOptions()->setData('var_dir', vfsStream::url(self::VAR_ROOT));
+            \Mage::getConfig()->getOptions()->setData('var_dir', $varDir);
             return \Mage::helper('integernet_solr/factory');
         };
+    }
+
+    /**
+     * @return string
+     */
+    private function getCacheDir()
+    {
+        $varDir = __DIR__ . '/fixtures';
+        $solrCacheDir = $varDir . '/cache/integernet_solr';
+        if (! is_dir($solrCacheDir)) {
+            mkdir($solrCacheDir, 0777, true);
+        }
+        return $solrCacheDir;
     }
 
     /**
@@ -155,6 +177,44 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
             mkdir($dir, 0777, true);
         }
         return $dir;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getLogMock()
+    {
+        $logMock = $this->getMockForAbstractClass(LoggerInterface::class);
+        $logMock->expects($this->never())->method('error');
+        return $logMock;
+    }
+
+    /**
+     * @param $request
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function setupFactory($request)
+    {
+        $cacheStorage = $this->setupCacheStorage();
+        $factory = $this->getMockBuilder(Factory::class)
+            ->setConstructorArgs([$request, $cacheStorage, $this->getLoadAppCallback()])
+            ->setMethods(['getSolrResource'])
+            ->getMock();
+        if ($this->generateMockData) {
+            $this->setupMockDataGenerator($factory);
+            return $factory;
+        } else {
+            $this->setupResourceMock($factory);
+            return $factory;
+        }
+    }
+
+    /**
+     * @return PsrCache
+     */
+    private function setupCacheStorage()
+    {
+        return new PsrCache(new CacheItemPool($this->getCacheDir()));
     }
 }
 

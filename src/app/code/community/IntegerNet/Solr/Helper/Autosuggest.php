@@ -267,7 +267,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
             $this->_addAttributeData($config, $store->getId());
 
-            $this->_addCategoriesData($config, $store);
+            $this->_addCategoriesData($config, $store->getId());
 
             $this->_stopStoreEmulation();
 

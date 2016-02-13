@@ -199,11 +199,10 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
     public function getAutosuggestController(LoggerInterface $customLogger = null)
     {
         $generalConfig = $this->getStoreConfigByStoreId($this->request->getStoreId())->getGeneralConfig();
-        $loggerFromConfig = $this->getLogger($generalConfig, 'solr.log');
         return new AutosuggestController(
             $generalConfig,
             $this->getAutosuggestBlock(),
-            $customLogger !== null ? $customLogger : $loggerFromConfig
+            $customLogger !== null ? $customLogger : $this->getLogger($generalConfig, 'solr.log')
         );
     }
 

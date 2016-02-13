@@ -18,6 +18,13 @@ class Transport extends ArrayObject
     {
         return $this[$key];
     }
+    public function addData(array $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->setData($key, $value);
+        }
+        return $this;
+    }
     public function setData($key, $value)
     {
         $this[$key] = $value;

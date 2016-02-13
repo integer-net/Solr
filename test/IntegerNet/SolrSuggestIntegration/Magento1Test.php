@@ -12,14 +12,16 @@ namespace IntegerNet\SolrSuggest\Plain;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool;
-use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
 use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
-use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Psr\Log\LoggerInterface;
+use \RecursiveDirectoryIterator;
 
+/**
+ * @todo Find a way to replace absolute path names in cache fixture (template, custom helper)
+ */
 class Magento1Test extends \PHPUnit_Framework_TestCase
 {
     const VAR_ROOT = 'var';
@@ -41,6 +43,28 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->vfsRoot = null;
+        if ($this->generateMockData) {
+            $this->copyFixtureToFilesystem();
+        }
+    }
+    private function copyFixtureToFilesystem()
+    {
+        $filesystemDir = $this->getFixtureCacheDir();
+        $virtualDir = $this->getFixtureCacheDir(true);
+        $iterator = new \RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($virtualDir),
+            \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($iterator as $path) {
+            $relativePath = substr($path, strlen($virtualDir));
+            $filesystemPath = $filesystemDir . '/' . $relativePath;
+            if ($path->isDir()) {
+                if (! is_dir($filesystemPath)) {
+                    mkdir($filesystemPath, 0777, true);
+                }
+            } else {
+                copy($path, $filesystemPath);
+            }
+        }
     }
 
     /**
@@ -70,7 +94,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     public function testSuggestWithCachedConfig($query, $storeId)
     {
-        $response = $this->processAutosuggestRequest($query, $storeId, $this->getFixtureCacheDir());
+        $response = $this->processAutosuggestRequest($query, $storeId, $this->getFixtureCacheDir(true));
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
         if ($this->generateMockData) {
             file_put_contents($this->getFixtureDir() . "/out.html", $response->getBody());
@@ -98,10 +122,11 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
             $root = \getenv('MAGENTO_ROOT') ?: '../../htdocs';
             if ($this->hasVirtualCacheDir()) {
                 $varDir = vfsStream::url(self::VAR_ROOT);
-            } else {
-                // will generate cache fixture
+            } elseif ($this->generateMockData) {
                 $varDir = __DIR__ . '/fixtures';
-                $this->getFixtureCacheDir();
+                $this->getFixtureCacheDir(true);
+            } else {
+                $this->fail('App callback was not expected to be used');
             }
             require_once $root . '/app/Mage.php';
             \Mage::app();
@@ -113,12 +138,19 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
     /**
      * @return string
      */
-    private function getFixtureCacheDir()
+    private function getFixtureCacheDir($asVirtualCopy = false)
     {
         $varDir = __DIR__ . '/fixtures';
         $solrCacheDir = $varDir . '/cache/integernet_solr';
         if (! is_dir($solrCacheDir)) {
             mkdir($solrCacheDir, 0777, true);
+        }
+        if ($asVirtualCopy) {
+            $this->vfsRoot = vfsStream::setup(self::VAR_ROOT);
+            $virtualCacheDir = $this->vfsRoot->url(self::VAR_ROOT) . '/cache/integernet_solr';
+            mkdir($virtualCacheDir, 0777, true);
+            vfsStream::copyFromFileSystem($solrCacheDir, $this->vfsRoot->getChild('/cache/integernet_solr'));
+            return $virtualCacheDir;
         }
         return $solrCacheDir;
     }

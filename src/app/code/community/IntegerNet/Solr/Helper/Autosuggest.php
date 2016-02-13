@@ -37,8 +37,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function storeSolrConfig()
     {
-        $this->_storeSolrConfigTxt();
-
         $factory = Mage::helper('integernet_solr/factory');
         $factory->getCacheWriter()->write($factory->getStoreConfig());
     }
@@ -240,57 +238,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         return $templateContents;
     }
-
-    /**
-     * Old way of storing the configuration
-     *
-     * @deprecated
-     */
-    private function _storeSolrConfigTxt()
-    {
-        $initialStoreId = Mage::app()->getStore()->getId();
-        foreach (Mage::app()->getStores(false) as $store) {
-            /** @var Mage_Core_Model_Store $store */
-
-            $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
-
-            $config = array();
-
-            $this->_emulateStore($store->getId());
-
-            $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr');
-
-            $templateFile = $this->getTemplateFile($store->getId());
-            $config[$store->getId()]['template_filename'] = $templateFile;
-            $store->setConfig('template_filename', $templateFile);
-            $config[$store->getId()]['base_url'] = Mage::getUrl();
-
-            $this->_addAttributeData($config, $store->getId());
-
-            $this->_addCategoriesData($config, $store->getId());
-
-            $this->_stopStoreEmulation();
-
-            foreach ($this->_modelIdentifiers as $identifier) {
-                $config['model'][$identifier] = Mage::getConfig()->getModelClassName($identifier);
-            }
-
-            foreach ($this->_resourceModelIdentifiers as $identifier) {
-                $config['resource_model'][$identifier] = Mage::getConfig()->getResourceModelClassName($identifier);
-            }
-
-            $transportObject = new Varien_Object(array('config' => $config));
-
-            Mage::dispatchEvent('integernet_solr_autosuggest_config', array('transport' => $transportObject, 'store' => $store));
-
-            $config = $transportObject->getConfig();
-
-            file_put_contents($filename, serialize($config));
-        }
-        $this->_emulateStore($initialStoreId);
-        $this->_stopStoreEmulation();
-    }
-
 
     protected $_configForCache = array();
     /**

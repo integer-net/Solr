@@ -26,7 +26,7 @@ class Autosuggest implements AutosuggestBlock
     /**
      * @var Factory
      */
-    private $resultFactory;
+    private $factory;
     /**
      * @var AutosuggestResult
      */
@@ -48,7 +48,7 @@ class Autosuggest implements AutosuggestBlock
     public function __construct($storeId, Factory $resultFactory, TemplateRepository $templateRepository, StringHighlighter $highlighter)
     {
         $this->storeId = $storeId;
-        $this->resultFactory = $resultFactory;
+        $this->factory = $resultFactory;
         $this->templateRepository = $templateRepository;
         $this->highlighter = $highlighter;
     }
@@ -61,7 +61,7 @@ class Autosuggest implements AutosuggestBlock
     public function getResult()
     {
         if (!$this->result) {
-            $this->result = $this->resultFactory->getAutosuggestResult();
+            $this->result = $this->factory->getAutosuggestResult();
         }
         return $this->result;
     }
@@ -109,7 +109,7 @@ class Autosuggest implements AutosuggestBlock
 
     public function getCustomHelper()
     {
-        //TODO find different way to inject additional functions
-        throw new \BadMethodCallException('custom helper functionality not implemented in plain PHP mode');
+        $cacheReader = $this->factory->getCacheReader();
+        return $cacheReader->getCustomHelperFactory($this->storeId)->getCustomHelper($this, $cacheReader);
     }
 }

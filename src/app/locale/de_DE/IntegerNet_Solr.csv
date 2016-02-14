@@ -147,3 +147,7 @@
 "Categoy Page with active Filters","Kategorieseite mit gesetzten Filtern"
 "Hide the following pages from robots:","Die folgenden Seiten vor Bots schützen:"
 "This will set NOINDEX,NOFOLLOW","Dadurch wird NOINDEX,NOFOLLOW gesetzt"
+"Position of Filters","Position der Filter"
+"Left column (Magento default)","Linke Spalte (Magento-Standard)"
+"Content column (above products)","Inhaltsspalte (oberhalb der Produkte)"
+"Default Value from Configuration","Standardwert aus der Konfiguration"

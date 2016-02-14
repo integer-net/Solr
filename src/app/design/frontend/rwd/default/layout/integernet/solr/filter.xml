@@ -15,6 +15,17 @@
                 <block type="integernet_solr/result_layer_renderers" name="catalogsearch.layer.renderers" as="state_renderers"/>
             </block>
         </reference>
+
+        <reference name="content">
+            <block ifconfig="integernet_solr/general/is_active" type="integernet_solr/result_layer_view" name="catalogsearch.topnav" template="integernet/solr/layer/top/view.phtml" before="search.result">
+                <action method="setModuleName">
+                    <name>Mage_CatalogSearch</name>
+                </action>
+                <block type="integernet_solr/result_layer_state" name="catalogsearch.topnav.layer.state" as="state" template="integernet/solr/layer/top/state.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalogsearch.topnav.layer.filter" as="filter" template="integernet/solr/layer/top/filter.phtml"/>
+                <block type="integernet_solr/result_layer_renderers" name="catalogsearch.topnav.layer.renderers" as="state_renderers"/>
+            </block>
+        </reference>
     </catalogsearch_result_index>
 
     <catalog_category_layered>
@@ -29,6 +40,17 @@
                 <block type="integernet_solr/result_layer_state" name="catalog.layer.state" as="state" template="catalog/layer/state.phtml"/>
                 <block type="integernet_solr/result_layer_filter" name="catalog.layer.filter" as="filter" template="catalog/layer/filter.phtml"/>
                 <block type="integernet_solr/result_layer_renderers" name="catalog.layer.renderers" as="state_renderers"/>
+            </block>
+        </reference>
+
+        <reference name="content">
+            <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_layer_view" name="catalog.solr.topnav" template="integernet/solr/layer/top/view.phtml" before="category.products">
+                <action method="setModuleName">
+                    <name>Mage_Catalog</name>
+                </action>
+                <block type="integernet_solr/result_layer_state" name="catalog.topnav.layer.state" as="state" template="integernet/solr/layer/top/state.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalog.topnav.layer.filter" as="filter" template="integernet/solr/layer/top/filter.phtml"/>
+                <block type="integernet_solr/result_layer_renderers" name="catalog.topnav.layer.renderers" as="state_renderers"/>
             </block>
         </reference>
     </catalog_category_layered>

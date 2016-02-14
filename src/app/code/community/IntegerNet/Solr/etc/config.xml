@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.5.0</version>
+            <version>1.5.0.1</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -306,6 +306,7 @@
             <results>
                 <use_html_from_solr>0</use_html_from_solr>
                 <search_operator>AND</search_operator>
+                <filter_position>1</filter_position>
                 <priority_categories>2</priority_categories>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>
@@ -316,6 +317,7 @@
             </results>
             <category>
                 <is_active>0</is_active>
+                <filter_position>1</filter_position>
             </category>
             <autosuggest>
                 <is_active>1</is_active>

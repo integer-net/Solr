@@ -57,7 +57,7 @@ class LoggerDecorator implements LoggerInterface
                 }
             }
         }
-        $this->logger->debug($resultClone);
+        $this->logger->debug(print_r($resultClone, true));
         $this->logger->debug('Elapsed time: ' . $time . 's');
     }
 
@@ -67,7 +67,7 @@ class LoggerDecorator implements LoggerInterface
      */
     public function logSuggestion(SolrResponse $result, $time)
     {
-        $this->logger->debug($result);
+        $this->logger->debug(print_r($result, true));
         $this->logger->debug('Elapsed time: ' . $time . 's');
     }
 

@@ -1,5 +1,11 @@
 <?php
 use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
+use IntegerNet\SolrSuggest\Plain\Block\Template;
+use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
+use IntegerNet\SolrSuggest\Plain\Bridge\Category;
 
 /**
  * integer_net Magento Module
@@ -10,9 +16,7 @@ use IntegerNet\Solr\Config\AutosuggestConfig;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
-    implements \IntegerNet\SolrSuggest\Implementor\TemplateRepository,
-    \IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository,
-    \IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository
+    implements TemplateRepository, SerializableAttributeRepository, SerializableCategoryRepository
 {
     protected $_modelIdentifiers = array(
         'integernet_solr/suggestion_collection',
@@ -43,14 +47,14 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\Template
+     * @return Template
      */
     public function getTemplateByStoreId($storeId)
     {
         $initialStoreId = Mage::app()->getStore()->getId();
         $this->_emulateStore($storeId);
 
-        $template = new \IntegerNet\SolrSuggest\Plain\Bridge\Template($this->getTemplateFile($storeId));
+        $template = new Template($this->getTemplateFile($storeId));
 
         $this->_emulateStore($initialStoreId);
         $this->_stopStoreEmulation();
@@ -252,7 +256,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addAttributeData($this->_configForCache, $storeId);
         }
         return array_map(function(array $attributeConfig) {
-            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+            return new Attribute($attributeConfig);
         }, $this->_configForCache[$storeId]['attribute']);
     }
 
@@ -266,7 +270,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addAttributeData($this->_configForCache, $storeId);
         }
         return array_map(function(array $attributeConfig) {
-            return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute($attributeConfig);
+            return new Attribute($attributeConfig);
         }, $this->_configForCache[$storeId]['searchable_attribute']);
     }
 
@@ -281,7 +285,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addCategoriesData($this->_configForCache, $storeId);
         }
         return array_map(function(array $categoryConfig) {
-            return new \IntegerNet\SolrSuggest\Plain\Bridge\Category($categoryConfig['id'], $categoryConfig['title'], $categoryConfig['url']);
+            return new Category($categoryConfig['id'], $categoryConfig['title'], $categoryConfig['url']);
         }, $this->_configForCache[$storeId]['categories']);
     }
 

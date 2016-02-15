@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache\Item;
 
-use IntegerNet\SolrSuggest\Plain\Bridge\Template as PlainTemplate;
+use IntegerNet\SolrSuggest\Plain\Block\Template as PlainTemplate;
 
 final class TemplateCacheItem extends AbstractCacheItem
 {

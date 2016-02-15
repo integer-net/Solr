@@ -24,7 +24,7 @@ use IntegerNet\SolrSuggest\Implementor\Template;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
-use IntegerNet\SolrSuggest\Plain\Bridge\Template as PlainTemplate;
+use IntegerNet\SolrSuggest\Plain\Block\Template as PlainTemplate;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;

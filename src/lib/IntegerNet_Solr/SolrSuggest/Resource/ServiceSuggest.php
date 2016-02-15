@@ -13,5 +13,5 @@ use IntegerNet\Solr\Resource\ServiceBase;
 
 class ServiceSuggest extends ServiceBase
 {
-    //TODO extract suggest specific service methods to this class
+    //suggest specific service methods would be added here
 }

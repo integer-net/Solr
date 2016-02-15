@@ -7,12 +7,9 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Plain\Bridge;
+namespace IntegerNet\SolrSuggest\Plain\Block;
 
-/**
- * @todo move, this can be a generic implementation, no need for a bridge (there is TemplateRepository now)
- */
-class Template implements \IntegerNet\SolrSuggest\Implementor\Template
+final class Template
 {
     /**
      * @var string

@@ -13,6 +13,5 @@ use IntegerNet\Solr\Resource\ServiceBase;
 
 class ServiceCategories extends ServiceBase
 {
-    //TODO extract category specific service methods to this class
-
+    //category specific service methods would be added here
 }

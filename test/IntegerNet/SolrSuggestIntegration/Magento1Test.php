@@ -21,7 +21,8 @@ use \RecursiveDirectoryIterator;
 
 class Magento1Test extends \PHPUnit_Framework_TestCase
 {
-    const CACHE_ROOT = 'cache';
+    const VFS_ROOT = 'var';
+
     private $generateMockData = false;
 
     /**
@@ -78,11 +79,11 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
         $storeId = 1;
         $cacheDir = $this->createVirtualCacheDir();
         $this->createCustomHelperInVirtualFilesystem();
-        $this->assertFalse($this->vfsRoot->getChild($this->getRelativeCacheDir())->hasChildren(), 'Precondition: cache directory is empty');
+        $this->assertFalse($this->vfsRoot->getChild('cache')->getChild($this->getRelativeCacheDir())->hasChildren(), 'Precondition: cache directory is empty');
         $response = $this->processAutosuggestRequest($query, $storeId, $cacheDir);
         $this->assertEquals(200, $response->getStatus(), 'Response status should be 200 OK');
         $this->assertContains('<ul class="searchwords">', $response->getBody(), 'Response body should contain at least search term suggestions');
-        $this->assertTrue($this->vfsRoot->getChild($this->getRelativeCacheDir())->hasChildren(), 'Postcondition: cache directory is not empty');
+        $this->assertTrue($this->vfsRoot->getChild('cache')->getChild($this->getRelativeCacheDir())->hasChildren(), 'Postcondition: cache directory is not empty');
     }
     /**
      * @test
@@ -119,16 +120,17 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
         return function () {
             $root = \getenv('MAGENTO_ROOT') ?: '../../htdocs';
             if ($this->hasVirtualCacheDir()) {
-                $varDir = vfsStream::url(self::CACHE_ROOT);
+                $cacheDir = vfsStream::url(self::VFS_ROOT) . '/cache';
             } elseif ($this->generateMockData) {
-                $varDir = __DIR__ . '/fixtures';
+                $cacheDir = __DIR__ . '/fixtures';
                 $this->getFixtureCacheDir(true);
             } else {
                 $this->fail('App callback was not expected to be used');
             }
             require_once $root . '/app/Mage.php';
             \Mage::app();
-            \Mage::getConfig()->getOptions()->setData('cache_dir', $varDir);
+            \Mage::getConfig()->getOptions()->setData('cache_dir', $cacheDir);
+            \Mage::getConfig()->getOptions()->setData('log_dir', vfsStream::url(self::VFS_ROOT) . '/log');
             return \Mage::helper('integernet_solr/factory');
         };
     }
@@ -145,12 +147,12 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
         }
         if ($asVirtualCopy) {
             if (is_null($this->vfsRoot)) {
-                $this->vfsRoot = vfsStream::setup(self::CACHE_ROOT);
+                $this->vfsRoot = vfsStream::setup(self::VFS_ROOT);
             }
-            $virtualCacheDir = $this->vfsRoot->url(self::CACHE_ROOT) . '/integernet_solr';
+            $virtualCacheDir = $this->vfsRoot->url(self::VFS_ROOT) . '/cache/integernet_solr';
             if (!is_dir($virtualCacheDir)) {
                 mkdir($virtualCacheDir, 0777, true);
-                vfsStream::copyFromFileSystem($solrCacheDir, $this->vfsRoot->getChild('/integernet_solr'));
+                vfsStream::copyFromFileSystem($solrCacheDir, $this->vfsRoot->getChild('/cache/integernet_solr'));
             }
             return $virtualCacheDir;
         }
@@ -162,8 +164,8 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
      */
     private function createVirtualCacheDir()
     {
-        $this->vfsRoot = vfsStream::setup(self::CACHE_ROOT);
-        $virtualCacheDir = vfsStream::url(self::CACHE_ROOT) . '/' . $this->getRelativeCacheDir();
+        $this->vfsRoot = vfsStream::setup(self::VFS_ROOT);
+        $virtualCacheDir = vfsStream::url(self::VFS_ROOT) . '/cache/' . $this->getRelativeCacheDir();
         \mkdir($virtualCacheDir, 0777, true);
         return $virtualCacheDir;
     }
@@ -178,7 +180,7 @@ class Magento1Test extends \PHPUnit_Framework_TestCase
 
     private function createCustomHelperInVirtualFilesystem()
     {
-        $helperFilename = vfsStream::url(self::CACHE_ROOT) . '/helper.php';
+        $helperFilename = vfsStream::url(self::VFS_ROOT) . '/helper.php';
         $helperCode = <<<PHP
 <?php class IntegerNet_Solr_Helper_Custom {}
 PHP;

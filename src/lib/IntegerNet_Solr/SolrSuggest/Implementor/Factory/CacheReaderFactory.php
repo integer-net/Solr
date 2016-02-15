@@ -7,13 +7,15 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Implementor;
+namespace IntegerNet\SolrSuggest\Implementor\Factory;
 
-interface TemplateRepository
+use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
+
+interface CacheReaderFactory
 {
+
     /**
-     * @param int $storeId
-     * @return Template
+     * @return CacheReader
      */
-    public function getTemplateByStoreId($storeId);
+    public function getCacheReader();
 }

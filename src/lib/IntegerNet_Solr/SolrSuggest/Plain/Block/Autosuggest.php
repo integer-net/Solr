@@ -11,8 +11,8 @@
 namespace IntegerNet\SolrSuggest\Plain\Block;
 
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
-use IntegerNet\SolrSuggest\Implementor\Factory;
-use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\StringHighlighter;
@@ -24,9 +24,13 @@ class Autosuggest implements AutosuggestBlock
      */
     private $storeId;
     /**
-     * @var Factory
+     * @var AutosuggestResultFactory
      */
-    private $factory;
+    private $resultFactory;
+    /**
+     * @var CacheReaderFactory
+     */
+    private $cacheReaderFactory;
     /**
      * @var AutosuggestResult
      */
@@ -41,14 +45,18 @@ class Autosuggest implements AutosuggestBlock
     private $highlighter;
 
     /**
-     * @param Factory $resultFactory
+     * @param $storeId
+     * @param AutosuggestResultFactory $resultFactory
+     * @param CacheReaderFactory $cacheReaderFactory
      * @param TemplateRepository $templateRepository
      * @param StringHighlighter $highlighter
      */
-    public function __construct($storeId, Factory $resultFactory, TemplateRepository $templateRepository, StringHighlighter $highlighter)
+    public function __construct($storeId, AutosuggestResultFactory $resultFactory, CacheReaderFactory $cacheReaderFactory,
+                                TemplateRepository $templateRepository, StringHighlighter $highlighter)
     {
         $this->storeId = $storeId;
-        $this->factory = $resultFactory;
+        $this->resultFactory = $resultFactory;
+        $this->cacheReaderFactory = $cacheReaderFactory;
         $this->templateRepository = $templateRepository;
         $this->highlighter = $highlighter;
     }
@@ -61,7 +69,7 @@ class Autosuggest implements AutosuggestBlock
     public function getResult()
     {
         if (!$this->result) {
-            $this->result = $this->factory->getAutosuggestResult();
+            $this->result = $this->resultFactory->getAutosuggestResult();
         }
         return $this->result;
     }
@@ -109,7 +117,7 @@ class Autosuggest implements AutosuggestBlock
 
     public function getCustomHelper()
     {
-        $cacheReader = $this->factory->getCacheReader();
+        $cacheReader = $this->cacheReaderFactory->getCacheReader();
         return $cacheReader->getCustomHelperFactory($this->storeId)->getCustomHelper($this, $cacheReader);
     }
 }

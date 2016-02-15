@@ -8,9 +8,9 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-use IntegerNet\SolrSuggest\Implementor\Factory;
-use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
 use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
@@ -21,9 +21,9 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     protected $_customHelper;
     protected $_suggestData;
     /**
-     * @var Factory
+     * @var AutosuggestResultFactory
      */
-    private $suggestFactory;
+    private $resultFactory;
     /**
      * @var StringHighlighter
      */
@@ -33,7 +33,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
         $this->highlighter = new HtmlStringHighlighter();
-        $this->suggestFactory = Mage::helper('integernet_solr/factory');
+        $this->resultFactory = Mage::helper('integernet_solr/factory');
     }
 
     /**
@@ -44,7 +44,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     public function getResult()
     {
         if (is_null($this->_result)) {
-            $this->_result = $this->suggestFactory->getAutosuggestResult();
+            $this->_result = $this->resultFactory->getAutosuggestResult();
         }
 
         return $this->_result;

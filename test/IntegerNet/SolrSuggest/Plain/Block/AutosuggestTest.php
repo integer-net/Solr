@@ -10,9 +10,10 @@
 namespace IntegerNet\SolrSuggest\Plain\Block;
 
 use IntegerNet\SolrSuggest\Implementor\CustomHelper;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
-use IntegerNet\SolrSuggest\Plain\Factory;
 use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
 class AutosuggestTest extends \PHPUnit_Framework_TestCase
@@ -32,14 +33,15 @@ class AutosuggestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $cacheReaderStub->expects($this->any())->method('getCustomHelperFactory')->willReturn($customHelperFactoryMock);
-        $factoryStub = $this->getMockBuilder(Factory::class)
+        $cacheReaderFactoryStub = $this->getMockBuilder(CacheReaderFactory::class)
             ->setMethods(['getCacheReader'])
             ->disableOriginalConstructor()
             ->getMock();
-        $factoryStub->expects($this->any())->method('getCacheReader')->willReturn($cacheReaderStub);
+        $cacheReaderFactoryStub->expects($this->any())->method('getCacheReader')->willReturn($cacheReaderStub);
+        $autosuggestResultFactoryStub = $this->getMockForAbstractClass(AutosuggestResultFactory::class);
         $templateRepositoryStub = $this->getMockForAbstractClass(TemplateRepository::class);
         $highlighterStub = $this->getMockForAbstractClass(StringHighlighter::class);
-        $block = new Autosuggest(1, $factoryStub, $templateRepositoryStub, $highlighterStub);
+        $block = new Autosuggest(1, $autosuggestResultFactoryStub, $cacheReaderFactoryStub, $templateRepositoryStub, $highlighterStub);
         $customHelperFactoryMock->expects($this->once())
             ->method('getCustomHelper')
             ->with($block, $cacheReaderStub)

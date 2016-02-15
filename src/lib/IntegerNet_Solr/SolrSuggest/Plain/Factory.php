@@ -11,10 +11,11 @@ namespace IntegerNet\SolrSuggest\Plain;
 
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\StoreConfig;
-use IntegerNet\Solr\Implementor\Config as ConfigInterface;
-use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
+use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
+use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
 use IntegerNet\SolrSuggest\Plain\Block\Autosuggest as AutosuggestBlock;
 use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
@@ -24,7 +25,6 @@ use IntegerNet\SolrSuggest\Plain\Bridge\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
-use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Factory\LoggerFactory;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
@@ -34,7 +34,7 @@ use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
 use Psr\Log\LoggerInterface;
 
 // not final to allow partial mocking in integration test
-class Factory implements FactoryInterface, SuggestFactoryInterface
+class Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheReaderFactory
 {
     /**
      * @var AutosuggestRequest
@@ -143,26 +143,6 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
     /**
-     * @return ConfigInterface[]
-     */
-    public function getStoreConfig()
-    {
-        // not needed
-        // TODO: Segregate Factory interface
-    }
-
-
-    /**
-     * @return CacheWriter
-     */
-    public function getCacheWriter()
-    {
-        // probably not needed
-        //TODO Segregate Factory interface
-        //TODO instantiate Magento to write cache on the fly
-    }
-
-    /**
      * @return CacheReader
      */
     public function getCacheReader()
@@ -190,7 +170,7 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
         $storeId = $this->request->getStoreId();
         $highlighter = new HtmlStringHighlighter();
         $templateRepository = new TemplateRepository($this->getLoadedCacheReader($storeId));
-        return new AutosuggestBlock($storeId, $this, $templateRepository, $highlighter);
+        return new AutosuggestBlock($storeId, $this, $this, $templateRepository, $highlighter);
     }
 
     /**
@@ -215,7 +195,7 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
     private function initCacheFromApp()
     {
         $loader = $this->loadApplicationCallback;
-        /** @var \IntegerNet\SolrSuggest\Implementor\Factory $appFactory */
+        /** @var AppFactory $appFactory */
         $appFactory = $loader();
         $appFactory->getCacheWriter()->write($appFactory->getStoreConfig());
     }

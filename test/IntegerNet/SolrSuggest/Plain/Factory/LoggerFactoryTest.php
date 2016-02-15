@@ -11,7 +11,6 @@ namespace IntegerNet\SolrSuggest\Plain\Factory;
 
 use IntegerNet\Solr\Config\Stub\GeneralConfigBuilder;
 use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
-use IntegerNet\SolrSuggest\Plain\Factory;
 use org\bovigo\vfs\vfsStream;
 use Psr\Log\NullLogger;
 

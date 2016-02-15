@@ -7,13 +7,15 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Implementor;
+namespace IntegerNet\SolrSuggest\Implementor\Factory;
 
-interface TemplateRepository
+use IntegerNet\Solr\Implementor\Config;
+
+interface ConfigFactory
 {
+
     /**
-     * @param int $storeId
-     * @return Template
+     * @return Config[]
      */
-    public function getTemplateByStoreId($storeId);
+    public function getStoreConfig();
 }

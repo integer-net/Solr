@@ -15,7 +15,7 @@ use IntegerNet\Solr\Request\Request;
 /**
  * Interface for factory helper. Starting point for implementation
  */
-interface Factory
+interface SolrRequestFactory
 {
     const REQUEST_MODE_AUTODETECT = 0;
     const REQUEST_MODE_SEARCH = 1;
@@ -27,12 +27,13 @@ interface Factory
     /**
      * Returns new configured Solr recource
      *
+     * @deprecated should not be used directly from application
      * @return ResourceFacade
      */
     public function getSolrResource();
 
     /**
-     * Returns new Solr service (search, autosuggest or category service, depending on application state)
+     * Returns new Solr service (search, autosuggest or category service, depending on application state or parameter)
      *
      * @param int $requestMode
      * @return Request

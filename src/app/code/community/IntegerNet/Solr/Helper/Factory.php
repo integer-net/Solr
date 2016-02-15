@@ -7,25 +7,27 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\Implementor\Factory;
+use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
-use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactory;
-use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
-use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
-use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
+use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
-use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
+use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
+use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use Psr\Log\NullLogger;
 
-class IntegerNet_Solr_Helper_Factory implements Factory, SuggestFactory
+class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheReaderFactory, AppFactory
 {
 
     /**

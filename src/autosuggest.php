@@ -142,11 +142,6 @@ class Bootstrap
 
     private function initAutoload()
     {
-        // Varien_Autoload only as long as Logger uses Zend_Log
-        \set_include_path(\get_include_path() . PATH_SEPARATOR . \realpath('lib'));
-        require_once 'lib/Varien/Autoload.php';
-        \Varien_Autoload::register();
-
         require_once 'app/code/community/IntegerNet/Solr/Helper/Autoloader.php';
         \IntegerNet_Solr_Helper_Autoloader::createAndRegisterWithBaseDir($this->config->getLibBaseDir());
     }

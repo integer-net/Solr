@@ -17,6 +17,7 @@ class StoreConfigBuilder
      * Default values
      */
     private $baseUrl = 'http://www.example.com/';
+    private $logDir = 'var/log';
 
     private function __construct()
     {
@@ -36,11 +37,20 @@ class StoreConfigBuilder
         $this->baseUrl = $baseUrl;
         return $this;
     }
+
+    /**
+     * @param string $logDir
+     * @return StoreConfigBuilder
+     */
+    public function withLogDir($logDir)
+    {
+        $this->logDir = $logDir;
+        return $this;
+    }
     
 
     public function build()
     {
-        return new StoreConfig($this->baseUrl
-        );
+        return new StoreConfig($this->baseUrl, $this->logDir);
     }
 }

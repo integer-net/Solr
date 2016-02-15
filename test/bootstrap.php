@@ -18,6 +18,8 @@ spl_autoload_register(function($className)
     } elseif (strpos($className, 'Apache_Solr') === 0) {
         $className = str_replace('_', '\\', $className);
         $className = str_replace('Apache\Solr', 'IntegerNet_Solr\Apache_Solr', $className);
+    } elseif (strpos($className, 'Katzgrau\KLogger') === 0) {
+        $className = str_replace('Katzgrau\KLogger', 'IntegerNet_Solr\KLogger', $className);
     }
 
     $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';

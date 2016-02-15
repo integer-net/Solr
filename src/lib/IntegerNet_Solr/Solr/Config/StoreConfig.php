@@ -15,14 +15,19 @@ final class StoreConfig
      * @var string
      */
     private $baseUrl;
+    /**
+     * @var string
+     */
+    private $logDir;
 
     /**
-     * StoreConfig constructor.
      * @param string $baseUrl
+     * @param $logDir
      */
-    public function __construct($baseUrl)
+    public function __construct($baseUrl, $logDir)
     {
         $this->baseUrl = $baseUrl;
+        $this->logDir = $logDir;
     }
 
     /**
@@ -31,6 +36,14 @@ final class StoreConfig
     public function getBaseUrl()
     {
         return $this->baseUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogDir()
+    {
+        return $this->logDir;
     }
 
 

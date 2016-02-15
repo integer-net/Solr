@@ -69,7 +69,7 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
      */
     public function getStoreConfig()
     {
-        return new StoreConfig(Mage::app()->getStore($this->_storeId)->getBaseUrl());
+        return new StoreConfig(Mage::app()->getStore($this->_storeId)->getBaseUrl(), Mage::getBaseDir('log'));
     }
 
     /**

@@ -91,6 +91,7 @@ class IntegerNet_Solr_Helper_Autoloader
                 ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
                 ->addNamespace('Psr\Cache', $libBaseDir . '/Psr_Cache')
                 ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')
+                ->addNamespace('Katzgrau\KLogger', $libBaseDir . '/KLogger')
                 ->register();
             $registered = true;
         }

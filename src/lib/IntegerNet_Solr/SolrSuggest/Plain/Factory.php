@@ -10,6 +10,7 @@
 namespace IntegerNet\SolrSuggest\Plain;
 
 use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\StoreConfig;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
@@ -17,7 +18,6 @@ use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Autosuggest as AutosuggestBlock;
 use IntegerNet\SolrSuggest\Plain\Bridge\AttributeRepository;
 use IntegerNet\SolrSuggest\Plain\Bridge\CategoryRepository;
-use IntegerNet\SolrSuggest\Plain\Bridge\Logger;
 use IntegerNet\SolrSuggest\Plain\Bridge\NullEventDispatcher;
 use IntegerNet\SolrSuggest\Plain\Bridge\SearchUrl;
 use IntegerNet\SolrSuggest\Plain\Bridge\TemplateRepository;
@@ -25,12 +25,15 @@ use IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
+use IntegerNet\SolrSuggest\Plain\Factory\LoggerFactory;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
+use Katzgrau\KLogger\Logger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 // not final to allow partial mocking in integration test
 class Factory implements FactoryInterface, SuggestFactoryInterface
@@ -92,7 +95,7 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
         $storeId = $this->request->getStoreId();
         $storeConfig = $this->getStoreConfigByStoreId($storeId);
         $logFile = $requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST ? 'solr_suggest.log' : 'solr.log';
-        $logger = $this->getLogger($storeConfig->getGeneralConfig(), $logFile);
+        $logger = $this->getLogger($storeConfig->getGeneralConfig(), $storeConfig->getStoreConfig(), $logFile);
         $applicationContext = new \IntegerNet\Solr\Request\ApplicationContext(
             new AttributeRepository($this->getLoadedCacheReader($storeId)), $storeConfig->getResultsConfig(), $storeConfig->getAutosuggestConfig(), new NullEventDispatcher(), $logger
         );
@@ -198,11 +201,13 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
      */
     public function getAutosuggestController(LoggerInterface $customLogger = null)
     {
-        $generalConfig = $this->getStoreConfigByStoreId($this->request->getStoreId())->getGeneralConfig();
+        $config = $this->getStoreConfigByStoreId($this->request->getStoreId());
+        $generalConfig = $config->getGeneralConfig();
+        $storeConfig = $config->getStoreConfig();
         return new AutosuggestController(
             $generalConfig,
             $this->getAutosuggestBlock(),
-            $customLogger !== null ? $customLogger : $this->getLogger($generalConfig, 'solr.log')
+            $customLogger !== null ? $customLogger : $this->getLogger($generalConfig, $storeConfig, 'solr.log')
         );
     }
 
@@ -218,19 +223,14 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
     /**
-     * @param GeneralConfig $config
-     * @param $logFile
-     * @return Logger|\Psr\Log\NullLogger
+     * @param GeneralConfig $generalConfig
+     * @param StoreConfig $storeConfig
+     * @param $filename
+     * @return null|\Psr\Log\NullLogger
      */
-    private function getLogger(GeneralConfig $config, $logFile)
+    private function getLogger(GeneralConfig $generalConfig, StoreConfig $storeConfig, $filename)
     {
-        if ($config->isLog()) {
-            $logger = new Logger();
-            $logger->setFile($logFile);
-            return $logger;
-        } else {
-            $logger = new \Psr\Log\NullLogger();
-            return $logger;
-        }
+        $loggerFactory = new LoggerFactory($generalConfig, $storeConfig);
+        return $loggerFactory->getLogger($filename);
     }
 }

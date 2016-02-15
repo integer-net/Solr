@@ -11,7 +11,7 @@ namespace IntegerNet\SolrSuggest\Plain;
 
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\StoreConfig;
-use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\Factory as FactoryInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\Implementor\Factory as SuggestFactoryInterface;
@@ -31,9 +31,7 @@ use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
-use Katzgrau\KLogger\Logger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 // not final to allow partial mocking in integration test
 class Factory implements FactoryInterface, SuggestFactoryInterface
@@ -145,7 +143,7 @@ class Factory implements FactoryInterface, SuggestFactoryInterface
     }
 
     /**
-     * @return Config[]
+     * @return ConfigInterface[]
      */
     public function getStoreConfig()
     {

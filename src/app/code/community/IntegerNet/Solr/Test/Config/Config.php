@@ -62,6 +62,7 @@ class IntegerNet_Solr_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Confi
     }
 
     /**
+     * The SerializableConfig interface is part of the SolrSuggest package
      * @test
      */
     public function configShouldBeSerializable()
@@ -74,9 +75,9 @@ class IntegerNet_Solr_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Confi
          * @var $configFromSerialized IntegerNet\Solr\Implementor\Config
          */
         $config = Mage::getModel('integernet_solr/config_store', 1);
-        $configFromSerialized = unserialize(serialize($config->toSerializableConfig()));
+        $configFromSerialized = unserialize(serialize(\IntegerNet\SolrSuggest\Plain\Config::fromConfig($config)));
 
-        $this->assertInstanceOf(\IntegerNet\Solr\Config\ConfigContainer::class, $configFromSerialized);
+        $this->assertInstanceOf(\IntegerNet\SolrSuggest\Plain\Config::class, $configFromSerialized);
         $this->assertEquals($config->getStoreConfig(), $configFromSerialized->getStoreConfig());
         $this->assertEquals($config->getGeneralConfig(), $configFromSerialized->getGeneralConfig());
         $this->assertEquals($config->getResultsConfig(), $configFromSerialized->getResultsConfig());

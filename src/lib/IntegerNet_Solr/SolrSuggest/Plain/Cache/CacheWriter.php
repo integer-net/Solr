@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
@@ -84,7 +85,7 @@ class CacheWriter
     public function write(array $storeConfigs)
     {
         foreach ($storeConfigs as $storeId => $config) {
-            $this->writeStoreConfig($storeId, $config->toSerializableConfig());
+            $this->writeStoreConfig($storeId, Config::fromConfig($config));
             $this->writeAttributeCache($storeId);
             $this->writeCustomCache($storeId);
             $doNotCacheCategories = $config->getAutosuggestConfig()->getMaxNumberCategorySuggestions() == 0;

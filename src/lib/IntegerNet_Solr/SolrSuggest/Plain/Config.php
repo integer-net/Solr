@@ -7,14 +7,22 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr\Config;
+namespace IntegerNet\SolrSuggest\Plain;
 
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\FuzzyConfig;
+use IntegerNet\Solr\Config\GeneralConfig;
+use IntegerNet\Solr\Config\IndexingConfig;
+use IntegerNet\Solr\Config\ResultsConfig;
+use IntegerNet\Solr\Config\ServerConfig;
+use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 
 /**
  * Dumb, serializable Config implementation, used for caching
  */
-final class ConfigContainer implements SerializableConfig
+final class Config implements SerializableConfig
 {
     /**
      * @var StoreConfig
@@ -151,13 +159,18 @@ final class ConfigContainer implements SerializableConfig
         return $this->resultsConfig;
     }
 
-    /**
-     * @return SerializableConfig
-     */
-    public function toSerializableConfig()
+    public static function fromConfig(ConfigInterface $other)
     {
-        return $this;
+        return new static(
+            $other->getStoreConfig(),
+            $other->getGeneralConfig(),
+            $other->getServerConfig(),
+            $other->getIndexingConfig(),
+            $other->getAutosuggestConfig(),
+            $other->getFuzzySearchConfig(),
+            $other->getFuzzyAutosuggestConfig(),
+            $other->getResultsConfig()
+        );
     }
-
 
 }

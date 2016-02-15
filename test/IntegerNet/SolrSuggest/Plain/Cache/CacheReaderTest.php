@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
-use IntegerNet\Solr\Config\ConfigContainer;
+use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
 use IntegerNet\Solr\Config\Stub\GeneralConfigBuilder;
@@ -57,7 +57,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
      */
     public static function dataConfig()
     {
-        $defaultConfig = new ConfigContainer(
+        $defaultConfig = new Config(
             StoreConfigBuilder::defaultConfig()->build(),
             GeneralConfigBuilder::defaultConfig()->build(),
             ServerConfigBuilder::defaultConfig()->build(),
@@ -204,7 +204,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(new ConfigCacheItem($storeId, $config));
 
         $actualConfig = $this->cacheReader->getConfig($storeId);
-        $this->assertInstanceOf(ConfigContainer::class, $actualConfig);
+        $this->assertInstanceOf(Config::class, $actualConfig);
         $this->assertEquals($config, $actualConfig);
     }
     /**

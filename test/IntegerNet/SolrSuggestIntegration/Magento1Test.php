@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain;
 
-use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool;
 use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
@@ -309,7 +309,7 @@ class ResourceMockDataGenerator extends ResourceFacade
     private $testCase;
 
     /**
-     * @param Config[] $storeConfig
+     * @param ConfigInterface[] $storeConfig
      * @param Magento1Test $testCase
      */
     public function __construct(array $storeConfig = array(), Magento1Test $testCase)

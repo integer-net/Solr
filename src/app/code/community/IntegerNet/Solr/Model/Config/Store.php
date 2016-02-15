@@ -227,22 +227,4 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
         return Mage::getStoreConfigFlag($path, $this->_storeId);
     }
 
-    /**
-     * @todo invert: move to ConfigContainer as fromConfig, move/copy ConfigContainer to SolrSuggest (Plain\Config)
-     * @return \IntegerNet\Solr\Implementor\SerializableConfig
-     */
-    public function toSerializableConfig()
-    {
-        return new \IntegerNet\Solr\Config\ConfigContainer(
-            $this->getStoreConfig(),
-            $this->getGeneralConfig(),
-            $this->getServerConfig(),
-            $this->getIndexingConfig(),
-            $this->getAutosuggestConfig(),
-            $this->getFuzzySearchConfig(),
-            $this->getFuzzyAutosuggestConfig(),
-            $this->getResultsConfig()
-        );
-    }
-
 }

@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
-use IntegerNet\Solr\Config\ConfigContainer;
+use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
 use IntegerNet\Solr\Config\Stub\GeneralConfigBuilder;
@@ -183,7 +183,7 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
 
         $parameters = [];
         $parameters[] = new CacheWriterTestParameters(1,
-            new ConfigContainer(
+            new Config(
                 StoreConfigBuilder::defaultConfig()->build(),
                 GeneralConfigBuilder::defaultConfig()->build(),
                 ServerConfigBuilder::defaultConfig()->build(),
@@ -202,7 +202,7 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
             'Custom_Helper'
         );
         $parameters[] = new CacheWriterTestParameters(3,
-            new ConfigContainer(
+            new Config(
                 StoreConfigBuilder::defaultConfig()->build(),
                 GeneralConfigBuilder::defaultConfig()->build(),
                 ServerConfigBuilder::defaultConfig()->build(),
@@ -262,7 +262,7 @@ class CacheWriterTestParameters
 {
     /** @var  int */
     private $storeId;
-    /** @var  ConfigContainer */
+    /** @var  Config */
     private $config;
     /** @var  string */
     private $templateFile;
@@ -277,14 +277,14 @@ class CacheWriterTestParameters
 
     /**
      * @param int $storeId
-     * @param ConfigContainer $config
+     * @param Config $config
      * @param string $templateFile
      * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $filterableAttributes
      * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $searchableAttributes
      * @param \IntegerNet\SolrSuggest\Plain\Bridge\Category[] $activeCategories
      * @param array $customData
      */
-    public function __construct($storeId, ConfigContainer $config, $templateFile, array $filterableAttributes,
+    public function __construct($storeId, Config $config, $templateFile, array $filterableAttributes,
                                 array $searchableAttributes, array $activeCategories, array $customData)
     {
         $this->storeId = $storeId;
@@ -305,7 +305,7 @@ class CacheWriterTestParameters
     }
 
     /**
-     * @return ConfigContainer
+     * @return Config
      */
     public function getConfig()
     {

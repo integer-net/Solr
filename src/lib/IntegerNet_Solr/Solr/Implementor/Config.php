@@ -77,8 +77,4 @@ interface Config
      */
     public function getResultsConfig();
 
-    /**
-     * @return SerializableConfig
-     */
-    public function toSerializableConfig();
 }

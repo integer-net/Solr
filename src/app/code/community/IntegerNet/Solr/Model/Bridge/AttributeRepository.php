@@ -9,7 +9,6 @@
  */
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
 
 class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
 {

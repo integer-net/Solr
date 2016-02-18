@@ -57,6 +57,7 @@ final class AutosuggestConfig
      * @param int $maxNumberCategorySuggestions
      * @param bool $showCompleteCategoryPath
      * @param string $categoryLinkType
+     * @param $attributeFilterSuggestions
      */
     public function __construct($active, $usePhpFile, $maxNumberSearchwordSuggestions, $maxNumberProductSuggestions,
                                 $maxNumberCategorySuggestions, $showCompleteCategoryPath, $categoryLinkType, $attributeFilterSuggestions)
@@ -128,6 +129,8 @@ final class AutosuggestConfig
     }
 
     /**
+     * Array of items in the form ["attribute_code" => string, "max_number_suggestions" => int, "sorting" => int]
+     *
      * @return mixed[][]
      */
     public function getAttributeFilterSuggestions()

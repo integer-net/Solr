@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache\Convert;
 
+use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
@@ -26,16 +27,23 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
      * @var EventDispatcher
      */
     private $eventDispatcher;
+    /**
+     * @var AutosuggestConfig[]
+     */
+    private $autosuggestConfigByStore;
 
     /**
      * SerializableAttributeRepository constructor.
      * @param AttributeRepository $attributeRepository
      * @param EventDispatcher $eventDispatcher
+     * @param AutosuggestConfig[] $autosuggestConfigByStore
      */
-    public function __construct(AttributeRepository $attributeRepository, EventDispatcher $eventDispatcher)
+    public function __construct(AttributeRepository $attributeRepository, EventDispatcher $eventDispatcher,
+                                array $autosuggestConfigByStore)
     {
         $this->attributeRepository = $attributeRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->autosuggestConfigByStore = $autosuggestConfigByStore;
     }
 
     /**
@@ -65,9 +73,20 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
     public function findFilterableInSearchAttributes($storeId)
     {
         $self = $this;
-        return array_map(function(Attribute $attribute) use ($self, $storeId) {
-            return $self->_convertAttribute($attribute, $storeId);
-        }, $this->attributeRepository->getFilterableInSearchAttributes($storeId));
+        $allowedAttributeCodes = array_map(
+            function($row) { return $row['attribute_code']; },
+            $this->autosuggestConfigByStore[$storeId]->getAttributeFilterSuggestions());
+        return array_map(
+            function (Attribute $attribute) use ($self, $storeId) {
+                return $self->_convertAttribute($attribute, $storeId);
+            },
+            array_filter(
+                $this->attributeRepository->getFilterableInSearchAttributes($storeId),
+                function (Attribute $attribute) use ($allowedAttributeCodes) {
+                    return in_array($attribute->getAttributeCode(), $allowedAttributeCodes);
+                }
+            )
+        );
     }
 
     /**

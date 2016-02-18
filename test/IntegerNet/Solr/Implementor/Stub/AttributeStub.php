@@ -35,6 +35,10 @@ class AttributeStub implements Attribute
     {
         return new self($name, $name, 0, new SourceStub(), 'string', true, true, 'text');
     }
+    public static function filterable($name, array $options)
+    {
+        return new self($name, $name, 0, new \IntegerNet\SolrSuggest\Plain\Bridge\Source($options), 'int', true, false, 'int');
+    }
 
     public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source, $backendType, $isSearchable, $usedForSortBy, $facetType)
     {

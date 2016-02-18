@@ -22,7 +22,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getSearchableAttributes()
     {
         return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getSearchableAttributes();
+            ->getSearchableAttributes(Mage::app()->getStore()->getId());
     }
 
     /**
@@ -33,7 +33,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
         return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getFilterableAttributes($useAlphabeticalSearch);
+            ->getFilterableAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
     
     /**
@@ -44,7 +44,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
         return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getFilterableInSearchAttributes($useAlphabeticalSearch);
+            ->getFilterableInSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
 
 
@@ -56,7 +56,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
         return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getFilterableInCatalogAttributes($useAlphabeticalSearch);
+            ->getFilterableInCatalogAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
 
     }
 
@@ -68,7 +68,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
         return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch);
+            ->getFilterableInCatalogOrSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
 
     /**

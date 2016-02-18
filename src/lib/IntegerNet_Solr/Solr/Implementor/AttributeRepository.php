@@ -22,33 +22,38 @@ use IntegerNet\Solr\Exception;
 interface AttributeRepository
 {
     /**
+     * @param int $storeId
      * @return Attribute[]
      */
-    public function getSearchableAttributes();
+    public function getSearchableAttributes($storeId);
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableAttributes($useAlphabeticalSearch = true);
+    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true);
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true);
+    public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true);
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true);
+    public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true);
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true);
+    public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true);
 
     /**
      * @return string[]
@@ -56,9 +61,10 @@ interface AttributeRepository
     public function getAttributeCodesToIndex();
 
     /**
+     * @param int $storeId
      * @param string $attributeCode
      * @return Attribute
      * @throws Exception
      */
-    public function getAttributeByCode($attributeCode);
+    public function getAttributeByCode($storeId, $attributeCode);
 }

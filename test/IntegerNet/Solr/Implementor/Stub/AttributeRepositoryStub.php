@@ -19,9 +19,20 @@ class AttributeRepositoryStub implements AttributeRepository
 {
     /**
      * @todo convert to IntegerNet\Solr\Implementor\Attribute array, maybe add getSearchableAttributeCodes()
+     * @param int $storeId
      * @return \Mage_Catalog_Model_Resource_Product_Attribute_Collection
      */
-    public function getSearchableAttributes()
+    public function getSearchableAttributes($storeId)
+    {
+        return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
+    }
+
+    /**
+     * @param int $storeId
+     * @param bool $useAlphabeticalSearch
+     * @return Attribute[]
+     */
+    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
         return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
     }
@@ -30,7 +41,7 @@ class AttributeRepositoryStub implements AttributeRepository
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
         return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
     }
@@ -39,16 +50,7 @@ class AttributeRepositoryStub implements AttributeRepository
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
-    {
-        return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
-    }
-
-    /**
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
-     */
-    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
         throw new BadMethodCallException('not used in query builder');
     }
@@ -57,7 +59,7 @@ class AttributeRepositoryStub implements AttributeRepository
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
-    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
         throw new BadMethodCallException('not used in query builder');
     }
@@ -74,7 +76,7 @@ class AttributeRepositoryStub implements AttributeRepository
      * @param string $attributeCode
      * @return Attribute
      */
-    public function getAttributeByCode($attributeCode)
+    public function getAttributeByCode($storeId, $attributeCode)
     {
         throw new BadMethodCallException('not used in query builder');
     }

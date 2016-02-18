@@ -259,7 +259,7 @@ class AutosuggestResult
      */
     private function getAttribute($attributeCode)
     {
-        return $this->attributeRepository->getAttributeByCode($attributeCode);
+        return $this->attributeRepository->getAttributeByCode($this->storeId, $attributeCode);
     }
 
     /**

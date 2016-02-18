@@ -39,18 +39,6 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
     }
 
     /**
-     * @param int $storeId
-     * @return SerializableAttribute[]
-     */
-    public function findFilterableInSearchAttributes($storeId)
-    {
-        $self = $this;
-        return array_map(function(Attribute $attribute) use ($self, $storeId) {
-            return $self->_convertAttribute($attribute, $storeId);
-        }, $this->attributeRepository->getFilterableInSearchAttributes());
-    }
-
-    /**
      * @internal
      * @param Attribute $attribute
      * @param int $storeId
@@ -71,6 +59,18 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
     }
 
     /**
+     * @param int $storeId
+     * @return SerializableAttribute[]
+     */
+    public function findFilterableInSearchAttributes($storeId)
+    {
+        $self = $this;
+        return array_map(function(Attribute $attribute) use ($self, $storeId) {
+            return $self->_convertAttribute($attribute, $storeId);
+        }, $this->attributeRepository->getFilterableInSearchAttributes($storeId));
+    }
+
+    /**
      * @param $storeId
      * @return SerializableAttribute[]
      */
@@ -79,6 +79,6 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
         $self = $this;
         return array_map(function(Attribute $attribute) use ($self, $storeId) {
             return $self->_convertAttribute($attribute, $storeId);
-        }, $this->attributeRepository->getSearchableAttributes());
+        }, $this->attributeRepository->getSearchableAttributes($storeId));
     }
 }

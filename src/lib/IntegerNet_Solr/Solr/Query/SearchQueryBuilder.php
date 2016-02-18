@@ -134,7 +134,7 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
             $searchValue = ($this->broaden) ? explode(' ', $queryText) : $queryText;
             $queryText = '';
 
-            $attributes = $this->getAttributeRepository()->getSearchableAttributes();
+            $attributes = $this->getAttributeRepository()->getSearchableAttributes($this->getStoreId());
             $isFirst    = true;
 
             foreach ($attributes as $attribute) {

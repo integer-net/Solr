@@ -55,6 +55,7 @@ class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->setUpEventDispatcher($storeId, $customData);
         $this->attributeRepositoryStub->expects($this->once())
             ->method('getFilterableInSearchAttributes')
+            ->with($storeId)
             ->willReturn($attributes);
         $actualResult = $this->serializableAttributeRepository->findFilterableInSearchAttributes($storeId);
         $this->assertEquals($expectedResult, $actualResult);
@@ -73,6 +74,7 @@ class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->setUpEventDispatcher($storeId, $customData);
         $this->attributeRepositoryStub->expects($this->once())
             ->method('getSearchableAttributes')
+            ->with($storeId)
             ->willReturn($attributes);
         $actualResult = $this->serializableAttributeRepository->findSearchableAttributes($storeId);
         $this->assertEquals($expectedResult, $actualResult);

@@ -40,6 +40,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
                               FilterQueryBuilder $filterQueryBuilder, Pagination $paginationStub,
                               SearchString $searchString, Query $expectedQuery)
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher $eventDispatcherMock */
         $eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);
         $eventDispatcherMock->expects($this->once())->method('dispatch')->with(
             'integernet_solr_update_query_text', $this->equalTo(

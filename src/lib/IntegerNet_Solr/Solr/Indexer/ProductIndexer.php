@@ -202,7 +202,7 @@ class ProductIndexer
      */
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
-        foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes() as $attribute) {
+        foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
             switch ($attribute->getFacetType()) {
                 case Attribute::FACET_TYPE_SELECT:
                     $rawValue = $product->getAttributeValue($attribute);
@@ -277,7 +277,7 @@ class ProductIndexer
             $productData->setData('price_f', 0.00);
         }
 
-        foreach ($this->_attributeRepository->getSearchableAttributes() as $attribute) {
+        foreach ($this->_attributeRepository->getSearchableAttributes($product->getStoreId()) as $attribute) {
 
             if (($attribute->getAttributeCode() == 'price') && ($productData->getData('price_f') > 0)) {
                 continue;

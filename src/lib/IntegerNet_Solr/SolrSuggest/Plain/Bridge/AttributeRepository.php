@@ -59,44 +59,49 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
+     * @param int $storeId
      * @return AttributeInterface[]
      */
-    public function getSearchableAttributes()
+    public function getSearchableAttributes($storeId)
     {
-        return $this->findSearchableAttributes(self::DEFAULT_STORE_ID);
+        return $this->findSearchableAttributes($storeId);
     }
 
     /**
+     * @param int $storeId
      * @return AttributeInterface[]
      */
-    public function getFilterableAttributes($useAlphabeticalSearch = true)
+    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        return $this->getFilterableInSearchAttributes();
+        return $this->getFilterableInSearchAttributes($storeId);
     }
 
     /**
+     * @param int $storeId
      * @return AttributeInterface[]
      */
-    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        return $this->findFilterableInSearchAttributes(self::DEFAULT_STORE_ID);
+        return $this->findFilterableInSearchAttributes($storeId);
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return AttributeInterface[]
      */
-    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
         // not used in autosuggest
         return array();
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
-    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
         // not used in autosuggest
         return array();
@@ -112,13 +117,14 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
+     * @param int $storeId
      * @param string $attributeCode
      * @return AttributeInterface
      * @throws Exception
      */
-    public function getAttributeByCode($attributeCode)
+    public function getAttributeByCode($storeId, $attributeCode)
     {
-        $attributes = $this->findFilterableInSearchAttributes(self::DEFAULT_STORE_ID);
+        $attributes = $this->findFilterableInSearchAttributes($storeId);
         if (! isset($attributes[$attributeCode])) {
             throw new Exception('Attribute not found: ' . $attributeCode);
         }

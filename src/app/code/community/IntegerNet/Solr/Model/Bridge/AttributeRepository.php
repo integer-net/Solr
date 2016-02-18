@@ -74,10 +74,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
+     * @param int $storeId
      * @return Attribute[]
      */
-    public function getSearchableAttributes()
+    public function getSearchableAttributes($storeId)
     {
+        //TODO actually use storeid
         $this->_prepareSearchableAttributeCollection();
 
         return $this->_getAttributeArrayFromCollection($this->_searchableAttributes);
@@ -101,24 +103,27 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableAttributes($useAlphabeticalSearch = true)
+    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
         if (Mage::helper('integernet_solr')->isCategoryPage()) {
-            return $this->getFilterableInCatalogAttributes($useAlphabeticalSearch);
+            return $this->getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch);
         } else {
-            return $this->getFilterableInSearchAttributes($useAlphabeticalSearch);
+            return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
         }
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
+        //TODO actually use storeid
         if (is_null($this->_filterableInSearchAttributes)) {
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
@@ -141,11 +146,13 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
 
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
+        //TODO actually use storeid
         if (is_null($this->_filterableInCatalogAttributes)) {
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
@@ -204,11 +211,13 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
+    public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
+        //TODO actually use store id
         $this->_prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch);
 
         return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
@@ -228,14 +237,15 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
+     * @param int $storeId
      * @param string $attributeCode
      * @return Attribute
      * @deprecated not part of AttributeRepository interface anymore, should not be needed
      */
-    public function getAttributeByCode($attributeCode)
+    public function getAttributeByCode($storeId, $attributeCode)
     {
         $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
-        $attribute->setStoreId(Mage::app()->getStore()->getId());
+        $attribute->setStoreId($storeId);
         return $this->_registerAttribute($attribute);
     }
 

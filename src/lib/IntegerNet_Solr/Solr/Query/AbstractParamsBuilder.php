@@ -139,7 +139,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
     {
         $codes = array('category');
 
-        foreach($this->attributeRespository->getFilterableAttributes() as $attribute) {
+        foreach($this->attributeRespository->getFilterableAttributes($this->getStoreId()) as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';
         }
         return $codes;

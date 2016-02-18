@@ -288,7 +288,10 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addIsSearchableFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-                ->addFieldToFilter('source_model', array('neq' => 'eav/entity_attribute_source_boolean'));
+                ->addFieldToFilter('source_model', array(
+                    array('neq' => 'eav/entity_attribute_source_boolean'),
+                    array('null' => true)
+                ));
         }
     }
     protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection)

@@ -1,4 +1,13 @@
 tables:
+  eav_attribute_label:
+    - attribute_label_id: 22
+      attribute_id: 81
+      store_id: 1
+      value: Manufacturer1
+    - attribute_label_id: 23
+      attribute_id: 81
+      store_id: 2
+      value: Manufacturer2
   eav_attribute_option:
     - option_id: 3
       attribute_id: 92
@@ -33,6 +42,10 @@ tables:
     - value_id: 7
       option_id: 7
       value: Viktor Yanukovych
+    - value_id: 8
+      option_id: 5
+      store_id: 2
+      value: Hodor Hodor Hodor
 # Thanks to https://github.com/EcomDev/EcomDev_UrlRewrite
 eav:
   catalog_category:
@@ -205,6 +218,9 @@ eav:
       tax_class_id: 2 # Taxable Goods
       status: 1             # Enabled
       visibility: 4         # Visible in Catalog & Search
+      /stores:
+        store2:
+          name: "Hodor Hodor Hodor: Hodor of the Hodor"
     - entity_id: 22111
       attribute_set_id: 4
       type_id: simple

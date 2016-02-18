@@ -395,6 +395,7 @@ class ProductIndexer
     /**
      * @param boolean $emptyIndex
      * @param \IntegerNet\Solr\Implementor\ProductIterator $productCollection
+     * @param int $storeId
      * @return int
      */
     protected function _indexProductCollection($emptyIndex, $productCollection, $storeId)

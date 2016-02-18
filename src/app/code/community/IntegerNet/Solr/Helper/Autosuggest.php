@@ -121,7 +121,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         }
 
         $config[$storeId]['searchable_attribute'] = array();
-        foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
+        $searchableAttributes = Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getSearchableAttributes($storeId);
+        foreach ($searchableAttributes as $attribute) {
             $config[$storeId]['searchable_attribute'][$attribute->getAttributeCode()] = array(
                 'attribute_code' => $attribute->getAttributeCode(),
                 'label' => $attribute->getStoreLabel(),

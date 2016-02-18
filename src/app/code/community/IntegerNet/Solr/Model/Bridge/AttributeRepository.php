@@ -13,6 +13,7 @@ use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
 
 class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
 {
+    const DEFAULT_STORE_ID = 1;
     /**
      * Holds attribute instances with their Magento attributes as attached data
      *
@@ -20,17 +21,17 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     protected $_attributeStorage;
 
-    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-    protected $_searchableAttributes = null;
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_searchableAttributes = array();
 
-    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-    protected $_filterableInCatalogOrSearchAttributes = null;
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_filterableInCatalogOrSearchAttributes = array();
 
-    /** @var Mage_Eav_Model_Entity_Attribute[] */
-    protected $_filterableInSearchAttributes = null;
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_filterableInSearchAttributes = array();
 
-    /** @var Mage_Eav_Model_Entity_Attribute[] */
-    protected $_filterableInCatalogAttributes = null;
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_filterableInCatalogAttributes = array();
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_varcharProductAttributes = null;
@@ -63,7 +64,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /**
      * Returns Magento attribute for a given registered attribute instance
      * @param Attribute $attribute
-     * @return mixed|null|object
+     * @return null|Mage_Catalog_Model_Resource_Eav_Attribute
      */
     public function getMagentoAttribute(Attribute $attribute)
     {
@@ -79,10 +80,9 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getSearchableAttributes($storeId)
     {
-        //TODO actually use storeid
-        $this->_prepareSearchableAttributeCollection();
+        $this->_prepareSearchableAttributeCollection($storeId);
 
-        return $this->_getAttributeArrayFromCollection($this->_searchableAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_searchableAttributes[$storeId], $storeId);
     }
 
     /**
@@ -94,12 +94,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
             $this->_sortableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter('used_for_sort_by', 1)
+                ->addFieldToFilter('used_for_sort_by', self::DEFAULT_STORE_ID)
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
             ;
         }
 
-        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes, self::DEFAULT_STORE_ID);
     }
 
     /**
@@ -123,25 +123,24 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        //TODO actually use storeid
-        if (is_null($this->_filterableInSearchAttributes)) {
+        if (! isset($this->_filterableInSearchAttributes[$storeId])) {
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_filterableInSearchAttributes[$storeId] = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addStoreLabel($storeId)
                 ->addIsFilterableInSearchFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
             ;
 
             if ($useAlphabeticalSearch) {
-                $this->_filterableInSearchAttributes
+                $this->_filterableInSearchAttributes[$storeId]
                     ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             } else {
-                $this->_filterableInSearchAttributes
+                $this->_filterableInSearchAttributes[$storeId]
                     ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             }
         }
 
-        return $this->_getAttributeArrayFromCollection($this->_filterableInSearchAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_filterableInSearchAttributes[$storeId], $storeId);
     }
 
 
@@ -152,25 +151,24 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        //TODO actually use storeid
-        if (is_null($this->_filterableInCatalogAttributes)) {
+        if (! isset($this->_filterableInCatalogAttributes[$storeId])) {
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInCatalogAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_filterableInCatalogAttributes[$storeId] = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addStoreLabel($storeId)
                 ->addIsFilterableFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
             ;
 
             if ($useAlphabeticalSearch) {
-                $this->_filterableInCatalogAttributes
+                $this->_filterableInCatalogAttributes[$storeId]
                     ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             } else {
-                $this->_filterableInCatalogAttributes
+                $this->_filterableInCatalogAttributes[$storeId]
                     ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             }
         }
 
-        return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogAttributes[$storeId], $storeId);
     }
 
     /**
@@ -207,7 +205,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             }
         }
 
-        return $this->_getAttributeArrayFromCollection($this->_varcharProductAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_varcharProductAttributes, self::DEFAULT_STORE_ID);
     }
 
     /**
@@ -217,10 +215,9 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        //TODO actually use store id
-        $this->_prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch);
+        $this->_prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch, $storeId);
 
-        return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes);
+        return $this->_getAttributeArrayFromCollection($this->_filterableInCatalogOrSearchAttributes[$storeId], $storeId);
     }
 
     /**
@@ -228,11 +225,11 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getAttributeCodesToIndex()
     {
-        $this->_prepareFilterableInCatalogOrSearchAttributeCollection(true);
-        $this->_prepareSearchableAttributeCollection();
+        $this->_prepareFilterableInCatalogOrSearchAttributeCollection(true, self::DEFAULT_STORE_ID);
+        $this->_prepareSearchableAttributeCollection(self::DEFAULT_STORE_ID);
         return array_merge(
-            $this->_filterableInCatalogOrSearchAttributes->getColumnValues('attribute_code'),
-            $this->_searchableAttributes->getColumnValues('attribute_code')
+            $this->_filterableInCatalogOrSearchAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code'),
+            $this->_searchableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code')
         );
     }
 
@@ -250,14 +247,16 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
-     * @param $useAlphabeticalSearch
+     * @param bool $useAlphabeticalSearch
+     * @param int $storeId
      */
-    protected function _prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch)
+    protected function _prepareFilterableInCatalogOrSearchAttributeCollection($useAlphabeticalSearch, $storeId)
     {
-        if (is_null($this->_filterableInCatalogOrSearchAttributes)) {
+        if (! isset($this->_filterableInCatalogOrSearchAttributes[$storeId])) {
 
             /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_filterableInCatalogOrSearchAttributes[$storeId] = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addStoreLabel($storeId)
                 ->addFieldToFilter(
                     array(
                         'additional_table.is_filterable',
@@ -271,21 +270,21 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')));
 
             if ($useAlphabeticalSearch) {
-                $this->_filterableInCatalogOrSearchAttributes
+                $this->_filterableInCatalogOrSearchAttributes[$storeId]
                     ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             } else {
-                $this->_filterableInCatalogOrSearchAttributes
+                $this->_filterableInCatalogOrSearchAttributes[$storeId]
                     ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
             }
         }
     }
 
-    protected function _prepareSearchableAttributeCollection()
+    protected function _prepareSearchableAttributeCollection($storeId)
     {
-        if (is_null($this->_searchableAttributes)) {
+        if (! isset($this->_searchableAttributes[$storeId])) {
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_searchableAttributes[$storeId] = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->addStoreLabel($storeId)
                 ->addIsSearchableFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))
                 ->addFieldToFilter('source_model', array(
@@ -294,11 +293,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                 ));
         }
     }
-    protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection)
+    protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection, $storeId)
     {
         $self = $this;
         return array_map(
-            function($item) use ($self) {
+            function($item) use ($self, $storeId) {
+                $item->setStoreId($storeId);
                 return $self->_registerAttribute($item);
             },
             $collection->getItems()

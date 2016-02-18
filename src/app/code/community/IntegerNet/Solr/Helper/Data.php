@@ -17,16 +17,6 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @deprecated use repository directly
-     * @return Attribute[]
-     */
-    public function getSearchableAttributes()
-    {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getSearchableAttributes(Mage::app()->getStore()->getId());
-    }
-
-    /**
-     * @deprecated use repository directly
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */

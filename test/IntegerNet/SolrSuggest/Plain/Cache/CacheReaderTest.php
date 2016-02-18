@@ -87,8 +87,8 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
     public static function dataFilterableAttributes()
     {
         $filterableAttributes = [
-            new Attribute(['code' => 'color', 'label' => 'Color', 'options' => [90 => 'red', 91 => 'blue']]),
-            new Attribute(['code' => 'size', 'label' => 'Size', 'options' => [92 => 'S', 93 => 'M', 94 => 'L']]),
+            Attribute::fromArray(['attribute_code' => 'color', 'label' => 'Color', 'options' => [90 => 'red', 91 => 'blue']]),
+            Attribute::fromArray(['attribute_code' => 'size', 'label' => 'Size', 'options' => [92 => 'S', 93 => 'M', 94 => 'L']]),
         ];
 
         return [
@@ -102,7 +102,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
     public static function dataSearchableAttributes()
     {
         $searchableAttributes = [
-            new Attribute(['code' => 'color', 'label' => 'Color', 'solr_boost' => 1.5, 'used_for_sortby' => true]),
+            Attribute::fromArray(['attribute_code' => 'color', 'label' => 'Color', 'options' => [], 'solr_boost' => 1.5, 'used_for_sortby' => true]),
         ];
 
         return [

@@ -41,7 +41,7 @@ class AttributeRepositoryStub implements AttributeRepository
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
-        throw new BadMethodCallException('not used in query builder');
+        return [AttributeStub::sortableString('attribute1'), AttributeStub::sortableString('attribute2')];
     }
 
     /**

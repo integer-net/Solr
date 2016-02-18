@@ -246,7 +246,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     protected $_configForCache = array();
+
     /**
+     * @deprecated SerializableAttributeRepository will be part of the library
      * @param int $storeId
      * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
      */
@@ -261,6 +263,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @deprecated SerializableAttributeRepository will be part of the library
      * @param $storeId
      * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
      */

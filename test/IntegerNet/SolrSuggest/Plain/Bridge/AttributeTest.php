@@ -12,26 +12,57 @@ namespace IntegerNet\SolrSuggest\Plain\Bridge;
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @dataProvider dataConfigArray
      * @test
+     * @param array $inputArray
+     * @param array $expectedValues
      */
-    public function shouldCreateFromConfigArray()
+    public function shouldCreateFromConfigArray(array $inputArray, array $expectedValues)
     {
-        $attribute = Attribute::fromArray([
-            'attribute_code' => 'color',
-            'label' => 'Color',
-            'options' => [90 => 'red', 91 => 'blue'],
-            'images' => [90 => 'red.jpg', 91 => 'blue.jpg'],
-            'solr_boost' => 1.5,
-            'used_for_sortby' => true,
-        ]);
-        $this->assertEquals('color', $attribute->getAttributeCode(), 'getAttributeCode()');
-        $this->assertEquals('Color', $attribute->getStoreLabel(), 'getStoreLabel()');
-        $this->assertEquals('red', $attribute->getSource()->getOptionText(90), 'getSource()->getOptionText()');
-        $this->assertEquals('blue', $attribute->getSource()->getOptionText(91), 'getSource()->getOptionText()');
-        $this->assertEquals(1.5, $attribute->getSolrBoost(), 'getSolrBoost()');
+        $attribute = Attribute::fromArray($inputArray);
+        $this->assertEquals($expectedValues['attribute_code'], $attribute->getAttributeCode(), 'getAttributeCode()');
+        $this->assertEquals($expectedValues['label'], $attribute->getStoreLabel(), 'getStoreLabel()');
+        foreach ($expectedValues['options'] as $expectedId => $expectedLabel) {
+            $this->assertEquals($expectedLabel, $attribute->getSource()->getOptionText($expectedId), 'getSource()->getOptionText()');
+        }
+        $this->assertEquals($expectedValues['solr_boost'], $attribute->getSolrBoost(), 'getSolrBoost()');
         $this->assertEquals('varchar', $attribute->getBackendType(), 'getBackendType() should always return varchar');
-        $this->assertEquals(true, $attribute->getIsSearchable(), 'getIsSearchable() should always return varchar');
-        $this->assertEquals(true, $attribute->getUsedForSortBy(), 'getUsedForSortBy()');
-        $this->assertEquals([90 => 'red.jpg', 91 => 'blue.jpg'], $attribute->getCustomData('images'), 'getCustomData(images)');
+        $this->assertEquals(true, $attribute->getIsSearchable(), 'getIsSearchable() should always return true');
+        $this->assertEquals($expectedValues['used_for_sortby'], $attribute->getUsedForSortBy(), 'getUsedForSortBy()');
+        foreach ($expectedValues['custom_data'] as $expectedKey => $expectedValue) {
+            $this->assertEquals($expectedValue, $attribute->getCustomData($expectedKey), 'getCustomData('.$expectedKey.')');
+        }
+    }
+    public static function dataConfigArray()
+    {
+        return [
+            'all_properties' => [[
+                'attribute_code' => 'color',
+                'label' => 'Color',
+                'options' => [90 => 'red', 91 => 'blue'],
+                'images' => [90 => 'red.jpg', 91 => 'blue.jpg'],
+                'solr_boost' => 1.5,
+                'used_for_sortby' => true,
+            ], [
+                'attribute_code' => 'color',
+                'label' => 'Color',
+                'options' => [90 => 'red', 91 => 'blue'],
+                'solr_boost' => 1.5,
+                'used_for_sortby' => true,
+                'custom_data' => ['images' => [90 => 'red.jpg', 91 => 'blue.jpg']]
+            ]],
+
+            'only_required_properties' => [[
+                'attribute_code' => 'color',
+                'label' => 'Color',
+            ], [
+                'attribute_code' => 'color',
+                'label' => 'Color',
+                'options' => [],
+                'solr_boost' => null,
+                'used_for_sortby' => false,
+                'custom_data' => []
+            ]]
+        ];
     }
 }

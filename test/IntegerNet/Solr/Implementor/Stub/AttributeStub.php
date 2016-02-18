@@ -33,10 +33,10 @@ class AttributeStub implements Attribute
 
     public static function sortableString($name)
     {
-        return new self($name, $name, 0, null, 'string', true, true, 'text');
+        return new self($name, $name, 0, new SourceStub(), 'string', true, true, 'text');
     }
 
-    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source = null, $backendType, $isSearchable, $usedForSortBy, $facetType)
+    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source, $backendType, $isSearchable, $usedForSortBy, $facetType)
     {
         $this->attributeCode = $attributeCode;
         $this->storeLabel = $storeLabel;
@@ -174,6 +174,19 @@ class AttributeStub implements Attribute
     public function setFacetType($facetType)
     {
         $this->facetType = $facetType;
+    }
+
+}
+
+class SourceStub implements Source
+{
+    /**
+     * @param int $optionId
+     * @return string
+     */
+    public function getOptionText($optionId)
+    {
+        return '';
     }
 
 }

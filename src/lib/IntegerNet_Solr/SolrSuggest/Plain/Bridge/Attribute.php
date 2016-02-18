@@ -2,6 +2,7 @@
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
 use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\Solr\Implementor\Source as SourceInterface;
 
 /**
  * integer_net Magento Module
@@ -11,51 +12,88 @@ use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+
+/**
+ * @todo move (no bridge needed)
+ */
 final class Attribute implements SerializableAttribute
 {
     protected $_attributeConfig = null;
     protected $_source = null;
+    /**
+     * @var
+     */
+    private $attributeCode;
+    /**
+     * @var
+     */
+    private $label;
+    /**
+     * @var
+     */
+    private $solrBoost;
+    /**
+     * @var
+     */
+    private $source;
+    /**
+     * @var
+     */
+    private $usedForSortBy;
+    /**
+     * @var
+     */
+    private $facetType;
 
     /**
-     * @internal use fromArray() instead, the constructor signature will change!
-     * @todo take parameters explicitly, then deprecate fromArray()
-     * @param $attributeConfig
+     * @param string $attributeCode
+     * @param string $label
+     * @param float $solrBoost
+     * @param SourceInterface $source
+     * @param bool $usedForSortBy
+     * @param array $customData
      */
-    public function __construct($attributeConfig)
+    public function __construct($attributeCode, $label, $solrBoost, SourceInterface $source, $usedForSortBy, array $customData)
     {
-        $this->_attributeConfig = $attributeConfig;
+        $this->_attributeConfig = $customData;
+        $this->attributeCode = $attributeCode;
+        $this->label = $label;
+        $this->solrBoost = $solrBoost;
+        $this->source = $source;
+        $this->usedForSortBy = $usedForSortBy;
     }
 
     /**
+     * @deprecated explicit constructor is preferred
      * @param $array
      * @return Attribute
      */
     public static function fromArray($array)
     {
-        return new self($array);
+        $options = isset($array['options']) ? $array['options'] : [];
+        $source = new Source($options);
+        $usedForSortBy = isset($array['used_for_sortby']) ? $array['used_for_sortby'] : false;
+        return new self($array['attribute_code'], $array['label'], @$array['solr_boost'], $source, $usedForSortBy, $array);
     }
 
     public function getAttributeCode()
     {
-        return $this->_attributeConfig['attribute_code'];
+        return $this->attributeCode;
     }
 
     public function getStoreLabel()
     {
-        return $this->_attributeConfig['label'];
+        return $this->label;
     }
 
     public function getSolrBoost()
     {
-        return $this->_attributeConfig['solr_boost'];
+        return $this->solrBoost;
     }
 
     public function getSource()
     {
-        if (is_null($this->_source)) {
-            $this->_source = new Source($this->_attributeConfig['options']);
-        }
-        return $this->_source;
+        return $this->source;
     }
 
     public function getIsSearchable()
@@ -70,12 +108,12 @@ final class Attribute implements SerializableAttribute
 
     public function getUsedForSortBy()
     {
-        return $this->_attributeConfig['used_for_sortby'];
+        return $this->usedForSortBy;
     }
 
     public function getFacetType()
     {
-        return $this->_attributeConfig['frontend_input'];
+        throw new \BadMethodCallException('only used for indexer, not needed in plain mode');
     }
 
     /**

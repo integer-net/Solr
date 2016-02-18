@@ -176,5 +176,4 @@ class AttributeStub implements Attribute
         $this->facetType = $facetType;
     }
 
-
 }

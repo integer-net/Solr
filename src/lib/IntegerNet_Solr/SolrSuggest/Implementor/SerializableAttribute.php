@@ -14,8 +14,14 @@ use IntegerNet\Solr\Implementor\Attribute;
 /**
  * Marker interface for serializable attribute, used for caching. Does not extend \Serializable
  * because standard PHP serialization is accepted too.
+ *
+ * Added getCustomData() method to allow caching of additional information for custom helper
  */
 interface SerializableAttribute extends Attribute
 {
-
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function getCustomData($key);
 }

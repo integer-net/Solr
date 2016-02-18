@@ -9,7 +9,6 @@
  */
 
 namespace IntegerNet\Solr\Implementor;
-use IntegerNet\Solr\Implementor\Source;
 
 /**
  * integer_net Magento Module
@@ -44,6 +43,9 @@ interface Attribute
      */
     public function getSource();
 
+    /**
+     * @return string
+     */
     public function getFacetType();
 
     /**
@@ -60,4 +62,5 @@ interface Attribute
      * @return bool
      */
     public function getUsedForSortBy();
+
 }

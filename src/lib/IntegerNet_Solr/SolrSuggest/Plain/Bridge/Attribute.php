@@ -16,9 +16,23 @@ final class Attribute implements SerializableAttribute
     protected $_attributeConfig = null;
     protected $_source = null;
 
+    /**
+     * @internal use fromArray() instead, the constructor signature will change!
+     * @todo take parameters explicitly, then deprecate fromArray()
+     * @param $attributeConfig
+     */
     public function __construct($attributeConfig)
     {
         $this->_attributeConfig = $attributeConfig;
+    }
+
+    /**
+     * @param $array
+     * @return Attribute
+     */
+    public static function fromArray($array)
+    {
+        return new self($array);
     }
 
     public function getAttributeCode()
@@ -62,6 +76,15 @@ final class Attribute implements SerializableAttribute
     public function getFacetType()
     {
         return $this->_attributeConfig['frontend_input'];
+    }
+
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function getCustomData($key)
+    {
+        return $this->_attributeConfig[$key];
     }
 
 }

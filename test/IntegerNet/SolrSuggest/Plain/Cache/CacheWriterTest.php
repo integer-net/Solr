@@ -139,9 +139,9 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
     }
 
 
-
-
     /**
+     * @param array $dataToAdd
+     * @param int $callIndex
      * @return Transport
      */
     protected function &mockEventDispatcherAndReturnTransportReference(array $dataToAdd, $callIndex)
@@ -172,11 +172,11 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
     public static function dataStoreConfigs()
     {
         $filterableAttributes = [
-            new Attribute(['code' => 'color', 'label' => 'Color', 'options' => [90 => 'red', 91 => 'blue']]),
-            new Attribute(['code' => 'size', 'label' => 'Size', 'options' => [92 => 'S', 93 => 'M', 94 => 'L']]),
+            new Attribute(['attribute_code' => 'color', 'label' => 'Color', 'options' => [90 => 'red', 91 => 'blue'], 'images' => [90 => 'red.jpg', 91 => 'blue.jpg']]),
+            new Attribute(['attribute_code' => 'size', 'label' => 'Size', 'options' => [92 => 'S', 93 => 'M', 94 => 'L']]),
         ];
         $searchableAttributes = [
-            new Attribute(['code' => 'color', 'label' => 'Color', 'solr_boost' => 1.5, 'used_for_sortby' => true]),
+            new Attribute(['attribute_code' => 'color', 'label' => 'Color', 'solr_boost' => 1.5, 'used_for_sortby' => true]),
         ];
         $categories = [new Category(1, 'Books', 'books.html'), new Category(2, 'DVDs', 'dvds.html')];
 

@@ -256,7 +256,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addAttributeData($this->_configForCache, $storeId);
         }
         return array_map(function(array $attributeConfig) {
-            return new Attribute($attributeConfig);
+            return Attribute::fromArray($attributeConfig);
         }, $this->_configForCache[$storeId]['attribute']);
     }
 
@@ -270,7 +270,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             $this->_addAttributeData($this->_configForCache, $storeId);
         }
         return array_map(function(array $attributeConfig) {
-            return new Attribute($attributeConfig);
+            return Attribute::fromArray($attributeConfig);
         }, $this->_configForCache[$storeId]['searchable_attribute']);
     }
 

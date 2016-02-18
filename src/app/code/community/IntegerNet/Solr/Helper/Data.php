@@ -13,7 +13,6 @@ use IntegerNet\SolrSuggest\Implementor\SearchUrl;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */ 
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
-    implements EventDispatcher, HasUserQuery, SearchUrl
 {
 
     /**
@@ -188,46 +187,4 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
         return true;
     }
-
-    /**
-     * Dispatch event
-     *
-     * @param string $eventName
-     * @param array $data
-     * @return void
-     */
-    public function dispatch($eventName, array $data = array())
-    {
-        Mage::dispatchEvent($eventName, $data);
-    }
-
-    /**
-     * Returns query as entered by user
-     *
-     * @return string
-     */
-    public function getUserQueryText()
-    {
-        $query = Mage::helper('catalogsearch')->getQuery();
-        $queryText = $query->getQueryText();
-        if ($query->getSynonymFor()) {
-            $queryText = $query->getSynonymFor();
-            return $queryText;
-        }
-        return $queryText;
-    }
-
-    /**
-     * Returns search URL for given user query text
-     *
-     * @param string $queryText
-     * @param string[] $additionalParameters
-     * @return string
-     */
-    public function getUrl($queryText, array $additionalParameters = array())
-    {
-        return Mage::getUrl('catalogsearch/result',
-            array('_query' => array_merge(array('q' => $queryText), $additionalParameters)));
-    }
-
 }

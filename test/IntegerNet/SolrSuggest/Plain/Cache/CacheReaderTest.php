@@ -18,13 +18,11 @@ use IntegerNet\Solr\Config\Stub\ResultConfigBuilder;
 use IntegerNet\Solr\Config\Stub\ServerConfigBuilder;
 use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
 use IntegerNet\Solr\Event\Transport;
-use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
-use IntegerNet\SolrSuggest\Implementor\Template;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
-use IntegerNet\SolrSuggest\Plain\Block\Template as PlainTemplate;
+use IntegerNet\SolrSuggest\Plain\Block\Template;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\CustomDataCacheItem;
@@ -218,7 +216,7 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with(new TemplateCacheItem($storeId))
-            ->willReturn(new TemplateCacheItem($storeId, new PlainTemplate($templateFile)));
+            ->willReturn(new TemplateCacheItem($storeId, new Template($templateFile)));
 
         $actualTemplate = $this->cacheReader->getTemplate($storeId);
         $this->assertInstanceOf(Template::class, $actualTemplate);

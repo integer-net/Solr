@@ -13,9 +13,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-$autoloader = new IntegerNet_Solr_Helper_Autoloader();
-$autoloader->createAndRegister();
-
 $installer->addAttribute('catalog_category', 'solr_exclude', array(
     'type'              => 'int',
     'input'             => 'select',

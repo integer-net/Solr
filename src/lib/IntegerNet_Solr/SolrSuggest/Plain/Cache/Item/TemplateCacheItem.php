@@ -9,16 +9,16 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache\Item;
 
-use IntegerNet\SolrSuggest\Plain\Block\Template as PlainTemplate;
+use IntegerNet\SolrSuggest\Plain\Block\Template;
 
 final class TemplateCacheItem extends AbstractCacheItem
 {
 
     /**
      * @param int $storeId
-     * @param \IntegerNet\SolrSuggest\Implementor\Template $value
+     * @param Template $value
      */
-    public function __construct($storeId, \IntegerNet\SolrSuggest\Implementor\Template $value = null)
+    public function __construct($storeId, Template $value = null)
     {
         $this->storeId = $storeId;
         $this->value = $value;
@@ -36,6 +36,6 @@ final class TemplateCacheItem extends AbstractCacheItem
 
     public function withValueFromCache($value)
     {
-        return parent::withValueFromCache(new PlainTemplate($value));
+        return parent::withValueFromCache(new Template($value));
     }
 }

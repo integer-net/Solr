@@ -21,7 +21,7 @@ use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
-use IntegerNet\SolrSuggest\Implementor\Template;
+use IntegerNet\SolrSuggest\Plain\Block\Template;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
@@ -226,14 +226,13 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $index
-     * @param $parameters
+     * @param CacheWriterTestParameters $parameters
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function prepareStubsByParametersAndReturnTemplateStub($index, $parameters)
+    private function prepareStubsByParametersAndReturnTemplateStub($index, CacheWriterTestParameters $parameters)
     {
         $storeId = $parameters->getStoreId();
-        $templateStub = $this->getMockForAbstractClass(Template::class);
-        $templateStub->expects($this->any())->method('getFilename')->willReturn($parameters->getTemplateFile());
+        $templateStub = new Template($parameters->getTemplateFile());
         $this->templateRepositoryStub->expects($this->at($index))
             ->method('getTemplateByStoreId')
             ->with($storeId)

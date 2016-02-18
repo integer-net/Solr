@@ -44,6 +44,7 @@ abstract class AbstractCacheItem implements CacheItem
     }
 
     /**
+     * @param mixed $value
      * @return static
      */
     public function withValueFromCache($value)

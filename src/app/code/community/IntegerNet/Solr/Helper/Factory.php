@@ -54,7 +54,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $defaultStoreId,
             $this->getStoreConfig(),
             $this->getSolrResource(),
-            Mage::helper('integernet_solr'),
+            Mage::helper('integernet_solr/event'),
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
             $this->_getIndexCategoryRepository(),
             Mage::getModel('integernet_solr/bridge_productRepository'),
@@ -88,7 +88,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
             $config->getResultsConfig(),
             $config->getAutosuggestConfig(),
-            Mage::helper('integernet_solr'),
+            Mage::helper('integernet_solr/event'),
             $logger
         );
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
@@ -112,7 +112,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         } elseif ($requestMode === self::REQUEST_MODE_AUTOSUGGEST) {
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzyAutosuggestConfig())
-                ->setQuery(Mage::helper('integernet_solr'));
+                ->setQuery(Mage::helper('integernet_solr/searchtermSynonym'));
             $factory = new AutosuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
@@ -121,7 +121,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         } else {
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzySearchConfig())
-                ->setQuery(Mage::helper('integernet_solr'));
+                ->setQuery(Mage::helper('integernet_solr/searchtermSynonym'));
             $factory = new SearchRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
@@ -165,7 +165,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $storeConfig->getGeneralConfig(),
             $storeConfig->getAutosuggestConfig(),
             Mage::helper('integernet_solr/searchterm'),
-            Mage::helper('integernet_solr'),
+            Mage::helper('integernet_solr/searchUrl'),
             $this->_getSuggestCategoryRepository(),
             $this->_getAttributeRepository(),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
@@ -194,7 +194,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             Mage::helper('integernet_solr/autosuggest'),
             Mage::helper('integernet_solr/autosuggest'),
             new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
-            Mage::helper('integernet_solr'),
+            Mage::helper('integernet_solr/event'),
             Mage::helper('integernet_solr/autosuggest')
         );
     }

@@ -279,10 +279,6 @@ class ProductIndexer
 
         foreach ($this->_attributeRepository->getSearchableAttributes() as $attribute) {
 
-            if (get_class($attribute->getSource()) == 'Mage_Eav_Model_Entity_Attribute_Source_Boolean') {
-                continue;
-            }
-
             if (($attribute->getAttributeCode() == 'price') && ($productData->getData('price_f') > 0)) {
                 continue;
             }
@@ -295,7 +291,7 @@ class ProductIndexer
                 $productData->setData($fieldName . '_boost', $solrBoost);
             }
 
-            $attribute->setStoreId($product->getStoreId()); //TODO (re)move
+            $attribute->setStoreId($product->getStoreId()); //TODO move to AttributeRepository
 
             if ($product->getAttributeValue($attribute)
                 && $value = $product->getSearchableAttributeValue($attribute)

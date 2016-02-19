@@ -59,6 +59,7 @@ class CacheWriter
     private $templateRepository;
 
     /**
+     * @todo take normal repositories and instantiate converters here (or better, in a CacheWriterFactory)
      * @param CacheStorage $cache
      * @param SerializableAttributeRepository $attributeRepository
      * @param SerializableCategoryRepository $categoryRepository

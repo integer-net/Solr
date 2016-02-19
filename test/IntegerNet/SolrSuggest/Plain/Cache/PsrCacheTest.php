@@ -73,6 +73,35 @@ class PsrCacheTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function shouldOverwriteInvalidValue()
+    {
+        $cacheItemMock = $this->getMockForAbstractClass(CacheItemInterface::class);
+        $cacheItemMock->expects($this->once())
+            ->method('set')
+            ->with(self::A_VALUE);
+
+        $this->cachePoolMock->expects($this->at(0))
+            ->method('getItem')
+            ->with(self::A_KEY)
+            ->willThrowException(new InvalidCacheItemValueException());
+        $this->cachePoolMock->expects($this->at(1))
+            ->method('deleteItem')
+            ->willReturn(true);
+        $this->cachePoolMock->expects($this->at(2))
+            ->method('getItem')
+            ->with(self::A_KEY)
+            ->willReturn($cacheItemMock);
+        $this->cachePoolMock->expects($this->once())
+            ->method('saveDeferred')
+            ->with($cacheItemMock)
+            ->willReturn(true);
+
+        $this->cache->save($this->getItemStub(self::A_KEY, self::A_VALUE));
+    }
+
+    /**
+     * @test
+     */
     public function shouldReturnCachedValue()
     {
         $cacheItemMock = $this->getMockForAbstractClass(CacheItemInterface::class);

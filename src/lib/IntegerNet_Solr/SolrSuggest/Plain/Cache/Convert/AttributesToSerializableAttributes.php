@@ -15,8 +15,9 @@ use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository;
 
-final class AttributesToSerializableAttributes implements \IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository
+final class AttributesToSerializableAttributes implements SerializableAttributeRepository
 {
     const EVENT_ATTRIBUTE_CUSTOM_DATA = 'integernet_solr_autosuggest_config_attribute';
     /**

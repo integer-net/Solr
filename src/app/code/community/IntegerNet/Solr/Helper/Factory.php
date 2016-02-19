@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
@@ -21,6 +22,7 @@ use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
+use IntegerNet\SolrSuggest\Plain\Cache\Convert\AttributesToSerializableAttributes;
 use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
@@ -132,7 +134,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
     }
 
     /**
-     * @return \IntegerNet\Solr\Implementor\Config[]
+     * @return Config[]
      */
     public function getStoreConfig()
     {
@@ -189,9 +191,15 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         $customHelperClass = new ReflectionClass(
             Mage::getConfig()->getHelperClassName('integernet_solr/custom')
         );
+        $autosuggestConfigByStore = array_map(
+            function (Config $config) {
+                return $config->getAutosuggestConfig();
+            },
+            $this->getStoreConfig()
+        );
         return new CacheWriter(
             $this->_getCacheStorage(),
-            Mage::helper('integernet_solr/autosuggest'),
+            new AttributesToSerializableAttributes($this->_getAttributeRepository(), Mage::helper('integernet_solr/event'), $autosuggestConfigByStore),
             Mage::helper('integernet_solr/autosuggest'),
             new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
             Mage::helper('integernet_solr/event'),

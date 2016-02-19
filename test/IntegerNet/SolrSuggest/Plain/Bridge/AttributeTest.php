@@ -9,6 +9,8 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
+use IntegerNet\SolrSuggest\Plain\Entity\Attribute;
+
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
     /**

@@ -20,7 +20,7 @@ use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
-use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
+use IntegerNet\SolrSuggest\Plain\Entity\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;

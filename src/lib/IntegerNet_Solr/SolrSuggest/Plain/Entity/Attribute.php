@@ -1,7 +1,6 @@
 <?php
-namespace IntegerNet\SolrSuggest\Plain\Bridge;
+namespace IntegerNet\SolrSuggest\Plain\Entity;
 
-use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
 use IntegerNet\Solr\Implementor\Source as SourceInterface;
 
 /**
@@ -13,9 +12,6 @@ use IntegerNet\Solr\Implementor\Source as SourceInterface;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-/**
- * @todo move (no bridge needed)
- */
 final class Attribute implements SerializableAttribute
 {
     protected $_attributeConfig = null;
@@ -40,10 +36,6 @@ final class Attribute implements SerializableAttribute
      * @var
      */
     private $usedForSortBy;
-    /**
-     * @var
-     */
-    private $facetType;
 
     /**
      * @param string $attributeCode

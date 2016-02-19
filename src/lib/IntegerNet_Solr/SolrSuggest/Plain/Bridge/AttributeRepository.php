@@ -11,7 +11,7 @@ namespace IntegerNet\SolrSuggest\Plain\Bridge;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheReader;
 
 class AttributeRepository implements AttributeRepositoryInterface

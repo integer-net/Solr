@@ -19,12 +19,12 @@ use IntegerNet\Solr\Config\Stub\ServerConfigBuilder;
 use IntegerNet\Solr\Config\Stub\StoreConfigBuilder;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
-use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
+use IntegerNet\SolrSuggest\Plain\Entity\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ConfigCacheItem;
@@ -278,8 +278,8 @@ class CacheWriterTestParameters
      * @param int $storeId
      * @param Config $config
      * @param string $templateFile
-     * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $filterableAttributes
-     * @param \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[] $searchableAttributes
+     * @param \IntegerNet\SolrSuggest\Plain\Entity\Attribute[] $filterableAttributes
+     * @param \IntegerNet\SolrSuggest\Plain\Entity\Attribute[] $searchableAttributes
      * @param \IntegerNet\SolrSuggest\Plain\Bridge\Category[] $activeCategories
      * @param array $customData
      */
@@ -320,7 +320,7 @@ class CacheWriterTestParameters
     }
 
     /**
-     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[]
+     * @return \IntegerNet\SolrSuggest\Plain\Entity\Attribute[]
      */
     public function getFilterableAttributes()
     {
@@ -328,7 +328,7 @@ class CacheWriterTestParameters
     }
 
     /**
-     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Attribute[]
+     * @return \IntegerNet\SolrSuggest\Plain\Entity\Attribute[]
      */
     public function getSearchableAttributes()
     {

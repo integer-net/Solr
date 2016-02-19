@@ -10,7 +10,10 @@
 namespace IntegerNet\SolrSuggest\Implementor;
 
 /**
- * Retrieves serielizable categories for cache
+ * Retrieves serializable categories for cache
+ *
+ * @todo extract implementation and move to Plain/Entity
+ * @see SerializableAttributeRepository
  */
 interface SerializableCategoryRepository
 {

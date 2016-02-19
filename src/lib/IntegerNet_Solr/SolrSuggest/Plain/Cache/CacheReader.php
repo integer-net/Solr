@@ -10,7 +10,7 @@
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Implementor\Config;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Block\Template;

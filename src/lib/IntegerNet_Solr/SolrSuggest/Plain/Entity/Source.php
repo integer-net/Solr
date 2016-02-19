@@ -1,7 +1,5 @@
 <?php
-namespace IntegerNet\SolrSuggest\Plain\Bridge;
-
-use IntegerNet\SolrSuggest\Implementor\SerializableSource;
+namespace IntegerNet\SolrSuggest\Plain\Entity;
 
 /**
  * integer_net Magento Module

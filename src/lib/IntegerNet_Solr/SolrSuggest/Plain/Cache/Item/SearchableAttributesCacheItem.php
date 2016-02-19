@@ -13,7 +13,7 @@ final class SearchableAttributesCacheItem extends AbstractCacheItem
 {
     /**
      * @param int $storeId
-     * @param \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[] $value
+     * @param \IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute[] $value
      */
     public function __construct($storeId, array $value = null)
     {

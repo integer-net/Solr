@@ -16,9 +16,9 @@ use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Stub\AttributeStub;
 use IntegerNet\Solr\Implementor\Stub\SourceStub;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
-use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
-use IntegerNet\SolrSuggest\Plain\Bridge\Source;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
+use IntegerNet\SolrSuggest\Plain\Entity\Attribute;
+use IntegerNet\SolrSuggest\Plain\Entity\Source;
 
 class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +32,7 @@ class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $attributeRepositoryStub;
     /**
-     * @var SerializableAttributeRepository
+     * @var AttributesToSerializableAttributes
      */
     private $serializableAttributeRepository;
 
@@ -45,7 +45,7 @@ class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         ])->build();
         $this->attributeRepositoryStub = $this->getMockForAbstractClass(AttributeRepository::class);
         $this->eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);
-        $this->serializableAttributeRepository = new SerializableAttributeRepository(
+        $this->serializableAttributeRepository = new AttributesToSerializableAttributes(
             $this->attributeRepositoryStub, $this->eventDispatcherMock, [self::DEFAULT_STORE_ID => $autosuggestConfig]);
     }
     /**

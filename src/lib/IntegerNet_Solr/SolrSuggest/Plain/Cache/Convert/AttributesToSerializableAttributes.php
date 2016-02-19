@@ -14,9 +14,9 @@ use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttribute;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
 
-final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository
+final class AttributesToSerializableAttributes implements \IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository
 {
     const EVENT_ATTRIBUTE_CUSTOM_DATA = 'integernet_solr_autosuggest_config_attribute';
     /**
@@ -50,7 +50,7 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
      * @internal
      * @param Attribute $attribute
      * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Plain\Bridge\Attribute
+     * @return \IntegerNet\SolrSuggest\Plain\Entity\Attribute
      */
     public function _convertAttribute(Attribute $attribute, $storeId)
     {
@@ -60,7 +60,7 @@ final class SerializableAttributeRepository implements \IntegerNet\SolrSuggest\I
             'attribute' => $attribute,
             'store_id' => $storeId
         ]);
-        return new \IntegerNet\SolrSuggest\Plain\Bridge\Attribute(
+        return new \IntegerNet\SolrSuggest\Plain\Entity\Attribute(
             $attribute->getAttributeCode(), $attribute->getStoreLabel(),
             $attribute->getSolrBoost(), $attribute->getSource(), $attribute->getUsedForSortBy(), $transport->getArrayCopy()
         );

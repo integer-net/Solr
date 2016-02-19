@@ -13,7 +13,7 @@ use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
+use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;

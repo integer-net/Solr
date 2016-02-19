@@ -1,10 +1,8 @@
 <?php
 use IntegerNet\Solr\Config\AutosuggestConfig;
-use IntegerNet\SolrSuggest\Implementor\SerializableAttributeRepository;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
-use IntegerNet\SolrSuggest\Plain\Bridge\Attribute;
 use IntegerNet\SolrSuggest\Plain\Bridge\Category;
 
 /**
@@ -16,7 +14,7 @@ use IntegerNet\SolrSuggest\Plain\Bridge\Category;
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
-    implements TemplateRepository, SerializableAttributeRepository, SerializableCategoryRepository
+    implements TemplateRepository, SerializableCategoryRepository
 {
     protected $_modelIdentifiers = array(
         'integernet_solr/suggestion_collection',
@@ -90,47 +88,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         file_put_contents($targetFilename, $templateContents);
 
         return $targetFilename;
-    }
-
-    /**
-     * @param array $config
-     * @param $storeId
-     */
-    protected function _addAttributeData(&$config, $storeId)
-    {
-        $autosuggestAttributeConfig = unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
-        $allowedAttributeCodes = array();
-        foreach ($autosuggestAttributeConfig as $row) {
-            $allowedAttributeCodes[] = $row['attribute_code'];
-        }
-
-        $config[$storeId]['attribute'] = array();
-        foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
-            if (!in_array($attribute->getAttributeCode(), $allowedAttributeCodes)) {
-                continue;
-            }
-            $options = array();
-            foreach ($attribute->getSource()->getAllOptions(false) as $option) {
-                $options[$option['value']] = $option['label'];
-            }
-            $config[$storeId]['attribute'][$attribute->getAttributeCode()] = array(
-                'attribute_code' => $attribute->getAttributeCode(),
-                'label' => $attribute->getStoreLabel(),
-                'options' => $options,
-            );
-        }
-
-        $config[$storeId]['searchable_attribute'] = array();
-        $searchableAttributes = Mage::getSingleton('integernet_solr/bridge_attributeRepository')
-            ->getSearchableAttributes($storeId);
-        foreach ($searchableAttributes as $attribute) {
-            $config[$storeId]['searchable_attribute'][$attribute->getAttributeCode()] = array(
-                'attribute_code' => $attribute->getAttributeCode(),
-                'label' => $attribute->getStoreLabel(),
-                'solr_boost' => $attribute->getSolrBoost(),
-                'used_for_sortby' => $attribute->getUsedForSortBy(),
-            );
-        }
     }
 
     /**
@@ -248,36 +205,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     protected $_configForCache = array();
-
-    /**
-     * @deprecated SerializableAttributeRepository will be part of the library
-     * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
-     */
-    public function findFilterableInSearchAttributes($storeId)
-    {
-        if (! isset($this->_configForCache[$storeId]['attribute'])) {
-            $this->_addAttributeData($this->_configForCache, $storeId);
-        }
-        return array_map(function(array $attributeConfig) {
-            return Attribute::fromArray($attributeConfig);
-        }, $this->_configForCache[$storeId]['attribute']);
-    }
-
-    /**
-     * @deprecated SerializableAttributeRepository will be part of the library
-     * @param $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableAttribute[]
-     */
-    public function findSearchableAttributes($storeId)
-    {
-        if (! isset($this->_configForCache[$storeId]['searchable_attribute'])) {
-            $this->_addAttributeData($this->_configForCache, $storeId);
-        }
-        return array_map(function(array $attributeConfig) {
-            return Attribute::fromArray($attributeConfig);
-        }, $this->_configForCache[$storeId]['searchable_attribute']);
-    }
 
 
     /**

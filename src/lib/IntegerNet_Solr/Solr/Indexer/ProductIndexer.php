@@ -291,8 +291,6 @@ class ProductIndexer
                 $productData->setData($fieldName . '_boost', $solrBoost);
             }
 
-            $attribute->setStoreId($product->getStoreId()); //TODO move to AttributeRepository
-
             if ($product->getAttributeValue($attribute)
                 && $value = $product->getSearchableAttributeValue($attribute)
             ) {

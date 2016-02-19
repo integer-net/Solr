@@ -6,6 +6,9 @@
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
                 <name>catalogsearch.leftnav</name>
             </action>
+            <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
+                <name>enterprisesearch.leftnav</name>
+            </action>
             <block ifconfig="integernet_solr/general/is_active" type="integernet_solr/result_layer_view" name="catalogsearch.solr.leftnav" after="currency" template="catalog/layer/view.phtml">
                 <action method="setModuleName">
                     <name>Mage_CatalogSearch</name>
@@ -32,6 +35,9 @@
         <reference name="left_first">
             <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
                 <name>catalog.leftnav</name>
+            </action>
+            <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
+                <name>enterprisecatalog.leftnav</name>
             </action>
             <block ifconfig="integernet_solr/category/is_active" type="integernet_solr/result_layer_view" name="catalog.solr.leftnav" after="currency" template="catalog/layer/view.phtml">
                 <action method="setModuleName">

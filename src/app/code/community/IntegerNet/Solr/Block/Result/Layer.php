@@ -14,10 +14,26 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Abstract
      */
     public function getState()
     {
+        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+            if ($block = $this->getLayout()->getBlock('catalog.layer.state')) {
+                return $block;
+            }
+
+            $block = $this->getLayout()->createBlock('integernet_solr/result_layer_state')
+                ->setTemplate('integernet/solr/layer/top/state.phtml')
+                ->setLayer($this);
+
+            return $block;
+        }
+
         if ($block = $this->getLayout()->getBlock('catalogsearch.layer.state')) {
             return $block;
         }
 
-        return $block = $this->getLayout()->getBlock('catalog.layer.state');
+        $block = $this->getLayout()->createBlock('integernet_solr/result_layer_state')
+            ->setTemplate('integernet/solr/layer/top/state.phtml')
+            ->setLayer($this);
+
+        return $block;
     }
 }

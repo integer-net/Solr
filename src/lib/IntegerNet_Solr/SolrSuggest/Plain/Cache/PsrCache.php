@@ -36,7 +36,13 @@ final class PsrCache implements CacheStorage
      */
     public function save(CacheItem $item)
     {
-        $cacheItem = $this->cachePool->getItem($item->getKey());
+        $key = $item->getKey();
+        try {
+            $cacheItem = $this->cachePool->getItem($key);
+        } catch (InvalidCacheItemValueException $e) {
+            $this->cachePool->deleteItem($key);
+            $cacheItem = $this->cachePool->getItem($key);
+        }
         $cacheItem->set($item->getValueForCache());
         $this->cachePool->saveDeferred($cacheItem);
     }

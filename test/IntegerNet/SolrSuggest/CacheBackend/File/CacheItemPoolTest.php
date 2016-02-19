@@ -13,12 +13,14 @@ namespace IntegerNet\SolrSuggest\CacheBackend\File;
 
 use IntegerNet\SolrSuggest\CacheBackend\CacheItem;
 use IntegerNet\SolrSuggest\CacheBackend\InvalidArgumentException;
+use IntegerNet\SolrSuggest\Plain\Cache\InvalidCacheItemValueException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
 class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
 {
     const CACHE_ROOT = 'cache';
+    private static $NUMERIC_INPUT = ['item-1' => 23, 'item-2' => 42, 'item-3' => 1337];
 
     /**
      * @var vfsStreamDirectory
@@ -72,7 +74,7 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldWriteOnSaveDeferred()
     {
-        $input = ['item-1' => 23, 'item-2' => 42, 'item-3' => 1337];
+        $input = self::$NUMERIC_INPUT;
         $writeCacheItemPool = $this->setUpCacheItemPool();
         foreach ($input as $inputKey => $inputData) {
             $this->assertFalse($writeCacheItemPool->hasItem($inputKey), 'has item should return false');
@@ -179,7 +181,7 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
      * After all slashes are replaced (see dataSanitizedFilenames()), the only problematic cache keys
      * are "." and ".."
      *
-     * @return array
+     * @return string[][]
      */
     public static function dataInvalidKeys()
     {
@@ -189,6 +191,52 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
             ['\\.'],
             ['.\\.'],
             ['\\\\.'], // works on some file systems but we don't allow it to be sure (and because vfsStream does not like it)
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider dataInvalidSerializedValues
+     * @param $invalidFileContents
+     */
+    public function shouldThrowExceptionOnUnserializeError($invalidFileContents)
+    {
+        $key = 'garbage';
+        \file_put_contents(vfsStream::url(self::CACHE_ROOT) . '/'. $key, $invalidFileContents);
+        $writeCacheItemPool = $this->setUpCacheItemPool();
+        $this->setExpectedException(InvalidCacheItemValueException::class, 'Invalid cached value for "'.$key.'"');
+        $writeCacheItemPool->getItem($key);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldDeleteSingleItem()
+    {
+        $input = self::$NUMERIC_INPUT;
+        $writeCacheItemPool = $this->setUpCacheItemPool();
+        $readCacheItemPool = $this->setUpCacheItemPool();
+        foreach ($input as $inputKey => $inputData) {
+            $cacheItem = $writeCacheItemPool->getItem($inputKey);
+            $cacheItem->set($inputData);
+            $writeCacheItemPool->save($cacheItem);
+        }
+        $keyToDelete = key($input);
+        $this->assertTrue($readCacheItemPool->hasItem($keyToDelete), 'item should exist before delete');
+        $writeCacheItemPool->deleteItem($keyToDelete);
+        $this->assertFalse($readCacheItemPool->hasItem($keyToDelete), 'item should not exist after delete');
+    }
+
+    /**
+     * data provider
+     *
+     * @return string[][]
+     */
+    public static function dataInvalidSerializedValues()
+    {
+        return [
+            ['garbage'],
+            ['O:16:"NONEXISTENTCLASS":0:{}'],
         ];
     }
 

@@ -10,6 +10,7 @@
 namespace IntegerNet\SolrSuggest\CacheBackend\File;
 
 use IntegerNet\SolrSuggest\CacheBackend\CacheItem;
+use IntegerNet\SolrSuggest\Plain\Cache\InvalidCacheItemValueException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -50,7 +51,10 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $path = $this->getFilePath($key);
         if (\file_exists($path)) {
-            $value = unserialize(file_get_contents($path));
+            $value = @unserialize(file_get_contents($path));
+            if ($value === false || $value instanceof \__PHP_Incomplete_Class) {
+                throw new InvalidCacheItemValueException('Invalid cached value for "' . $key . '""');
+            }
             return new CacheItem(true, $key, $value);
         }
         return CacheItem::newItem($key);
@@ -139,7 +143,9 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        return false; // not supported, use clear() to flush cache
+        $filename = $this->getFilePath($key);
+        \unlink($filename);
+        return true;
     }
 
     /**

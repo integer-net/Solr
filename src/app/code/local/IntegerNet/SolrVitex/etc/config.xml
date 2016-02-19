@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <IntegerNet_SolrVitex>
+            <version>0.1.0</version>
+        </IntegerNet_SolrVitex>
+    </modules>
+    <global>
+        <models>
+            <integernet_solrvitex>
+                <class>IntegerNet_SolrVitex_Model</class>
+            </integernet_solrvitex>
+        </models>
+    </global>
+
+    <frontend>
+        <events>
+            <integernet_solr_filter_item_create>
+                <observers>
+                    <integernet_solrvitex>
+                        <type>singleton</type>
+                        <class>integernet_solrvitex/observer</class>
+                        <method>integernetSolrFilterItemCreate</method>
+                    </integernet_solrvitex>
+                </observers>
+            </integernet_solr_filter_item_create>
+        </events>
+    </frontend>
+</config>

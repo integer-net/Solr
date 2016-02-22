@@ -19,6 +19,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
     protected $_currentStoreId = null;
     protected $_isEmulated = false;
     protected $_initialEnvironmentInfo = null;
+    protected $_unsecureBaseConfig = array();
 
     /**
      * @param Product $product
@@ -121,10 +122,23 @@ class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
         Mage::getDesign()->setPackageName();
         $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
         Mage::getDesign()->setTheme($themeName);
+
+        $this->_unsecureBaseConfig[$storeId] = Mage::getStoreConfig('web/unsecure', $storeId);
+        $store = Mage::app()->getStore($storeId);
+        $store->setConfig('web/unsecure/base_skin_url', Mage::getStoreConfig('web/secure/base_skin_url', $storeId));
+        $store->setConfig('web/unsecure/base_media_url', Mage::getStoreConfig('web/secure/base_media_url', $storeId));
+        $store->setConfig('web/unsecure/base_js_url', Mage::getStoreConfig('web/secure/base_js_url', $storeId));
     }
 
     public function stopStoreEmulation()
     {
+        if (isset($this->_unsecureBaseConfig[$this->_currentStoreId])) {
+            $store = Mage::app()->getStore($this->_currentStoreId);
+            $store->setConfig('web/unsecure/base_skin_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_skin_url']);
+            $store->setConfig('web/unsecure/base_media_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_media_url']);
+            $store->setConfig('web/unsecure/base_js_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_js_url']);
+        }
+
         if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
             Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }

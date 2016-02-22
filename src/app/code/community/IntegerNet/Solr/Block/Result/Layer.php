@@ -15,7 +15,7 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Abstract
     public function getState()
     {
         if (Mage::helper('integernet_solr')->isCategoryPage()) {
-            if ($block = $this->getLayout()->getBlock('catalog.layer.state')) {
+            if ($block = $this->getLayout()->getBlock('catalog.solr.layer.state')) {
                 return $block;
             }
 
@@ -26,7 +26,7 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Abstract
             return $block;
         }
 
-        if ($block = $this->getLayout()->getBlock('catalogsearch.layer.state')) {
+        if ($block = $this->getLayout()->getBlock('catalogsearch.solr.layer.state')) {
             return $block;
         }
 

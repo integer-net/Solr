@@ -8,6 +8,7 @@
             </action>
         </reference>
     </default>
+
     <catalogsearch_result_index>
         <reference name="left">
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">

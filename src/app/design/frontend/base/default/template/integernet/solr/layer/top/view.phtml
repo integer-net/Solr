@@ -32,28 +32,50 @@
  */
 ?>
 <?php if($this->canShowBlock()): ?>
-<div class="block block-layered-nav">
+<div class="block block-filter-nav">
     <div class="block-title">
         <strong><span><?php echo $this->__('Shop By') ?></span></strong>
     </div>
-    <div class="block-content">
-        <?php echo $this->getStateHtml() ?>
+    <div class="block-content toggle-content">
         <?php if ($this->getLayer()->getState()->getFilters()): ?>
             <div class="actions"><a href="<?php echo $this->getClearUrl() ?>"><?php echo $this->__('Clear All') ?></a></div>
         <?php endif; ?>
         <?php if($this->canShowOptions()): ?>
-            <p class="block-subtitle"><?php echo $this->__('Shopping Options') ?></p>
-            <dl id="narrow-by-list">
+            <p class="block-subtitle block-subtitle--filter"><?php echo $this->__('Filter') ?></p>
+
+            <div class="filter">
                 <?php $_filters = $this->getFilters() ?>
                 <?php foreach ($_filters as $_filter): ?>
-                <?php if($_filter->getItemsCount()): ?>
-                    <dt><?php echo $this->__($_filter->getName()) ?></dt>
-                    <dd><?php echo $_filter->getHtml() ?></dd>
-                <?php endif; ?>
+                    <?php if($_filter->getItemsCount()): ?>
+                        <dl class="filter-item">
+                            <dt class="filter-title"><?php echo $this->__($_filter->getName()) ?></dt>
+                            <dd class="filter-content">
+                                <div class="filter-list">
+                                    <?php echo $_filter->getHtml() ?>
+                                </div>
+                            </dd>
+                        </dl>
+                    <?php endif; ?>
                 <?php endforeach; ?>
-            </dl>
-            <script type="text/javascript">decorateDataList('narrow-by-list')</script>
+            </div>
+
+            <script>
+                (function(){
+                    var filters = $$('.filter-title');
+                    filters.each(function(filter){
+                        filter.on('click', function(event){
+                            var item = filter.up('.filter-item');
+                            var sibs = item.siblings();
+                            sibs.each(function(element){
+                                element.removeClassName('filter-item--active');
+                            });
+                            filter.up('.filter-item').toggleClassName('filter-item--active');
+                        })
+                    })
+                })()
+            </script>
         <?php endif; ?>
+        <?php echo $this->getStateHtml() ?>
     </div>
 </div>
 <?php endif; ?>

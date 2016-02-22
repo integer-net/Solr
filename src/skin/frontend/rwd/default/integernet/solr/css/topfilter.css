@@ -1,0 +1,95 @@
+.triangle-up, .filter-item:before, .filter-item:after {
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 6px solid #cccccc; }
+
+.filter:after {
+  content: '';
+  position: relative;
+  display: block;
+  clear: both; }
+
+.filter-item {
+  position: relative;
+  float: left;
+  width: calc(1/4 * (100% - 30px));
+  height: 35px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  background-color: #f4f4f4;
+  cursor: pointer; }
+  .filter-item:hover {
+    background-color: #3399cc; }
+    .filter-item:hover .filter-title {
+      color: #ffffff; }
+  .filter-item:nth-child(4n) {
+    margin-right: 0; }
+  .filter-item:before, .filter-item:after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 6px);
+    right: 15px; }
+  .filter-item:after {
+    top: calc(50% + 3px);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg); }
+
+.filter-title {
+  padding-right: 15px;
+  font-size: .8em; }
+
+.filter-content {
+  display: none;
+  position: absolute;
+  z-index: 200;
+  left: 2px;
+  top: 25px;
+  height: 0;
+  transition: all .4s ease; }
+
+.filter-list {
+  overflow: auto;
+  height: 100%; }
+
+.filter-link {
+  position: relative;
+  padding-left: 15px; }
+  .filter-link:before {
+    position: relative;
+    content: '';
+    display: block;
+    float: left;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #cccccc;
+    background-color: white;
+    margin-right: 10px; }
+
+.filter-link--active:after {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  content: 'x';
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+  color: #3399cc; }
+
+.filter-item--active {
+  background-color: #3399cc;
+  color: #ffffff; }
+  .filter-item--active:before, .filter-item--active:after {
+    border-bottom-color: #ffffff; }
+  .filter-item--active .filter-content {
+    display: block;
+    width: 150%;
+    height: 200px;
+    padding: 10px 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); }
+    .filter-item--active .filter-content li {
+      font-size: .8em;
+      font-style: italic; }

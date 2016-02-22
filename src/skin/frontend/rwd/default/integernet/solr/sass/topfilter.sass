@@ -1,0 +1,119 @@
+$c-white:       #ffffff
+$c-grey:        #f4f4f4
+$c-grey--dark:  #cccccc
+$c-blue:        #3399cc
+
+.triangle-up
+  width: 0
+  height: 0
+  border-left: 3px solid transparent
+  border-right: 3px solid transparent
+  border-bottom: 6px solid $c-grey--dark
+
+.filter
+  &:after
+    content: ''
+    position: relative
+    display: block
+    clear: both
+
+.filter-item
+  position: relative
+  float: left
+  width: calc(1/4 * (100% - 30px))
+  height: 35px
+  margin-right: 10px
+  margin-bottom: 10px
+  padding: 10px 15px
+  background-color: $c-grey
+  cursor: pointer
+
+  &:hover
+    background-color: $c-blue
+
+    .filter-title
+      color: $c-white
+
+
+  &:nth-child(4n)
+    margin-right: 0
+
+  &:before,
+  &:after
+    @extend .triangle-up
+    content: ''
+    position: absolute
+    top: calc(50% - 6px)
+    right: 15px
+
+  &:after
+    top: calc(50% + 3px)
+    transform: rotate(180deg)
+
+
+.filter-title
+  padding-right: 15px
+  font-size: .8em
+
+.filter-content
+  display: none
+  position: absolute
+  z-index: 200
+  left: 2px
+  top: 25px
+  height: 0
+  transition: all .4s ease
+
+.filter-list
+  overflow: auto
+  height: 100%
+
+
+.filter-link
+  position: relative
+  padding-left: 15px
+
+  &:before
+    position: relative
+    content: ''
+    display: block
+    float: left
+    width: 15px
+    height: 15px
+    border: 1px solid $c-grey--dark
+    background-color: white
+    margin-right: 10px
+
+.filter-link--active
+  &:after
+    position: absolute
+    top: 10px
+    left: 15px
+    content: 'x'
+    width: 13px
+    height: 13px
+    font-size: 13px
+    color: $c-blue
+
+// Active item state
+
+.filter-item--active
+  background-color: $c-blue
+  color: $c-white
+
+  &:before,
+  &:after
+    border-bottom-color: $c-white
+
+  .filter-content
+    display: block
+    width: 150%
+    height: 200px
+    padding: 10px 0
+    background-color: $c-white
+    box-shadow: 0 2px 5px rgba(#000000,.3)
+
+    li
+      font:
+        size: .8em
+        style: italic

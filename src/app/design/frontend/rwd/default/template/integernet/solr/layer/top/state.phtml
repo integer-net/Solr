@@ -37,8 +37,8 @@ $_renderers = $this->getParentBlock()->getChild('state_renderers')->getSortedChi
 ?>
 <?php if(!empty($_filters)): ?>
 <div class="currently">
-    <p class="block-subtitle"><?php echo $this->__('Currently Shopping by:') ?></p>
-    <ol>
+    <ol class="filter-currently">
+        <li class="filter-currently-intro"><?php echo $this->__('Currently Shopping by:') ?></li>
     <?php foreach ($_filters as $_filter): ?>
         <?php
         $_rendered = false;
@@ -54,7 +54,7 @@ $_renderers = $this->getParentBlock()->getChild('state_renderers')->getSortedChi
 
         if (!$_rendered):
         ?>
-        <li>
+        <li class="filter-currently-item">
             <?php
                 $clearLinkUrl = $_filter->getClearLinkUrl();
                 if ($clearLinkUrl):

@@ -37,7 +37,7 @@
         <strong><span><?php echo $this->__('Shop By') ?></span></strong>
     </div>
     <div class="block-content toggle-content">
-        <?php echo $this->getStateHtml() ?>
+
         <?php if ($this->getLayer()->getState()->getFilters()): ?>
             <div class="actions"><a href="<?php echo $this->getClearUrl() ?>"><?php echo $this->__('Clear All') ?></a></div>
         <?php endif; ?>
@@ -76,6 +76,7 @@
                 })()
             </script>
         <?php endif; ?>
+        <?php echo $this->getStateHtml() ?>
     </div>
 </div>
 <?php endif; ?>

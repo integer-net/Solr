@@ -16,6 +16,9 @@ gulp.task('sass', function () {
             cascade: false
         }))
         .pipe(rename({prefix: '../css/'}))
+        .pipe(gulp.dest("src"))
+        .pipe(cssnano())
+        .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest("src"));
 });
 

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Use this PHPUnit bootstrap file if you installed the packaged module with all libraries in
+ * MAGENTO_ROOT/lib/
+ */
 define('CLASS_DIR', realpath(__DIR__ . '/../src/lib'));
 set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . PATH_SEPARATOR . CLASS_DIR);
 spl_autoload_register(function($className)

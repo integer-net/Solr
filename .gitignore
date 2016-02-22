@@ -2,3 +2,4 @@ composer.lock
 /*.log
 vendor
 /build
+node_modules

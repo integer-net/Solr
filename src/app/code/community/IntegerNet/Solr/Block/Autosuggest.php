@@ -147,16 +147,10 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     }
 
     /**
-     * @return IntegerNet_Solr_Helper_Custom|IntegerNet_Solr_Autosuggest_Custom
+     * @return IntegerNet_Solr_Helper_Custom
      */
     public function getCustomHelper()
     {
-        if (class_exists('IntegerNet_Solr_Autosuggest_Custom')) {
-            /**
-             * @deprecated only for backwards compatibility in Magento mode
-             */
-            return new IntegerNet_Solr_Autosuggest_Custom();
-        }
         $cacheReader = Mage::helper('integernet_solr/factory')->getCacheReader();
         $storeId = Mage::app()->getStore()->getId();
         try {

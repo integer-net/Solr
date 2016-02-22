@@ -1,6 +1,6 @@
 <?php
 /**
- * Use this PHPUnit bootstrap file if you installed the packaged module with all libraries in
+ * Use this PHPUnit bootstrap file for unit tests if you installed the packaged module with all libraries in
  * MAGENTO_ROOT/lib/
  */
 define('CLASS_DIR', realpath(__DIR__ . '/../src/lib'));

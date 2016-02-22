@@ -43,16 +43,38 @@
         <?php endif; ?>
         <?php if($this->canShowOptions()): ?>
             <p class="block-subtitle block-subtitle--filter"><?php echo $this->__('Filter') ?></p>
-            <dl id="narrow-by-list">
+
+            <div class="filter">
                 <?php $_filters = $this->getFilters() ?>
                 <?php foreach ($_filters as $_filter): ?>
                 <?php if($_filter->getItemsCount()): ?>
-                    <dt><?php echo $this->__($_filter->getName()) ?></dt>
-                    <dd><?php echo $_filter->getHtml() ?></dd>
+                    <dl class="filter-item">
+                        <dt class="filter-title"><?php echo $this->__($_filter->getName()) ?></dt>
+                        <dd class="filter-content">
+                            <div class="filter-list">
+                                <?php echo $_filter->getHtml() ?>
+                            </div>
+                        </dd>
+                    </dl>
                 <?php endif; ?>
                 <?php endforeach; ?>
-            </dl>
-            <script type="text/javascript">decorateDataList('narrow-by-list')</script>
+            </div>
+
+            <script>
+                (function(){
+                    var filters = $$('.filter-title');
+                    filters.each(function(filter){
+                        filter.on('click', function(event){
+                            var item = filter.up('.filter-item');
+                            var sibs = item.siblings();
+                            sibs.each(function(element){
+                              element.removeClassName('filter-item--active');
+                            });
+                            filter.up('.filter-item').toggleClassName('filter-item--active');
+                        })
+                    })
+                })()
+            </script>
         <?php endif; ?>
     </div>
 </div>

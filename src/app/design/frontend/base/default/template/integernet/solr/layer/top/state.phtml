@@ -34,11 +34,10 @@
 <?php $_filters = $this->getActiveFilters() ?>
 <?php if(!empty($_filters)): ?>
 <div class="currently">
-    <p class="block-subtitle"><?php echo $this->__('Currently Shopping by:') ?></p>
-    <ol>
+    <ol class="filter-currently">
+        <li class="filter-currently-intro"><?php echo $this->__('Currently Shopping by:') ?></li>
     <?php foreach ($_filters as $_filter): ?>
-        <li>
-            <span class="label"><?php echo $this->__($_filter->getName()) ?>:</span> <span class="value"><?php echo $this->stripTags($_filter->getLabel()) ?></span>
+        <li class="filter-currently-item">
             <?php
                 $clearLinkUrl = $_filter->getClearLinkUrl();
                 if ($clearLinkUrl):
@@ -48,6 +47,7 @@
             <?php else: ?>
                 <a  class="btn-remove" href="<?php echo $_filter->getRemoveUrl() ?>" title="<?php echo $this->__('Remove This Item') ?>"><?php echo $this->__('Remove This Item') ?></a>
             <?php endif; ?>
+            <span class="label"><?php echo $this->__($_filter->getName()) ?>:</span> <span class="value"><?php echo $this->stripTags($_filter->getLabel()) ?></span>
         </li>
     <?php endforeach; ?>
     </ol>

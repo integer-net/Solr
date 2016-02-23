@@ -102,7 +102,7 @@ class SerializableAttributeRepositoryTest extends \PHPUnit_Framework_TestCase
             'single_attribute_with_custom_data' => [
                 self::DEFAULT_STORE_ID,
                 [AttributeStub::sortableString('attribute1')],
-                [new Attribute('attribute1', 'attribute1', 0, new SourceStub(), true, ['custom_key' => 'custom_value'])],
+                [new Attribute('attribute1', 'attribute1', 0, new Source([]), true, ['custom_key' => 'custom_value'])],
                 [['custom_key' => 'custom_value']]
             ],
             'suggest_attributes' => [

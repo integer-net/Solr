@@ -1,0 +1,15 @@
+{
+  "name": "integernet_solr_frontend",
+  "description": "integernet_solr: Frontend",
+  "author": "Sandro Wagner, sw@integer-net.de",
+  "repository": "",
+  "version": "0.1.0",
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-cssnano": "^2.1.0",
+    "gulp-rename": "*",
+    "gulp-sass": "^2.2.0"
+  },
+  "dependencies": {}
+}

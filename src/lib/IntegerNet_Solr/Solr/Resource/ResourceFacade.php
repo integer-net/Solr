@@ -271,11 +271,16 @@ class ResourceFacade
 
     /**
      * @param int $storeId
+     * @param string $contentType
      * @return Apache_Solr_Response
      */
-    public function deleteAllDocuments($storeId)
+    public function deleteAllDocuments($storeId, $contentType = '')
     {
-        $response = $this->getSolrService($storeId)->deleteByQuery('store_id:' . $storeId);
+        $query = 'store_id:' . $storeId;
+        if ($contentType) {
+            $query .= ' AND content_type:' . $contentType;
+        }
+        $response = $this->getSolrService($storeId)->deleteByQuery($query);
         $this->getSolrService($storeId)->commit();
         return $response;
     }

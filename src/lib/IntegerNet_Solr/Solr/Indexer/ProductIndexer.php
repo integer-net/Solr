@@ -21,6 +21,8 @@ use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 
 class ProductIndexer
 {
+    const CONTENT_TYPE = 'product';
+    
     /** @var  int */
     private $_defaultStoreId;
     /**
@@ -82,7 +84,7 @@ class ProductIndexer
     /**
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
-     * @param null|Mage_Core_Model_Store $restrictToStore
+     * @param null|\Mage_Core_Model_Store $restrictToStore
      */
     public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
@@ -112,7 +114,7 @@ class ProductIndexer
                 ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
                 || $emptyIndex === 'force'
             ) {
-                $this->_getResource()->deleteAllDocuments($storeId);
+                $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
             }
 
             $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
@@ -165,7 +167,7 @@ class ProductIndexer
             'category' => $categoryIds, // @todo get category ids from parent anchor categories as well
             'category_name_t_mv' => $this->_categoryRepository->getCategoryNames($categoryIds, $product->getStoreId()),
             'store_id' => $product->getStoreId(),
-            'content_type' => 'product',
+            'content_type' => self::CONTENT_TYPE,
             'is_visible_in_catalog_i' => $product->isVisibleInCatalog(),
             'is_visible_in_search_i' => $product->isVisibleInSearch(),
         ));

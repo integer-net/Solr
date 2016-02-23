@@ -29,6 +29,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
             throw new InvalidArgumentException('Magento 1 product bridge expected, '. get_class($product) .' received.');
         }
         $product = $product->getMagentoProduct();
+        $product->getUrlModel()->getUrlInstance()->setUseSession(false);
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */
         $block = $this->_getResultItemBlock();

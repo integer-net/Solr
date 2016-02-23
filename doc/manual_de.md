@@ -56,7 +56,7 @@ Installation
 6. Leeren Sie den Magento-Cache.
 7. (Starten Sie den Kompilierungsprozess und reaktivieren Sie die Magento-Kompilierung - wir empfehlen, die Kompilierungsfunktion von Magento nicht zu nutzen, unabhängig von diesem Modul.)
 8. Gehen Sie in den Administrationsbereich von Magento zu `System -> Konfiguration -> Solr` (weit unten).
-9. Geben Sie die Solr-Zugangsdaten ein und konfigurieren Sie das Modul (siehe unten).
+9. Geben Sie die Solr-Zugangsdaten ein und konfigurieren Sie das Modul ([siehe unten](#solr-server-data)).
 10. Klicken Sie auf "Konfiguration speichern". Die Verbindung zum Solr-Server wird automatisch getestet. Sie erhalten entsprechende Erfolgs- und/oder Fehlermeldungen.
 11. Wenn Sie die Magento Enterprise Edition nutzen, müssen Sie die integrierte Solr-Suche ausschalten. Setzen Sie `System -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine` auf `MySql Fulltext`.
 12. Reindizieren Sie den Index von IntegerNet_Solr. Wir empfehlen, dies über die Kommandozeile zu machen. Gehen Sie in das Verzeichnis `shell` und rufen Sie den Befehl `php -f indexer.php -- --reindex integernet_solr` auf.
@@ -146,6 +146,8 @@ Achtung: Es wird keine Verbindung zu einem Lizenzserver o.ä. aufgebaut. Sobald 
 Wenn dieser Schalter aktiv ist, werden alle Anfragen zum Solr-Server gespeichert. Das betrifft sowohl die Suchvorschau als auch die eigentlichen Suchergebnisse. Sie finden die Logs anschließend im Verzeichnis `/var/log/` mit den Dateinamen `solr.log` bzw. `solr_suggestions.log`.
 
 Die Logdateien werden ausschließlich zur Fehlersuche bzw. zur Optimierung der Suchergebnisse genutzt. Da die Datenmengen bei einer häufig genutzten Suchfunktion erheblich sein können, empfehlen wir, das Logging auf Produktivsystemen üblicherweise zu deaktivieren.
+
+<a name="solr-server-data"></a>
 
 ### Server
 
@@ -263,7 +265,7 @@ Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche für Su
 
 ### Suchergebnisse
 
-![Suchergebnisse](http://www.integer-net.de/download/solr/integernet-solr-config-results-de.png)
+![Suchergebnisse](http://www.integer-net.de/download/solr/integernet-solr-config-search-results-de.png)
 
 #### HTML vom Solr-Index verwenden
 
@@ -276,6 +278,11 @@ Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, w
 Hier haben Sie die Wahl zwischen *UND* und *ODER*. Der Such-Operator wird eingesetzt, wenn es mehr als einen Suchbegriff in der Anfrage gibt, z.B. "rotes Shirt". Bei *UND* werden nur Ergebnisse ausgegeben, die auf beide (bzw. alle) Suchbegriffe passen, bei *ODER* werden dafür auch Ergebnisse ausgegeben, die nur auf einen der Suchbegriffe passen. 
 In den meisten Fällen ist *UND* die bessere Einstellung.
 
+#### Solr-Priorität von Kategorienamen
+
+Hier können Sie einstellen, mit welcher Priorität Kategorienamen im Solr-Index verarbeitet werden. Ein Beispiel: Wenn der Suchbegriff "schwarze Shirts" hauptsächlich solche Artikel im Suchergebnis anzeigen soll, die in der Kategorie "Shirts" enthalten sind, tragen Sie hier einen höheren Wert ein.
+Der Standardwert ist 1. Wenn Sie einen höheren Wert eintragen, werden Kategorienamen im Solr-Index stärker beachtet.
+
 #### Größe der Preis-Schritte
 
 Diese Einstellung ist für den Preisfilter wichtig. Hier kann man einstellen, in welchen Schritten die einzelnen Intervalle definiert sein sollen. So führt z.B. *10* zu den Intervallen *0,00-10,00*, *10,00-20,00*, *20,00-30,00* usw.
@@ -287,6 +294,16 @@ Auch diese Einstellung ist für die Steuerung des Preisfilters gedacht. Hierübe
 #### Individuelle Preisintervalle verwenden
 Wenn Sie keine lineare Einteilung der Intervalle wünschen und mindestens Solr 4.10 einsetzen, können Sie hier die gewünschten Intervallgrenzen für den Preisfilter individuell einstellen. Beim Beispiel *10,20,50,100,200,300,400,500* wären das die Schritte *0,00-10,00*, *10,00-20,00*, *20,00-50,00* usw. bis *400,00-500,00* und *ab 500,00*. 
 
+#### Weiterleitung zur Produktseite bei 100% Übereinstimmung mit einem dieser Attribute
+
+Wird als Suchbegriff ein Wert eingegeben, der mit einem wichtigen Attributwert eines Produkts exakt übereinstimmt, können Sie für diesen Fall eine direkte Weiterleitung zum Produkt aktivieren. Dadurch wird der Weg zum Produkt weiter verkürzt, indem das Anzeigen der Suchergebnisseite übersprungen wird.
+Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zum Produkt eindeutig ist.
+
+#### Weiterleitung zur Kategorieseite bei 100% Übereinstimmung mit einem dieser Attribute
+
+Wie bei der direkten Weiterleitung zu Produkten können Sie auch eine Weiterleitung zu exakt übereinstimmenden Kategorieseiten aktivieren.
+Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zur Kategorie eindeutig ist.
+
 ### Kategorieseiten
 
 ![Kategorieseiten](http://www.integer-net.com/download/solr/integernet-solr-config-category-display-de.png)
@@ -294,6 +311,7 @@ Wenn Sie keine lineare Einteilung der Intervalle wünschen und mindestens Solr 4
 #### Solr für die Darstellung von Produkten auf Kategorieseiten verwenden
 
 Das Aktivieren dieser Funktion führt dazu, dass die Produkte auf Kategorieseiten von Solr dargestellt werden. Besonders in Online-Shops mit einer Vielzahl von Produkten oder filterbaren Attributen in der Filternavigation können so die Ladezeiten von Kategorieseiten deutlich verringert werden.
+Wird diese Funktion aktiviert, ist danach eine Reindizierung des Solr Suchindex notwendig, bevor die Änderungen im Frontend des Shops übernommen werden.
 
 ### Suchvorschlags-Box
 
@@ -336,6 +354,14 @@ Hier geht es um den Link, der hinter den angezeigten Kategorien steht. Die Optio
 
 Hier können Sie beliebig viele Attribute eintragen, die in der Suchvorschau mit den am häufigsten vorkommenden Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die Anzahl der angezeigten Optionen definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei "Sortierung" wird zuoberst angezeigt.
 Es stehen nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
+
+### SEO
+
+![SEO](http://www.integer-net.de/download/solr/integernet-solr-config-seo-de.png)
+
+#### Die folgenden Seiten vor Bots schützen:
+
+Wählen Sie aus, welche der von IntegerNet_Solr verarbeiteten Seiten für Bots und Suchmaschinen gesperrt werden sollen. Diese Seiten erhalten im Meta-Element Robots den Wert "NOINDEX,NOFOLLOW". Bitte beachten Sie, dass diese Konfiguration starke Auswirkungen auf das Suchmaschinen-Ranking Ihres Shops haben kann. 
 
 Modifikation der Reihenfolge der Suchergebnisse
 -------------

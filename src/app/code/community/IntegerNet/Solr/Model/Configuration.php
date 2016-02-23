@@ -84,7 +84,7 @@ class IntegerNet_Solr_Model_Configuration
         }
         if (!Mage::helper('integernet_solr')->isModuleEnabled('Aoe_LayoutConditions')) {
             $this->_addWarningMessage(
-                Mage::helper('integernet_solr')->__('The module Aoe_LayoutConditions is not installed. Please get it from <a href="%s" target="_blank">%s</a>.', 'https://github.com/fbrnc/Aoe_LayoutConditions', 'https://github.com/fbrnc/Aoe_LayoutConditions')
+                Mage::helper('integernet_solr')->__('The module Aoe_LayoutConditions is not installed. Please get it from <a href="%s" target="_blank">%s</a>.', 'https://github.com/aoepeople/Aoe_LayoutConditions', 'https://github.com/aoepeople/Aoe_LayoutConditions')
             );
         }
     }

@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\Solr\Indexer;
 use IntegerNet\Solr\Implementor\ProductRenderer;
+use IntegerNet\Solr\Implementor\StoreEmulation;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\EventDispatcher;
@@ -41,9 +42,10 @@ class ProductIndexer
     private $_categoryRepository;
     /** @var  ProductRepository */
     private $_productRepository;
-
     /** @var  ProductRenderer */
     private $_renderer;
+    /** @var StoreEmulation */
+    private $storeEmulation;
 
     /**
      * @param int $defaultStoreId
@@ -54,10 +56,11 @@ class ProductIndexer
      * @param IndexCategoryRepository $_categoryRepository
      * @param ProductRepository $_productRepository
      * @param ProductRenderer $_renderer
+     * @param StoreEmulation $storeEmulation
      */
     public function __construct($defaultStoreId, array $_config, ResourceFacade $_resource, EventDispatcher $_eventDispatcher,
                                 AttributeRepository $_attributeRepository, IndexCategoryRepository $_categoryRepository,
-                                ProductRepository $_productRepository, ProductRenderer $_renderer)
+                                ProductRepository $_productRepository, ProductRenderer $_renderer, StoreEmulation $storeEmulation)
     {
         $this->_defaultStoreId = $defaultStoreId;
         $this->_config = $_config;
@@ -67,6 +70,7 @@ class ProductIndexer
         $this->_categoryRepository = $_categoryRepository;
         $this->_productRepository = $_productRepository;
         $this->_renderer = $_renderer;
+        $this->storeEmulation = $storeEmulation;
     }
 
     protected function _getStoreConfig($storeId = null)
@@ -85,6 +89,8 @@ class ProductIndexer
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
      * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @throws \Exception
+     * @throws \IntegerNet\Solr\Exception
      */
     public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
     {
@@ -105,25 +111,30 @@ class ProductIndexer
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
+            $this->storeEmulation->start($storeId);
+            try {
 
-            if (is_null($productIds) && $storeConfig->getIndexingConfig()->isSwapCores()) {
-                $this->_getResource()->setUseSwapIndex();
+                if (is_null($productIds) && $storeConfig->getIndexingConfig()->isSwapCores()) {
+                    $this->_getResource()->setUseSwapIndex();
+                }
+
+                if (
+                    ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
+                    || $emptyIndex === 'force'
+                ) {
+                    $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
+                }
+
+                $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
+                $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
+
+                $this->_getResource()->setUseSwapIndex(false);
+            } catch (\Exception $e) {
+                $this->storeEmulation->stop();
+                throw $e;
             }
-
-            if (
-                ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
-                || $emptyIndex === 'force'
-            ) {
-                $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
-            }
-
-            $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
-            $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
-
-            $this->_getResource()->setUseSwapIndex(false);
+            $this->storeEmulation->stop();
         }
-
-        $this->_renderer->stopStoreEmulation();
 
         if (is_null($productIds)) {
             $this->_getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());

@@ -8,18 +8,14 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 
-use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Indexer\IndexDocument;
 
 class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
 {
     /** @var IntegerNet_Solr_Block_Indexer_Item[] */
-    protected $_itemBlocks = array();
-    protected $_currentStoreId = null;
-    protected $_isEmulated = false;
-    protected $_initialEnvironmentInfo = null;
-    protected $_unsecureBaseConfig = array();
+    private $_itemBlocks = array();
 
     /**
      * @param Product $product
@@ -33,11 +29,6 @@ class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
             throw new InvalidArgumentException('Magento 1 product bridge expected, '. get_class($product) .' received.');
         }
         $product = $product->getMagentoProduct();
-        $storeId = $product->getStoreId();
-        if ($this->_currentStoreId != $storeId) {
-
-            $this->_emulateStore($storeId);
-        }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */
         $block = $this->_getResultItemBlock();
@@ -103,44 +94,6 @@ class IntegerNet_Solr_Model_Bridge_ProductRenderer implements ProductRenderer
             $block->addPriceBlockType('downloadable', $priceBlockType, 'catalog/product/price.phtml');
             $block->addPriceBlockType('configurable', $priceBlockType, 'catalog/product/price.phtml');
             $block->addPriceBlockType('bundle', 'magesetup/bundle_catalog_product_price', 'bundle/catalog/product/price.phtml');
-        }
-    }
-
-    /**
-     * @param int $storeId
-     * @throws Mage_Core_Exception
-     */
-    protected function _emulateStore($storeId)
-    {
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-        $this->_currentStoreId = $storeId;
-        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-        $this->_isEmulated = true;
-        Mage::getDesign()->setStore($storeId);
-        Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
-
-        $this->_unsecureBaseConfig[$storeId] = Mage::getStoreConfig('web/unsecure', $storeId);
-        $store = Mage::app()->getStore($storeId);
-        $store->setConfig('web/unsecure/base_skin_url', Mage::getStoreConfig('web/secure/base_skin_url', $storeId));
-        $store->setConfig('web/unsecure/base_media_url', Mage::getStoreConfig('web/secure/base_media_url', $storeId));
-        $store->setConfig('web/unsecure/base_js_url', Mage::getStoreConfig('web/secure/base_js_url', $storeId));
-    }
-
-    public function stopStoreEmulation()
-    {
-        if (isset($this->_unsecureBaseConfig[$this->_currentStoreId])) {
-            $store = Mage::app()->getStore($this->_currentStoreId);
-            $store->setConfig('web/unsecure/base_skin_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_skin_url']);
-            $store->setConfig('web/unsecure/base_media_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_media_url']);
-            $store->setConfig('web/unsecure/base_js_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_js_url']);
-        }
-
-        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
         }
     }
 }

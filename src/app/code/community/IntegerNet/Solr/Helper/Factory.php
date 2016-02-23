@@ -80,7 +80,8 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $this->getSolrResource(),
             Mage::helper('integernet_solr/event'),
             Mage::getModel('integernet_solr/bridge_pageRepository'),
-            Mage::getModel('integernet_solr/bridge_pageRenderer')
+            Mage::getModel('integernet_solr/bridge_pageRenderer'),
+            Mage::getModel('integernet_solr/bridge_storeEmulation')
         );
     }
 

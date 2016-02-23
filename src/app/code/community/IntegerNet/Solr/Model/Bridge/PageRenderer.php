@@ -15,11 +15,7 @@ use IntegerNet\Solr\Indexer\IndexDocument;
 class IntegerNet_Solr_Model_Bridge_PageRenderer implements PageRenderer
 {
     /** @var IntegerNet_Solr_Block_Indexer_Item[] */
-    protected $_itemBlocks = array();
-    protected $_currentStoreId = null;
-    protected $_isEmulated = false;
-    protected $_initialEnvironmentInfo = null;
-    protected $_unsecureBaseConfig = array();
+    private $_itemBlocks = array();
 
     /**
      * @param Page $page
@@ -33,11 +29,6 @@ class IntegerNet_Solr_Model_Bridge_PageRenderer implements PageRenderer
             throw new InvalidArgumentException('Magento 1 page bridge expected, '. get_class($page) .' received.');
         }
         $page = $page->getMagentoPage();
-        $storeId = $page->getStoreId();
-        if ($this->_currentStoreId != $storeId) {
-
-            $this->_emulateStore($storeId);
-        }
 
         /** @var IntegerNet_Solr_Block_Indexer_Item $block */
         $block = $this->_getResultItemBlock();
@@ -70,41 +61,5 @@ class IntegerNet_Solr_Model_Bridge_PageRenderer implements PageRenderer
         return $this->_itemBlocks[Mage::app()->getStore()->getId()];
     }
 
-    /**
-     * @param int $storeId
-     * @throws Mage_Core_Exception
-     */
-    protected function _emulateStore($storeId)
-    {
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-        $this->_currentStoreId = $storeId;
-        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-        $this->_isEmulated = true;
-        Mage::getDesign()->setStore($storeId);
-        Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
 
-        $this->_unsecureBaseConfig[$storeId] = Mage::getStoreConfig('web/unsecure', $storeId);
-        $store = Mage::app()->getStore($storeId);
-        $store->setConfig('web/unsecure/base_skin_url', Mage::getStoreConfig('web/secure/base_skin_url', $storeId));
-        $store->setConfig('web/unsecure/base_media_url', Mage::getStoreConfig('web/secure/base_media_url', $storeId));
-        $store->setConfig('web/unsecure/base_js_url', Mage::getStoreConfig('web/secure/base_js_url', $storeId));
-    }
-
-    public function stopStoreEmulation()
-    {
-        if (isset($this->_unsecureBaseConfig[$this->_currentStoreId])) {
-            $store = Mage::app()->getStore($this->_currentStoreId);
-            $store->setConfig('web/unsecure/base_skin_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_skin_url']);
-            $store->setConfig('web/unsecure/base_media_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_media_url']);
-            $store->setConfig('web/unsecure/base_js_url', $this->_unsecureBaseConfig[$this->_currentStoreId]['base_js_url']);
-        }
-
-        if ($this->_isEmulated && $this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
-        }
-    }
 }

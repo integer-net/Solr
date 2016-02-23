@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 namespace IntegerNet\SolrCms\Indexer;
+use IntegerNet\Solr\Implementor\StoreEmulation;
 use IntegerNet\SolrCms\Implementor\PageRenderer;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Implementor\Config;
@@ -35,9 +36,10 @@ class PageIndexer
     private $_eventDispatcher;
     /** @var  PageRepository */
     private $_pageRepository;
-
     /** @var  PageRenderer */
     private $_renderer;
+    /** @var StoreEmulation */
+    private $storeEmulation;
 
     /**
      * @param int $defaultStoreId
@@ -46,9 +48,10 @@ class PageIndexer
      * @param EventDispatcher $_eventDispatcher
      * @param PageRepository $_pageRepository
      * @param PageRenderer $_renderer
+     * @param StoreEmulation $storeEmulation
      */
     public function __construct($defaultStoreId, array $_config, ResourceFacade $_resource, EventDispatcher $_eventDispatcher,
-                                PageRepository $_pageRepository, PageRenderer $_renderer)
+                                PageRepository $_pageRepository, PageRenderer $_renderer, StoreEmulation $storeEmulation)
     {
         $this->_defaultStoreId = $defaultStoreId;
         $this->_config = $_config;
@@ -56,6 +59,7 @@ class PageIndexer
         $this->_eventDispatcher = $_eventDispatcher;
         $this->_pageRepository = $_pageRepository;
         $this->_renderer = $_renderer;
+        $this->storeEmulation = $storeEmulation;
     }
 
     protected function _getStoreConfig($storeId = null)
@@ -74,6 +78,7 @@ class PageIndexer
      * @param array|null $pageIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
      * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @throws \Exception
      */
     public function reindex($pageIds = null, $emptyIndex = false, $restrictToStore = null)
     {
@@ -90,19 +95,25 @@ class PageIndexer
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
+            $this->storeEmulation->start($storeId);
+            try {
 
-            if (
-                ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
-                || $emptyIndex === 'force'
-            ) {
-                $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
+                if (
+                    ($emptyIndex && $storeConfig->getIndexingConfig()->isDeleteDocumentsBeforeIndexing())
+                    || $emptyIndex === 'force'
+                ) {
+                    $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
+                }
+
+                $pageCollection = $this->_pageRepository->setPageSizeForIndex($pageSize)->getPagesForIndex($storeId, $pageIds);
+                $this->_indexPageCollection($emptyIndex, $pageCollection, $storeId);
+
+            } catch (\Exception $e) {
+                $this->storeEmulation->stop();
+                throw $e;
             }
-
-            $pageCollection = $this->_pageRepository->setPageSizeForIndex($pageSize)->getPagesForIndex($storeId, $pageIds);
-            $this->_indexPageCollection($emptyIndex, $pageCollection, $storeId);
+            $this->storeEmulation->stop();
         }
-
-        $this->_renderer->stopStoreEmulation();
     }
 
     /**

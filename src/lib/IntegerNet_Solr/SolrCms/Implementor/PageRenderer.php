@@ -26,11 +26,4 @@ interface PageRenderer
      * @param bool $useHtmlInResults
      */
     public function addResultHtmlToPageData(Page $page, IndexDocument $pageData, $useHtmlInResults);
-
-    /**
-     * Is called when all blocks are rendered and should be used to reset global state
-     *
-     * @return mixed
-     */
-    public function stopStoreEmulation();
 }

@@ -121,6 +121,16 @@
                     </integernet_solr>
                 </observers>
             </core_block_abstract_to_html_before>
+
+            <cms_page_save_commit_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/cmsIndexer</class>
+                        <method>cmsPageSaveAfter</method>
+                    </integernet_solr>
+                </observers>
+            </cms_page_save_commit_after>
         </events>
 
         <resources>

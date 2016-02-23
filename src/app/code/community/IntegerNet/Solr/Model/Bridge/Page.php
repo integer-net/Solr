@@ -67,21 +67,22 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
     }
 
     /**
+     * @param int $storeId
      * @return bool
      */
-    public function isIndexable()
+    public function isIndexable($storeId)
     {
         Mage::dispatchEvent('integernet_solr_can_index_page', array('page' => $this->_page));
 
         if ($this->_page->getSolrExclude()) {
             return false;
         }
-        /*if (!in_array($this->_page->getStore()->getWebsiteId(), $this->_page->getWebsiteIds())) {
+        
+        if (!$this->_page->getIsActive()) {
             return false;
-        }*/
-
+        }
+        
         return true;
-
     }
 
     /**

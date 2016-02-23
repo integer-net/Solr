@@ -129,11 +129,10 @@ class IntegerNet_Solr_Model_Bridge_LazyPageIterator implements PageIterator, Out
     {
         /** @var $pageCollection Mage_Cms_Model_Resource_Page_Collection */
         $pageCollection = Mage::getResourceModel('cms/page_collection')
-            ->addStoreFilter($storeId)
-            ->addFieldToFilter('is_active', 1);
+            ->addStoreFilter($storeId);
 
         if (is_array($pageIds)) {
-            $pageCollection->addFieldToFilter('entity_id', array('in' => $pageIds));
+            $pageCollection->addFieldToFilter('page_id', array('in' => $pageIds));
         }
 
         if (!is_null($pageSize)) {

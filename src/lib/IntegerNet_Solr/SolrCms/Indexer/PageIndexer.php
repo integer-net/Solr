@@ -146,7 +146,7 @@ class PageIndexer
 
         //$this->_addResultHtmlToPageData($page, $pageData);
 
-        $this->_eventDispatcher->dispatch('integernet_solr_get_page_data', array('product' => $page, 'page_data' => $pageData));
+        $this->_eventDispatcher->dispatch('integernet_solr_get_page_data', array('page' => $page, 'page_data' => $pageData));
 
         return $pageData->getData();
     }
@@ -159,7 +159,7 @@ class PageIndexer
      */
     protected function _getSolrId($page)
     {
-        return $page->getId() . '_' . $page->getStoreId();
+        return 'page_' . $page->getId() . '_' . $page->getStoreId();
     }
 
     /**
@@ -186,7 +186,7 @@ class PageIndexer
             $pageData->setData($fieldName . '_boost', $solrBoost);
         }
 
-        if ($value = strip_tags($page->getContent())) {
+        if ($value = str_replace(array("\n", "\r"), ' ', strip_tags($page->getContent()))) {
             $pageData->setData($fieldName . '_t', $value);
         }
     }
@@ -236,13 +236,13 @@ class PageIndexer
         $idsForDeletion = array();
 
         foreach ($pageCollection as $page) {
-            if ($page->isIndexable()) {
+            if ($page->isIndexable($storeId)) {
                 $combinedPageData[] = $this->_getPageData($page);
             } else {
                 $idsForDeletion[] = $this->_getSolrId($page);
             }
         }
-
+        
         if (!$emptyIndex && sizeof($idsForDeletion)) {
             $this->_getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
         }

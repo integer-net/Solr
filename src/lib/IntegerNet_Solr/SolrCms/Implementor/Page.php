@@ -16,9 +16,10 @@ interface Page
      */
     public function getSolrId();
     /**
+     * @param int $storeId
      * @return bool
      */
-    public function isIndexable();
+    public function isIndexable($storeId);
 
     public function getId();
 

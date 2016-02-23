@@ -24,7 +24,7 @@ class IntegerNet_Solr_Model_CmsIndexer
     /**
      * Internal constructor not depended on params. Can be used for object initialization
      */
-    protected function _construct()
+    public function __construct()
     {
         $autoloader = new IntegerNet_Solr_Helper_Autoloader();
         $autoloader->createAndRegister();
@@ -38,6 +38,13 @@ class IntegerNet_Solr_Model_CmsIndexer
     public function reindexAll()
     {
         $this->_reindexPages(null, true);
+    }
+    
+    public function cmsPageSaveAfter(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Cms_Model_Page $page */
+        $page = $observer->getObject();
+        $this->_reindexPages(array($page->getId()));
     }
 
     /**

@@ -15,4 +15,11 @@ interface Source
      * @return string
      */
     public function getOptionText($optionId);
+
+    /**
+     * Returns [optionId => optionText] map
+     *
+     * @return string[]
+     */
+    public function getOptionMap();
 }

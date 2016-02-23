@@ -418,7 +418,7 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     {
         $storeId = $product->getStoreId();
         if ($this->_currentStoreId != $storeId) {
-
+            $this->_stopStoreEmulation();
             $this->_emulateStore($storeId);
         }
 
@@ -742,11 +742,14 @@ class IntegerNet_Solr_Model_Indexer_Product extends Mage_Core_Model_Abstract
     protected function _emulateStore($storeId)
     {
         $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+        
         $this->_currentStoreId = $storeId;
         $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
         $this->_isEmulated = true;
+        
+        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
+        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+        
         Mage::getDesign()->setStore($storeId);
         Mage::getDesign()->setPackageName();
         $themeName = Mage::getStoreConfig('design/theme/default', $storeId);

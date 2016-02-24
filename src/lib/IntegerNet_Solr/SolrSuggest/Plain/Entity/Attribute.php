@@ -1,8 +1,6 @@
 <?php
 namespace IntegerNet\SolrSuggest\Plain\Entity;
 
-use IntegerNet\Solr\Implementor\Source as SourceInterface;
-
 /**
  * integer_net Magento Module
  *
@@ -15,7 +13,6 @@ use IntegerNet\Solr\Implementor\Source as SourceInterface;
 final class Attribute implements SerializableAttribute
 {
     protected $_attributeConfig = null;
-    protected $_source = null;
     /**
      * @var
      */
@@ -29,7 +26,7 @@ final class Attribute implements SerializableAttribute
      */
     private $solrBoost;
     /**
-     * @var
+     * @var SerializableSource
      */
     private $source;
     /**
@@ -41,11 +38,11 @@ final class Attribute implements SerializableAttribute
      * @param string $attributeCode
      * @param string $label
      * @param float $solrBoost
-     * @param SourceInterface $source
+     * @param SerializableSource $source
      * @param bool $usedForSortBy
      * @param array $customData
      */
-    public function __construct($attributeCode, $label, $solrBoost, SourceInterface $source, $usedForSortBy, array $customData)
+    public function __construct($attributeCode, $label, $solrBoost, SerializableSource $source, $usedForSortBy, array $customData)
     {
         $this->_attributeConfig = $customData;
         $this->attributeCode = $attributeCode;

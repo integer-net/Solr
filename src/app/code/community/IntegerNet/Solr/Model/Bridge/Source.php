@@ -33,6 +33,20 @@ class IntegerNet_Solr_Model_Bridge_Source implements Source
         return $this->_source->getOptionText($optionId);
     }
 
+    /**
+     * Returns [optionId => optionText] map
+     *
+     * @return string[]
+     */
+    public function getOptionMap()
+    {
+        $result = array();
+        foreach ($this->_source->getAllOptions() as $option) {
+            $result[$option['value']] = $option['label'];
+        }
+        return $result;
+    }
+
 
     /**
      * Delegate all other calls (by Magento) to source model

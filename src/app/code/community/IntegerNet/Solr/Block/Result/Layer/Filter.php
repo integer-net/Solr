@@ -338,7 +338,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         $checkboxBlock
             ->setIsChecked($this->_isSelected($attributeCode, $optionId))
             ->setOptionId($optionId)
-            ->setAttributeCode($attributeCode);
+            ->setAttributeCode($attributeCode)
+            ->setIsTopNav(strpos($this->getNameInLayout(), 'topnav') !== false);
         return $checkboxBlock->toHtml();
     }
 

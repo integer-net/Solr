@@ -88,6 +88,7 @@ class IntegerNet_Solr_Helper_Autoloader
                 ->addNamespace('IntegerNet\Solr', $libBaseDir . '/Solr')
                 ->addNamespace('IntegerNet\SolrCategories', $libBaseDir . '/SolrCategories')
                 ->addNamespace('IntegerNet\SolrSuggest', $libBaseDir . '/SolrSuggest')
+                ->addNamespace('IntegerNet\SolrCms', $libBaseDir . '/SolrCms')
                 ->addNamespace('Psr\Log', $libBaseDir . '/Psr_Log')
                 ->addNamespace('Psr\Cache', $libBaseDir . '/Psr_Cache')
                 ->addNamespace('Apache\Solr', $libBaseDir . '/Apache_Solr')

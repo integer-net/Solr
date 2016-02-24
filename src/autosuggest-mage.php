@@ -15,12 +15,20 @@ class IntegerNet_Solr_Autosuggest
             die('Store ID not given.');
         }
 
+        $this->initAutoload();
+
         $storeId = intval($_GET['store_id']);
         Mage::app()->setCurrentStore($storeId);
 
         $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
         Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
         Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
+    }
+
+    private function initAutoload()
+    {
+        $autoloader = new IntegerNet_Solr_Helper_Autoloader();
+        $autoloader->createAndRegister();
     }
 
     public function getHtml()
@@ -38,6 +46,6 @@ class IntegerNet_Solr_Autosuggest
 require_once 'app/Mage.php';
 umask(0);
 
-$autosuggest = new \IntegerNet\SolrSuggest\Plain\Bootstrap();
+$autosuggest = new IntegerNet_Solr_Autosuggest();
 
 echo $autosuggest->getHtml();

@@ -26,10 +26,13 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
             $storeIds = $this->_getStoreIds($storeIdentifiers);
 
             $entityTypes = $this->getArg('type');
-            if ($entityTypes && $entityTypes != 'all') {
-                $entityTypes = explode(',', $entityTypes);
+            if (!$entityTypes) {
+                $entityTypes = 'product';
+            }
+            if ($entityTypes == 'all') {
+                $entityTypes = array('product', 'page');
             } else {
-                $entityTypes = array('product');
+                $entityTypes = explode(',', $entityTypes);
             }
 
             $emptyIndex = true;
@@ -80,7 +83,7 @@ Usage:  php -f integernet-solr.php -- [options]
   --stores <stores> reindex given stores (can be store id, store code, comma seperated. Or "all".) If not set, reindex all stores.
   --emptyindex      Force emptying the solr index for the given store(s). If not set, configured value is used.
   --noemptyindex    Force not emptying the solr index for the given store(s). If not set, configured value is used.
-  --type <types>    Restrict indexing to certain entity types, i.e. "product" or "page" (comma separated). Or "all". If not set, reindex all entity types.
+  --types <types>    Restrict indexing to certain entity types, i.e. "product" or "page" (comma separated). Or "all". If not set, reindex products.
   help              This help
 
 USAGE;

@@ -28,11 +28,17 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         return $this->getData('attribute');
     }
 
+    /**
+     * @return bool
+     */
     public function isCategory()
     {
         return (boolean)$this->getData('is_category');
     }
 
+    /**
+     * @return bool
+     */
     public function isRange()
     {
         return (boolean)$this->getData('is_range');

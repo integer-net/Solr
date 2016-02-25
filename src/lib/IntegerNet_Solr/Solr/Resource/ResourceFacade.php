@@ -117,22 +117,23 @@ class ResourceFacade
     }
 
     /**
-     * @param null|int $restrictToStore
+     * @param null|int[] $restrictToStoreIds
      * @throws Exception
      */
-    public function checkSwapCoresConfiguration($restrictToStore = null)
+    public function checkSwapCoresConfiguration($restrictToStoreIds = null)
     {
         $coresToSwap = array();
         $coresNotToSwap = array();
         $swapCoreNames = array();
 
         foreach ($this->_config as $storeId => $storeConfig) {
-            /** @var Config $storeConfig */
-            $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
-            if (!is_null($restrictToStore) && ($restrictToStore != $storeId)) {
+            if ($storeId == 0) {
                 continue;
             }
+
+            /** @var Config $storeConfig */
+            $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
@@ -154,13 +155,20 @@ class ResourceFacade
             if (sizeof(array_unique($swapCoreNamesByCore)) > 1) {
                 throw new Exception('Configuration Error: A Core must swap with the same Core for all Store Views using it.');
             }
+            if (!is_null($restrictToStoreIds)) {
+                if (sizeof(array_intersect($restrictToStoreIds, array_keys($swapCoreNamesByCore)))) {
+                    if (sizeof(array_diff(array_keys($swapCoreNamesByCore), $restrictToStoreIds))) {
+                        throw new Exception('Call Error: All Stores using the same Swap Configuration must be reindexed at the same Time.');
+                    }
+                }
+            }
         }
     }
 
     /**
-     * @param null|int $restrictToStore
+     * @param null|int[] $restrictToStoreIds
      */
-    public function swapCores($restrictToStore = null)
+    public function swapCores($restrictToStoreIds = null)
     {
         $storeIdsToSwap = array();
 
@@ -168,7 +176,7 @@ class ResourceFacade
             /** @var Config $storeConfig */
             $solrServerInfo = $storeConfig->getServerConfig()->getServerInfo();
 
-            if (!is_null($restrictToStore) && ($restrictToStore != $storeId)) {
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
                 continue;
             }
 

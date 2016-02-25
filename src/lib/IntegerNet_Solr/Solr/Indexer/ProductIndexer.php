@@ -38,7 +38,7 @@ class ProductIndexer
     private $_eventDispatcher;
     /** @var  AttributeRepository */
     private $_attributeRepository;
-    /** @var  CategoryRepository */
+    /** @var  IndexCategoryRepository */
     private $_categoryRepository;
     /** @var  ProductRepository */
     private $_productRepository;
@@ -88,14 +88,14 @@ class ProductIndexer
     /**
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
-     * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @param null|int[] $restrictToStoreIds
      * @throws \Exception
      * @throws \IntegerNet\Solr\Exception
      */
-    public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
+    public function reindex($productIds = null, $emptyIndex = false, $restrictToStoreIds = null)
     {
         if (is_null($productIds)) {
-            $this->_getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
+            $this->_getResource()->checkSwapCoresConfiguration($restrictToStoreIds);
         }
 
         $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
@@ -104,7 +104,7 @@ class ProductIndexer
         }
 
         foreach($this->_config as $storeId => $storeConfig) {
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
                 continue;
             }
 
@@ -137,7 +137,7 @@ class ProductIndexer
         }
 
         if (is_null($productIds)) {
-            $this->_getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
+            $this->_getResource()->swapCores($restrictToStoreIds);
         }
     }
 

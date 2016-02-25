@@ -77,10 +77,10 @@ class PageIndexer
     /**
      * @param array|null $pageIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
-     * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @param null|int[]
      * @throws \Exception
      */
-    public function reindex($pageIds = null, $emptyIndex = false, $restrictToStore = null)
+    public function reindex($pageIds = null, $emptyIndex = false, $restrictToStoreIds = null)
     {
         $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
         if ($pageSize <= 0) {
@@ -88,7 +88,7 @@ class PageIndexer
         }
 
         foreach($this->_config as $storeId => $storeConfig) {
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
                 continue;
             }
 

@@ -94,9 +94,18 @@ USAGE;
         foreach (explode(',', $storeIdentifiers) as $storeIdentifier) {
             $storeIdentifier = trim($storeIdentifier);
             if ($storeIdentifier == 'all') {
-                return Mage::app()->getStores();
+                $stores = array();
+                foreach (Mage::app()->getStores() as $store) {
+                    if ($store->getIsActive()) {
+                        $stores[] = $store;
+                    }
+                }
+                return $stores;
             }
-            $stores[] = Mage::app()->getStore($storeIdentifier);
+            $store = Mage::app()->getStore($storeIdentifier);
+            if ($store->getIsActive()) {
+                $stores[] = $store;
+            }
         }
         return $stores;
     }

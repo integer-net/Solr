@@ -193,4 +193,14 @@ class SourceStub implements Source
         return '';
     }
 
+    /**
+     * Returns [optionId => optionText] map
+     *
+     * @return string[]
+     */
+    public function getOptionMap()
+    {
+        return array();
+    }
+
 }

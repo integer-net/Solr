@@ -14,6 +14,7 @@ use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\Source;
 use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
 use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository;
 
@@ -63,7 +64,7 @@ final class AttributesToSerializableAttributes implements SerializableAttributeR
         ]);
         return new \IntegerNet\SolrSuggest\Plain\Entity\Attribute(
             $attribute->getAttributeCode(), $attribute->getStoreLabel(),
-            $attribute->getSolrBoost(), $attribute->getSource(), $attribute->getUsedForSortBy(), $transport->getArrayCopy()
+            $attribute->getSolrBoost(), $this->convertSource($attribute->getSource()), $attribute->getUsedForSortBy(), $transport->getArrayCopy()
         );
     }
 
@@ -100,5 +101,14 @@ final class AttributesToSerializableAttributes implements SerializableAttributeR
         return array_map(function(Attribute $attribute) use ($self, $storeId) {
             return $self->_convertAttribute($attribute, $storeId);
         }, $this->attributeRepository->getSearchableAttributes($storeId));
+    }
+
+    /**
+     * @param Source $source
+     * @return Source
+     */
+    private function convertSource(Source $source)
+    {
+        return new \IntegerNet\SolrSuggest\Plain\Entity\Source($source->getOptionMap());
     }
 }

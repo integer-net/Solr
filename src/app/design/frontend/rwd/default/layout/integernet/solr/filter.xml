@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
 
+    <default>
+        <reference name="head">
+            <action method="addCss" ifconfig="integernet_solr/general/is_active">
+                <stylesheet>integernet/solr/css/topfilter.css</stylesheet>
+            </action>
+        </reference>
+    </default>
+
     <catalogsearch_result_index>
         <reference name="left_first">
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
@@ -14,7 +22,7 @@
                     <name>Mage_CatalogSearch</name>
                 </action>
                 <block type="integernet_solr/result_layer_state" name="catalogsearch.solr.layer.state" as="state" template="catalog/layer/state.phtml"/>
-                <block type="integernet_solr/result_layer_filter" name="catalogsearchsolr..layer.filter" as="filter" template="catalog/layer/filter.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalogsearchsolr.solr.layer.filter" as="filter" template="catalog/layer/filter.phtml"/>
                 <block type="integernet_solr/result_layer_renderers" name="catalogsearch.solr.layer.renderers" as="state_renderers"/>
             </block>
         </reference>

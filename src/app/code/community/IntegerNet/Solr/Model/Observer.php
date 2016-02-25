@@ -312,13 +312,13 @@ class IntegerNet_Solr_Model_Observer
                 return;
             }
             /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
-            $stateBlock = $block->getLayout()->getBlock('catalogsearch.layer.state');
+            $stateBlock = $block->getLayout()->getBlock('catalogsearch.solr.layer.state');
         } elseif ($helper->isCategoryPage() && $helper->isCategoryDisplayActive()) {
             if (!in_array('categories_filtered', $robotOptions)) {
                 return;
             }
             /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
-            $stateBlock = $block->getLayout()->getBlock('catalog.layer.state');
+            $stateBlock = $block->getLayout()->getBlock('catalog.solr.layer.state');
         }
         if ($stateBlock instanceof IntegerNet_Solr_Block_Result_Layer_State) {
             $activeFilters = $stateBlock->getActiveFilters();

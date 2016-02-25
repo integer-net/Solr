@@ -9,8 +9,8 @@ src/app/etc/modules/*                                               app/etc/modu
 src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/de_DE/IntegerNet_Solr.csv
 src/app/locale/de_DE/template/email/*                               app/locale/de_DE/template/email/
 src/app/locale/en_US/template/email/*                               app/locale/en_US/template/email/
-src/app/code/community/Apache/Solr                                  app/code/community/Apache/Solr
 src/lib/IntegerNet_Solr                                             lib/IntegerNet_Solr
+src/shell/integernet-solr-check-configuration.php                   shell/integernet-solr-check-configuration.php
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
 src/skin/frontend/base/default/integernet/*                         skin/frontend/base/default/integernet/
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/

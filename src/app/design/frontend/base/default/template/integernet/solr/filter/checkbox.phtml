@@ -9,5 +9,6 @@
  */
 /** @var IntegerNet_Solr_Block_Result_Layer_Checkbox $this */
 ?>
-
+<?php if (!$this->getIsTopNav()): ?>
 <input type="checkbox" name="" value="" <?php if ($this->getIsChecked()): ?>checked="checked"<?php endif ?> />
+<?php endif ?>

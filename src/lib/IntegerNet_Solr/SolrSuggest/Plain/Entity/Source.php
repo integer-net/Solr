@@ -22,4 +22,15 @@ final class Source implements SerializableSource
     {
         return isset($this->_options[$optionId]) ? $this->_options[$optionId] : '';
     }
+
+    /**
+     * Returns [optionId => optionText] map
+     *
+     * @return string[]
+     */
+    public function getOptionMap()
+    {
+        return $this->_options;
+    }
+
 }

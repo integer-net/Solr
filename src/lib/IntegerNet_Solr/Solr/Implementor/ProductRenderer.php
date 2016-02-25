@@ -26,11 +26,4 @@ interface ProductRenderer
      * @param bool $useHtmlInResults
      */
     public function addResultHtmlToProductData(Product $product, IndexDocument $productData, $useHtmlInResults);
-
-    /**
-     * Is called when all blocks are rendered and should be used to reset global state
-     *
-     * @return mixed
-     */
-    public function stopStoreEmulation();
 }

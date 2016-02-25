@@ -10,6 +10,7 @@
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrCms\Indexer\PageIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
@@ -60,7 +61,27 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
             $this->_getIndexCategoryRepository(),
             Mage::getModel('integernet_solr/bridge_productRepository'),
-            Mage::getModel('integernet_solr/bridge_productRenderer')
+            Mage::getModel('integernet_solr/bridge_productRenderer'),
+            Mage::getModel('integernet_solr/bridge_storeEmulation')
+        );
+    }
+
+    /**
+     * Returns new product indexer.
+     *
+     * @return PageIndexer
+     */
+    public function getPageIndexer()
+    {
+        $defaultStoreId = Mage::app()->getStore(true)->getId();
+        return new PageIndexer(
+            $defaultStoreId,
+            $this->getStoreConfig(),
+            $this->getSolrResource(),
+            Mage::helper('integernet_solr/event'),
+            Mage::getModel('integernet_solr/bridge_pageRepository'),
+            Mage::getModel('integernet_solr/bridge_pageRenderer'),
+            Mage::getModel('integernet_solr/bridge_storeEmulation')
         );
     }
 

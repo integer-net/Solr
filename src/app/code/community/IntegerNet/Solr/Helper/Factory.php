@@ -41,7 +41,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     public function getSolrResource()
     {
-        $storeConfig = $this->getStoreConfig();
+        $storeConfig = $this->getStoreConfigWithAdmin();
         return new ResourceFacade($storeConfig);
     }
 
@@ -158,6 +158,21 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      * @return Config[]
      */
     public function getStoreConfig()
+    {
+        $storeConfig = array();
+        foreach (Mage::app()->getStores(false) as $store) {
+            /** @var Mage_Core_Model_Store $store */
+            if ($store->getIsActive()) {
+                $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
+            }
+        }
+        return $storeConfig;
+    }
+
+    /**
+     * @return Config[]
+     */
+    public function getStoreConfigWithAdmin()
     {
         $storeConfig = array();
         foreach (Mage::app()->getStores(true) as $store) {

@@ -127,6 +127,7 @@ class CacheWriter
         $this->cache->save(new ConfigCacheItem($storeId, $config));
         $this->cache->save(new TemplateCacheItem($storeId, $this->templateRepository->getTemplateByStoreId($storeId)));
     }
+    
     /**
      * @param int $storeId  The store id
      */

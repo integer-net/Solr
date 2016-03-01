@@ -57,11 +57,11 @@ final class AttributesToSerializableAttributes implements SerializableAttributeR
     public function _convertAttribute(Attribute $attribute, $storeId)
     {
         $transport = new Transport();
-        $this->eventDispatcher->dispatch(self::EVENT_ATTRIBUTE_CUSTOM_DATA, [
+        $this->eventDispatcher->dispatch(self::EVENT_ATTRIBUTE_CUSTOM_DATA, array(
             'transport' => $transport,
             'attribute' => $attribute,
             'store_id' => $storeId
-        ]);
+        ));
         return new \IntegerNet\SolrSuggest\Plain\Entity\Attribute(
             $attribute->getAttributeCode(), $attribute->getStoreLabel(),
             $attribute->getSolrBoost(), $this->convertSource($attribute->getSource()), $attribute->getUsedForSortBy(), $transport->getArrayCopy()

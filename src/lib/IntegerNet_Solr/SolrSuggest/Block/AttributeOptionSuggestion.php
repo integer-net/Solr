@@ -14,6 +14,10 @@ namespace IntegerNet\SolrSuggest\Block;
 final class AttributeOptionSuggestion
 {
     /**
+     * @var int
+     */
+    private $id;
+    /**
      * @var string
      */
     private $title;
@@ -27,17 +31,27 @@ final class AttributeOptionSuggestion
     private $url;
 
     /**
+     * @param int $id
      * @param string $title
      * @param int $numResults
      * @param string $url
      */
-    public function __construct($title, $numResults, $url)
+    public function __construct($id, $title, $numResults, $url)
     {
+        $this->id = $id;
         $this->title = $title;
         $this->numResults = $numResults;
         $this->url = $url;
     }
 
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @return string

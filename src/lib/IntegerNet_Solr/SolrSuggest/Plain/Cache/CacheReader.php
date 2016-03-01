@@ -136,6 +136,9 @@ class CacheReader
             $this->loadedCustomData[$storeId] = $this->cache->load(CustomDataCacheItem::createEmpty($storeId))->getValue();
         }
         $result = $this->loadedCustomData[$storeId];
+        if (!is_null($path) && isset($result[$path])) {
+            return $result[$path];
+        }
         foreach (array_filter(explode('/', $path)) as $pathElement) {
             if ((is_array($result) || $result instanceof \ArrayAccess) && isset ($result[$pathElement])) {
                 $result = $result[$pathElement];

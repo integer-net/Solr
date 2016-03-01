@@ -233,6 +233,7 @@ class AutosuggestResult
             $optionSuggestions = array();
             foreach ($optionIds as $optionId => $numResults) {
                 $optionSuggestions[] = new AttributeOptionSuggestion(
+                    $optionId,
                     $this->getAttribute($attributeCode)->getSource()->getOptionText($optionId),
                     $numResults,
                     $this->searchUrl->getUrl($this->getQuery(), array($attributeCode => $optionId))

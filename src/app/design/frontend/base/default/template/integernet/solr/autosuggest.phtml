@@ -32,6 +32,20 @@
     
 <?php endif ?>
 
+<?php if ($cmsPageSuggestions = $this->getResult()->getCmsPageSuggestions()): ?>
+
+    <ul class="cms_pages">
+
+    <?php foreach ($cmsPageSuggestions as $index => $item): ?>
+        <li>
+            <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>&hellip;
+        </li>
+    <?php endforeach ?>
+
+    </ul>
+
+<?php endif ?>
+
 <?php $productSuggestions = $this->getResult()->getProductSuggestions() ?>
 <?php if (sizeof($productSuggestions)): ?>
 

@@ -58,6 +58,11 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
         return $this->_page->getData('content');
     }
 
+    public function getUrl()
+    {
+        return Mage::helper('cms/page')->getPageUrl($this->getId());
+    }
+
     /**
      * @return int
      */

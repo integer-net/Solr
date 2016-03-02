@@ -23,6 +23,7 @@ use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
 use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
+use IntegerNet\SolrSuggest\Block\CmsPageSuggestion;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 
 class AutosuggestResult
@@ -60,6 +61,10 @@ class AutosuggestResult
      */
     private $searchTermSuggestRequest;
     /**
+     * @var Request
+     */
+    private $cmsPageSuggestRequest;
+    /**
      * @var $searchResult null|\IntegerNet\Solr\Resource\SolrResponse
      */
     private $searchResult;
@@ -68,6 +73,10 @@ class AutosuggestResult
      */
     private $searchTermSuggestResult;
     /**
+     * @var $cmsPageSuggestResult null|\IntegerNet\Solr\Resource\SolrResponse
+     */
+    private $cmsPageSuggestResult;
+    /**
      * @var int
      */
     private $storeId;
@@ -75,7 +84,7 @@ class AutosuggestResult
     public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
                                 HasUserQuery $userQuery, SearchUrl $searchUrl, SuggestCategoryRepository $categoryRepository,
                                 AttributeRepository $attributeRepository, Request $searchRequest,
-                                Request $searchTermSuggestRequest)
+                                Request $searchTermSuggestRequest, Request $cmsPageSuggestRequest)
     {
         $this->storeId = $storeId;
         $this->generalConfig = $generalConfig;
@@ -85,6 +94,7 @@ class AutosuggestResult
         $this->categoryRepository = $categoryRepository;
         $this->searchRequest = $searchRequest;
         $this->searchTermSuggestRequest = $searchTermSuggestRequest;
+        $this->cmsPageSuggestRequest = $cmsPageSuggestRequest;
         $this->attributeRepository = $attributeRepository;
     }
 
@@ -152,6 +162,59 @@ class AutosuggestResult
             } else {
                 $suggestions[] = $_suggestion;
             }
+        }
+
+        if (sizeof($suggestions)) {
+            $lastKey = max(array_keys($suggestions));
+            $suggestions[$lastKey] = $suggestions[$lastKey]->appendRowClass('last');
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * @return SearchTermSuggestion[]
+     */
+    public function getCmsPageSuggestions()
+    {
+        $maxNumberCmsPageSuggestions = $this->autosuggestConfig->getMaxNumberSearchwordSuggestions(); /** @todo use correct config value */
+
+        if (!$maxNumberCmsPageSuggestions) {
+            return array();
+        }
+
+        $solrResponse = $this->getCmsPageSuggestResult();
+        $collection = new CmsPageSuggestionCollection($solrResponse, $this->userQuery);
+        $query = $this->getQuery();
+        $counter = 0;
+        mb_internal_encoding('UTF-8');
+        $title = mb_strtolower(trim($query));
+        /** @var CmsPageSuggestion[] $suggestions */
+        $suggestions = array();
+
+        $titles = array($title);
+        foreach ($collection as $item) {
+
+            if ($counter >= $maxNumberCmsPageSuggestions) {
+                break;
+            }
+
+            $title = mb_strtolower(trim($this->escapeHtml($item->getQueryText())));
+            if (in_array($title, $titles)) {
+                continue;
+            }
+
+            $titles[] = $title;
+            $counter++;
+
+            $_suggestion = new CmsPageSuggestion(
+                $title,
+                ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
+                $item->getNumResults(),
+                'test_url'
+            );
+
+            $suggestions[] = $_suggestion;
         }
 
         if (sizeof($suggestions)) {
@@ -387,6 +450,17 @@ class AutosuggestResult
             $this->searchTermSuggestResult = $this->searchTermSuggestRequest->doRequest();
         }
         return $this->searchTermSuggestResult;
+    }
+
+    /**
+     * @return \IntegerNet\Solr\Resource\SolrResponse
+     */
+    private function getCmsPageSuggestResult()
+    {
+        if (is_null($this->cmsPageSuggestResult)) {
+            $this->cmsPageSuggestResult = $this->cmsPageSuggestRequest->doRequest();
+        }
+        return $this->cmsPageSuggestResult;
     }
 
 }

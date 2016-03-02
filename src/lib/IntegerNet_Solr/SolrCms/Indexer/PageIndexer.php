@@ -206,6 +206,8 @@ class PageIndexer
         if ($value = str_replace(array("\n", "\r"), ' ', strip_tags($page->getContent()))) {
             $pageData->setData($fieldName . '_t', $value);
         }
+
+        $pageData->setData('url_s', $page->getUrl());
     }
 
     /**

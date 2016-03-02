@@ -59,7 +59,7 @@ final class Attribute implements SerializableAttribute
      */
     public static function fromArray($array)
     {
-        $options = isset($array['options']) ? $array['options'] : [];
+        $options = isset($array['options']) ? $array['options'] : array();
         $source = new Source($options);
         $usedForSortBy = isset($array['used_for_sortby']) ? $array['used_for_sortby'] : false;
         return new self($array['attribute_code'], $array['label'], @$array['solr_boost'], $source, $usedForSortBy, $array);

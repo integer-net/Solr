@@ -82,19 +82,20 @@ class PageIndexer
      */
     public function reindex($pageIds = null, $emptyIndex = false, $restrictToStoreIds = null)
     {
-        $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
-        if ($pageSize <= 0) {
-            $pageSize = 100;
-        }
-
         foreach($this->_config as $storeId => $storeConfig) {
-            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
-                continue;
-            }
 
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
+
+            if (!$storeConfig->getCmsConfig()->isActive()) {
+                continue;
+            }
+
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
+                continue;
+            }
+
             $this->storeEmulation->start($storeId);
             try {
 
@@ -103,6 +104,11 @@ class PageIndexer
                     || $emptyIndex === 'force'
                 ) {
                     $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
+                }
+
+                $pageSize = intval($storeConfig->getIndexingConfig()->getPagesize());
+                if ($pageSize <= 0) {
+                    $pageSize = 100;
                 }
 
                 $pageCollection = $this->_pageRepository->setPageSizeForIndex($pageSize)->getPagesForIndex($storeId, $pageIds);

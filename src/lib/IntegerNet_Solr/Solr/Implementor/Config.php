@@ -16,6 +16,7 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CmsConfig;
 
 /**
  * Interface for configuration reader. One instance per store.
@@ -76,5 +77,12 @@ interface Config
      * @return ResultsConfig
      */
     public function getResultsConfig();
+
+    /**
+     * Returns cms page configuration
+     *
+     * @return CmsConfig
+     */
+    public function getCmsConfig();
 
 }

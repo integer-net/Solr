@@ -26,11 +26,8 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
             $storeIds = $this->_getStoreIds($storeIdentifiers);
 
             $entityTypes = $this->getArg('type');
-            if (!$entityTypes) {
-                $entityTypes = 'product';
-            }
-            if ($entityTypes == 'all') {
-                $entityTypes = array('product', 'page');
+            if (!$entityTypes || $entityTypes == 'all') {
+                $entityTypes = $this->_getDefaultEntityTypes();
             } else {
                 $entityTypes = explode(',', $entityTypes);
             }
@@ -100,7 +97,7 @@ USAGE;
             $storeIdentifier = trim($storeIdentifier);
             if ($storeIdentifier == 'all') {
                 $storeIds = array();
-                foreach (Mage::app()->getStores() as $store) {
+                foreach (Mage::app()->getStores(false) as $store) {
                     if ($store->getIsActive() && Mage::getStoreConfigFlag('integernet_solr/general/is_active', $store->getId())) {
                         $storeIds[] = $store->getId();
                     }
@@ -113,6 +110,14 @@ USAGE;
             }
         }
         return $storeIds;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getDefaultEntityTypes()
+    {
+        return array('product', 'page');
     }
 }
 

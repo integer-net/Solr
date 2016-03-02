@@ -14,6 +14,7 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CmsConfig;
 use IntegerNet\Solr\Implementor\Config;
 
 /**
@@ -53,6 +54,10 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
      * @var ResultsConfig
      */
     protected $_results;
+    /**
+     * @var CmsConfig
+     */
+    protected $_cms;
 
     /**
      * @param int $_storeId
@@ -214,6 +219,22 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             );
         }
         return $this->_results;
+    }
+
+    /**
+     * Returns search results configuration
+     *
+     * @return CmsConfig
+     */
+    public function getCmsConfig()
+    {
+        if ($this->_cms === null) {
+            $prefix = 'integernet_solr/cms/';
+            $this->_cms = new CmsConfig(
+                $this->_getConfigFlag($prefix . 'is_active')
+            );
+        }
+        return $this->_cms;
     }
 
 

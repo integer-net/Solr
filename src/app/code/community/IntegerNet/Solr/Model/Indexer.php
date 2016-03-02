@@ -9,6 +9,7 @@
  */
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrCms\Indexer\PageIndexer;
 
 /**
  * Class IntegerNet_Solr_Model_Indexer
@@ -21,6 +22,10 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      * @var ProductIndexer
      */
     protected $_productIndexer;
+    /**
+     * @var PageIndexer
+     */
+    protected $_pageIndexer;
     /**
      * @var string[]
      */
@@ -41,6 +46,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
         $autoloader->createAndRegister();
 
         $this->_productIndexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
+        $this->_pageIndexer = Mage::helper('integernet_solr/factory')->getPageIndexer();
     }
 
 
@@ -60,6 +66,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     public function reindexAll()
     {
         $this->_reindexProducts(null, true);
+        $this->_reindexCmsPages(null, true);
     }
 
     /**
@@ -129,6 +136,19 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         try {
             $this->_productIndexer->reindex($productIds, $emptyIndex);
+        } catch (Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array|null $pageIds
+     * @param boolean $emptyIndex
+     */
+    protected function _reindexCmsPages($pageIds = null, $emptyIndex = false)
+    {
+        try {
+            $this->_pageIndexer->reindex($pageIds, $emptyIndex);
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }

@@ -16,6 +16,7 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CmsConfig;
 use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 
@@ -56,6 +57,10 @@ final class Config implements SerializableConfig
      * @var ResultsConfig
      */
     private $resultsConfig;
+    /**
+     * @var CmsConfig
+     */
+    private $cmsConfig;
 
     /**
      * @param StoreConfig $storeConfig
@@ -66,8 +71,9 @@ final class Config implements SerializableConfig
      * @param FuzzyConfig $fuzzySearchConfig
      * @param FuzzyConfig $fuzzyAutosuggestConfig
      * @param ResultsConfig $resultsConfig
+     * @param CmsConfig $cmsConfig
      */
-    public function __construct(StoreConfig $storeConfig, GeneralConfig $generalConfig, ServerConfig $serverConfig, IndexingConfig $indexingConfig, AutosuggestConfig $autosuggestConfig, FuzzyConfig $fuzzySearchConfig, FuzzyConfig $fuzzyAutosuggestConfig, ResultsConfig $resultsConfig)
+    public function __construct(StoreConfig $storeConfig, GeneralConfig $generalConfig, ServerConfig $serverConfig, IndexingConfig $indexingConfig, AutosuggestConfig $autosuggestConfig, FuzzyConfig $fuzzySearchConfig, FuzzyConfig $fuzzyAutosuggestConfig, ResultsConfig $resultsConfig, CmsConfig $cmsConfig)
     {
         $this->storeConfig = $storeConfig;
         $this->generalConfig = $generalConfig;
@@ -77,6 +83,7 @@ final class Config implements SerializableConfig
         $this->fuzzySearchConfig = $fuzzySearchConfig;
         $this->fuzzyAutosuggestConfig = $fuzzyAutosuggestConfig;
         $this->resultsConfig = $resultsConfig;
+        $this->cmsConfig = $cmsConfig;
     }
 
     /**
@@ -159,6 +166,16 @@ final class Config implements SerializableConfig
         return $this->resultsConfig;
     }
 
+    /**
+     * Returns cms configuration
+     *
+     * @return CmsConfig
+     */
+    public function getCmsConfig()
+    {
+        return $this->cmsConfig;
+    }
+
     public static function fromConfig(ConfigInterface $other)
     {
         return new static(
@@ -169,7 +186,8 @@ final class Config implements SerializableConfig
             $other->getAutosuggestConfig(),
             $other->getFuzzySearchConfig(),
             $other->getFuzzyAutosuggestConfig(),
-            $other->getResultsConfig()
+            $other->getResultsConfig(),
+            $other->getCmsConfig()
         );
     }
 

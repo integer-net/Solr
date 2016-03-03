@@ -10,6 +10,7 @@
 namespace IntegerNet\SolrSuggest\Query;
 
 use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\SearchString;
 
@@ -19,6 +20,10 @@ class CmsPageSuggestParamsBuilder implements ParamsBuilder
      * @var AutosuggestConfig
      */
     private $autosuggestConfig;
+    /**
+     * @var ResultsConfig
+     */
+    private $resultsConfig;
     /**
      * @var int
      */
@@ -32,10 +37,12 @@ class CmsPageSuggestParamsBuilder implements ParamsBuilder
      * CmsPageSuggestParamsBuilder constructor.
      * @param SearchString $searchString
      * @param AutosuggestConfig $autosuggestConfig
+     * @param ResultsConfig $resultsConfig
      * @param int $storeId
      */
-    public function __construct(SearchString $searchString, AutosuggestConfig $autosuggestConfig, $storeId)
+    public function __construct(SearchString $searchString, AutosuggestConfig $autosuggestConfig, ResultsConfig $resultsConfig, $storeId)
     {
+        $this->resultsConfig = $resultsConfig;
         $this->autosuggestConfig = $autosuggestConfig;
         $this->storeId = $storeId;
         $this->searchString = $searchString;
@@ -50,14 +57,13 @@ class CmsPageSuggestParamsBuilder implements ParamsBuilder
     public function buildAsArray($attributeToReset = '')
     {
         $params = array(
-            'fq' => 'store_id:' . $this->getStoreId(),
-            'df' => 'text_autocomplete',
-            'facet' => 'true',
-            'facet.field' => 'text_autocomplete',
-            'facet.sort' => 'count',
-            'facet.limit' => $this->autosuggestConfig->getMaxNumberCmsPageSuggestions(),
-            'f.text_autocomplete.facet.prefix' => strtolower($this->searchString->getEscapedString()),
+            'q.op' => $this->resultsConfig->getSearchOperator(),
+            'fq' => 'store_id:' . $this->storeId,
+            'fl' => 'title_t, url_s',
+            'sort' => 'score desc',
+            'defType' => 'edismax',
         );
+
         return $params;
     }
 

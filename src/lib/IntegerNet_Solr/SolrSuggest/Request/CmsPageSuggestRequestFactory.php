@@ -27,6 +27,10 @@ class CmsPageSuggestRequestFactory extends RequestFactory
      * @var \IntegerNet\Solr\Config\AutosuggestConfig
      */
     private $autosuggestConfig;
+    /**
+     * @var \IntegerNet\Solr\Config\ResultsConfig
+     */
+    private $resultsConfig;
 
     /**
      * @param ApplicationContext $applicationContext
@@ -38,17 +42,23 @@ class CmsPageSuggestRequestFactory extends RequestFactory
         parent::__construct($applicationContext, $resource, $storeId);
         $this->query = $applicationContext->getQuery();
         $this->autosuggestConfig = $applicationContext->getAutosuggestConfig();
+        $this->resultsConfig = $applicationContext->getResultsConfig();
     }
 
     protected function createQueryBuilder()
     {
-        return new CmsPageSuggestQueryBuilder($this->createParamsBuilder(), $this->getStoreId());
+        return new CmsPageSuggestQueryBuilder(
+            new SearchString($this->getQuery()->getUserQueryText()),
+            $this->createParamsBuilder(),
+            $this->getStoreId(),
+            $this->getEventDispatcher()
+        );
     }
 
     protected function createParamsBuilder()
     {
         return new CmsPageSuggestParamsBuilder(
-            new SearchString($this->query->getUserQueryText()), $this->autosuggestConfig, $this->getStoreId());
+            new SearchString($this->query->getUserQueryText()), $this->autosuggestConfig, $this->resultsConfig, $this->getStoreId());
     }
 
     /**
@@ -62,6 +72,14 @@ class CmsPageSuggestRequestFactory extends RequestFactory
             $this->getEventDispatcher(),
             $this->getLogger()
         );
+    }
+
+    /**
+     * @return HasUserQuery
+     */
+    protected function getQuery()
+    {
+        return $this->query;
     }
 
 }

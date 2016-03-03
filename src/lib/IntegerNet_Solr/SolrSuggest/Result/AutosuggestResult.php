@@ -177,7 +177,7 @@ class AutosuggestResult
      */
     public function getCmsPageSuggestions()
     {
-        $maxNumberCmsPageSuggestions = $this->autosuggestConfig->getMaxNumberSearchwordSuggestions(); /** @todo use correct config value */
+        $maxNumberCmsPageSuggestions = $this->autosuggestConfig->getMaxNumberCmsPageSuggestions();
 
         if (!$maxNumberCmsPageSuggestions) {
             return array();

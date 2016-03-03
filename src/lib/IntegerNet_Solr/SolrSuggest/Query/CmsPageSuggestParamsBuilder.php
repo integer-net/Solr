@@ -55,7 +55,7 @@ class CmsPageSuggestParamsBuilder implements ParamsBuilder
             'facet' => 'true',
             'facet.field' => 'text_autocomplete',
             'facet.sort' => 'count',
-            'facet.limit' => $this->autosuggestConfig->getMaxNumberSearchwordSuggestions(), /** @todo change  */
+            'facet.limit' => $this->autosuggestConfig->getMaxNumberCmsPageSuggestions(),
             'f.text_autocomplete.facet.prefix' => strtolower($this->searchString->getEscapedString()),
         );
         return $params;

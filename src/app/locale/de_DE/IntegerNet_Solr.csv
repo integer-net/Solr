@@ -145,7 +145,7 @@
 "If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.","Wenn der exakte Name / ... in das Suchfeld eingetragen wird, wird der Kunde auf die entsprechende Kategorieseite weitergeleitet."
 "Search Result Page (always)","Suchergebnisseite (immer)"
 "Search Result Page with active Filters","Suchergebnisseite mit gesetzten Filtern"
-"Categoy Page with active Filters","Kategorieseite mit gesetzten Filtern"
+"Category Page with active Filters","Kategorieseite mit gesetzten Filtern"
 "Hide the following pages from robots:","Die folgenden Seiten vor Bots schützen:"
 "This will set NOINDEX,NOFOLLOW","Dadurch wird NOINDEX,NOFOLLOW gesetzt"
 "Position of Filters","Position der Filter"
@@ -153,3 +153,4 @@
 "Content column (above products)","Inhaltsspalte (oberhalb der Produkte)"
 "Default Value from Configuration","Standardwert aus der Konfiguration"
 "Use Solr to index cms pages","Solr für die Indizierung von CMS-Seiten verwenden"
+"Contents","Inhalte"

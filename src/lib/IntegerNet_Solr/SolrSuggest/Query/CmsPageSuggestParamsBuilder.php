@@ -58,7 +58,7 @@ class CmsPageSuggestParamsBuilder implements ParamsBuilder
     {
         $params = array(
             'q.op' => $this->resultsConfig->getSearchOperator(),
-            'fq' => 'store_id:' . $this->storeId,
+            'fq' => 'content_type:page AND store_id:' . $this->storeId,
             'fl' => 'title_t, url_s',
             'sort' => 'score desc',
             'defType' => 'edismax',

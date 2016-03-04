@@ -32,20 +32,6 @@
     
 <?php endif ?>
 
-<?php if ($cmsPageSuggestions = $this->getResult()->getCmsPageSuggestions()): ?>
-
-    <ul class="cms_pages">
-
-    <?php foreach ($cmsPageSuggestions as $index => $item): ?>
-        <li>
-            <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>&hellip;
-        </li>
-    <?php endforeach ?>
-
-    </ul>
-
-<?php endif ?>
-
 <?php $productSuggestions = $this->getResult()->getProductSuggestions() ?>
 <?php if (sizeof($productSuggestions)): ?>
 
@@ -73,8 +59,9 @@
 
 <?php $categorySuggestions = $this->getResult()->getCategorySuggestions() ?>
 <?php $attributeSuggestions = $this->getResult()->getAttributeSuggestions() ?>
+<?php $cmsPageSuggestions = $this->getResult()->getCmsPageSuggestions() ?>
 
-<?php if (sizeof($categorySuggestions) || sizeof($attributeSuggestions)): ?>
+<?php if (sizeof($categorySuggestions) || sizeof($cmsPageSuggestions) || sizeof($attributeSuggestions)): ?>
 
     <div class="additional-box">
         <?php if (sizeof($categorySuggestions)): ?>
@@ -96,6 +83,26 @@
                 </ul>
 
             </div>
+        <?php endif ?>
+
+        <?php if (sizeof($cmsPageSuggestions)): ?>
+
+            <div class="cms-pages-box">
+                <h3>
+                    <strong><?php echo $this->__('Contents') ?></strong>
+                    <?php echo $this->__('for your Search') ?>
+                </h3>
+                <ul class="cms-pages">
+
+                    <?php foreach ($cmsPageSuggestions as $index => $item): ?>
+                        <li>
+                            <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>
+                        </li>
+                    <?php endforeach ?>
+
+                </ul>
+            </div>
+
         <?php endif ?>
 
         <?php foreach($attributeSuggestions as $attributeSuggestion): ?>
@@ -122,5 +129,4 @@
     </div>
 
 <?php endif ?>
-
 

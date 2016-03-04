@@ -63,27 +63,7 @@ class CmsPageSuggestionCollection implements IteratorAggregate, Countable
      */
     private function loadData()
     {
-        $items = array();
-        if (!isset($this->getResponse()->facet_counts->facet_fields->text_autocomplete) /** @todo adjust */
-            && !isset($this->getResponse()->spellcheck->suggestions)
-        ) {
-            return $this;
-        }
-
-        // Facet Search
-        if (isset($this->getResponse()->facet_counts->facet_fields->text_autocomplete)) {
-
-            $suggestions = (array)$this->getResponse()->facet_counts->facet_fields->text_autocomplete;
-
-            foreach ($suggestions as $suggestion => $numResults) {
-                if (! $numResults) {
-                    continue;
-                }
-                $items[] = new CmsPageSuggestion($suggestion, $numResults);
-            }
-        }
-
-        return $items;
+        return $this->getResponse()->response->docs;
     }
 
     public function count()

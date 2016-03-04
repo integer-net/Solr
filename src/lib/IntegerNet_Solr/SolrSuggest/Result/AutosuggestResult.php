@@ -193,13 +193,13 @@ class AutosuggestResult
         $suggestions = array();
 
         $titles = array($title);
-        foreach ($collection as $item) {
+        foreach ($collection as $item) { /** @var \Apache_Solr_Document $item */
 
             if ($counter >= $maxNumberCmsPageSuggestions) {
                 break;
             }
 
-            $title = mb_strtolower(trim($this->escapeHtml($item->getQueryText())));
+            $title = trim($this->escapeHtml($item->title_t));
             if (in_array($title, $titles)) {
                 continue;
             }
@@ -210,8 +210,8 @@ class AutosuggestResult
             $_suggestion = new CmsPageSuggestion(
                 $title,
                 ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
-                $item->getNumResults(),
-                'test_url'
+                1,
+                $item->url_s
             );
 
             $suggestions[] = $_suggestion;

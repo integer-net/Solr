@@ -88,7 +88,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
                     break;
 
                 case Mage_Index_Model_Event::TYPE_DELETE:
-                    $event->addNewData('solr_delete_product_skus', array($object->getId()));
+                    $event->addNewData('solr_delete_product_ids', array($object->getId()));
                     break;
 
                 case Mage_Index_Model_Event::TYPE_MASS_ACTION:
@@ -111,11 +111,11 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         $data = $event->getNewData();
 
-        if (isset($data['solr_delete_product_skus'])) {
-            $productSkus = $data['solr_delete_product_skus'];
-            if (is_array($productSkus) && !empty($productSkus)) {
+        if (isset($data['solr_delete_product_ids'])) {
+            $productIds = $data['solr_delete_product_ids'];
+            if (is_array($productIds) && !empty($productIds)) {
 
-                $this->_deleteProductsIndex($productSkus);
+                $this->_deleteProductsIndex($productIds);
             }
         }
 

@@ -15,7 +15,7 @@ $installer->startSetup();
 
 $installer->getConnection()->addColumn($installer->getTable('cms/page'), 'solr_boost', 'float( 12,4 ) UNSIGNED NOT NULL DEFAULT 1');
 $installer->getConnection()->addColumn($installer->getTable('cms/page'), 'solr_exclude', 'smallint(6) UNSIGNED NOT NULL DEFAULT 0');
-if ($installer->getConnection()->isTableExists($installer->getTable('enterprise_cms/page_revision'))) {
+if (Mage::helper('core')->isModuleEnabled('Enterprise_Cms') && $installer->getConnection()->isTableExists($installer->getTable('enterprise_cms/page_revision'))) {
     $installer->getConnection()->addColumn($installer->getTable('enterprise_cms/page_revision'), 'solr_boost', 'float( 12,4 ) UNSIGNED NOT NULL DEFAULT 1');
     $installer->getConnection()->addColumn($installer->getTable('enterprise_cms/page_revision'), 'solr_exclude', 'smallint(6) UNSIGNED NOT NULL DEFAULT 0');
 }

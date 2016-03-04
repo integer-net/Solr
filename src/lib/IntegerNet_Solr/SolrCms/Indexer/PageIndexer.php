@@ -75,7 +75,7 @@ class PageIndexer
     }
 
     /**
-     * @param array|null $pageIds Restrict to given Products if this is set
+     * @param array|null $pageIds Restrict to given Pages if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
      * @param null|int[]
      * @throws \Exception
@@ -123,9 +123,9 @@ class PageIndexer
     }
 
     /**
-     * @param string[] $productIds
+     * @param string[] $pageIds
      */
-    public function deleteIndex($productIds)
+    public function deleteIndex($pageIds)
     {
         foreach($this->_config as $storeId => $storeConfig) {
 
@@ -135,8 +135,8 @@ class PageIndexer
 
             $ids = array();
 
-            foreach($productIds as $productId) {
-                $ids[] = $productId . '_' . $storeId;
+            foreach($pageIds as $pageId) {
+                $ids[] = 'page_' . $pageId . '_' . $storeId;
             }
 
             $this->_getResource()->deleteByMultipleIds($storeId, $ids);
@@ -145,7 +145,7 @@ class PageIndexer
 
 
     /**
-     * Generate single product data for Solr
+     * Generate single page data for Solr
      *
      * @param Page $page
      * @return array

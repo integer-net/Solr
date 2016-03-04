@@ -15,6 +15,7 @@ use IntegerNet\Solr\Query\ParamsBuilder;
 use IntegerNet\Solr\Query\Query;
 use IntegerNet\Solr\Query\QueryBuilder;
 use IntegerNet\Solr\Query\SearchString;
+use IntegerNet\Solr\Config\AutosuggestConfig;
 
 class CmsPageSuggestQueryBuilder implements QueryBuilder
 {
@@ -35,6 +36,10 @@ class CmsPageSuggestQueryBuilder implements QueryBuilder
      * @var $storeId int
      */
     private $storeId;
+    /**
+     * @var $autosuggestConfig AutosuggestConfig
+     */
+    private $autosuggestConfig;
 
     /**
      * @param SearchString $searchString
@@ -42,12 +47,13 @@ class CmsPageSuggestQueryBuilder implements QueryBuilder
      * @param int $storeId
      * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(SearchString $searchString, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher)
+    public function __construct(SearchString $searchString, ParamsBuilder $paramsBuilder, $storeId, EventDispatcher $eventDispatcher, AutosuggestConfig $autosuggestConfig)
     {
         $this->searchString = $searchString;
         $this->paramsBuilder = $paramsBuilder;
         $this->storeId = $storeId;
         $this->eventDispatcher = $eventDispatcher;
+        $this->autosuggestConfig = $autosuggestConfig;
     }
 
     public function build()
@@ -56,7 +62,7 @@ class CmsPageSuggestQueryBuilder implements QueryBuilder
             $this->storeId,
             $this->getQueryText(),
             0,
-            4,
+            $this->autosuggestConfig->getMaxNumberCmsPageSuggestions(),
             $this->paramsBuilder->buildAsArray()
         );
     }

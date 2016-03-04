@@ -51,7 +51,8 @@ class CmsPageSuggestRequestFactory extends RequestFactory
             new SearchString($this->getQuery()->getUserQueryText()),
             $this->createParamsBuilder(),
             $this->getStoreId(),
-            $this->getEventDispatcher()
+            $this->getEventDispatcher(),
+            $this->autosuggestConfig
         );
     }
 

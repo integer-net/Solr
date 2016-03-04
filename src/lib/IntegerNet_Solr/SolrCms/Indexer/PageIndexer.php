@@ -161,7 +161,7 @@ class PageIndexer
 
         $this->_addSearchDataToPageData($page, $pageData);
 
-        //$this->_addResultHtmlToPageData($page, $pageData);
+        $this->_addBoostToPageData($page, $pageData);
 
         $this->_eventDispatcher->dispatch('integernet_solr_get_page_data', array('page' => $page, 'page_data' => $pageData));
 

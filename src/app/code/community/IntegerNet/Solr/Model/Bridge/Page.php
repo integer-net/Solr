@@ -45,7 +45,7 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
 
     public function getSolrBoost()
     {
-        $this->_page->getData('solr_boost');
+        return $this->_page->getData('solr_boost');
     }
     
     public function getTitle()

@@ -19,7 +19,7 @@ interface SerializableCategoryRepository
 {
     /**
      * @param int $storeId
-     * @return SerializableCategory[]
+     * @return SerializableSuggestCategory[]
      */
     public function findActiveCategories($storeId);
 }

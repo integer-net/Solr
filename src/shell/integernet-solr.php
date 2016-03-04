@@ -56,6 +56,13 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
                     $storeIdsString = implode(', ', $storeIds);
                     echo "Solr page index rebuilt for Stores {$storeIdsString}.\n";
                 }
+
+                if (in_array('category', $entityTypes)) {
+                    $indexer = Mage::helper('integernet_solr/factory')->getCategoryIndexer();
+                    $indexer->reindex(null, $emptyIndex, $storeIds);
+                    $storeIdsString = implode(', ', $storeIds);
+                    echo "Solr category index rebuilt for Stores {$storeIdsString}.\n";
+                }
             } catch (Exception $e) {
                 echo $e->getMessage() . "\n";
             }
@@ -117,7 +124,7 @@ USAGE;
      */
     protected function _getDefaultEntityTypes()
     {
-        return array('product', 'page');
+        return array('product', 'category', 'page');
     }
 }
 

@@ -14,7 +14,7 @@ use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\SolrCms\Result\CmsPageSuggestionCollection;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
-use IntegerNet\Solr\Implementor\Category;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Implementor\HasUserQuery;
@@ -390,10 +390,10 @@ class AutosuggestResult
     }
 
     /**
-     * @param Category $category
+     * @param SuggestCategory $category
      * @return string
      */
-    protected function _getCategoryUrl(Category $category)
+    protected function _getCategoryUrl(SuggestCategory $category)
     {
         $linkType = $this->autosuggestConfig->getCategoryLinkType();
         if ($linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
@@ -406,10 +406,10 @@ class AutosuggestResult
     /**
      * Return category name or complete path, depending on what is configured
      *
-     * @param Category $category
+     * @param SuggestCategory $category
      * @return string
      */
-    protected function _getCategoryTitle(Category $category)
+    protected function _getCategoryTitle(SuggestCategory $category)
     {
         if ($this->autosuggestConfig->isShowCompleteCategoryPath()) {
             return $category->getPath(' > ');

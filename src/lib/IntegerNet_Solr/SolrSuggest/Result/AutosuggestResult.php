@@ -12,6 +12,7 @@ namespace IntegerNet\SolrSuggest\Result;
 
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\SolrCms\Result\CmsPageSuggestionCollection;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\Solr\Implementor\Category;
 use IntegerNet\Solr\Config\GeneralConfig;
@@ -23,7 +24,7 @@ use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
 use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
-use IntegerNet\SolrSuggest\Block\CmsPageSuggestion;
+use IntegerNet\SolrCms\Block\CmsPageSuggestion;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 
 class AutosuggestResult

@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Result;
+namespace IntegerNet\SolrCms\Result;
 
 final class CmsPageSuggestion
 {

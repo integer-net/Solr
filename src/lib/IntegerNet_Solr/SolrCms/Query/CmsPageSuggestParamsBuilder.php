@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Query;
+namespace IntegerNet\SolrCms\Query;
 
 use IntegerNet\Solr\Config\AutosuggestConfig;
 use IntegerNet\Solr\Config\ResultsConfig;

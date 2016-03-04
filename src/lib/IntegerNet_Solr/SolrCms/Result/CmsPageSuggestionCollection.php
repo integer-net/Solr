@@ -8,7 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-namespace IntegerNet\SolrSuggest\Result;
+namespace IntegerNet\SolrCms\Result;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;

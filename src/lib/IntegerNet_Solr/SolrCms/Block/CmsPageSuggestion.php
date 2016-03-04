@@ -8,8 +8,10 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-namespace IntegerNet\SolrSuggest\Block;
+namespace IntegerNet\SolrCms\Block;
 
+
+use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 
 final class CmsPageSuggestion
 {

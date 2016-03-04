@@ -7,14 +7,14 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Request;
+namespace IntegerNet\SolrCms\Request;
 
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Resource\LoggerDecorator;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\Solr\Resource\SolrResponse;
-use IntegerNet\SolrSuggest\Query\CmsPageSuggestQueryBuilder;
+use IntegerNet\SolrCms\Query\CmsPageSuggestQueryBuilder;
 use Psr\Log\LoggerInterface;
 
 class CmsPageSuggestRequest implements Request

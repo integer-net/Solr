@@ -29,7 +29,7 @@ use IntegerNet\SolrSuggest\Plain\Factory\LoggerFactory;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
-use IntegerNet\SolrSuggest\Request\CmsPageSuggestRequestFactory;
+use IntegerNet\SolrCms\Request\CmsPageSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
 use Psr\Log\LoggerInterface;

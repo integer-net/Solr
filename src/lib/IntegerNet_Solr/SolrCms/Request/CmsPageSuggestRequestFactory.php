@@ -7,15 +7,16 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\SolrSuggest\Request;
+namespace IntegerNet\SolrCms\Request;
 
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Query\SearchString;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
-use IntegerNet\SolrSuggest\Query\CmsPageSuggestParamsBuilder;
-use IntegerNet\SolrSuggest\Query\CmsPageSuggestQueryBuilder;
+use IntegerNet\SolrCms\Query\CmsPageSuggestParamsBuilder;
+use IntegerNet\SolrCms\Query\CmsPageSuggestQueryBuilder;
+use IntegerNet\SolrCms\Request\CmsPageSuggestRequest;
 
 class CmsPageSuggestRequestFactory extends RequestFactory
 {

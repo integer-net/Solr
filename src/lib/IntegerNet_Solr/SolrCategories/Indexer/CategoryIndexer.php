@@ -88,9 +88,9 @@ class CategoryIndexer
                 continue;
             }
 
-//            if (!$storeConfig->getCategoryConfig()->isActive()) { /** @todo add category configuration */
-//                continue;
-//            }
+            if (!$storeConfig->getCategoryConfig()->isIndexerActive()) { 
+                continue;
+            }
 
             if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
                 continue;

@@ -13,18 +13,20 @@ namespace IntegerNet\SolrSuggest\Result;
 use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\SolrCms\Result\CmsPageSuggestionCollection;
+use IntegerNet\SolrCategories\Result\CategorySuggestionCollection;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\SolrSuggest\Block\AttributeOptionSuggestion;
 use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
-use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 use IntegerNet\SolrCms\Block\CmsPageSuggestion;
+use IntegerNet\SolrCategories\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 
 class AutosuggestResult
@@ -37,6 +39,10 @@ class AutosuggestResult
      * @var \IntegerNet\Solr\Config\AutosuggestConfig
      */
     private $autosuggestConfig;
+    /**
+     * @var \IntegerNet\Solr\Config\CategoryConfig
+     */
+    private $categoryConfig;
     /**
      * @var \IntegerNet\Solr\Implementor\HasUserQuery
      */
@@ -64,6 +70,10 @@ class AutosuggestResult
     /**
      * @var Request
      */
+    private $categorySuggestRequest;
+    /**
+     * @var Request
+     */
     private $cmsPageSuggestRequest;
     /**
      * @var $searchResult null|\IntegerNet\Solr\Resource\SolrResponse
@@ -74,6 +84,10 @@ class AutosuggestResult
      */
     private $searchTermSuggestResult;
     /**
+     * @var $categorySuggestResult null|\IntegerNet\Solr\Resource\SolrResponse
+     */
+    private $categorySuggestResult;
+    /**
      * @var $cmsPageSuggestResult null|\IntegerNet\Solr\Resource\SolrResponse
      */
     private $cmsPageSuggestResult;
@@ -82,19 +96,36 @@ class AutosuggestResult
      */
     private $storeId;
 
-    public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig,
+    /**
+     * AutosuggestResult constructor.
+     * @param int $storeId
+     * @param GeneralConfig $generalConfig
+     * @param AutosuggestConfig $autosuggestConfig
+     * @param CategoryConfig $categoryConfig
+     * @param HasUserQuery $userQuery
+     * @param SearchUrl $searchUrl
+     * @param SuggestCategoryRepository $categoryRepository
+     * @param AttributeRepository $attributeRepository
+     * @param Request $searchRequest
+     * @param Request $searchTermSuggestRequest
+     * @param Request $categorySuggestRequest
+     * @param Request $cmsPageSuggestRequest
+     */
+    public function __construct($storeId, GeneralConfig $generalConfig, AutosuggestConfig $autosuggestConfig, CategoryConfig $categoryConfig,
                                 HasUserQuery $userQuery, SearchUrl $searchUrl, SuggestCategoryRepository $categoryRepository,
                                 AttributeRepository $attributeRepository, Request $searchRequest,
-                                Request $searchTermSuggestRequest, Request $cmsPageSuggestRequest)
+                                Request $searchTermSuggestRequest, Request $categorySuggestRequest, Request $cmsPageSuggestRequest)
     {
         $this->storeId = $storeId;
         $this->generalConfig = $generalConfig;
         $this->autosuggestConfig = $autosuggestConfig;
+        $this->categoryConfig = $categoryConfig;
         $this->userQuery = $userQuery;
         $this->searchUrl = $searchUrl;
         $this->categoryRepository = $categoryRepository;
         $this->searchRequest = $searchRequest;
         $this->searchTermSuggestRequest = $searchTermSuggestRequest;
+        $this->categorySuggestRequest = $categorySuggestRequest;
         $this->cmsPageSuggestRequest = $cmsPageSuggestRequest;
         $this->attributeRepository = $attributeRepository;
     }
@@ -249,25 +280,68 @@ class AutosuggestResult
             return array();
         }
 
+        /** @var CategorySuggestion[] $categorySuggestions */
         $categorySuggestions = array();
         $counter = 0;
 
-        $categoryIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->category;
-        $categories = $this->categoryRepository->findActiveCategoriesByIds($this->storeId, $categoryIds);
+        if ($this->categoryConfig->isIndexerActive()) {
 
-        foreach ($categoryIds as $categoryId => $numResults) {
-            if (isset($categories[$categoryId])) {
-                if (++$counter > $maxNumberCategories) {
+            $solrResponse = $this->getCategorySuggestResult();
+            $collection = new CategorySuggestionCollection($solrResponse, $this->userQuery);
+            $query = $this->getQuery();
+            mb_internal_encoding('UTF-8');
+            $title = mb_strtolower(trim($query));
+
+            $titles = array($title);
+            foreach ($collection as $item) {
+                /** @var \Apache_Solr_Document $item */
+
+                if ($counter >= $maxNumberCategories) {
                     break;
                 }
 
-                $category = $categories[$categoryId];
-                $categorySuggestions[] = new CategorySuggestion(
-                    $this->escapeHtml($this->_getCategoryTitle($category)),
-                    $numResults,
-                    $this->_getCategoryUrl($category)
+                $title = trim($this->escapeHtml($item->name_t));
+                if (in_array($title, $titles)) {
+                    continue;
+                }
+
+                $titles[] = $title;
+                $counter++;
+
+                $_suggestion = new CategorySuggestion(
+                    $title,
+                    ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
+                    1,
+                    $item->url_s
                 );
 
+                $categorySuggestions[] = $_suggestion;
+            }
+
+            if (sizeof($categorySuggestions)) {
+                $lastKey = max(array_keys($categorySuggestions));
+                $categorySuggestions[$lastKey] = $categorySuggestions[$lastKey]->appendRowClass('last');
+            }
+        } else {
+
+            $categoryIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->category;
+            $categories = $this->categoryRepository->findActiveCategoriesByIds($this->storeId, $categoryIds);
+
+            foreach ($categoryIds as $categoryId => $numResults) {
+                if (isset($categories[$categoryId])) {
+                    if (++$counter > $maxNumberCategories) {
+                        break;
+                    }
+
+                    $category = $categories[$categoryId];
+                    $categorySuggestions[] = new CategorySuggestion(
+                        $this->escapeHtml($this->_getCategoryTitle($category)),
+                        '',
+                        $numResults,
+                        $this->_getCategoryUrl($category)
+                    );
+
+                }
             }
         }
 
@@ -451,6 +525,17 @@ class AutosuggestResult
             $this->searchTermSuggestResult = $this->searchTermSuggestRequest->doRequest();
         }
         return $this->searchTermSuggestResult;
+    }
+
+    /**
+     * @return \IntegerNet\Solr\Resource\SolrResponse
+     */
+    private function getCategorySuggestResult()
+    {
+        if (is_null($this->categorySuggestResult)) {
+            $this->categorySuggestResult = $this->categorySuggestRequest->doRequest();
+        }
+        return $this->categorySuggestResult;
     }
 
     /**

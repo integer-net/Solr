@@ -19,4 +19,10 @@ interface CategoryRepository
      * @return CategoryIterator
      */
     public function getCategoriesForIndex($storeId, $categoryIds = null);
+
+    /**
+     * @param int $pageSize
+     * @return $this
+     */
+    public function setPageSizeForIndex($pageSize);
 }

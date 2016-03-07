@@ -55,7 +55,7 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
     
     public function getContent()
     {
-        return $this->_page->getData('content');
+        return Mage::helper('cms')->getPageTemplateProcessor()->filter($this->_page->getData('content'));
     }
 
     public function getUrl()

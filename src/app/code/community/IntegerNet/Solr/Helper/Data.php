@@ -1,4 +1,9 @@
 <?php
+use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\HasUserQuery;
+use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 /**
  * integer_net Magento Module
  *
@@ -6,190 +11,79 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */
+ */ 
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_searchableAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_filterableInSearchAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_filterableInCatalogAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_filterableInCatalogOrSearchAttributes = null;
-
-    /** @var Mage_Catalog_Model_Entity_Attribute[] */
-    protected $_sortableAttributes = null;
 
     /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
-     */
-    public function getSearchableAttributes()
-    {
-        if (is_null($this->_searchableAttributes)) {
-
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_searchableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsSearchableFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-        }
-
-        return $this->_searchableAttributes;
-    }
-
-    /**
-     * @return Mage_Catalog_Model_Entity_Attribute[]
-     */
-    public function getSortableAttributes()
-    {
-        if (is_null($this->_sortableAttributes)) {
-
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_sortableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter('used_for_sort_by', 1)
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-        }
-
-        return $this->_sortableAttributes;
-    }
-
-    /**
+     * @deprecated use repository directly
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
-        if ($this->isCategoryPage()) {
-            return $this->getFilterableInCatalogAttributes($useAlphabeticalSearch);
-        } else {
-            return $this->getFilterableInSearchAttributes($useAlphabeticalSearch);
-        }
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getFilterableAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
-
+    
     /**
+     * @deprecated use repository directly
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
-        if (is_null($this->_filterableInSearchAttributes)) {
-
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsFilterableInSearchFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-
-            if ($useAlphabeticalSearch) {
-                $this->_filterableInSearchAttributes
-                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            } else {
-                $this->_filterableInSearchAttributes
-                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            }
-        }
-
-        return $this->_filterableInSearchAttributes;
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getFilterableInSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
 
 
     /**
+     * @deprecated use repository directly
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
-        if (is_null($this->_filterableInCatalogAttributes)) {
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getFilterableInCatalogAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInCatalogAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addIsFilterableFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-
-            if ($useAlphabeticalSearch) {
-                $this->_filterableInCatalogAttributes
-                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            } else {
-                $this->_filterableInCatalogAttributes
-                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            }
-        }
-
-        return $this->_filterableInCatalogAttributes;
     }
 
     /**
+     * @deprecated use repository directly
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
-        if (is_null($this->_filterableInCatalogOrSearchAttributes)) {
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getFilterableInCatalogOrSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
+    }
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_filterableInCatalogOrSearchAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter(
-                    array(
-                        'additional_table.is_filterable',
-                        'additional_table.is_filterable_in_search'
-                    ),
-                    array(
-                        array('gt' => 0),
-                        array('gt' => 0),
-                    )
-                )
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-
-            if ($useAlphabeticalSearch) {
-                $this->_filterableInCatalogOrSearchAttributes
-                    ->setOrder('frontend_label', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            } else {
-                $this->_filterableInCatalogOrSearchAttributes
-                    ->setOrder('position', Mage_Eav_Model_Entity_Collection_Abstract::SORT_ORDER_ASC);
-            }
-        }
-
-        return $this->_filterableInCatalogOrSearchAttributes;
+    /**
+     * @deprecated use repository directly
+     * @return string[]
+     */
+    public function getAttributeCodesToIndex()
+    {
+        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex();
     }
 
 
     /**
-     * @param Mage_Catalog_Model_Entity_Attribute $attribute
+     * @deprecated use IndexField directly
+     * @param Attribute $attribute
      * @param bool $forSorting
      * @return string
      */
     public function getFieldName($attribute, $forSorting = false)
     {
-        if ($attribute->getUsedForSortBy()) {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t';
-
-                default:
-                    return ($forSorting) ? $attribute->getAttributeCode() . '_s' : $attribute->getAttributeCode() . '_t';
-            }
-        } else {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f_mv';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t_mv';
-
-                default:
-                    return $attribute->getAttributeCode() . '_t_mv';
-            }
+        if (! $attribute instanceof Attribute) {
+            $attribute = new IntegerNet_Solr_Model_Bridge_Attribute($attribute);
         }
+        $indexField = new \IntegerNet\Solr\Indexer\IndexField($attribute, $forSorting);
+        return $indexField->getFieldName();
     }
 
     /**
@@ -204,7 +98,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$this->isLicensed()) {
             return false;
         }
-
+        
         if ($this->isCategoryPage() && !$this->isCategoryDisplayActive()) {
             return false;
         }
@@ -215,10 +109,19 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
+    public function isSearchPage()
+    {
+        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
+            && Mage::app()->getRequest()->getControllerName() == 'result';
+    }
+
+    /**
+     * @return bool
+     */
     public function isCategoryPage()
     {
-        return Mage::app()->getRequest()->getModuleName() != 'catalogsearch'
-            || Mage::app()->getRequest()->getControllerName() != 'result';
+        return Mage::app()->getRequest()->getModuleName() == 'catalog'
+            && Mage::app()->getRequest()->getControllerName() == 'category';
     }
 
     /**
@@ -240,13 +143,13 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $key = trim(strtolower($key));
         $key = str_replace(array('-', '_', ' '), '', $key);
-
+        
         if (strlen($key) != 10) {
             return false;
         }
-
+        
         $hash = md5($key);
-
+        
         return substr($hash, -3) == 'f11';
     }
 

@@ -1,4 +1,10 @@
 <?php
+use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
+use IntegerNet\SolrSuggest\Plain\Block\Template;
+use IntegerNet\SolrSuggest\Plain\Bridge\Category;
+
 /**
  * integer_net Magento Module
  *
@@ -8,70 +14,45 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
+    implements TemplateRepository, SerializableCategoryRepository
 {
-    protected $_modelIdentifiers = array(
-        'integernet_solr/suggestion_collection',
-        'integernet_solr/result',
-        'integernet_solr/suggestion',
-    );
+    /**
+     * @var IntegerNet_Solr_Model_Bridge_StoreEmulation
+     */
+    protected $_storeEmulation;
 
-    protected $_resourceModelIdentifiers = array(
-        'integernet_solr/solr',
-    );
+    public function __construct()
+    {
+        $this->_storeEmulation = Mage::getModel('integernet_solr/bridge_storeEmulation');
+    }
+
 
     public function getTemplate()
     {
         return 'integernet/solr/autosuggest.phtml';
     }
 
-    protected $_initialEnvironmentInfo = null;
-
     /**
      * Store Solr configuration in serialized text field so it can be accessed from autosuggest later
      */
     public function storeSolrConfig()
     {
-        $initialStoreId = Mage::app()->getStore()->getId();
-        foreach(Mage::app()->getStores(false) as $store) { /** @var Mage_Core_Model_Store $store */
-
-            $filename = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $store->getId() . DS . 'config.txt';
-
-            $config = array();
-
-            $this->_emulateStore($store->getId());
-
-            $config[$store->getId()]['integernet_solr'] = Mage::getStoreConfig('integernet_solr');
-
-            $templateFile = $this->getTemplateFile($store->getId());
-            $config[$store->getId()]['template_filename'] = $templateFile;
-            $store->setConfig('template_filename', $templateFile);
-            $config[$store->getId()]['base_url'] = Mage::getUrl();
-
-            $this->_addAttributeData($config, $store);
-
-            $this->_addCategoriesData($config, $store);
-
-            $this->_stopStoreEmulation();
-
-            foreach($this->_modelIdentifiers as $identifier) {
-                $config['model'][$identifier] = get_class(Mage::getModel($identifier));
-            }
-
-            foreach($this->_resourceModelIdentifiers as $identifier) {
-                $config['resource_model'][$identifier] = get_class(Mage::getResourceModel($identifier));
-            }
-
-            $transportObject = new Varien_Object(array('config' => $config));
-
-            Mage::dispatchEvent('integernet_solr_autosuggest_config', array('transport' => $transportObject, 'store' => $store));
-
-            $config = $transportObject->getConfig();
-
-            file_put_contents($filename, serialize($config));
-        }
-        $this->_emulateStore($initialStoreId);
-        $this->_stopStoreEmulation();
+        $factory = Mage::helper('integernet_solr/factory');
+        $factory->getCacheWriter()->write($factory->getStoreConfig());
     }
+
+    /**
+     * @param int $storeId
+     * @return Template
+     */
+    public function getTemplateByStoreId($storeId)
+    {
+        $this->_storeEmulation->start($storeId);
+        $template = new Template($this->getTemplateFile($storeId));
+        $this->_storeEmulation->stop();
+        return $template;
+    }
+
 
     /**
      * Get absolute path to template
@@ -92,7 +73,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         $templateContents = $this->_getTranslatedTemplate($templateContents);
 
-        $targetDirname = Mage::getBaseDir('var') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
+        $targetDirname = Mage::getBaseDir('cache') . DS . 'integernet_solr' . DS . 'store_' . $storeId;
         if (!is_dir($targetDirname)) {
             mkdir($targetDirname, 0777, true);
         }
@@ -104,46 +85,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param array $config
-     * @param Mage_Core_Model_Store $store
+     * @param $storeId
      */
-    protected function _addAttributeData(&$config, $store)
-    {
-        $autosuggestAttributeConfig = unserialize(Mage::getStoreConfig('integernet_solr/autosuggest/attribute_filter_suggestions'));
-        $allowedAttributeCodes = array();
-        foreach ($autosuggestAttributeConfig as $row) {
-            $allowedAttributeCodes[] = $row['attribute_code'];
-        }
-
-        foreach (Mage::helper('integernet_solr')->getFilterableInSearchAttributes() as $attribute) {
-            if (!in_array($attribute->getAttributeCode(), $allowedAttributeCodes)) {
-                continue;
-            }
-            $options = array();
-            foreach ($attribute->getSource()->getAllOptions(false) as $option) {
-                $options[$option['value']] = $option['label'];
-            }
-            $config[$store->getId()]['attribute'][$attribute->getAttributeCode()] = array(
-                'attribute_code' => $attribute->getAttributeCode(),
-                'label' => $attribute->getStoreLabel(),
-                'options' => $options,
-            );
-        }
-
-        foreach (Mage::helper('integernet_solr')->getSearchableAttributes() as $attribute) {
-            $config[$store->getId()]['searchable_attribute'][$attribute->getAttributeCode()] = array(
-                'attribute_code' => $attribute->getAttributeCode(),
-                'label' => $attribute->getStoreLabel(),
-                'solr_boost' => $attribute->getSolrBoost(),
-                'used_for_sortby' => $attribute->getUsedForSortBy(),
-            );
-        }
-    }
-
-    /**
-     * @param array $config
-     * @param Mage_Core_Model_Store $store
-     */
-    protected function _addCategoriesData(&$config, $store)
+    public function _addCategoriesData(&$config, $storeId)
     {
         $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
         if (!$maxNumberCategories) {
@@ -156,9 +100,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
             ->addAttributeToFilter('include_in_menu', 1);
 
         foreach($categories as $category) {
-            $config[$store->getId()]['categories'][$category->getId()] = array(
+            $config[$storeId]['categories'][$category->getId()] = array(
                 'id' => $category->getId(),
-                'title' => $this->escapeHtml($this->_getCategoryTitle($category)),
+                'title' => $this->_getCategoryTitle($category),
                 'url' => $category->getUrl(),
             );
         }
@@ -173,7 +117,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     protected function _getCategoryUrl($category)
     {
         $linkType = Mage::getStoreConfig('integernet_solr/autosuggest/category_link_type');
-        if (false && $linkType == IntegerNet_Solr_Model_Source_CategoryLinkType::CATEGORY_LINK_TYPE_FILTER) {
+        if (false && $linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
             return Mage::getUrl('catalogsearch/result', array(
                 '_query' => array(
                     'q' => $this->escapeHtml($this->getQuery()),
@@ -210,31 +154,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param int $storeId
-     * @throws Mage_Core_Exception
-     */
-    protected function _emulateStore($storeId)
-    {
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-        $this->_currentStoreId = $storeId;
-        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-        $this->_isEmulated = true;
-        Mage::getDesign()->setStore($storeId);
-        Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
-    }
-
-    protected function _stopStoreEmulation()
-    {
-        if ($this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
-        }
-    }
-
-    /**
      * Translate all occurences of $this->__('...') with translated text
      *
      * @param string $templateContents
@@ -252,4 +171,22 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
         return $templateContents;
     }
+
+    protected $_configForCache = array();
+
+
+    /**
+     * @param int $storeId
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
+     */
+    public function findActiveCategories($storeId)
+    {
+        if (! isset($this->_configForCache[$storeId]['categories'])) {
+            $this->_addCategoriesData($this->_configForCache, $storeId);
+        }
+        return array_map(function(array $categoryConfig) {
+            return new Category($categoryConfig['id'], $categoryConfig['title'], $categoryConfig['url']);
+        }, $this->_configForCache[$storeId]['categories']);
+    }
+
 }

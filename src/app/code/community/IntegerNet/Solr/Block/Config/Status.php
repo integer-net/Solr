@@ -64,6 +64,10 @@ class IntegerNet_Solr_Block_Config_Status extends Mage_Core_Block_Template
         $storeId = null;
         if ($storeCode = Mage::app()->getRequest()->getParam('store')) {
             $storeId = Mage::app()->getStore($storeCode)->getId();
+        } else {
+            if ($websiteCode = Mage::app()->getRequest()->getParam('website')) {
+                $storeId = Mage::app()->getWebsite($websiteCode)->getDefaultStore()->getId();
+            }
         }
         $this->_messages = Mage::getSingleton('integernet_solr/configuration')->getMessages($storeId);
     }

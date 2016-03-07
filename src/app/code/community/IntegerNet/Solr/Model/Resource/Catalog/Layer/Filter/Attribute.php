@@ -27,7 +27,19 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
             return parent::applyFilterToCollection($filter, $value);
         }
 
-        Mage::getSingleton('integernet_solr/result')->addAttributeFilter($filter->getAttributeModel(), $value);
+        $bridgeAttribute = new IntegerNet_Solr_Model_Bridge_Attribute($filter->getAttributeModel());
+        
+        $attributeFilters = Mage::registry('attribute_filters');
+        if (!is_array($attributeFilters)) {
+            $attributeFilters = array();
+        }
+        $attributeFilters[] = array(
+            'attribute' => $bridgeAttribute,
+            'value' => $value,
+        );
+        Mage::unregister('attribute_filters');
+        Mage::register('attribute_filters', $attributeFilters);
+
         return $this;
     }
 

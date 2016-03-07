@@ -59,7 +59,18 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category
      */
     public function getDescription()
     {
-        return $this->_category->getDescription();
+        $description = $this->_category->getDescription();
+        switch ($this->_category->getDisplayMode()) {
+            case Mage_Catalog_Model_Category::DM_PAGE:
+            case Mage_Catalog_Model_Category::DM_MIXED:
+                if ($blockId = $this->_category->getLandingPage()) {
+                    $block = Mage::getModel('cms/block')->load($blockId);
+                    if ($block->getId() && $block->getIsActive()) {
+                        $description .= ' ' .  Mage::helper('cms')->getPageTemplateProcessor()->filter($block->getContent());
+                    }
+                }
+        }
+        return $description;
     }
 
     /**

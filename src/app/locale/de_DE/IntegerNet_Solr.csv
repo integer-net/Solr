@@ -36,6 +36,7 @@
 "Maximum number of category suggestions","Maximale Anzahl Kategorie-Vorschläge"
 "Maximum number of cms page suggestions","Maximale Anzahl CMS-Seiten-Vorschläge"
 "0 = don't show","0 = nicht anzeigen"
+"0 = don't show<br />Indexing of CMS pages must be active.","0 = nicht anzeigen<br />Indizierung von CMS-Seiten muss aktiv sein."
 "0 = show all","0 = alle anzeigen"
 "Type of Category Links","Typ von Kategorie-Links"
 "Search result page with set category filter","Suchergebnisseite mit gesetztem Kategoriefilter"
@@ -154,4 +155,5 @@
 "Content column (above products)","Inhaltsspalte (oberhalb der Produkte)"
 "Default Value from Configuration","Standardwert aus der Konfiguration"
 "Use Solr to index cms pages","Solr für die Indizierung von CMS-Seiten verwenden"
+"Use Solr to index category pages","Solr für die Indizierung von Kategorie-Seiten verwenden"
 "Contents","Inhalte"

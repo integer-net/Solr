@@ -3,58 +3,177 @@
  * integer_net Magento Module
  *
  * @category   IntegerNet
- * @package    IntegerNet_Solr
+ * @package    IntegerNet_SolrSuggest
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
+ *
  */
 
-class IntegerNet_Solr_Autosuggest
+namespace IntegerNet\SolrSuggest\Plain;
+/*
+ * NO USE STATEMENTS BEFORE AUTOLOADER IS INITIALIZED!
+ */
+
+/**
+ * Class used for customization in autosuggest.config.php
+ */
+class AppConfig
 {
-    public function __construct()
+    /** @var string */
+    private $cacheBaseDir;
+    /** @var  string */
+    private $libBaseDir;
+    /** @var \Closure */
+    private $loadApplicationCallback;
+
+    /**
+     * @param string $libBaseDir
+     * @param string $cacheBaseDir
+     * @param $loadApplicationCallback
+     */
+    private function __construct($libBaseDir, $cacheBaseDir, $loadApplicationCallback)
     {
-        if (!isset($_GET['store_id'])) {
-            die('Store ID not given.');
-        }
-
-        $storeId = intval($_GET['store_id']);
-
-        $config = $this->_getConfig($storeId);
-
-        if (!class_exists('Mage')) {
-            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Mage.php');
-            class_alias('IntegerNet_Solr_Autosuggest_Mage', 'Mage');
-            Mage::setConfig($config);
-
-            require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Empty.php');
-            class_alias('IntegerNet_Solr_Autosuggest_Empty', 'Mage_Core_Model_Resource_Abstract');
-        }
-
-/*        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);*/
+        $this->libBaseDir = $libBaseDir;
+        $this->cacheBaseDir = $cacheBaseDir;
+        $this->loadApplicationCallback = $loadApplicationCallback;
     }
-    
-    public function printHtml()
+
+    public static function defaultConfig()
     {
-        if (!isset($_GET['q'])) {
-            die('Query not given.');
-        }
-
-        $block = new IntegerNet_Solr_Autosuggest_Result();
-
-        return $block->printHtml();
+        $libBaseDir = __DIR__ . '/lib/IntegerNet_Solr';
+        $cacheBaseDir = '/tmp/integernet_solr';
+        $loadApplicationCallback = function () {
+            throw new \BadMethodCallException('Application cannot be instantiated');
+        };
+        return new self($libBaseDir, $cacheBaseDir, $loadApplicationCallback);
     }
 
     /**
-     * @return IntegerNet_Solr_Autosuggest_Config
+     * @param string $libBaseDir
+     * @return AppConfig
      */
-    protected function _getConfig($storeId)
+    public function withLibBaseDir($libBaseDir)
     {
-        require_once('lib' . DIRECTORY_SEPARATOR . 'IntegerNet' . DIRECTORY_SEPARATOR . 'Solr' . DIRECTORY_SEPARATOR . 'Autosuggest' . DIRECTORY_SEPARATOR . 'Config.php');
-        return new IntegerNet_Solr_Autosuggest_Config($storeId);
+        //TODO allow defining path to external autoloader instead (i.e. composer)
+        $config = clone $this;
+        $config->libBaseDir = $libBaseDir;
+        return $config;
     }
+
+    /**
+     * @param string $cacheBaseDir
+     * @return AppConfig
+     */
+    public function withCacheBaseDir($cacheBaseDir)
+    {
+        $config = clone $this;
+        $config->cacheBaseDir = $cacheBaseDir;
+        return $config;
+    }
+
+    /**
+     * @param \Closure $callback
+     * @return AppConfig
+     */
+    public function withLoadApplicationCallback(\Closure $callback)
+    {
+        $config = clone $this;
+        $config->loadApplicationCallback = $callback;
+        return $config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLibBaseDir()
+    {
+        return $this->libBaseDir;
+    }
+
+    /**
+     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheStorage
+     */
+    public function getCache()
+    {
+        //TODO allow defining custom callback for cache instantiation
+        return new \IntegerNet\SolrSuggest\Plain\Cache\PsrCache(
+            new \IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool($this->cacheBaseDir)
+        );
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getLoadApplicationCallback()
+    {
+        return $this->loadApplicationCallback;
+    }
+
 }
 
-$autosuggest = new IntegerNet_Solr_Autosuggest();
+class Bootstrap
+{
+    /**
+     * @var \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest
+     */
+    private $request;
+    /**
+     * @var AppConfig
+     */
+    private $config;
 
-$autosuggest->printHtml();
+    public function __construct()
+    {
+        $this->initAppConfig();
+        $this->initAutoload();
+        $this->initRequest();
+    }
+
+    private function initAppConfig()
+    {
+        if (\file_exists(__DIR__ . '/autosuggest.config.php')) {
+            $this->config = include __DIR__ . '/autosuggest.config.php';
+            if ($this->config instanceof AppConfig) {
+                return;
+            }
+        }
+        $this->config = include __DIR__ . '/autosuggest.config.dist.php';
+    }
+
+    private function initAutoload()
+    {
+        require_once 'app/code/community/IntegerNet/Solr/Helper/Autoloader.php';
+        \IntegerNet_Solr_Helper_Autoloader::createAndRegisterWithBaseDir($this->config->getLibBaseDir());
+    }
+
+    private function initRequest()
+    {
+        $this->request = \IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest::fromGet($_GET);
+    }
+
+    public function run()
+    {
+        try {
+            $factory = new \IntegerNet\SolrSuggest\Plain\Factory(
+                $this->request,
+                $this->config->getCache(),
+                $this->config->getLoadApplicationCallback()
+            );
+            $response = $factory->getAutosuggestController()->process($this->request);
+        } catch (\Exception $e) {
+            // controller could not be initialized, need to craft own error response
+            $response = new \IntegerNet\SolrSuggest\Plain\Http\AutosuggestResponse(500, 'Internal Server Error');
+        }
+
+        if (\function_exists('http_response_code')) {
+            \http_response_code($response->getStatus());
+        }
+        echo $response->getBody();
+    }
+
+}
+
+\call_user_func(function() {
+    $bootstrap = new Bootstrap();
+    $bootstrap->run();
+});

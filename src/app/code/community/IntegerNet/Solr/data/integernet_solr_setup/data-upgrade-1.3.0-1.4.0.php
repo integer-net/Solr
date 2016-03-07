@@ -13,8 +13,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
-
 Mage::getModel('index/process')
     ->load('integernet_solr', 'indexer_code')
     ->setStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX)

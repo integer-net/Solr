@@ -7,69 +7,47 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
+
+use IntegerNet\SolrSuggest\Implementor\AutosuggestBlock;
+use IntegerNet\SolrSuggest\Implementor\Factory\AutosuggestResultFactory;
+use IntegerNet\SolrSuggest\Result\AutosuggestResult;
+use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
+use IntegerNet\SolrSuggest\Util\StringHighlighter;
+
+class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template implements AutosuggestBlock
 {
     protected $_attributes = array();
     protected $_result = null;
     protected $_customHelper;
     protected $_suggestData;
+    /**
+     * @var AutosuggestResultFactory
+     */
+    private $resultFactory;
+    /**
+     * @var StringHighlighter
+     */
+    private $highlighter;
 
     protected function _construct()
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
+        $this->highlighter = new HtmlStringHighlighter();
+        $this->resultFactory = Mage::helper('integernet_solr/factory');
     }
 
     /**
-     * @return IntegerNet_Solr_Autosuggest_Result
+     * Lazy loading the Solr result
+     *
+     * @return AutosuggestResult
      */
-    protected function _getResult()
+    public function getResult()
     {
         if (is_null($this->_result)) {
-            $this->_result = new IntegerNet_Solr_Autosuggest_Result();
+            $this->_result = $this->resultFactory->getAutosuggestResult();
         }
 
         return $this->_result;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSearchwordSuggestions()
-    {
-        return $this->_getResult()->getSearchwordSuggestions();
-    }
-
-    /**
-     * @return array
-     */
-    public function getProductSuggestions()
-    {
-        return $this->_getResult()->getProductSuggestions();
-    }
-
-    /**
-     * @return array
-     */
-    public function getCategorySuggestions()
-    {
-        return $this->_getResult()->getCategorySuggestions();
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributeSuggestions()
-    {
-        return $this->_getResult()->getAttributeSuggestions();
-    }
-
-    /**
-     * @param string $attributeCode
-     * @return Mage_Catalog_Model_Entity_Attribute
-     */
-    public function getAttribute($attributeCode)
-    {
-        return $this->_getResult()->getAttribute($attributeCode);
     }
 
     /**
@@ -79,7 +57,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
      */
     public function highlight($resultText, $query)
     {
-        return $this->_getResult()->highlight($resultText, $query);
+        return $this->highlighter->highlight($resultText, $query);
     }
 
     /**
@@ -87,7 +65,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
      */
     public function getQuery()
     {
-        return $this->_getResult()->getQuery();
+        return $this->getResult()->getQuery();
     }
 
     /**
@@ -132,17 +110,6 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
     }
 
     /**
-     * @return IntegerNet_Solr_Autosuggest_Custom
-     */
-    public function getCustomHelper()
-    {
-        if (is_null($this->_customHelper)) {
-            $this->_customHelper = new IntegerNet_Solr_Autosuggest_Custom();
-        }
-        return $this->_customHelper;
-    }
-
-    /**
      * @return string
      */
     protected function _getFallbackHtml()
@@ -177,5 +144,27 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template
         $html .= '</ul>';
 
         return $html;
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Custom|IntegerNet_Solr_Autosuggest_Custom
+     */
+    public function getCustomHelper()
+    {
+        if (class_exists('IntegerNet_Solr_Autosuggest_Custom')) {
+            /**
+             * @deprecated only for backwards compatibility in Magento mode
+             */
+            return new IntegerNet_Solr_Autosuggest_Custom();
+        }
+        $cacheReader = Mage::helper('integernet_solr/factory')->getCacheReader();
+        $storeId = Mage::app()->getStore()->getId();
+        try {
+            $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
+        } catch (\IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException $e) {
+            Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+            $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
+        }
+        return $customHelperFactory->getCustomHelper($this, $cacheReader);
     }
 }

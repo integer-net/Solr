@@ -1,0 +1,112 @@
+<?php
+/**
+ * integer_net Magento Module
+ *
+ * @category   IntegerNet
+ * @package    IntegerNet_Solr
+ * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Andreas von Studnitz <avs@integer-net.de>
+ */
+?>
+
+<?php
+/**
+ * Autosuggest box template
+ *
+ * @see \IntegerNet\SolrSuggest\Implementor\AutosuggestBlock
+ * @var $this \IntegerNet\SolrSuggest\Implementor\AutosuggestBlock
+ */
+?>
+
+<?php if ($searchwordSuggestions = $this->getResult()->getSearchTermSuggestions()): ?>
+
+    <ul class="searchwords">
+
+    <?php foreach ($searchwordSuggestions as $index => $item): ?>
+        <li>
+            <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>&hellip;
+        </li>
+    <?php endforeach ?>
+
+    </ul>
+    
+<?php endif ?>
+
+<?php $productSuggestions = $this->getResult()->getProductSuggestions() ?>
+<?php if (sizeof($productSuggestions)): ?>
+
+    <div class="products-box">
+
+        <h3>
+            <strong><?php echo $this->__('Produktvorschläge') ?></strong>
+            <?php echo $this->__('zu Ihrer Suche') ?>
+        </h3>
+
+        <ul class="products">
+
+        <?php foreach ($productSuggestions as $index => $item): ?>
+            <li>
+                <?php echo $this->highlight($item->getHtml(), $this->getQuery()) ?>
+            </li>
+        <?php endforeach ?>
+
+            <li class="last"></li>
+        </ul>
+    </div>
+    
+<?php endif ?>
+
+
+<?php $categorySuggestions = $this->getResult()->getCategorySuggestions() ?>
+<?php $attributeSuggestions = $this->getResult()->getAttributeSuggestions() ?>
+
+<?php if (sizeof($categorySuggestions) || sizeof($attributeSuggestions)): ?>
+
+    <div class="additional-box">
+        <?php if (sizeof($categorySuggestions)): ?>
+
+            <div class="categories-box">
+
+                <h3>
+                    <strong><?php echo $this->__('Kategorien') ?></strong>
+                    <?php echo $this->__('zu Ihrer Suche') ?>
+                </h3>
+
+                <ul class="categories">
+
+                <?php foreach ($categorySuggestions as $index => $item): ?>
+                    <li>
+                        <a href="<?php echo $item->getUrl() ?>"><?php echo $this->highlight($item->getTitle(), $this->getQuery()) ?></a>
+                    </li>
+                <?php endforeach ?>
+                </ul>
+
+            </div>
+        <?php endif ?>
+
+        <?php foreach($attributeSuggestions as $attributeSuggestion): ?>
+
+            <div class="attributes-box">
+
+                <h3>
+                    <strong><?php echo $attributeSuggestion->getLabel() ?></strong>
+                </h3>
+
+                <ul class="attributes">
+                    <li>
+                        <?php $items = array() ?>
+                        <?php foreach ($attributeSuggestion->getOptions() as $item): ?>
+                            <?php $items[] = '<a href="' . htmlspecialchars($item->getUrl()) . '">' . $this->highlight($item->getTitle(), $this->getQuery()) . '</a>' ?>
+                        <?php endforeach ?>
+                        <?php echo implode(', ', $items) ?>
+                    </li>
+                </ul>
+            </div>
+        <?php endforeach ?>
+
+        <div class="last"></div>
+    </div>
+
+<?php endif ?>
+
+

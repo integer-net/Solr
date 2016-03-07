@@ -1,4 +1,5 @@
 <?php
+
 /**
  * integer_net Magento Module
  *
@@ -14,8 +15,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      * @var bool
      */
     protected $_displayProductCount = null;
-    
+
     protected $_categoryFilterItems = null;
+
+    protected $_currentCategory = null;
 
     /**
      * @return Mage_Catalog_Model_Entity_Attribute
@@ -25,11 +28,17 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         return $this->getData('attribute');
     }
 
+    /**
+     * @return bool
+     */
     public function isCategory()
     {
         return (boolean)$this->getData('is_category');
     }
 
+    /**
+     * @return bool
+     */
     public function isRange()
     {
         return (boolean)$this->getData('is_range');
@@ -61,17 +70,12 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getUrl($optionId)
     {
         if ($this->isCategory()) {
-            $query = array(
-                'cat' => $optionId,
-                Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-            );
+            $identifier = 'cat';
         } else {
-            $query = array(
-                $this->getAttribute()->getAttributeCode() => $optionId,
-                Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-            );
+            $identifier = $this->getAttribute()->getAttributeCode();
         }
-        return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
+        $query = $this->_getQuery($identifier, $optionId);
+        return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
     }
 
     /**
@@ -83,26 +87,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRangeUrl($rangeStart, $rangeEnd)
     {
-        $query = array(
-            $this->getAttribute()->getAttributeCode() => floatval($rangeStart) . '-' . floatval($rangeEnd),
-            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-        );
-        return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
-    }
-
-    /**
-     * Get filter item url
-     *
-     * @param int $index
-     * @return string
-     */
-    protected function _getIntervalUrl($index)
-    {
-        $query = array(
-            $this->getAttribute()->getAttributeCode() => $index . ',' . Mage::getStoreConfig('integernet_solr/results/price_step_size'),
-            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
-        );
-        return Mage::getUrl('*/*/*', array('_current'=>true, '_use_rewrite'=>true, '_query'=>$query));
+        $identifier = 'price';
+        $query = $this->_getQuery($identifier, floatval($rangeStart) . '-' . floatval($rangeEnd));
+        return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
     }
 
     /**
@@ -131,21 +118,15 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getCurrentChildrenCategories()
     {
-        if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
-            /** @var Mage_Catalog_Model_Category $currentCategory */
-            $currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
-        } else {
-            /** @var Mage_Catalog_Model_Category $currentCategory */
-            $currentCategory = Mage::registry('current_category');
-        }
-        
+        $currentCategory = $this->_getCurrentCategory();
+
         $childrenCategories = Mage::getResourceModel('catalog/category_collection')
             ->setStore(Mage::app()->getStore())
-            ->addAttributeToSelect('name')
+            ->addAttributeToSelect('name', 'url_key')
             ->addAttributeToFilter('level', $currentCategory->getLevel() + 1)
             ->addAttributeToFilter('path', array('like' => $currentCategory->getPath() . '_%'))
             ->setOrder('position', 'asc');
-        
+
         return $childrenCategories;
     }
 
@@ -170,8 +151,20 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                         if (isset($categoryFacets->{$childCategoryId})) {
                             $item = new Varien_Object();
                             $item->setCount($categoryFacets->{$childCategoryId});
-                            $item->setLabel($childCategory->getName());
+                            $item->setLabel($this->_getCheckboxHtml('cat', $childCategoryId) . ' ' . $childCategory->getName());
                             $item->setUrl($this->_getUrl($childCategoryId));
+                            $item->setIsChecked($this->_isSelected('cat', $childCategoryId));
+                            $item->setType('category');
+                            $item->setOptionId($childCategoryId);
+
+                            Mage::dispatchEvent('integernet_solr_filter_item_create', array(
+                                'item' => $item,
+                                'solr_result' => $this->_getSolrResult(),
+                                'type' => 'category',
+                                'entity_id' => $childCategoryId,
+                                'entity' => $childCategory,
+                            ));
+
                             $this->_categoryFilterItems[] = $item;
                         }
                     }
@@ -181,14 +174,25 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     foreach ((array)$categoryFacets as $optionId => $optionCount) {
                         $item = new Varien_Object();
                         $item->setCount($optionCount);
-                        $item->setLabel(Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                        $item->setLabel($this->_getCheckboxHtml('cat', $optionId) . ' ' . Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
                         $item->setUrl($this->_getUrl($optionId));
+                        $item->setIsChecked($this->_isSelected('cat', $optionId));
+                        $item->setType('category');
+                        $item->setOptionId($optionId);
+                        
+                        Mage::dispatchEvent('integernet_solr_filter_item_create', array(
+                            'item' => $item,
+                            'solr_result' => $this->_getSolrResult(),
+                            'type' => 'category',
+                            'entity_id' => $optionId,
+                        ));
+
                         $this->_categoryFilterItems[] = $item;
                     }
                 }
             }
         }
-        
+
         return $this->_categoryFilterItems;
     }
 
@@ -221,15 +225,22 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 if ($rangeEnd == 0) {
                     $label = Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($rangeStart));
                 } else {
-                    $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd - 0.01));
+                    $label = Mage::helper('catalog')->__('%s - %s', $store->formatPrice($rangeStart), $store->formatPrice($rangeEnd));
                 }
 
-                $item->setLabel($label);
-                if (version_compare(Mage::getVersion(), '1.7.0.0') >= 0) {
-                    $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
-                } else {
-                    $item->setUrl($this->_getIntervalUrl($i));
-                }
+                $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . $label);
+                $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
+                $item->setIsChecked($this->_isSelected('price', floatval($rangeStart) . '-' . floatval($rangeEnd)));
+                $item->setType('range');
+                $item->setOptionId(floatval($rangeStart) . '-' . floatval($rangeEnd));
+
+                Mage::dispatchEvent('integernet_solr_filter_item_create', array(
+                    'item' => $item,
+                    'solr_result' => $this->_getSolrResult(),
+                    'type' => 'range',
+                    'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                ));
+
                 $items[] = $item;
             }
         } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
@@ -240,12 +251,23 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item = new Varien_Object();
                 $item->setCount($rangeCount);
                 $rangeEnd = $rangeStart + $attributeFacetData['gap'];
-                $item->setLabel(Mage::helper('catalog')->__(
+                $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . Mage::helper('catalog')->__(
                     '%s - %s',
                     $store->formatPrice($rangeStart),
-                    $store->formatPrice($rangeEnd - 0.01)
+                    $store->formatPrice($rangeEnd)
                 ));
                 $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
+                $item->setIsChecked($this->_isSelected('price', floatval($rangeStart) . '-' . floatval($rangeEnd)));
+                $item->setType('range');
+                $item->setOptionId(floatval($rangeStart) . '-' . floatval($rangeEnd));
+                
+                Mage::dispatchEvent('integernet_solr_filter_item_create', array(
+                    'item' => $item,
+                    'solr_result' => $this->_getSolrResult(),
+                    'type' => 'range',
+                    'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                ));
+                
                 $items[] = $item;
             }
         }
@@ -259,7 +281,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getAttributeFilterItems()
     {
         $items = array();
-        $attributeCodeFacetName = $this->getAttribute()->getAttributeCode() . '_facet';
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $attributeCodeFacetName = $attributeCode . '_facet';
         if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
 
             $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
@@ -268,14 +291,121 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 if (!$optionCount) {
                     continue;
                 }
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $currentCategory = $this->_getCurrentCategory();
+                if ($currentCategory) {
+                    $removedFilterAttributeCodes = $currentCategory->getData('solr_remove_filters');
+                    if (is_array($removedFilterAttributeCodes) && in_array($attributeCode, $removedFilterAttributeCodes)) {
+                        continue;
+                    }
+                }
                 $item = new Varien_Object();
                 $item->setCount($optionCount);
-                $item->setLabel($this->getAttribute()->getSource()->getOptionText($optionId));
+                $item->setLabel($this->_getCheckboxHtml($attributeCode, $optionId) . ' ' . $this->getAttribute()->getSource()->getOptionText($optionId));
                 $item->setUrl($this->_getUrl($optionId));
+                $item->setIsChecked($this->_isSelected($attributeCode, $optionId));
+                $item->setType('attribute');
+                $item->setOptionId($optionId);
+                
+                Mage::dispatchEvent('integernet_solr_filter_item_create', array(
+                    'item' => $item,
+                    'solr_result' => $this->_getSolrResult(),
+                    'type' => 'attribute',
+                    'entity_id' => $optionId,
+                ));
+                
                 $items[] = $item;
             }
         }
 
         return $items;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Category|false
+     */
+    protected function _getCurrentCategory()
+    {
+        if (is_null($this->_currentCategory)) {
+            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
+            } else {
+                /** @var Mage_Catalog_Model_Category $currentCategory */
+                $this->_currentCategory = Mage::registry('current_category');
+                if (is_null($this->_currentCategory)) {
+                    $this->_currentCategory = false;
+                }
+            }
+        }
+
+        return $this->_currentCategory;
+    }
+
+    protected function _getCheckboxHtml($attributeCode, $optionId)
+    {
+        /** @var $checkboxBlock IntegerNet_Solr_Block_Result_Layer_Checkbox */
+        $checkboxBlock = $this->getLayout()->createBlock('integernet_solr/result_layer_checkbox');
+        $checkboxBlock
+            ->setIsChecked($this->_isSelected($attributeCode, $optionId))
+            ->setOptionId($optionId)
+            ->setAttributeCode($attributeCode)
+            ->setIsTopNav(strpos($this->getNameInLayout(), 'topnav') !== false);
+        return $checkboxBlock->toHtml();
+    }
+
+    /**
+     * @param string $identifier
+     * @param int $optionId
+     * @return bool
+     */
+    protected function _isSelected($identifier, $optionId)
+    {
+        $selectedOptionIds = explode(',', $this->getCurrentParamValue($identifier));
+        if (in_array($optionId, $selectedOptionIds)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get updated query params, depending on previously selected filters
+     *
+     * @param string $identifier
+     * @param int $optionId
+     * @return array
+     */
+    protected function _getQuery($identifier, $optionId)
+    {
+        $currentParamValue = $this->getCurrentParamValue($identifier);
+        if (strlen($currentParamValue)) {
+            $selectedOptionIds = explode(',', $currentParamValue);
+        } else {
+            $selectedOptionIds = array();
+        }
+        if (in_array($optionId, $selectedOptionIds)) {
+            $newParamValues = array_diff($selectedOptionIds, array($optionId));
+        } else {
+            $newParamValues = $selectedOptionIds;
+            $newParamValues[] = $optionId;
+        }
+        if (sizeof($newParamValues)) {
+            $newParamValues = implode(',', $newParamValues);
+        } else {
+            $newParamValues = null;
+        }
+        return array(
+            $identifier => $newParamValues,
+            Mage::getBlockSingleton('page/html_pager')->getPageVarName() => null // exclude current page from urls
+        );
+    }
+
+    /**
+     * @param $identifier
+     * @return mixed
+     */
+    public function getCurrentParamValue($identifier)
+    {
+        return Mage::app()->getRequest()->getParam($identifier);
     }
 }

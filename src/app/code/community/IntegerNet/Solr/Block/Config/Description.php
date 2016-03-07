@@ -16,7 +16,7 @@ class IntegerNet_Solr_Block_Config_Description extends Mage_Adminhtml_Block_Syst
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         return $this->getLayout()
-            ->createBlock('integernet_solr/config_status')
+            ->createBlock('integernet_solr/config_status', 'integernet_solr_config_status')
             ->setTemplate('integernet/solr/config/status.phtml')
             ->toHtml();
     }

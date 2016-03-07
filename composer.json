@@ -1,9 +1,18 @@
 {
-   "name": "integer_net/solr",
-   "type": "magento-module",
-   "description": "integer_net Solr Module",
-   "homepage": "https://github.com/integer-net/Solr",
-   "require": {
-      "fbrnc/aoe_layoutconditions": "dev-master"
-   }
+  "name": "integer_net/solr",
+  "type": "magento-module",
+  "description": "integer_net Solr Module",
+  "homepage": "https://github.com/integer-net/Solr",
+  "require": {
+    "fbrnc/aoe_layoutconditions": "dev-master"
+  },
+  "require-dev": {
+    "mikey179/vfsStream": "~1.3"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://packages.firegento.com"
+    }
+  ]
 }

@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Resource\HttpTransportMethod;
+
 /**
  * integer_net Magento Module
  *
@@ -10,8 +12,6 @@
 
 class IntegerNet_Solr_Model_Source_HttpTransportMethod
 {
-    const HTTP_TRANSPORT_METHOD_FILEGETCONTENTS = 'filegetcontents';
-    const HTTP_TRANSPORT_METHOD_CURL = 'curl';
 
     /**
      * Options getter
@@ -22,11 +22,11 @@ class IntegerNet_Solr_Model_Source_HttpTransportMethod
     {
         return array(
             array(
-                'value' => self::HTTP_TRANSPORT_METHOD_FILEGETCONTENTS,
+                'value' => HttpTransportMethod::HTTP_TRANSPORT_METHOD_FILEGETCONTENTS,
                 'label' => Mage::helper('integernet_solr')->__('file_get_contents'),
             ),
             array(
-                'value' => self::HTTP_TRANSPORT_METHOD_CURL,
+                'value' => HttpTransportMethod::HTTP_TRANSPORT_METHOD_CURL,
                 'label' => Mage::helper('integernet_solr')->__('cURL'),
             ),
         );

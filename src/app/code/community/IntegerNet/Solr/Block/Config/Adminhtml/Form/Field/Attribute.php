@@ -11,7 +11,8 @@ class IntegerNet_Solr_Block_Config_Adminhtml_Form_Field_Attribute extends Mage_C
 
     public function _toHtml()
     {
-        $attributes = Mage::helper('integernet_solr')->getFilterableInSearchAttributes();
+        $attributes = Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+            ->getFilterableInSearchAttributes(Mage::app()->getStore()->getId());
 
         foreach($attributes as $attribute) {
             $this->addOption($attribute->getAttributeCode(), $attribute->getFrontendLabel() . ' [' . $attribute->getAttributeCode() . ']');

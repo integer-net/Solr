@@ -207,7 +207,7 @@ class PageIndexer
             $pageData->setData($fieldName . '_t', $value);
         }
 
-        $pageData->setData('url_s', $page->getUrl());
+        $pageData->setData('url_s_nonindex', $page->getUrl());
     }
 
     /**

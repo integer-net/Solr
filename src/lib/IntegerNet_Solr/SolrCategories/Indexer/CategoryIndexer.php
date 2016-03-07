@@ -207,7 +207,7 @@ class CategoryIndexer
             $categoryData->setData($fieldName . '_t', $value);
         }
 
-        $categoryData->setData('url_s', $category->getUrl());
+        $categoryData->setData('url_s_nonindex', $category->getUrl());
     }
 
     /**

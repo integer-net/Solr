@@ -243,7 +243,7 @@ class AutosuggestResult
                 $title,
                 ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
                 1,
-                $item->url_s
+                $item->url_s_nonindex
             );
 
             $suggestions[] = $_suggestion;
@@ -312,7 +312,7 @@ class AutosuggestResult
                     $title,
                     ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
                     1,
-                    $item->url_s
+                    $item->url_s_nonindex
                 );
 
                 $categorySuggestions[] = $_suggestion;

@@ -6,8 +6,16 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
-class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Model_Layer_Filter_Price 
+ */
+if (@class_exists('GoMage_Navigation_Model_Layer_Filter_Price')) {
+    class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract extends GoMage_Navigation_Model_Layer_Filter_Price
+    {}
+} else {
+    class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract extends Mage_Catalog_Model_Layer_Filter_Price
+    {}
+}
+
+class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract 
 {
     /**
      * Get price range for building filter steps

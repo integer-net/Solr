@@ -9,13 +9,13 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache\Item;
 
-use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory;
 
 final class ActiveCategoriesCacheItem extends AbstractCacheItem
 {
     /**
      * @param int $storeId
-     * @param SerializableCategory[] $value
+     * @param SerializableSuggestCategory[] $value
      */
     public function __construct($storeId, array $value = null)
     {

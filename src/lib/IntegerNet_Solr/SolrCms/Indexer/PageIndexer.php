@@ -75,26 +75,27 @@ class PageIndexer
     }
 
     /**
-     * @param array|null $pageIds Restrict to given Products if this is set
+     * @param array|null $pageIds Restrict to given Pages if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
-     * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @param null|int[]
      * @throws \Exception
      */
-    public function reindex($pageIds = null, $emptyIndex = false, $restrictToStore = null)
+    public function reindex($pageIds = null, $emptyIndex = false, $restrictToStoreIds = null)
     {
-        $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
-        if ($pageSize <= 0) {
-            $pageSize = 100;
-        }
-
         foreach($this->_config as $storeId => $storeConfig) {
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
-                continue;
-            }
 
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
+
+            if (!$storeConfig->getCmsConfig()->isActive()) {
+                continue;
+            }
+
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
+                continue;
+            }
+
             $this->storeEmulation->start($storeId);
             try {
 
@@ -103,6 +104,11 @@ class PageIndexer
                     || $emptyIndex === 'force'
                 ) {
                     $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
+                }
+
+                $pageSize = intval($storeConfig->getIndexingConfig()->getPagesize());
+                if ($pageSize <= 0) {
+                    $pageSize = 100;
                 }
 
                 $pageCollection = $this->_pageRepository->setPageSizeForIndex($pageSize)->getPagesForIndex($storeId, $pageIds);
@@ -117,9 +123,9 @@ class PageIndexer
     }
 
     /**
-     * @param string[] $productIds
+     * @param string[] $pageIds
      */
-    public function deleteIndex($productIds)
+    public function deleteIndex($pageIds)
     {
         foreach($this->_config as $storeId => $storeConfig) {
 
@@ -129,8 +135,8 @@ class PageIndexer
 
             $ids = array();
 
-            foreach($productIds as $productId) {
-                $ids[] = $productId . '_' . $storeId;
+            foreach($pageIds as $pageId) {
+                $ids[] = 'page_' . $pageId . '_' . $storeId;
             }
 
             $this->_getResource()->deleteByMultipleIds($storeId, $ids);
@@ -139,7 +145,7 @@ class PageIndexer
 
 
     /**
-     * Generate single product data for Solr
+     * Generate single page data for Solr
      *
      * @param Page $page
      * @return array
@@ -155,7 +161,7 @@ class PageIndexer
 
         $this->_addSearchDataToPageData($page, $pageData);
 
-        //$this->_addResultHtmlToPageData($page, $pageData);
+        $this->_addBoostToPageData($page, $pageData);
 
         $this->_eventDispatcher->dispatch('integernet_solr_get_page_data', array('page' => $page, 'page_data' => $pageData));
 
@@ -200,6 +206,8 @@ class PageIndexer
         if ($value = str_replace(array("\n", "\r"), ' ', strip_tags($page->getContent()))) {
             $pageData->setData($fieldName . '_t', $value);
         }
+
+        $pageData->setData('url_s_nonindex', $page->getUrl());
     }
 
     /**

@@ -38,7 +38,7 @@ class ProductIndexer
     private $_eventDispatcher;
     /** @var  AttributeRepository */
     private $_attributeRepository;
-    /** @var  CategoryRepository */
+    /** @var  IndexCategoryRepository */
     private $_categoryRepository;
     /** @var  ProductRepository */
     private $_productRepository;
@@ -88,29 +88,25 @@ class ProductIndexer
     /**
      * @param array|null $productIds Restrict to given Products if this is set
      * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
-     * @param null|\Mage_Core_Model_Store $restrictToStore
+     * @param null|int[] $restrictToStoreIds
      * @throws \Exception
      * @throws \IntegerNet\Solr\Exception
      */
-    public function reindex($productIds = null, $emptyIndex = false, $restrictToStore = null)
+    public function reindex($productIds = null, $emptyIndex = false, $restrictToStoreIds = null)
     {
         if (is_null($productIds)) {
-            $this->_getResource()->checkSwapCoresConfiguration($restrictToStore === null ? null : $restrictToStore->getId());
-        }
-
-        $pageSize = intval($this->_getStoreConfig()->getIndexingConfig()->getPagesize());
-        if ($pageSize <= 0) {
-            $pageSize = 100;
+            $this->_getResource()->checkSwapCoresConfiguration($restrictToStoreIds);
         }
 
         foreach($this->_config as $storeId => $storeConfig) {
-            if (!is_null($restrictToStore) && ($restrictToStore->getId() != $storeId)) {
+            if (!is_null($restrictToStoreIds) && !in_array($storeId, $restrictToStoreIds)) {
                 continue;
             }
 
             if (!$storeConfig->getGeneralConfig()->isActive()) {
                 continue;
             }
+
             $this->storeEmulation->start($storeId);
             try {
 
@@ -125,6 +121,11 @@ class ProductIndexer
                     $this->_getResource()->deleteAllDocuments($storeId, self::CONTENT_TYPE);
                 }
 
+                $pageSize = intval($storeConfig->getIndexingConfig()->getPagesize());
+                if ($pageSize <= 0) {
+                    $pageSize = 100;
+                }
+
                 $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
                 $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
 
@@ -137,7 +138,7 @@ class ProductIndexer
         }
 
         if (is_null($productIds)) {
-            $this->_getResource()->swapCores($restrictToStore === null ? null : $restrictToStore->getId());
+            $this->_getResource()->swapCores($restrictToStoreIds);
         }
     }
 

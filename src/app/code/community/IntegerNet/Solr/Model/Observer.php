@@ -327,4 +327,34 @@ class IntegerNet_Solr_Model_Observer
             }
         }
     }
+
+    public function adminhtmlCmsPageEditTabContentPrepareForm(Varien_Event_Observer $observer)
+    {
+        $model = Mage::registry('cms_page');
+        $form = $observer->getForm();
+        $fieldset = $form->addFieldset('integernet_solr_fieldset', array('legend'=>Mage::helper('integernet_solr')->__('Solr'),'class'=>'fieldset-wide'));
+        $fieldset->addField('solr_exclude', 'select', array(
+            'name'      => 'solr_exclude',
+            'label'     => Mage::helper('integernet_solr')->__('Exclude this Page from Solr Index'),
+            'title'     => Mage::helper('integernet_solr')->__('Exclude this Page from Solr Index'),
+            'disabled'  => false,
+            'values' => Mage::getSingleton('adminhtml/system_config_source_yesno')->toOptionArray(),
+            'value'     => $model->getData('solr_exclude')
+        ));
+
+        $field = $fieldset->addField('solr_boost', 'text', array(
+            'name' => 'solr_boost',
+            'label' => Mage::helper('integernet_solr')->__('Solr Priority'),
+            'title' => Mage::helper('integernet_solr')->__('Solr Priority'),
+            'note' => Mage::helper('integernet_solr')->__('1 is default, use higher numbers for higher priority.'),
+            'class' => 'validate-number',
+            'value'     => $model->getData('solr_boost')
+        ));
+
+        // Set default value
+        if (!$model->getId()) {
+            $field->setValue('1.0000');
+        }
+
+    }
 }

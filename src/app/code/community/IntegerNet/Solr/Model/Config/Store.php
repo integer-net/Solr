@@ -14,6 +14,8 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CmsConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Implementor\Config;
 
 /**
@@ -53,6 +55,14 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
      * @var ResultsConfig
      */
     protected $_results;
+    /**
+     * @var CategoryConfig
+     */
+    protected $_category;
+    /**
+     * @var CmsConfig
+     */
+    protected $_cms;
 
     /**
      * @param int $_storeId
@@ -150,6 +160,7 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
                 $this->_getConfig($prefix . 'max_number_searchword_suggestions'),
                 $this->_getConfig($prefix . 'max_number_product_suggestions'),
                 $this->_getConfig($prefix . 'max_number_category_suggestions'),
+                $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
                 $this->_getConfigFlag($prefix . 'category_link_type'),
                 @unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
@@ -214,6 +225,40 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             );
         }
         return $this->_results;
+    }
+
+    /**
+     * Returns search results configuration
+     *
+     * @return CmsConfig
+     */
+    public function getCmsConfig()
+    {
+        if ($this->_cms === null) {
+            $prefix = 'integernet_solr/cms/';
+            $this->_cms = new CmsConfig(
+                $this->_getConfigFlag($prefix . 'is_active')
+            );
+        }
+        return $this->_cms;
+    }
+
+    /**
+     * Returns search results configuration
+     *
+     * @return CategoryConfig
+     */
+    public function getCategoryConfig()
+    {
+        if ($this->_category === null) {
+            $prefix = 'integernet_solr/category/';
+            $this->_category = new CategoryConfig(
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'filter_position'),
+                $this->_getConfigFlag($prefix . 'is_indexer_active')
+            );
+        }
+        return $this->_category;
     }
 
 

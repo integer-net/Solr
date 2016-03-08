@@ -9,14 +9,14 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
-use IntegerNet\Solr\Implementor\Category;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 
 interface SuggestCategoryRepository
 {
     /**
      * @param int $storeId
      * @param int[] $categoryIds
-     * @return Category[]
+     * @return SuggestCategory[]
      */
     public function findActiveCategoriesByIds($storeId, $categoryIds);
 }

@@ -9,9 +9,9 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Bridge;
 
-use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory;
 
-class Category implements SerializableCategory
+class Category implements SerializableSuggestCategory
 {
     private $id;
     private $title;

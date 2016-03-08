@@ -23,13 +23,13 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
             if (!$storeIdentifiers) {
                 $storeIdentifiers = 'all';
             }
-            $stores = $this->_getStores($storeIdentifiers);
+            $storeIds = $this->_getStoreIds($storeIdentifiers);
 
             $entityTypes = $this->getArg('type');
-            if ($entityTypes && $entityTypes != 'all') {
-                $entityTypes = explode(',', $entityTypes);
+            if (!$entityTypes || $entityTypes == 'all') {
+                $entityTypes = $this->_getDefaultEntityTypes();
             } else {
-                $entityTypes = array('product', 'page');
+                $entityTypes = explode(',', $entityTypes);
             }
 
             $emptyIndex = true;
@@ -42,20 +42,29 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
             $autoloader = new IntegerNet_Solr_Helper_Autoloader();
             $autoloader->createAndRegister();
 
-            if (in_array('product', $entityTypes)) {
-                $indexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
-                foreach($stores as $store) {
-                    $indexer->reindex(null, $emptyIndex, $store);
-                    echo "Solr product index rebuilt for Store '{$store->getCode()}'.\n";
+            try {
+                if (in_array('product', $entityTypes)) {
+                    $indexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
+                    $indexer->reindex(null, $emptyIndex, $storeIds);
+                    $storeIdsString = implode(', ', $storeIds);
+                    echo "Solr product index rebuilt for Stores {$storeIdsString}.\n";
                 }
-            }
 
-            if (in_array('page', $entityTypes)) {
-                $indexer = Mage::helper('integernet_solr/factory')->getPageIndexer();
-                foreach($stores as $store) {
-                    $indexer->reindex(null, $emptyIndex, $store);
-                    echo "Solr page index rebuilt for Store '{$store->getCode()}'.\n";
+                if (in_array('page', $entityTypes)) {
+                    $indexer = Mage::helper('integernet_solr/factory')->getPageIndexer();
+                    $indexer->reindex(null, $emptyIndex, $storeIds);
+                    $storeIdsString = implode(', ', $storeIds);
+                    echo "Solr page index rebuilt for Stores {$storeIdsString}.\n";
                 }
+
+                if (in_array('category', $entityTypes)) {
+                    $indexer = Mage::helper('integernet_solr/factory')->getCategoryIndexer();
+                    $indexer->reindex(null, $emptyIndex, $storeIds);
+                    $storeIdsString = implode(', ', $storeIds);
+                    echo "Solr category index rebuilt for Stores {$storeIdsString}.\n";
+                }
+            } catch (Exception $e) {
+                echo $e->getMessage() . "\n";
             }
 
         } else {
@@ -78,7 +87,7 @@ Usage:  php -f integernet-solr.php -- [options]
   --stores <stores> reindex given stores (can be store id, store code, comma seperated. Or "all".) If not set, reindex all stores.
   --emptyindex      Force emptying the solr index for the given store(s). If not set, configured value is used.
   --noemptyindex    Force not emptying the solr index for the given store(s). If not set, configured value is used.
-  --type <types>    Restrict indexing to certain entity types, i.e. "product" or "page" (comma separated). Or "all". If not set, reindex all entity types.
+  --types <types>    Restrict indexing to certain entity types, i.e. "product" or "page" (comma separated). Or "all". If not set, reindex products.
   help              This help
 
 USAGE;
@@ -86,28 +95,36 @@ USAGE;
 
     /**
      * @param mixed[] $storeIdentifiers
-     * @return Mage_Core_Model_Store[]
+     * @return int[]
      */
-    protected function _getStores($storeIdentifiers)
+    protected function _getStoreIds($storeIdentifiers)
     {
-        $stores = array();
+        $storeIds = array();
         foreach (explode(',', $storeIdentifiers) as $storeIdentifier) {
             $storeIdentifier = trim($storeIdentifier);
             if ($storeIdentifier == 'all') {
-                $stores = array();
-                foreach (Mage::app()->getStores() as $store) {
-                    if ($store->getIsActive()) {
-                        $stores[] = $store;
+                $storeIds = array();
+                foreach (Mage::app()->getStores(false) as $store) {
+                    if ($store->getIsActive() && Mage::getStoreConfigFlag('integernet_solr/general/is_active', $store->getId())) {
+                        $storeIds[] = $store->getId();
                     }
                 }
-                return $stores;
+                return $storeIds;
             }
             $store = Mage::app()->getStore($storeIdentifier);
-            if ($store->getIsActive()) {
-                $stores[] = $store;
+            if ($store->getIsActive() && Mage::getStoreConfigFlag('integernet_solr/general/is_active', $store->getId())) {
+                $storeIds[] = $store->getId();
             }
         }
-        return $stores;
+        return $storeIds;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getDefaultEntityTypes()
+    {
+        return array('product', 'category', 'page');
     }
 }
 

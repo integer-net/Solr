@@ -14,7 +14,7 @@ use IntegerNet\Solr\Event\Transport;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\SerializableConfig;
 use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository;
-use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository;
@@ -127,6 +127,7 @@ class CacheWriter
         $this->cache->save(new ConfigCacheItem($storeId, $config));
         $this->cache->save(new TemplateCacheItem($storeId, $this->templateRepository->getTemplateByStoreId($storeId)));
     }
+    
     /**
      * @param int $storeId  The store id
      */

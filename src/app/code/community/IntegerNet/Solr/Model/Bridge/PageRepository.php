@@ -31,7 +31,7 @@ class IntegerNet_Solr_Model_Bridge_PageRepository implements PageRepository
      * Return page iterator, which may implement lazy loading
      *
      * @param int $storeId Pages will be returned that are visible in this store and with store specific values
-     * @param null|int[] $pageIds filter by product ids
+     * @param null|int[] $pageIds filter by page ids
      * @return PageIterator
      */
     public function getPagesForIndex($storeId, $pageIds = null)

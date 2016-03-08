@@ -10,6 +10,7 @@
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
 use IntegerNet\SolrCms\Indexer\PageIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
@@ -41,7 +42,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     public function getSolrResource()
     {
-        $storeConfig = $this->getStoreConfig();
+        $storeConfig = $this->getStoreConfigWithAdmin();
         return new ResourceFacade($storeConfig);
     }
 
@@ -62,6 +63,25 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $this->_getIndexCategoryRepository(),
             Mage::getModel('integernet_solr/bridge_productRepository'),
             Mage::getModel('integernet_solr/bridge_productRenderer'),
+            Mage::getModel('integernet_solr/bridge_storeEmulation')
+        );
+    }
+
+    /**
+     * Returns new product indexer.
+     *
+     * @return CategoryIndexer
+     */
+    public function getCategoryIndexer()
+    {
+        $defaultStoreId = Mage::app()->getStore(true)->getId();
+        return new CategoryIndexer(
+            $defaultStoreId,
+            $this->getStoreConfig(),
+            $this->getSolrResource(),
+            Mage::helper('integernet_solr/event'),
+            Mage::getModel('integernet_solr/bridge_categoryRepository'),
+            Mage::getModel('integernet_solr/bridge_categoryRenderer'),
             Mage::getModel('integernet_solr/bridge_storeEmulation')
         );
     }
@@ -160,6 +180,21 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
     public function getStoreConfig()
     {
         $storeConfig = array();
+        foreach (Mage::app()->getStores(false) as $store) {
+            /** @var Mage_Core_Model_Store $store */
+            if ($store->getIsActive()) {
+                $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
+            }
+        }
+        return $storeConfig;
+    }
+
+    /**
+     * @return Config[]
+     */
+    public function getStoreConfigWithAdmin()
+    {
+        $storeConfig = array();
         foreach (Mage::app()->getStores(true) as $store) {
             /** @var Mage_Core_Model_Store $store */
             if ($store->getIsActive()) {
@@ -187,12 +222,15 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             Mage::app()->getStore()->getId(),
             $storeConfig->getGeneralConfig(),
             $storeConfig->getAutosuggestConfig(),
+            $storeConfig->getCategoryConfig(),
             Mage::helper('integernet_solr/searchterm'),
             Mage::helper('integernet_solr/searchUrl'),
             $this->_getSuggestCategoryRepository(),
             $this->_getAttributeRepository(),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CATEGORY_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CMS_PAGE_SUGGEST)
         );
     }
 

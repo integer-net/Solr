@@ -11,7 +11,7 @@ namespace IntegerNet\SolrSuggest\Plain\Cache;
 
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\SolrSuggest\Plain\Entity\SerializableAttribute;
-use IntegerNet\SolrSuggest\Implementor\SerializableCategory;
+use IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
 use IntegerNet\SolrSuggest\Plain\Cache\Item\ActiveCategoriesCacheItem;
@@ -88,7 +88,7 @@ class CacheReader
     }
     /**
      * @param $storeId
-     * @return SerializableCategory[]
+     * @return SerializableSuggestCategory[]
      * @throws CacheItemNotFoundException
      */
     public function getActiveCategories($storeId)
@@ -136,6 +136,9 @@ class CacheReader
             $this->loadedCustomData[$storeId] = $this->cache->load(CustomDataCacheItem::createEmpty($storeId))->getValue();
         }
         $result = $this->loadedCustomData[$storeId];
+        if (!is_null($path) && isset($result[$path])) {
+            return $result[$path];
+        }
         foreach (array_filter(explode('/', $path)) as $pathElement) {
             if ((is_array($result) || $result instanceof \ArrayAccess) && isset ($result[$pathElement])) {
                 $result = $result[$pathElement];

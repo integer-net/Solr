@@ -155,6 +155,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                             $item->setUrl($this->_getUrl($childCategoryId));
                             $item->setIsChecked($this->_isSelected('cat', $childCategoryId));
                             $item->setType('category');
+                            $item->setOptionId($childCategoryId);
 
                             Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                                 'item' => $item,
@@ -177,6 +178,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                         $item->setUrl($this->_getUrl($optionId));
                         $item->setIsChecked($this->_isSelected('cat', $optionId));
                         $item->setType('category');
+                        $item->setOptionId($optionId);
                         
                         Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                             'item' => $item,
@@ -230,6 +232,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
                 $item->setIsChecked($this->_isSelected('price', floatval($rangeStart) . '-' . floatval($rangeEnd)));
                 $item->setType('range');
+                $item->setOptionId(floatval($rangeStart) . '-' . floatval($rangeEnd));
 
                 Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                     'item' => $item,
@@ -256,6 +259,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
                 $item->setIsChecked($this->_isSelected('price', floatval($rangeStart) . '-' . floatval($rangeEnd)));
                 $item->setType('range');
+                $item->setOptionId(floatval($rangeStart) . '-' . floatval($rangeEnd));
                 
                 Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                     'item' => $item,
@@ -301,6 +305,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item->setUrl($this->_getUrl($optionId));
                 $item->setIsChecked($this->_isSelected($attributeCode, $optionId));
                 $item->setType('attribute');
+                $item->setOptionId($optionId);
                 
                 Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                     'item' => $item,
@@ -356,7 +361,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _isSelected($identifier, $optionId)
     {
-        $selectedOptionIds = explode(',', $this->_getCurrentParamValue($identifier));
+        $selectedOptionIds = explode(',', $this->getCurrentParamValue($identifier));
         if (in_array($optionId, $selectedOptionIds)) {
             return true;
         }
@@ -372,7 +377,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getQuery($identifier, $optionId)
     {
-        $currentParamValue = $this->_getCurrentParamValue($identifier);
+        $currentParamValue = $this->getCurrentParamValue($identifier);
         if (strlen($currentParamValue)) {
             $selectedOptionIds = explode(',', $currentParamValue);
         } else {
@@ -399,7 +404,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      * @param $identifier
      * @return mixed
      */
-    protected function _getCurrentParamValue($identifier)
+    public function getCurrentParamValue($identifier)
     {
         return Mage::app()->getRequest()->getParam($identifier);
     }

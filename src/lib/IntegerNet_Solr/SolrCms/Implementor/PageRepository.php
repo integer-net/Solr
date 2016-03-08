@@ -19,4 +19,10 @@ interface PageRepository
      * @return PageIterator
      */
     public function getPagesForIndex($storeId, $pageIds = null);
+
+    /**
+     * @param int $pageSize
+     * @return $this
+     */
+    public function setPageSizeForIndex($pageSize);
 }

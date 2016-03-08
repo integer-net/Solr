@@ -19,7 +19,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <description translate="label">
-                            <label></label>
+                            <label />
                             <frontend_model>integernet_solr/config_description</frontend_model>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
@@ -500,8 +500,39 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </filter_position>
+                        <is_indexer_active translate="label,comment">
+                            <label>Use Solr to index category pages</label>
+                            <comment>Used for autosuggest</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </is_indexer_active>
                     </fields>
                 </category>
+
+                <cms translate="label">
+                    <label>CMS</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>70</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <is_active translate="label,comment">
+                            <label>Use Solr to index cms pages</label>
+                            <comment>Used for autosuggest</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </is_active>
+                    </fields>
+                </cms>
 
                 <autosuggest translate="label">
                     <label>Autosuggest Box</label>
@@ -556,7 +587,7 @@
                         </max_number_product_suggestions>
                         <max_number_category_suggestions translate="label,comment">
                             <label>Maximum number of category suggestions</label>
-                            <comment>0 = don't show</comment>
+                            <comment>0 = don't show&lt;br /&gt;Attention: If &lt;i&gt;Category Indexing&lt;/i&gt; is active, the suggestions will be better, but it will affect the performance of the autosuggest!</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
                             <sort_order>50</sort_order>
@@ -565,6 +596,17 @@
                             <show_in_store>1</show_in_store>
                             <depends><is_active>1</is_active></depends>
                         </max_number_category_suggestions>
+                        <max_number_cms_page_suggestions translate="label,comment">
+                            <label>Maximum number of cms page suggestions</label>
+                            <comment>0 = don't show&lt;br /&gt;Indexing of CMS pages must be active.&lt;br /&gt;Attention: This will affect the performance of the autosuggest!</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>55</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_active>1</is_active></depends>
+                        </max_number_cms_page_suggestions>
                         <show_complete_category_path translate="label">
                             <label>Show complete category path</label>
                             <frontend_type>select</frontend_type>

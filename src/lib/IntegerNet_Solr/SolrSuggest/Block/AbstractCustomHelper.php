@@ -59,7 +59,7 @@ abstract class AbstractCustomHelper implements CustomHelper
     /**
      * @return CacheReader
      */
-    protected function getCacheReader()
+    public function getCacheReader()
     {
         return $this->cacheReader;
     }

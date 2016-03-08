@@ -115,9 +115,20 @@ class Autosuggest implements AutosuggestBlock
         return ob_get_clean();
     }
 
+    /**
+     * @return \IntegerNet\SolrSuggest\Block\AbstractCustomHelper
+     */
     public function getCustomHelper()
     {
         $cacheReader = $this->cacheReaderFactory->getCacheReader();
         return $cacheReader->getCustomHelperFactory($this->storeId)->getCustomHelper($this, $cacheReader);
+    }
+
+    /**
+     * @return int
+     */
+    public function getStoreId()
+    {
+        return $this->storeId;
     }
 }

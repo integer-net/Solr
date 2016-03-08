@@ -26,4 +26,19 @@
             </integernet_solr_filter_item_create>
         </events>
     </frontend>
+
+    <default>
+        <integernet_solr>
+            <category>
+                <is_indexer_active>1</is_indexer_active>
+            </category>
+            <cms>
+                <is_active>1</is_active>
+            </cms>
+            <autosuggest>
+                <max_number_category_suggestions>4</max_number_category_suggestions>
+                <max_number_cms_page_suggestions>4</max_number_cms_page_suggestions>
+            </autosuggest>
+        </integernet_solr>
+    </default>
 </config>

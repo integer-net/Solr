@@ -70,16 +70,21 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _createGeneralInfoMessages($storeId)
     {
-        $this->_addWarningMessage(
+        $this->_addNoticeMessage(
             Mage::helper('integernet_solr')->__('Module version: %s', Mage::getConfig()->getModuleConfig('IntegerNet_Solr')->version)
         );
         if (method_exists('Mage', 'getEdition')) {
-            $this->_addWarningMessage(
+            $this->_addNoticeMessage(
                 Mage::helper('integernet_solr')->__('Magento version: %s (%s Edition)', Mage::getVersion(), Mage::getEdition())
             );
         } else {
-            $this->_addWarningMessage(
+            $this->_addNoticeMessage(
                 Mage::helper('integernet_solr')->__('Magento version: %s', Mage::getVersion())
+            );
+        }
+        if (!Mage::helper('integernet_solr')->isModuleEnabled('Aoe_LayoutConditions')) {
+            $this->_addWarningMessage(
+                Mage::helper('integernet_solr')->__('The module Aoe_LayoutConditions is not installed. Please get it from <a href="%s" target="_blank">%s</a>.', 'https://github.com/aoepeople/Aoe_LayoutConditions', 'https://github.com/aoepeople/Aoe_LayoutConditions')
             );
         }
     }
@@ -186,7 +191,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canPingSolrServer($storeId)
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -199,11 +204,11 @@ class IntegerNet_Solr_Model_Configuration
             Mage::helper('integernet_solr')->__('Connection to Solr server established successfully.')
         );
 
-        $info = Mage::getResourceModel('integernet_solr/solr')->getInfo($storeId);
+        $info = Mage::helper('integernet_solr/factory')->getSolrResource()->getInfo($storeId);
         if ($info instanceof Apache_Solr_Response) {
             if (isset($info->lucene->{'solr-spec-version'})) {
                 $solrVersion = $info->lucene->{'solr-spec-version'};
-                $this->_addWarningMessage(
+                $this->_addNoticeMessage(
                     Mage::helper('integernet_solr')->__('Solr version: %s', $solrVersion)
                 );
             }
@@ -218,7 +223,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canIssueSearchRequest($storeId)
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');
@@ -265,7 +270,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canPingSwapCore($storeId)
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->setUseSwapIndex()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->setUseSwapIndex()->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -286,7 +291,8 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canIssueSearchRequestToSwapCore($storeId)
     {
-        $solr = Mage::getResourceModel('integernet_solr/solr')->setUseSwapIndex()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->
+        setUseSwapIndex()->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');

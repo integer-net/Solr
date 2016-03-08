@@ -114,8 +114,17 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
         if ($from === '' && $to === '') {
             return $this;
         }
-        
-        Mage::getSingleton('integernet_solr/result')->addPriceRangeFilterByMinMax($from, $to);
+
+        $priceFilters = Mage::registry('price_filters');
+        if (!is_array($priceFilters)) {
+            $priceFilters = array();
+        }
+        $priceFilters[] = array(
+            'min' => $from,
+            'max' => $to,
+        );
+        Mage::unregister('price_filters');
+        Mage::register('price_filters', $priceFilters);
 
         return $this;
 

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.4.1</version>
+            <version>1.5.0.1</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -26,6 +26,7 @@
             <catalogsearch>
                 <rewrite>
                     <layer>IntegerNet_Solr_Model_CatalogSearch_Layer</layer>
+                    <layer_filter_attribute>IntegerNet_Solr_Model_CatalogSearch_Layer_Filter_Attribute</layer_filter_attribute>
                 </rewrite>
             </catalogsearch>
 
@@ -33,6 +34,8 @@
                 <rewrite>
                     <layer>IntegerNet_Solr_Model_Catalog_Layer</layer>
                     <layer_filter_price>IntegerNet_Solr_Model_Catalog_Layer_Filter_Price</layer_filter_price>
+                    <layer_filter_attribute>IntegerNet_Solr_Model_Catalog_Layer_Filter_Attribute</layer_filter_attribute>
+                    <layer_filter_category>IntegerNet_Solr_Model_Catalog_Layer_Filter_Category</layer_filter_category>
                 </rewrite>
             </catalog>
         </models>
@@ -98,6 +101,36 @@
                     </integernet_solr>
                 </observers>
             </application_clean_cache>
+
+            <controller_front_init_before>
+                <observers>
+                    <integernet_solr>
+                        <type>object</type>
+                        <class>IntegerNet_Solr_Helper_Autoloader</class>
+                        <method>createAndRegister</method>
+                    </integernet_solr>
+                </observers>
+            </controller_front_init_before>
+
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>coreBlockAbstractToHtmlBefore</method>
+                    </integernet_solr>
+                </observers>
+            </core_block_abstract_to_html_before>
+
+            <cms_page_save_commit_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/cmsIndexer</class>
+                        <method>cmsPageSaveAfter</method>
+                    </integernet_solr>
+                </observers>
+            </cms_page_save_commit_after>
         </events>
 
         <resources>
@@ -149,15 +182,6 @@
                     </integernet_solr>
                 </observers>
             </adminhtml_catalog_product_attribute_edit_prepare_form>
-            <core_block_abstract_to_html_before>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>coreBlockAbstractToHtmlBefore</method>
-                    </integernet_solr>
-                </observers>
-            </core_block_abstract_to_html_before>
             <admin_system_config_changed_section_integernet_solr>
                 <observers>
                     <integernet_solr>
@@ -292,15 +316,22 @@
             <results>
                 <use_html_from_solr>0</use_html_from_solr>
                 <search_operator>AND</search_operator>
+                <filter_position>1</filter_position>
                 <priority_categories>2</priority_categories>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>
                 <use_custom_price_intervals>0</use_custom_price_intervals>
                 <custom_price_intervals>10,20,50,100,200,300,400,500</custom_price_intervals>
+                <product_attributes_redirect>name,sku</product_attributes_redirect>
+                <category_attributes_redirect>name</category_attributes_redirect>
             </results>
             <category>
                 <is_active>0</is_active>
+                <filter_position>1</filter_position>
             </category>
+            <cms>
+                <is_active>0</is_active>
+            </cms>
             <autosuggest>
                 <is_active>1</is_active>
                 <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
@@ -311,6 +342,13 @@
                 <category_link_type>direct</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>
+            <seo>
+                <hide_from_robots>search_results_all,search_results_filtered,categories_filtered</hide_from_robots>
+            </seo>
+            <dev>
+                <register_autoloader>1</register_autoloader>
+                <autoloader_basepath>lib/IntegerNet_Solr</autoloader_basepath>
+            </dev>
         </integernet_solr>
     </default>
 

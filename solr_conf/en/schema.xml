@@ -26,6 +26,11 @@
         <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
             <analyzer type="index">
                 <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+                <filter class="solr.SynonymFilterFactory"
+                        synonyms="synonyms.txt"
+                        ignoreCase="true"
+                        expand="true"
+                />
                 <filter class="solr.NGramFilterFactory" maxGramSize="15" minGramSize="2"/>
                 <filter class="solr.WordDelimiterFilterFactory"
                         generateWordParts="1"
@@ -60,11 +65,6 @@
                         catenateAll="0"
                         splitOnCaseChange="1"
                         preserveOriginal="1"
-                />
-                <filter class="solr.SynonymFilterFactory"
-                        synonyms="synonyms.txt"
-                        ignoreCase="true"
-                        expand="true"
                 />
                 <filter class="solr.StopFilterFactory"
                         ignoreCase="true"

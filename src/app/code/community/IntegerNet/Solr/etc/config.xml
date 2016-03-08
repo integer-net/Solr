@@ -284,8 +284,8 @@
             <fuzzy>
                 <is_active>1</is_active>
                 <is_active_autosuggest>1</is_active_autosuggest>
-                <sensitivity>0.7</sensitivity>
-                <sensitivity_autosuggest>0.7</sensitivity_autosuggest>
+                <sensitivity>0.8</sensitivity>
+                <sensitivity_autosuggest>0.8</sensitivity_autosuggest>
                 <minimum_results>0</minimum_results>
                 <minimum_results_autosuggest>0</minimum_results_autosuggest>
             </fuzzy>
@@ -308,7 +308,7 @@
                 <max_number_product_suggestions>3</max_number_product_suggestions>
                 <max_number_category_suggestions>8</max_number_category_suggestions>
                 <show_complete_category_path>0</show_complete_category_path>
-                <category_link_type>filter</category_link_type>
+                <category_link_type>direct</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>
         </integernet_solr>

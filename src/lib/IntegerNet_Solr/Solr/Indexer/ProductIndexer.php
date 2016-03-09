@@ -217,6 +217,10 @@ class ProductIndexer
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
+            if (!$product->getData($attribute->getAttributeCode())) {
+                continue;
+            }
+            
             switch ($attribute->getFacetType()) {
                 case Attribute::FACET_TYPE_SELECT:
                     $rawValue = $product->getAttributeValue($attribute);

@@ -278,6 +278,10 @@ Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, w
 Hier haben Sie die Wahl zwischen *UND* und *ODER*. Der Such-Operator wird eingesetzt, wenn es mehr als einen Suchbegriff in der Anfrage gibt, z.B. "rotes Shirt". Bei *UND* werden nur Ergebnisse ausgegeben, die auf beide (bzw. alle) Suchbegriffe passen, bei *ODER* werden dafür auch Ergebnisse ausgegeben, die nur auf einen der Suchbegriffe passen. 
 In den meisten Fällen ist *UND* die bessere Einstellung.
 
+#### Position der Filter
+
+Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden. Letztere ist empfehlenswert bei einem eher schmalen Template.
+
 #### Solr-Priorität von Kategorienamen
 
 Hier können Sie einstellen, mit welcher Priorität Kategorienamen im Solr-Index verarbeitet werden. Ein Beispiel: Wenn der Suchbegriff "schwarze Shirts" hauptsächlich solche Artikel im Suchergebnis anzeigen soll, die in der Kategorie "Shirts" enthalten sind, tragen Sie hier einen höheren Wert ein.
@@ -312,6 +316,10 @@ Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zur Kategorie
 
 Das Aktivieren dieser Funktion führt dazu, dass die Produkte auf Kategorieseiten von Solr dargestellt werden. Besonders in Online-Shops mit einer Vielzahl von Produkten oder filterbaren Attributen in der Filternavigation können so die Ladezeiten von Kategorieseiten deutlich verringert werden.
 Wird diese Funktion aktiviert, ist danach eine Reindizierung des Solr Suchindex notwendig, bevor die Änderungen im Frontend des Shops übernommen werden.
+
+#### Position der Filter
+
+Unabhängig von der Position der Filter auf den Suchergebnisseiten können Sie für Kategorien eine andere Anordnung der Filter auswählen. Zur Wahl stehen die Anzeige links neben den Produkten und oberhalb der Produkte.  Dies ist ein Standardwert, der durch eine Konfiguration in der Kategorie selbst überschrieben werden kann.
 
 ### Suchvorschlags-Box
 
@@ -437,6 +445,18 @@ Bitte beachten Sie: Wenn die Suchvorschaufunktion nicht von Magento, sondern von
 Versuchen Sie, sich an die in `app/design/frontend/base/default/template/integernet/solr/result/autosuggest.phtml` genutzten Funktionen zu halten. Da der HTML-Code für die einzelnen Produkte von Magento generiert wird, können Sie dort hingegen alle Magento-Funktionen verwenden.
 
 Wenn Sie Produkt-, Kategorie-, Attribut- oder Suchwortvorschläge in der Suchvorschaufunktion nicht verwenden, schalten Sie sie bitte auch in der Konfiguration aus, um die Performance zu verbessern.
+
+Kategorieanpassungen
+---------------------
+
+![Category View](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-de.png)
+
+### Filter entfernen
+Selbst wenn IntegerNet_Solr nicht zum Laden der Produkte auf Kategorieseiten genutzt wird, können Sie das Modul nutzen um unnötige Filter von bestimmten Kategorieseiten zu entfernen. Zum Beispiel können Sie so verhindern, dass der Filter "Geschlecht" auf der Kategorieseite für Herrenbekleidung angezeigt wird.  
+
+### Position der Filter
+Für jede Kategorie können Sie bestimmen, wo die Filter angezeigt werden, auch abweichend vom Standardwert, den Sie in der Konfiguration von IntegerNet_Solr hinterlegen. Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden.
+
 
 Mögliche Probleme und Lösungsansätze
 -------------------------------------

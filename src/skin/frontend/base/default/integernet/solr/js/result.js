@@ -45,8 +45,28 @@ SolrResult.prototype = {
                     this.addParamToFilterUrls(parameter);
                 }
             }
+        } else if (newParameters.length < originalParameters.length) {
+            for (var index = 0; index < originalParameters.length; index++) {
+                var parameter = originalParameters[index];
+                if (newParameters.indexOf(parameter) == -1) {
+                    this.removeParamFromFilterUrls(parameter);
+                }
+            }
         } else {
+            for (var index = 0; index < newParameters.length; index++) {
+                var newParameter = newParameters[index];
+                var newParameterParts = newParameter.split('=');
+                var newParameterKey = newParameterParts[0];
+                for (var originalIndex = 0; originalIndex < originalParameters.length; originalIndex++) {
+                    var originalParameter = originalParameters[originalIndex];
+                    var originalParameterParts = originalParameter.split('=');
+                    var originalParameterKey = originalParameterParts[0];
 
+                    if (originalParameterKey == newParameterKey) {
+                        this.removeParamFromFilterUrls(newParameter);
+                    }
+                }
+            }
         }
     },
 
@@ -87,43 +107,110 @@ SolrResult.prototype = {
         return parametersPart.split('&');
     },
     
-    addParamToFilterUrls: function (newParameter) {
+    addParamToFilterUrls: function (parameterToAdd) {
         var self = this;
         $$('.block-layered-nav a').each(function (link) {
-            self.addParamToLink(newParameter, link);
+            self.toggleParameterInLink(parameterToAdd, link);
         });
     },
 
-    addParamToLink: function (newParameter, link) {
-        var newParameterParts = newParameter.split('=');
-        var newParameterKey = newParameterParts[0];
-        var newParameterValue = newParameterParts[1];
+    removeParamFromFilterUrls: function (parameterToRemove) {
+        var self = this;
+        $$('.block-layered-nav a').each(function (link) {
+            self.toggleParameterInLink(parameterToRemove, link, true);
+        });
+    },
+
+    replaceParam: function (oldUrl, oldParameter, newParameter) {
+        var newUrl = oldUrl
+            .replace('&' + oldParameter + '&', '&' + newParameter)
+            .replace('?' + oldParameter + '&', '?' + newParameter);
+        if (newUrl == oldUrl) {
+             newUrl = oldUrl
+                .replace('&' + oldParameter, newParameter)
+                .replace('?' + oldParameter, newParameter);
+        }
+        return newUrl
+
+    },
+
+    toggleParameterInLink: function (parameterToToggle, link, removeOnly) {
+        console.log('parameterToToggle: ' + parameterToToggle);
+        console.log('link.href: ' + link.href);
+        var parameterToToggleParts = parameterToToggle.split('=');
+        var parameterToToggleKey = parameterToToggleParts[0];
+        var parameterToToggleValue = parameterToToggleParts[1].toString();
 
         var linkUrl = link.href;
         var linkParams = this.getParametersAsArray(linkUrl);
 
-        if (linkUrl.indexOf('&' + newParameterKey + '=') != -1 || linkUrl.indexOf('?' + newParameterKey + '=') != -1) {
+        if (linkUrl.indexOf('&' + parameterToToggleKey + '=') != -1 || linkUrl.indexOf('?' + parameterToToggleKey + '=') != -1) {
+            for (var index = 0; index < linkParams.length; index++) {
+                var linkParameter = linkParams[index];
+                var linkParameterParts = linkParameter.split('=');
+                var linkParameterKey = linkParameterParts[0];
+                var linkParameterValue = linkParameterParts[1].toString();
+                if (linkParameterKey == parameterToToggleKey) {
+                    if (linkParameterValue == parameterToToggleValue) {
+                        console.log(1);
+                        linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
+                    } else {
+                        var linkParameterValues = linkParameterValue.split(encodeURIComponent(','));
+                        console.log(parameterToToggle);
+                        console.log(linkParameterValues);
+                        if (linkParameterValues.indexOf(parameterToToggleValue) != -1) {
+                            delete linkParameterValues[linkParameterValues.indexOf(parameterToToggleValue)];
+                            linkParameterValues = linkParameterValues.filter(Number)
+                        } else if (!removeOnly) {
+                            linkParameterValues.push(parameterToToggleValue);
+                        }
+                        console.log(linkParameterValues);
+                        console.log(' ');
+                        linkUrl = this.replaceParam(linkUrl, linkParameter, linkParameterKey + '=' + linkParameterValues.join(encodeURIComponent(',')));
+                    }
+                }
+            }
+        } else {
+            console.log(2);
+            if (linkParams.indexOf(parameterToToggle) != -1) {
+                linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
+            } else {
+                if (linkUrl.indexOf('?')) {
+                    linkUrl = linkUrl + '&' + parameterToToggle;
+                } else {
+                    linkUrl = linkUrl + '?' + parameterToToggle;
+                }
+            }
+        }
+        link.href = linkUrl;
+    },
+
+    removeParamFromLink: function (parameterToRemove, link) {
+        var parameterToRemoveParts = parameterToRemove.split('=');
+        var parameterToRemoveKey = parameterToRemoveParts[0];
+        var parameterToRemoveValue = parameterToRemoveParts[1];
+
+        var linkUrl = link.href;
+        var linkParams = this.getParametersAsArray(linkUrl);
+
+        if (linkUrl.indexOf('&' + parameterToRemoveKey + '=') != -1 || linkUrl.indexOf('?' + parameterToRemoveKey + '=') != -1) {
             for (var index = 0; index < linkParams.length; index++) {
                 var linkParameter = linkParams[index];
                 var linkParameterParts = linkParameter.split('=');
                 var linkParameterKey = linkParameterParts[0];
                 var linkParameterValue = linkParameterParts[1];
-                if (linkParameterKey == newParameterKey) {
-                    if (linkParameterValue == newParameterValue) {
-                        linkUrl = linkUrl.replace('&' + newParameter, '').replace('?' + newParameter, '');
+                if (linkParameterKey == parameterToRemoveKey) {
+                    if (linkParameterValue == parameterToRemoveValue) {
+                        linkUrl = this.replaceParam(linkUrl, parameterToRemove, '');
                     } else {
-                        
+                        var linkParameterValues = linkParameterValue.split(encodeURIComponent(','));
+                        if (linkParameterValues.indexOf(parameterToRemoveKey) != -1) {
+                            delete linkParameterValues[linkParameterValues.indexOf(parameterToRemoveKey)];
+                        } else {
+                            linkParameterValues.push(parameterToRemoveValue);
+                        }
+                        linkUrl = this.replaceParam(linkUrl, linkParameter, linkParameterKey + '=' + linkParameterValues.join(encodeURIComponent(',')));
                     }
-                }
-            }
-        } else {
-            if (linkParams.indexOf(newParameter) != -1) {
-                linkUrl = linkUrl.replace('&' + newParameter, '').replace('?' + newParameter, '');
-            } else {
-                if (linkUrl.indexOf('?')) {
-                    linkUrl = linkUrl + '&' + newParameter;
-                } else {
-                    linkUrl = linkUrl + '?' + newParameter;
                 }
             }
         }

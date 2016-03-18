@@ -127,6 +127,16 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
+    public function isSolrResultPage()
+    {
+        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
+        || Mage::app()->getRequest()->getModuleName() == 'solr'
+        || $this->isCategoryPage();
+    }
+
+    /**
+     * @return bool
+     */
     public function isCategoryDisplayActive()
     {
         return Mage::getStoreConfigFlag('integernet_solr/category/is_active');

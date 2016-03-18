@@ -75,7 +75,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $identifier = $this->getAttribute()->getAttributeCode();
         }
         $query = $this->_getQuery($identifier, $optionId);
-        return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
+        return Mage::getUrl($this->_getRoute(), array('_current' => true, '_use_rewrite' => true, '_query' => $query));
     }
 
     /**
@@ -89,7 +89,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     {
         $identifier = 'price';
         $query = $this->_getQuery($identifier, floatval($rangeStart) . '-' . floatval($rangeEnd));
-        return Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true, '_query' => $query));
+        return Mage::getUrl($this->_getRoute(), array('_current' => true, '_use_rewrite' => true, '_query' => $query));
     }
 
     /**
@@ -407,5 +407,16 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     public function getCurrentParamValue($identifier)
     {
         return Mage::app()->getRequest()->getParam($identifier);
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getRoute()
+    {
+        if (Mage::getStoreConfigFlag('integernet_solr/results/use_ajax_for_filter_results')) {
+            return 'integernet_solr/*/*';
+        }
+        return '*/*/*';
     }
 }

@@ -20,7 +20,7 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mode
             return parent::getPriceRange();
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
             return parent::getPriceRange();
         }
 

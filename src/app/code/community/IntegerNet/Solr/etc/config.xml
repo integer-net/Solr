@@ -237,6 +237,16 @@
             </updates>
         </layout>
 
+        <routers>
+            <integernet_solr>
+                <use>standard</use>
+                <args>
+                    <module>IntegerNet_Solr_Frontend</module>
+                    <frontName>solr</frontName>
+                </args>
+            </integernet_solr>
+        </routers>
+
         <events>
             <controller_action_predispatch_catalogsearch_result_index>
                 <observers>
@@ -318,6 +328,7 @@
                 <search_operator>AND</search_operator>
                 <filter_position>1</filter_position>
                 <priority_categories>2</priority_categories>
+                <use_ajax_for_filter_results>0</use_ajax_for_filter_results>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>
                 <use_custom_price_intervals>0</use_custom_price_intervals>

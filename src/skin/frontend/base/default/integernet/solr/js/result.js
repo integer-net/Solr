@@ -8,7 +8,6 @@ SolrResult.prototype = {
     },
 
     updateResults: function (ajaxUrl) {
-
         var self = this;
         var contentElement = $$('.col-main')[0];
         new Ajax.Updater(contentElement, ajaxUrl, {

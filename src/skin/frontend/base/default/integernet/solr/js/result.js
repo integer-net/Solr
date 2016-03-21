@@ -14,16 +14,24 @@ SolrResult.prototype = {
             insertion: 'bottom',
             onSuccess: function (response) {
                 var lastChild = $$(".col-main > :last-child");
-                while (!lastChild[0].hasClassName('block-layered-nav')) {
+                while (lastChild.length && !lastChild[0].hasClassName('block-layered-nav')) {
                     lastChild[0].remove();
                     lastChild = $$(".col-main > :last-child");
                 }
             },
             onComplete: function (response) {
 
+                self.updateUrl(ajaxUrl);
                 self.updateLinks(ajaxUrl);
             }
         });
+    },
+    
+    updateUrl: function(ajaxUrl) {
+        var currentUrl = window.location.href;
+        var urlBasePart = this.getUrlBasePart(currentUrl);
+        var newUrl = urlBasePart + '?' + this.getUrlParametersAsArray(ajaxUrl).join('&');
+        window.history.pushState(null, '', newUrl);
     },
     
     updateLinks: function (ajaxUrl) {
@@ -35,8 +43,8 @@ SolrResult.prototype = {
         if (!url) {
             return;
         }
-        var newParameters = this.getParametersAsArray(url);
-        var originalParameters = this.getParametersAsArray(window.location.href);
+        var newParameters = this.getUrlParametersAsArray(url);
+        var originalParameters = this.getUrlParametersAsArray(window.location.href);
         if (newParameters.length > originalParameters.length) {
             for (var index = 0; index < newParameters.length; index++) {
                 var parameter = newParameters[index];
@@ -101,9 +109,21 @@ SolrResult.prototype = {
         });
     },
 
-    getParametersAsArray: function(url) {
-        var parametersPart = url.substr(url.indexOf('?') + 1);
+    getUrlParametersAsArray: function(url) {
+        var position = url.indexOf('?');
+        if (position == -1) {
+            return [];
+        }
+        var parametersPart = url.substr(position + 1);
         return parametersPart.split('&');
+    },
+    
+    getUrlBasePart: function(url) {
+        var position = url.indexOf('?');
+        if (position == -1) {
+            return url;
+        }
+        return url.substring(0, position);
     },
     
     addParamToFilterUrls: function (parameterToAdd) {
@@ -141,7 +161,7 @@ SolrResult.prototype = {
         var parameterToToggleValue = parameterToToggleParts[1].toString();
 
         var linkUrl = link.href;
-        var linkParams = this.getParametersAsArray(linkUrl);
+        var linkParams = this.getUrlParametersAsArray(linkUrl);
 
         if (linkUrl.indexOf('&' + parameterToToggleKey + '=') != -1 || linkUrl.indexOf('?' + parameterToToggleKey + '=') != -1) {
             for (var index = 0; index < linkParams.length; index++) {
@@ -190,7 +210,7 @@ SolrResult.prototype = {
         var parameterToRemoveValue = parameterToRemoveParts[1];
 
         var linkUrl = link.href;
-        var linkParams = this.getParametersAsArray(linkUrl);
+        var linkParams = this.getUrlParametersAsArray(linkUrl);
 
         if (linkUrl.indexOf('&' + parameterToRemoveKey + '=') != -1 || linkUrl.indexOf('?' + parameterToRemoveKey + '=') != -1) {
             for (var index = 0; index < linkParams.length; index++) {

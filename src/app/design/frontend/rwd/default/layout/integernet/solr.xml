@@ -63,6 +63,12 @@
     </catalogsearch_result_index>
 
     <catalog_category_layered>
+        <reference name="head">
+            <action method="addItem" ifconfig="integernet_solr/category/is_active">
+                <type>skin_js</type>
+                <name>integernet/solr/js/result.js</name>
+            </action>
+        </reference>
         <reference name="category.products">
             <action ifconfig="integernet_solr/category/is_active" method="unsetChild">
                 <name>product_list</name>
@@ -166,11 +172,21 @@
             <action method="setTemplate">
                 <name>integernet/solr/page/content.phtml</name>
             </action>
+            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json">
+                <action method="insert">
+                    <name>search.result</name>
+                </action>
+                <action method="insert">
+                    <name>catalogsearch.solr.leftnav</name>
+                </action>
+                <action method="insert">
+                    <name>catalogsearch.solr.topnav</name>
+                </action>
+            </block>
         </reference>
-        <!--<remove name="left_first" />-->
-        <!--<remove name="left" />-->
+        
+        
         <remove name="right" />
-        <!--<remove name="head" />-->
         <remove name="header" />
         <remove name="footer" />
         <remove name="catalogsearch.solr.topnav" />

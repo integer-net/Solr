@@ -11,14 +11,22 @@ SolrResult.prototype = {
         var self = this;
         var contentElement = $$('.col-main')[0];
         var ajaxUrl = url.replace('/catalogsearch/result/', '/solr/result/');
-        new Ajax.Updater(contentElement, ajaxUrl, {
-            insertion: 'bottom',
+        new Ajax.Request(ajaxUrl, {
             onSuccess: function (response) {
                 var lastChild = $$(".col-main > :last-child");
                 while (lastChild.length && !lastChild[0].hasClassName('block-layered-nav')) {
                     lastChild[0].remove();
                     lastChild = $$(".col-main > :last-child");
                 }
+                var responseBody = JSON.parse(response.responseText);
+                $$('.col-main')[0].insert( {
+                    bottom: responseBody['products']
+                });
+                $$('.col-main')[0].insert( {
+                    bottom: responseBody['topnav']
+                });
+                $$('.col-left .block-layered-nav')[0].replace(responseBody['leftnav']);
+                
             },
             onComplete: function (response) {
 
@@ -36,7 +44,7 @@ SolrResult.prototype = {
     },
     
     updateLinks: function (ajaxUrl) {
-        this.updateLinkURLs(ajaxUrl);
+        //this.updateLinkURLs(ajaxUrl);
         this.updateLinkObservers();
     },
 
@@ -50,9 +58,6 @@ SolrResult.prototype = {
             for (var index = 0; index < newParameters.length; index++) {
                 var parameter = newParameters[index];
                 if (originalParameters.indexOf(parameter) == -1) {
-                    console.log('addParamToFilterUrls: ' + parameter);
-                    console.log(originalParameters);
-                    console.log(newParameters);
                     this.addParamToFilterUrls(parameter);
                 }
             }
@@ -60,16 +65,10 @@ SolrResult.prototype = {
             for (var index = 0; index < originalParameters.length; index++) {
                 var parameter = originalParameters[index];
                 if (newParameters.indexOf(parameter) == -1) {
-                    console.log('removeParamFromFilterUrls: ' + parameter);
-                    console.log(originalParameters);
-                    console.log(newParameters);
                     this.removeParamFromFilterUrls(parameter);
                 }
             }
         } else {
-            console.log('else: ');
-            console.log(originalParameters);
-            console.log(newParameters);
             for (var index = 0; index < newParameters.length; index++) {
                 var newParameter = newParameters[index];
                 var newParameterParts = newParameter.split('=');
@@ -110,7 +109,7 @@ SolrResult.prototype = {
             links = $$('.block-layered-nav a', '.toolbar a', '.toolbar-bottom a');
             this.isFirstCall = false;
         } else {
-            links = $$('.toolbar a', '.toolbar-bottom a');
+            links = $$('.block-layered-nav a', '.toolbar a', '.toolbar-bottom a');
         }
 
         links.each(function (element) {
@@ -273,9 +272,7 @@ SolrResult.prototype = {
         }
         link.href = linkUrl;
     }
-
 };
-
 
 document.observe("dom:loaded", function() {
     var solrResult = new SolrResult();

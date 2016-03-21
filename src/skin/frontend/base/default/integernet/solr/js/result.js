@@ -21,8 +21,8 @@ SolrResult.prototype = {
             },
             onComplete: function (response) {
 
-                self.updateUrl(ajaxUrl);
                 self.updateLinks(ajaxUrl);
+                self.updateUrl(ajaxUrl);
             }
         });
     },
@@ -49,6 +49,9 @@ SolrResult.prototype = {
             for (var index = 0; index < newParameters.length; index++) {
                 var parameter = newParameters[index];
                 if (originalParameters.indexOf(parameter) == -1) {
+                    console.log('addParamToFilterUrls: ' + parameter);
+                    console.log(originalParameters);
+                    console.log(newParameters);
                     this.addParamToFilterUrls(parameter);
                 }
             }
@@ -56,21 +59,43 @@ SolrResult.prototype = {
             for (var index = 0; index < originalParameters.length; index++) {
                 var parameter = originalParameters[index];
                 if (newParameters.indexOf(parameter) == -1) {
+                    console.log('removeParamFromFilterUrls: ' + parameter);
+                    console.log(originalParameters);
+                    console.log(newParameters);
                     this.removeParamFromFilterUrls(parameter);
                 }
             }
         } else {
+            console.log('else: ');
+            console.log(originalParameters);
+            console.log(newParameters);
             for (var index = 0; index < newParameters.length; index++) {
                 var newParameter = newParameters[index];
                 var newParameterParts = newParameter.split('=');
                 var newParameterKey = newParameterParts[0];
+                var newParameterValues = newParameterParts[1].split(encodeURIComponent(','));
                 for (var originalIndex = 0; originalIndex < originalParameters.length; originalIndex++) {
                     var originalParameter = originalParameters[originalIndex];
                     var originalParameterParts = originalParameter.split('=');
                     var originalParameterKey = originalParameterParts[0];
+                    var originalParameterValues = originalParameterParts[1].split(encodeURIComponent(','));
 
-                    if (originalParameterKey == newParameterKey) {
-                        this.removeParamFromFilterUrls(newParameter);
+                    if ((originalParameterKey == newParameterKey) && (originalParameter != newParameter)) {
+                        if (originalParameterValues.length < newParameterValues.length) {
+                            for (var newParameterIndex = 0; newParameterIndex < newParameterValues.length; newParameterIndex++) {
+                                var newParameterValue = newParameterValues[newParameterIndex];
+                                if (originalParameterValues.indexOf(newParameterValue) == -1) {
+                                    this.addParamToFilterUrls(newParameterKey + '=' + newParameterValue);
+                                }
+                            }
+                        } else {
+                            for (var originalParameterIndex = 0; originalParameterIndex < originalParameterValues.length; originalParameterIndex++) {
+                                var originalParameterValue = originalParameterValues[originalParameterIndex];
+                                if (newParameterValues.indexOf(originalParameterValue) == -1) {
+                                    this.removeParamFromFilterUrls(originalParameterKey + '=' + originalParameterValue);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -93,6 +118,9 @@ SolrResult.prototype = {
                 var url = element.href;
 
                 self.updateResults(url);
+                element.select('input[type=checkbox]').each(function(checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                });
             });
         });
 
@@ -141,13 +169,25 @@ SolrResult.prototype = {
     },
 
     replaceParam: function (oldUrl, oldParameter, newParameter) {
-        var newUrl = oldUrl
-            .replace('&' + oldParameter + '&', '&' + newParameter)
-            .replace('?' + oldParameter + '&', '?' + newParameter);
-        if (newUrl == oldUrl) {
-             newUrl = oldUrl
-                .replace('&' + oldParameter, newParameter)
-                .replace('?' + oldParameter, newParameter);
+        var newUrl;
+        if (!newParameter.length) {
+            newUrl = oldUrl
+                .replace('&' + oldParameter + '&', '&')
+                .replace('?' + oldParameter + '&', '?');
+            if (newUrl == oldUrl) {
+                newUrl = oldUrl
+                    .replace('&' + oldParameter, '')
+                    .replace('?' + oldParameter, '');
+            }
+        } else {
+            newUrl = oldUrl
+                .replace('&' + oldParameter + '&', '&' + newParameter + '&')
+                .replace('?' + oldParameter + '&', '?' + newParameter + '&');
+            if (newUrl == oldUrl) {
+                newUrl = oldUrl
+                    .replace('&' + oldParameter, '&' + newParameter)
+                    .replace('?' + oldParameter, '?' + newParameter);
+            }
         }
         return newUrl
 
@@ -175,16 +215,22 @@ SolrResult.prototype = {
                         linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
                     } else {
                         var linkParameterValues = linkParameterValue.split(encodeURIComponent(','));
-                        console.log(parameterToToggle);
+                        var parameterToToggleValues = parameterToToggleValue.split(encodeURIComponent(','));
+                        console.log(parameterToToggleValues);
                         console.log(linkParameterValues);
-                        if (linkParameterValues.indexOf(parameterToToggleValue) != -1) {
-                            delete linkParameterValues[linkParameterValues.indexOf(parameterToToggleValue)];
-                            linkParameterValues = linkParameterValues.filter(Number)
-                        } else if (!removeOnly) {
-                            linkParameterValues.push(parameterToToggleValue);
+                        for (var parameterToToggleIndex = 0; parameterToToggleIndex < parameterToToggleValues.length; parameterToToggleIndex++) {
+                            var parameterToToggleSingleValue = parameterToToggleValues[parameterToToggleIndex];
+                            if (linkParameterValues.indexOf(parameterToToggleSingleValue) != -1) {
+                                console.log('Delete ' + parameterToToggleSingleValue);
+                                delete linkParameterValues[linkParameterValues.indexOf(parameterToToggleSingleValue)];
+                                linkParameterValues = linkParameterValues.filter(Number);
+                            } else if (!removeOnly) {
+                                console.log('Add ' + parameterToToggleSingleValue);
+                                linkParameterValues.push(parameterToToggleSingleValue);
+                            }
                         }
+                        
                         console.log(linkParameterValues);
-                        console.log(' ');
                         linkUrl = this.replaceParam(linkUrl, linkParameter, linkParameterKey + '=' + linkParameterValues.join(encodeURIComponent(',')));
                     }
                 }
@@ -194,13 +240,15 @@ SolrResult.prototype = {
             if (linkParams.indexOf(parameterToToggle) != -1) {
                 linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
             } else {
-                if (linkUrl.indexOf('?')) {
+                if (linkUrl.indexOf('?') != -1) {
                     linkUrl = linkUrl + '&' + parameterToToggle;
                 } else {
                     linkUrl = linkUrl + '?' + parameterToToggle;
                 }
             }
         }
+        console.log('New link: ' + linkUrl);
+        console.log(' ');
         link.href = linkUrl;
     },
 

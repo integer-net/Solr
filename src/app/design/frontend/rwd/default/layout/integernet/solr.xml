@@ -60,6 +60,9 @@
             <action method="setListModes"/>
             <action method="setListCollection"/>
         </reference>
+        <reference name="before_body_end">
+            <block type="integernet_solr/js" name="solr.js" template="integernet/solr/js.phtml" />
+        </reference>
     </catalogsearch_result_index>
 
     <catalog_category_layered>
@@ -114,6 +117,9 @@
             <action method="setListOrders"/>
             <action method="setListModes"/>
             <action method="setListCollection"/>
+        </reference>
+        <reference name="before_body_end">
+            <block type="integernet_solr/js" name="solr.js" template="integernet/solr/js.phtml" />
         </reference>
     </catalog_category_layered>
 
@@ -189,6 +195,30 @@
         <remove name="right" />
         <remove name="header" />
         <remove name="footer" />
-        <remove name="catalogsearch.solr.topnav" />
     </integernet_solr_result_index>
+    
+    <integernet_solr_category_view>
+        <update handle="catalog_category_view"/>
+        <reference name="root">
+            <action method="setTemplate">
+                <name>integernet/solr/page/content.phtml</name>
+            </action>
+            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json">
+                <action method="insert">
+                    <name>category.products</name>
+                </action>
+                <action method="insert">
+                    <name>catalog.solr.leftnav</name>
+                </action>
+                <action method="insert">
+                    <name>catalog.solr.topnav</name>
+                </action>
+            </block>
+        </reference>
+        
+        
+        <remove name="right" />
+        <remove name="header" />
+        <remove name="footer" />
+    </integernet_solr_category_view>
 </layout>

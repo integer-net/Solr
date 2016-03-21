@@ -10,8 +10,4 @@
 require_once('Mage' . DS . 'CatalogSearch' . DS . 'controllers' . DS . 'ResultController.php');
 class IntegerNet_Solr_Frontend_ResultController extends Mage_CatalogSearch_ResultController
 {
-    public function ajaxAction()
-    {
-        die(__METHOD__);
-    }
 }

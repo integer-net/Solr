@@ -414,6 +414,6 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        return '*/*/*';
+        return 'catalogsearch/result/*';
     }
 }

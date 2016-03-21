@@ -3,29 +3,36 @@ SolrResult.prototype = {
 
     isFirstCall: true,
     
-    initialize: function() {
+    baseUrl: null,
+    
+    initialize: function(baseUrl) {
+        this.baseUrl = baseUrl;
         this.updateLinks();
     },
 
     updateResults: function (url) {
         var self = this;
         var contentElement = $$('.col-main')[0];
-        var ajaxUrl = url.replace('/catalogsearch/result/', '/solr/result/');
+        var ajaxUrl = this.baseUrl + '?' + this.getUrlParametersAsArray(url).join('&');
         new Ajax.Request(ajaxUrl, {
             onSuccess: function (response) {
-                var lastChild = $$(".col-main > :last-child");
-                while (lastChild.length && !lastChild[0].hasClassName('block-layered-nav')) {
-                    lastChild[0].remove();
-                    lastChild = $$(".col-main > :last-child");
-                }
                 var responseBody = JSON.parse(response.responseText);
-                $$('.col-main')[0].insert( {
-                    bottom: responseBody['products']
-                });
-                $$('.col-main')[0].insert( {
-                    bottom: responseBody['topnav']
-                });
-                $$('.col-left .block-layered-nav')[0].replace(responseBody['leftnav']);
+                var element;
+                if (element = $$('.col-main .page-title')[0]) {
+                    element.remove();
+                }
+                if (element = $$('.col-main .category-image')[0]) {
+                    element.remove();
+                }
+                if (element = $$('.col-main .category-products')[0]) {
+                    $$('.col-main .category-products')[0].replace(responseBody['products']);
+                }
+                if (element = $$('.col-main .block-layered-nav')[0]) {
+                    $$('.col-main .block-layered-nav')[0].replace(responseBody['topnav']);
+                }
+                if (element = $$('.col-left .block-layered-nav')[0]) {
+                    $$('.col-left .block-layered-nav')[0].replace(responseBody['leftnav']);
+                }
                 
             },
             onComplete: function (response) {
@@ -273,7 +280,3 @@ SolrResult.prototype = {
         link.href = linkUrl;
     }
 };
-
-document.observe("dom:loaded", function() {
-    var solrResult = new SolrResult();
-});

@@ -12,11 +12,19 @@ class IntegerNet_Solr_Block_Result_Layer_Ajax extends Mage_Core_Block_Abstract
 {
     protected function _toHtml()
     {
-        $content = array(
-            'products' => $this->getChildHtml('search.result'),
-            'leftnav' => $this->getChildHtml('catalogsearch.solr.leftnav'),
-            'topnav' => $this->getChildHtml('catalogsearch.solr.topnav'),
-        );
+        if ($this->getChild('search.result')) {
+            $content = array(
+                'products' => $this->getChildHtml('search.result'),
+                'leftnav' => $this->getChildHtml('catalogsearch.solr.leftnav'),
+                'topnav' => $this->getChildHtml('catalogsearch.solr.topnav'),
+            );
+        } else {
+            $content = array(
+                'products' => $this->getLayout()->getBlock('category.products')->toHtml(),
+                'leftnav' => $this->getLayout()->getBlock('catalog.solr.leftnav')->toHtml(),
+                'topnav' => $this->getLayout()->getBlock('catalog.solr.topnav')->toHtml(),
+            );
+        }
         
         return Zend_Json::encode($content);
     }

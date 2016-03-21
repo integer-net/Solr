@@ -414,9 +414,6 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/results/use_ajax_for_filter_results')) {
-            return 'integernet_solr/*/*';
-        }
         return '*/*/*';
     }
 }

@@ -7,9 +7,10 @@ SolrResult.prototype = {
         this.updateLinks();
     },
 
-    updateResults: function (ajaxUrl) {
+    updateResults: function (url) {
         var self = this;
         var contentElement = $$('.col-main')[0];
+        var ajaxUrl = url.replace('/catalogsearch/result/', '/solr/result/');
         new Ajax.Updater(contentElement, ajaxUrl, {
             insertion: 'bottom',
             onSuccess: function (response) {

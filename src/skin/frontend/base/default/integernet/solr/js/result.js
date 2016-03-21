@@ -194,8 +194,6 @@ SolrResult.prototype = {
     },
 
     toggleParameterInLink: function (parameterToToggle, link, removeOnly) {
-        console.log('parameterToToggle: ' + parameterToToggle);
-        console.log('link.href: ' + link.href);
         var parameterToToggleParts = parameterToToggle.split('=');
         var parameterToToggleKey = parameterToToggleParts[0];
         var parameterToToggleValue = parameterToToggleParts[1].toString();
@@ -211,32 +209,25 @@ SolrResult.prototype = {
                 var linkParameterValue = linkParameterParts[1].toString();
                 if (linkParameterKey == parameterToToggleKey) {
                     if (linkParameterValue == parameterToToggleValue) {
-                        console.log(1);
                         linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
                     } else {
                         var linkParameterValues = linkParameterValue.split(encodeURIComponent(','));
                         var parameterToToggleValues = parameterToToggleValue.split(encodeURIComponent(','));
-                        console.log(parameterToToggleValues);
-                        console.log(linkParameterValues);
                         for (var parameterToToggleIndex = 0; parameterToToggleIndex < parameterToToggleValues.length; parameterToToggleIndex++) {
                             var parameterToToggleSingleValue = parameterToToggleValues[parameterToToggleIndex];
                             if (linkParameterValues.indexOf(parameterToToggleSingleValue) != -1) {
-                                console.log('Delete ' + parameterToToggleSingleValue);
                                 delete linkParameterValues[linkParameterValues.indexOf(parameterToToggleSingleValue)];
                                 linkParameterValues = linkParameterValues.filter(Number);
                             } else if (!removeOnly) {
-                                console.log('Add ' + parameterToToggleSingleValue);
                                 linkParameterValues.push(parameterToToggleSingleValue);
                             }
                         }
                         
-                        console.log(linkParameterValues);
                         linkUrl = this.replaceParam(linkUrl, linkParameter, linkParameterKey + '=' + linkParameterValues.join(encodeURIComponent(',')));
                     }
                 }
             }
         } else {
-            console.log(2);
             if (linkParams.indexOf(parameterToToggle) != -1) {
                 linkUrl = this.replaceParam(linkUrl, parameterToToggle, '');
             } else {
@@ -247,8 +238,6 @@ SolrResult.prototype = {
                 }
             }
         }
-        console.log('New link: ' + linkUrl);
-        console.log(' ');
         link.href = linkUrl;
     },
 

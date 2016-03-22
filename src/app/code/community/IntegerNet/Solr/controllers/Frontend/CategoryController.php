@@ -34,6 +34,7 @@ class IntegerNet_Solr_Frontend_CategoryController extends Mage_Catalog_CategoryC
             if ($root = $this->getLayout()->getBlock('root')) {
                 $root->addBodyClass('categorypath-' . $category->getUrlPath())
                     ->addBodyClass('category-' . $category->getUrlKey());
+                $root->setTemplate('integernet/solr/ajax/json.phtml');
             }
 
             $this->renderLayout();

@@ -12,11 +12,11 @@ class IntegerNet_Solr_Block_Result_Layer_Ajax extends Mage_Core_Block_Abstract
 {
     protected function _toHtml()
     {
-        if ($this->getChild('search.result')) {
+        if ($this->getLayout()->getBlock('search.result')) {
             $content = array(
-                'products' => $this->getChildHtml('search.result'),
-                'leftnav' => $this->getChildHtml('catalogsearch.solr.leftnav'),
-                'topnav' => $this->getChildHtml('catalogsearch.solr.topnav'),
+                'products' => $this->getLayout()->getBlock('search.result')->toHtml(),
+                'leftnav' => $this->getLayout()->getBlock('catalogsearch.solr.leftnav')->toHtml(),
+                'topnav' => $this->getLayout()->getBlock('catalogsearch.solr.topnav')->toHtml(),
             );
         } else {
             $content = array(

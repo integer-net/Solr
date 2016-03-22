@@ -176,21 +176,10 @@
         <update handle="catalogsearch_result_index"/>
         <reference name="root">
             <action method="setTemplate">
-                <name>integernet/solr/page/content.phtml</name>
+                <name>integernet/solr/ajax/json.phtml</name>
             </action>
-            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json">
-                <action method="insert">
-                    <name>search.result</name>
-                </action>
-                <action method="insert">
-                    <name>catalogsearch.solr.leftnav</name>
-                </action>
-                <action method="insert">
-                    <name>catalogsearch.solr.topnav</name>
-                </action>
-            </block>
+            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json" />
         </reference>
-        
         
         <remove name="right" />
         <remove name="header" />
@@ -200,22 +189,8 @@
     <integernet_solr_category_view>
         <update handle="catalog_category_view"/>
         <reference name="root">
-            <action method="setTemplate">
-                <name>integernet/solr/page/content.phtml</name>
-            </action>
-            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json">
-                <action method="insert">
-                    <name>category.products</name>
-                </action>
-                <action method="insert">
-                    <name>catalog.solr.leftnav</name>
-                </action>
-                <action method="insert">
-                    <name>catalog.solr.topnav</name>
-                </action>
-            </block>
+            <block type="integernet_solr/result_layer_ajax" name="solr.json" as="json" />
         </reference>
-        
         
         <remove name="right" />
         <remove name="header" />

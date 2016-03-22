@@ -25,15 +25,17 @@ SolrResult.prototype = {
                     element.remove();
                 }
                 if (element = $$('.col-main .category-products')[0]) {
-                    $$('.col-main .category-products')[0].replace(responseBody['products']);
+                    element.replace(responseBody['products']);
                 }
                 if (element = $$('.col-main .block-layered-nav')[0]) {
-                    $$('.col-main .block-layered-nav')[0].replace(responseBody['topnav']);
+                    element.replace(responseBody['topnav']);
+                }
+                if (element = $$('.col-main .block-filter-nav')[0]) {
+                    element.replace(responseBody['topnav']);
                 }
                 if (element = $$('.col-left .block-layered-nav')[0]) {
-                    $$('.col-left .block-layered-nav')[0].replace(responseBody['leftnav']);
+                    element.replace(responseBody['leftnav']);
                 }
-                
             },
             onComplete: function (response) {
 
@@ -113,10 +115,10 @@ SolrResult.prototype = {
         var self = this;
         var links;
         if (this.isFirstCall) {
-            links = $$('.block-layered-nav a', '.toolbar a', '.toolbar-bottom a');
+            links = $$('.block-layered-nav a', '.block-filter-nav a', '.toolbar a', '.toolbar-bottom a');
             this.isFirstCall = false;
         } else {
-            links = $$('.block-layered-nav a', '.toolbar a', '.toolbar-bottom a');
+            links = $$('.block-layered-nav a', '.block-filter-nav a', '.toolbar a', '.toolbar-bottom a');
         }
 
         links.each(function (element) {

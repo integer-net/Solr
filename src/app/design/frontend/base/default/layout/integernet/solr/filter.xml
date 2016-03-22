@@ -60,7 +60,7 @@
                     <name>Mage_Catalog</name>
                 </action>
                 <block type="integernet_solr/result_layer_state" name="catalog.solr.topnav.layer.state" as="state" template="integernet/solr/layer/top/state.phtml"/>
-                <block type="integernet_solr/result_layer_filter" name="catalogsolr..topnav.layer.filter" as="filter" template="integernet/solr/layer/top/filter.phtml"/>
+                <block type="integernet_solr/result_layer_filter" name="catalog.solr.topnav.layer.filter" as="filter" template="integernet/solr/layer/top/filter.phtml"/>
             </block>
         </reference>
     </catalog_category_layered>

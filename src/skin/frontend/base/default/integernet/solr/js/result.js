@@ -15,6 +15,9 @@ SolrResult.prototype = {
         var contentElement = $$('.col-main')[0];
         var ajaxUrl = this.baseUrl + '?' + this.getUrlParametersAsArray(url).join('&');
         new Ajax.Request(ajaxUrl, {
+            onCreate: function () {
+                $('solr-loader').addClassName('active');
+            },
             onSuccess: function (response) {
                 var responseBody = JSON.parse(response.responseText);
                 var element;
@@ -38,9 +41,9 @@ SolrResult.prototype = {
                 }
             },
             onComplete: function (response) {
-
                 self.updateLinks(ajaxUrl);
                 self.updateUrl(ajaxUrl);
+                $('solr-loader').removeClassName('active');
             }
         });
     },

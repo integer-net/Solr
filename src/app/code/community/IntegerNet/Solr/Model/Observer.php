@@ -54,6 +54,11 @@ class IntegerNet_Solr_Model_Observer
         if ($block instanceof Mage_Page_Block_Html_Head) {
             $this->_adjustRobots($block);
         }
+
+        if ($block instanceof Mage_Page_Block_Html) {
+            $_class = 'solr-filter-'. Mage::helper('integernet_solr/filter')->getFilterPosition();
+            $block->addBodyClass($_class);
+        };
     }
 
     /**

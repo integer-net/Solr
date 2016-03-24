@@ -120,8 +120,18 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCategoryPage()
     {
-        return Mage::app()->getRequest()->getModuleName() == 'catalog'
-            && Mage::app()->getRequest()->getControllerName() == 'category';
+        return (Mage::app()->getRequest()->getModuleName() == 'catalog' && Mage::app()->getRequest()->getControllerName() == 'category')
+            || (Mage::app()->getRequest()->getModuleName() == 'solr' && Mage::app()->getRequest()->getControllerName() == 'category');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSolrResultPage()
+    {
+        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
+        || Mage::app()->getRequest()->getModuleName() == 'solr'
+        || $this->isCategoryPage();
     }
 
     /**

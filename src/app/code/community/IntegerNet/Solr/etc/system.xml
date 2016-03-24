@@ -290,6 +290,27 @@
                     </fields>
                 </indexing>
 
+                <solr_theme translate="label">
+                    <label>Theme</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>38</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <loader_style translate="label,comment">
+                            <label>Loader Style</label>
+                            <comment>Select AJAX loader style</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>integernet_solr/source_loaderStyle</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </loader_style>
+                    </fields>
+                </solr_theme>
+
                 <fuzzy translate="label">
                     <label>Fuzzy Search</label>
                     <frontend_type>text</frontend_type>
@@ -392,11 +413,20 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </search_operator>
+                        <use_ajax_for_filter_results translate="label,comment">
+                            <label>Use AJAX for filter results</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_ajax_for_filter_results>
                         <filter_position translate="label">
                             <label>Position of Filters</label>
                             <frontend_type>select</frontend_type>
                             <source_model>integernet_solr/source_filterPosition</source_model>
-                            <sort_order>23</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -406,7 +436,7 @@
                             <comment>1 is default, use higher numbers for higher priority.</comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
-                            <sort_order>25</sort_order>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -416,7 +446,7 @@
                             <comment><![CDATA[i.e. 100]]></comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
-                            <sort_order>30</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -426,7 +456,7 @@
                             <comment><![CDATA[i.e. 1000]]></comment>
                             <frontend_type>text</frontend_type>
                             <validate>validate-number validate-zero-or-greater</validate>
-                            <sort_order>40</sort_order>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -436,7 +466,7 @@
                             <comment><![CDATA[Needs Solr 4.10+ and Magento CE 1.7+ / Magento EE 1.12+]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>50</sort_order>
+                            <sort_order>80</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -445,7 +475,7 @@
                             <label>Custom Price Intervals</label>
                             <comment><![CDATA[Divide steps by comma, i.e. 10,20,50,100,200,300,400,500]]></comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>60</sort_order>
+                            <sort_order>90</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -523,7 +553,6 @@
                     <fields>
                         <is_active translate="label,comment">
                             <label>Use Solr to index cms pages</label>
-                            <comment>Used for autosuggest</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>

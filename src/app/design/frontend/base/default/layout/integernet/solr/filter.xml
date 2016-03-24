@@ -72,8 +72,8 @@
                        template="integernet/solr/layer/top/state.phtml"/>
                 <block type="integernet_solr/result_layer_filter" name="catalog.solr.topnav.layer.filter" as="filter"
                        template="integernet/solr/layer/top/filter.phtml"/>
+                <block type="core/template" template="integernet/solr/loader.phtml" name="solr.loader" as="solr.loader"/>
             </block>
-            <block type="core/template" template="integernet/solr/loader.phtml" name="solr.loader" as="solr.loader"/>
         </reference>
     </catalog_category_layered>
 </layout>

@@ -165,7 +165,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                                 'entity' => $childCategory,
                             ));
 
-                            $this->_categoryFilterItems[] = $item;
+                            if (!$item->getIsDisabled()) {
+                                $this->_categoryFilterItems[] = $item;
+                            }
                         }
                     }
 
@@ -187,7 +189,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                             'entity_id' => $optionId,
                         ));
 
-                        $this->_categoryFilterItems[] = $item;
+                        if (!$item->getIsDisabled()) {
+                            $this->_categoryFilterItems[] = $item;
+                        }
                     }
                 }
             }
@@ -241,7 +245,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
                 ));
 
-                $items[] = $item;
+                if (!$item->getIsDisabled()) {
+                    $items[] = $item;
+                }
             }
         } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
 
@@ -267,8 +273,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'type' => 'range',
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
                 ));
-                
-                $items[] = $item;
+
+                if (!$item->getIsDisabled()) {
+                    $items[] = $item;
+                }
             }
         }
         return $items;
@@ -313,8 +321,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'type' => 'attribute',
                     'entity_id' => $optionId,
                 ));
-                
-                $items[] = $item;
+
+                if (!$item->getIsDisabled()) {
+                    $items[] = $item;
+                }
             }
         }
 

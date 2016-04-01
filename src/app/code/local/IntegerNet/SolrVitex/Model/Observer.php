@@ -19,9 +19,7 @@ class IntegerNet_SolrVitex_Model_Observer
         $item = $observer->getItem();
         if ($observer->getType() == 'category') {
             /** @var Mage_Catalog_Model_Category $category */
-            if ($category = $observer->getEntity()) {
-                $item->setUrl($category->getUrl());
-            }
+            $item->setIsDisabled(true);
         }
     }
 }

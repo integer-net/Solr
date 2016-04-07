@@ -68,8 +68,8 @@ class IntegerNet_Solr_Helper_Autoloader
 
     public static function createAndRegister()
     {
-        if (Mage::getStoreConfigFlag('integernet_solr/dev/register_autoloader')) {
-            $libBaseDir = Mage::getStoreConfig('integernet_solr/dev/autoloader_basepath');
+        if (self::_getStoreConfig('integernet_solr/dev/register_autoloader')) {
+            $libBaseDir = self::_getStoreConfig('integernet_solr/dev/autoloader_basepath');
             if ($libBaseDir[0] !== '/') {
                 $libBaseDir = Mage::getBaseDir() . DS . $libBaseDir;
             }
@@ -96,6 +96,22 @@ class IntegerNet_Solr_Helper_Autoloader
                 ->register();
             $registered = true;
         }
+    }
+
+    /**
+     * Load store config first in case we are in update mode, where store config would not be available
+     *
+     * @param $path
+     * @return bool
+     */
+    protected static function _getStoreConfig($path)
+    {
+        static $configLoaded = false;
+        if (! $configLoaded && Mage::app()->getUpdateMode()) {
+            Mage::getConfig()->loadDb();
+            $configLoaded = true;
+        }
+        return Mage::getStoreConfig($path);
     }
 
     /**

@@ -124,9 +124,9 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             ->setStore(Mage::app()->getStore())
             ->addAttributeToSelect('name', 'url_key')
             ->addAttributeToFilter('level', $currentCategory->getLevel() + 1)
-            ->addAttributeToFilter('path', array('like' => $currentCategory->getPath() . '_%'))
+            ->addAttributeToFilter('path', array('like' => $currentCategory->getPath() . '/%'))
             ->setOrder('position', 'asc');
-
+        
         return $childrenCategories;
     }
 
@@ -327,15 +327,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getCurrentCategory()
     {
         if (is_null($this->_currentCategory)) {
-            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
-            } else {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::registry('current_category');
-                if (is_null($this->_currentCategory)) {
-                    $this->_currentCategory = false;
-                }
+            /** @var Mage_Catalog_Model_Category $currentCategory */
+            $this->_currentCategory = Mage::registry('current_category');
+            if (is_null($this->_currentCategory)) {
+                $this->_currentCategory = false;
             }
         }
 

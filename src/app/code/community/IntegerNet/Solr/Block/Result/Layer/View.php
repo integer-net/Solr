@@ -10,6 +10,7 @@
 class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
 {
     protected $_filters = null;
+    protected $_currentCategory = null;
 
     /**
      * Check availability display layer block
@@ -216,15 +217,10 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     protected function _getCurrentCategory()
     {
         if (is_null($this->_currentCategory)) {
-            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
-            } else {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::registry('current_category');
-                if (is_null($this->_currentCategory)) {
-                    $this->_currentCategory = false;
-                }
+            /** @var Mage_Catalog_Model_Category $currentCategory */
+            $this->_currentCategory = Mage::registry('current_category');
+            if (is_null($this->_currentCategory)) {
+                $this->_currentCategory = false;
             }
         }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <default>
+        <reference name="head">
+            <action method="addItem" ifconfig="integernet_solr/general/is_active">
+                <type>skin_js</type>
+                <stylesheet>integernet/solr/js/vitex.js</stylesheet>
+            </action>
+        </reference>
+    </default>
+
+</layout>

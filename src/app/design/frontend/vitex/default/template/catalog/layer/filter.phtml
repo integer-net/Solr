@@ -32,9 +32,12 @@
  */
 ?>
 
+<?php $numberVisibleItems = Mage::getStoreConfig('integernet_solr/results/number_visible_items') ?>
+
 <ol>
+    <?php $i = 0 ?>
     <?php foreach ($this->getItems() as $_item): ?>
-        <li>
+        <li<?php if ($i++ >= $numberVisibleItems): ?> style="display: none;" class="filter-list-item-hidden"<?php endif?>>
             <?php if ($_item->getCount() > 0): ?>
                 <?php if ($_item->getType() == 'category'): ?>
                     <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>">
@@ -44,14 +47,14 @@
                         <?php endif; ?>
                     </a>
                 <?php elseif ($_item->getIsChecked()): ?>
-                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-unchecked'" class="m-checkbox-checked">
+                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-unchecked'" class="m-checkbox-checked filter-item">
                         <?php echo $_item->getLabel() ?>
                         <?php if ($this->shouldDisplayProductCount()): ?>
                             <span class="count">(<?php echo $_item->getCount() ?>)</span>
                         <?php endif; ?>
                     </a>
                 <?php else: ?>
-                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-checked'" class="m-checkbox-unchecked">
+                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-checked'" class="m-checkbox-unchecked filter-item">
                         <?php echo $_item->getLabel() ?>
                         <?php if ($this->shouldDisplayProductCount()): ?>
                             <span class="count">(<?php echo $_item->getCount() ?>)</span>
@@ -68,4 +71,13 @@
             <?php endif; ?>
         </li>
     <?php endforeach ?>
+
+    <?php if ($i > $numberVisibleItems): ?>
+        <li class="filter-show-more">
+            <a href="" onclick="" data-alternative-text="<?php echo $this->__('Show less') ?>">
+                <?php echo $this->__('Show more') ?>
+            </a>
+        </li>
+    <?php endif ?>
 </ol>
+

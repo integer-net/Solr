@@ -21,7 +21,7 @@ SolrResult.prototype = {
             onSuccess: function (response) {
                 var responseBody = JSON.parse(response.responseText);
                 var element;
-                if (element = $$('.col-main .page-title')[0]) {
+                if (element = $$('.catalogsearch-result-index .col-main .page-title')[0]) {
                     element.remove();
                 }
                 if (element = $$('.col-main .category-image')[0]) {

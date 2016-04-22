@@ -11,6 +11,11 @@
                 <class>IntegerNet_SolrVitex_Model</class>
             </integernet_solrvitex>
         </models>
+        <helpers>
+            <integernet_solrvitex>
+                <class>IntegerNet_SolrVitex_Helper</class>
+            </integernet_solrvitex>
+        </helpers>
     </global>
 
     <frontend>
@@ -25,6 +30,24 @@
                 </observers>
             </integernet_solr_filter_item_create>
         </events>
+
+        <translate>
+            <modules>
+                <integernet_solrvitex>
+                    <files>
+                        <default>IntegerNet_SolrVitex.csv</default>
+                    </files>
+                </integernet_solrvitex>
+            </modules>
+        </translate>
+
+        <layout>
+            <updates>
+                <integernet_solrvitex>
+                    <file>integernet/solr/vitex.xml</file>
+                </integernet_solrvitex>
+            </updates>
+        </layout>
     </frontend>
 
     <default>
@@ -39,6 +62,9 @@
                 <max_number_category_suggestions>4</max_number_category_suggestions>
                 <max_number_cms_page_suggestions>4</max_number_cms_page_suggestions>
             </autosuggest>
+            <results>
+                <number_visible_items>5</number_visible_items>
+            </results>
         </integernet_solr>
     </default>
 </config>

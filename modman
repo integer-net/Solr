@@ -6,7 +6,7 @@ src/app/design/frontend/base/default/template/integernet/*          app/design/f
 src/app/design/frontend/rwd/default/layout/integernet/*             app/design/frontend/rwd/default/layout/integernet/
 src/app/design/frontend/rwd/default/template/integernet/*           app/design/frontend/rwd/default/template/integernet/
 src/app/design/frontend/vitex/default/layout/integernet/*           app/design/frontend/vitex/default/layout/integernet/
-src/app/design/frontend/vitex/default/template/integernet/*         app/design/frontend/vitex/default/template/integernet/
+src/app/design/frontend/vitex/default/template/integernet/solr/filter/checkbox.phtml        app/design/frontend/vitex/default/template/integernet/solr/filter/checkbox.phtml
 src/app/design/frontend/vitex/default/template/catalog/layer/*      app/design/frontend/vitex/default/template/catalog/layer/
 src/app/etc/modules/*                                               app/etc/modules/
 src/app/locale/de_DE/IntegerNet_Solr.csv                            app/locale/de_DE/IntegerNet_Solr.csv
@@ -20,7 +20,7 @@ src/skin/frontend/base/default/integernet/*                         skin/fronten
 src/skin/frontend/default/modern/integernet/*                       skin/frontend/default/modern/integernet/
 src/skin/frontend/rwd/default/integernet/*                          skin/frontend/rwd/default/integernet/
 src/skin/frontend/vitex/default/integernet/*                        skin/frontend/vitex/default/integernet/
-src/skin/adminhtml/default/default/integernet/*                     skin/adminhtml/default/default/integernet/
+src/skin/adminhtml/default/default/integernet/solr/js               skin/adminhtml/default/default/integernet/solr/js
 src/autosuggest.php                                                 autosuggest.php
 src/autosuggest.config.dist.php                                     autosuggest.config.dist.php
 src/autosuggest-mage.php                                            autosuggest-mage.php

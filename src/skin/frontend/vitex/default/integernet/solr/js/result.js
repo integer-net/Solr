@@ -36,7 +36,7 @@ SolrResult.prototype = {
                 if (element = $$('.col-main .block-filter-nav')[0]) {
                     element.replace(responseBody['topnav']);
                 }
-                if (element = $$('.col-left .block-layered-nav')[0]) {
+                if (element = $$('.col-left .block-layered-nav')[1]) {
                     element.replace(responseBody['leftnav']);
                 }
             },
@@ -118,10 +118,10 @@ SolrResult.prototype = {
         var self = this;
         var links;
         if (this.isFirstCall) {
-            links = $$('.block-layered-nav a.filter-item', '.block-filter-nav a.filter-item', '.toolbar a', '.toolbar-bottom a');
+            links = $$('.block-layered-nav a', '.block-filter-nav a', '.toolbar a', '.toolbar-bottom a');
             this.isFirstCall = false;
         } else {
-            links = $$('.block-layered-nav a.filter-item', '.block-filter-nav a.filter-item', '.toolbar a', '.toolbar-bottom a');
+            links = $$('.block-layered-nav a', '.block-filter-nav a', '.toolbar a', '.toolbar-bottom a');
         }
 
         links.each(function (element) {

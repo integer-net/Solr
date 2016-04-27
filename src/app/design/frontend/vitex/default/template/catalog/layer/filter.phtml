@@ -47,14 +47,14 @@
                         <?php endif; ?>
                     </a>
                 <?php elseif ($_item->getIsChecked()): ?>
-                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-unchecked'" class="m-checkbox-checked filter-item">
+                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>">
                         <?php echo $_item->getLabel() ?>
                         <?php if ($this->shouldDisplayProductCount()): ?>
                             <span class="count">(<?php echo $_item->getCount() ?>)</span>
                         <?php endif; ?>
                     </a>
                 <?php else: ?>
-                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>" onclick="this.className='m-checkbox-checked'" class="m-checkbox-unchecked filter-item">
+                    <a href="<?php echo $this->urlEscape($_item->getUrl()) ?>">
                         <?php echo $_item->getLabel() ?>
                         <?php if ($this->shouldDisplayProductCount()): ?>
                             <span class="count">(<?php echo $_item->getCount() ?>)</span>

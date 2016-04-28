@@ -194,7 +194,10 @@ class ProductIndexer
 
         $this->_addCategoryProductPositionsToProductData($product, $productData);
 
-        $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array('product' => $product, 'product_data' => $productData));
+        $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array(
+            'product' => $product, 
+            'product_data' => $productData
+        ));
 
         return $productData->getData();
     }
@@ -217,37 +220,70 @@ class ProductIndexer
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
-            if (!$product->getData($attribute->getAttributeCode())) {
-                continue;
+
+            $facetFieldName = $attribute->getAttributeCode() . '_facet';
+            if ($product->getData($attribute->getAttributeCode())) {
+
+                switch ($attribute->getFacetType()) {
+                    case Attribute::FACET_TYPE_SELECT:
+                        $rawValue = $product->getAttributeValue($attribute);
+                        if ($rawValue && $this->_isInteger($rawValue)) {
+                            $productData->setData($facetFieldName, $rawValue);
+                        }
+                        break;
+                    case Attribute::FACET_TYPE_MULTISELECT:
+                        $rawValue = $product->getAttributeValue($attribute);
+                        if ($rawValue && $this->_isInteger($rawValue)) {
+                            $productData->setData($facetFieldName, explode(',', $rawValue));
+                        }
+                        break;
+                }
+
+                $indexField = new IndexField($attribute);
+                $fieldName = $indexField->getFieldName();
+                if (!$productData->hasData($fieldName)) {
+                    $value = $product->getSearchableAttributeValue($attribute);
+                    if (!empty($value)) {
+                        $productData->setData($fieldName, $value);
+
+                        if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
+                            $productData->setData(
+                                $indexField->forSorting()->getFieldName(),
+                                $value
+                            );
+                        }
+                    }
+                }
             }
             
-            switch ($attribute->getFacetType()) {
-                case Attribute::FACET_TYPE_SELECT:
-                    $rawValue = $product->getAttributeValue($attribute);
-                    if ($rawValue && $this->_isInteger($rawValue)) {
-                        $productData->setData($attribute->getAttributeCode() . '_facet', $rawValue);
-                    }
-                    break;
-                case Attribute::FACET_TYPE_MULTISELECT:
-                    $rawValue = $product->getAttributeValue($attribute);
-                    if ($rawValue && $this->_isInteger($rawValue)) {
-                        $productData->setData($attribute->getAttributeCode() . '_facet', explode(',', $rawValue));
-                    }
-                    break;
+            $hasChildProducts = true;
+            try {
+                $childProducts = $this->_getChildProductsCollection($product);
+            } catch (\Exception $e) {
+                $hasChildProducts = false;
             }
 
-            $indexField = new IndexField($attribute);
-            $fieldName = $indexField->getFieldName();
-            if (!$productData->hasData($fieldName)) {
-                $value = $product->getSearchableAttributeValue($attribute);
-                if (!empty($value)) {
-                    $productData->setData($fieldName, $value);
+            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
 
-                    if (strstr($fieldName, '_t') == true && $attribute->getUsedForSortBy()) {
-                        $productData->setData(
-                            $indexField->forSorting()->getFieldName(),
-                            $value
-                        );
+                foreach($childProducts as $childProduct) {
+                    /** @var $childProduct Product */
+                    if ($childValues = $childProduct->getAttributeValue($attribute)
+                    ) {
+                        foreach(array_map('trim', explode(',', $childValues)) as $childValue) {
+                            if (!$productData->hasData($facetFieldName)) {
+                                $productData->setData($facetFieldName, $childValue);
+                            } else {
+                                $fieldValue = $productData->getData($facetFieldName);
+                                if (!is_array($fieldValue) && $childValue != $fieldValue) {
+                                    $productData->setData($facetFieldName, array($fieldValue, $childValue));
+                                } else {
+                                    if (is_array($fieldValue) && !in_array($childValue, $fieldValue)) {
+                                        $fieldValue[] = $childValue;
+                                        $productData->setData($facetFieldName, $fieldValue);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

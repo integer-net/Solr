@@ -221,6 +221,12 @@ class ProductIndexer
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
 
+            if ($attribute->getAttributeCode() == 'price') {
+                $price = $product->getPrice();
+                $productData->setData('price_f', floatval($price));
+                continue;
+            }
+
             $facetFieldName = $attribute->getAttributeCode() . '_facet';
             if ($product->getData($attribute->getAttributeCode())) {
 
@@ -286,11 +292,6 @@ class ProductIndexer
                         }
                     }
                 }
-            }
-
-            if ($attribute->getAttributeCode() == 'price') {
-                $price = $product->getPrice();
-                $productData->setData('price_f', floatval($price));
             }
         }
     }

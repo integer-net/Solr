@@ -28,7 +28,11 @@ class IntegerNet_Solr_Model_Configuration
     protected function _checkConfiguration($storeId = null)
     {
         $this->_createGeneralInfoMessages($storeId);
-        
+
+        if (!$this->_isStoreEnabled($storeId)) {
+            return;
+        }
+
         if (!$this->_isModuleActive($storeId)) {
             return;
         }
@@ -87,6 +91,22 @@ class IntegerNet_Solr_Model_Configuration
                 Mage::helper('integernet_solr')->__('The module Aoe_LayoutConditions is not installed. Please get it from <a href="%s" target="_blank">%s</a>.', 'https://github.com/aoepeople/Aoe_LayoutConditions', 'https://github.com/aoepeople/Aoe_LayoutConditions')
             );
         }
+    }
+
+    /**
+     * @param int $storeId
+     * @return boolean
+     */
+    protected function _isStoreEnabled($storeId)
+    {
+        $store = Mage::app()->getStore($storeId);
+        if (!$store->getIsActive()) {
+            $this->_addNoticeMessage(
+                Mage::helper('integernet_solr')->__('The store is disabled.')
+            );
+            return false;
+        }
+        return true;
     }
 
     /**

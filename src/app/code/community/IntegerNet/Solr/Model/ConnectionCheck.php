@@ -16,7 +16,10 @@ class IntegerNet_Solr_Model_ConnectionCheck
     {
         $errors = array();
         $hasCheckedAStore = false;
-        foreach (Mage::app()->getStores() as $store) {
+        foreach (Mage::app()->getStores() as $store) { /** @var Mage_Core_Model_Store $store */
+            if (!$store->getIsActive()) {
+                continue;
+            }
             if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active', $store->getId())) {
                 continue;
             }

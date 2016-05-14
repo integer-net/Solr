@@ -328,6 +328,7 @@
                 <search_operator>AND</search_operator>
                 <filter_position>1</filter_position>
                 <priority_categories>2</priority_categories>
+                <max_number_filter_options>0</max_number_filter_options>
                 <use_ajax_for_filter_results>0</use_ajax_for_filter_results>
                 <price_step_size>10</price_step_size>
                 <max_price>200</max_price>

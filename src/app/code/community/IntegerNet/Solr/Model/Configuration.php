@@ -28,7 +28,7 @@ class IntegerNet_Solr_Model_Configuration
     protected function _checkConfiguration($storeId = null)
     {
         $this->_createGeneralInfoMessages($storeId);
-
+        
         if (!$this->_isStoreEnabled($storeId)) {
             return;
         }

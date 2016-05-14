@@ -460,19 +460,11 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     }
 
     /**
-     * @return int
-     */
-    protected function _getMaxNumberFilterOptions()
-    {
-        return intval(Mage::getStoreConfig('integernet_solr/results/max_number_filter_options'));
-    }
-
-    /**
      * @return bool
      */
     protected function _isMaxNumberFilterOptionsExceeded()
     {
-        $maxNumberFilterOptions = $this->_getMaxNumberFilterOptions();
+        $maxNumberFilterOptions = intval(Mage::getStoreConfig('integernet_solr/results/max_number_filter_options'));
         if ($maxNumberFilterOptions == 0) {
             return false;
         }

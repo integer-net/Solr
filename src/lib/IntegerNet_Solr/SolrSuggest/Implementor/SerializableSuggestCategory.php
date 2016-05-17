@@ -9,13 +9,11 @@
  */
 namespace IntegerNet\SolrSuggest\Implementor;
 
-use IntegerNet\Solr\Implementor\Category;
-
 /**
  * Marker interface for serializable category, used for caching. Does not extend \Serializable
  * because standard PHP serialization is accepted too.
  */
-interface SerializableCategory extends Category
+interface SerializableSuggestCategory extends SuggestCategory
 {
 
 }

@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\Implementor\Category;
+use IntegerNet\SolrCategories\Implementor\Category;
 
 class IntegerNet_Solr_Model_Bridge_Category implements Category
 {
@@ -24,7 +24,7 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category
      * @param Mage_Catalog_Model_Category $category
      * @param string[] $categoryPathNames
      */
-    public function __construct(Mage_Catalog_Model_Category $category, array $categoryPathNames)
+    public function __construct(Mage_Catalog_Model_Category $category, array $categoryPathNames = null)
     {
         $this->_category = $category;
         $this->_categoryPathNames = $categoryPathNames;
@@ -55,6 +55,25 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        $description = $this->_category->getDescription();
+        switch ($this->_category->getDisplayMode()) {
+            case Mage_Catalog_Model_Category::DM_PAGE:
+            case Mage_Catalog_Model_Category::DM_MIXED:
+                if ($blockId = $this->_category->getLandingPage()) {
+                    $block = Mage::getModel('cms/block')->load($blockId);
+                    if ($block->getId() && $block->getIsActive()) {
+                        $description .= ' ' .  Mage::helper('cms')->getPageTemplateProcessor()->filter($block->getContent());
+                    }
+                }
+        }
+        return $description;
+    }
+
+    /**
      * @param string $separator
      * @return string
      */
@@ -63,4 +82,53 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category
         return implode($separator, $this->_categoryPathNames);
     }
 
+    public function getStoreId()
+    {
+        return $this->_category->getStoreId();
+    }
+
+    /**
+     * @return int
+     */
+    public function getSolrId()
+    {
+        return 'category_' . $this->getId() . '_' . $this->getStoreId();
+    }
+
+    public function getSolrBoost()
+    {
+        return $this->_category->getData('solr_boost');
+    }
+
+
+
+    /**
+     * @param int $storeId
+     * @return bool
+     */
+    public function isIndexable($storeId)
+    {
+        Mage::dispatchEvent('integernet_solr_can_index_category', array('category' => $this->_category));
+
+        if ($this->_category->getSolrExclude()) {
+            return false;
+        }
+
+        if (!$this->_category->getIsActive()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $method
+     * @param $args
+     * @return mixed
+     * @deprecated only use interface methods!
+     */
+    public function __call($method, $args)
+    {
+        return call_user_func_array(array($this->_category, $method), $args);
+    }
 }

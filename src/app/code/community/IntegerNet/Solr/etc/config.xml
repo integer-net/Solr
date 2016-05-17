@@ -131,6 +131,16 @@
                     </integernet_solr>
                 </observers>
             </cms_page_save_commit_after>
+
+            <cms_page_delete_commit_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/cmsIndexer</class>
+                        <method>cmsPageDeleteAfter</method>
+                    </integernet_solr>
+                </observers>
+            </cms_page_delete_commit_after>
         </events>
 
         <resources>
@@ -200,6 +210,15 @@
                     </integernet_solr>
                 </observers>
             </admin_session_user_login_success>
+            <adminhtml_cms_page_edit_tab_main_prepare_form>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>adminhtmlCmsPageEditTabContentPrepareForm</method>
+                    </integernet_solr>
+                </observers>
+            </adminhtml_cms_page_edit_tab_main_prepare_form>
         </events>
     </adminhtml>
 
@@ -340,6 +359,7 @@
             <category>
                 <is_active>0</is_active>
                 <filter_position>1</filter_position>
+                <is_indexer_active>0</is_indexer_active>
             </category>
             <cms>
                 <is_active>0</is_active>
@@ -349,7 +369,8 @@
                 <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
                 <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
                 <max_number_product_suggestions>3</max_number_product_suggestions>
-                <max_number_category_suggestions>8</max_number_category_suggestions>
+                <max_number_category_suggestions>0</max_number_category_suggestions>
+                <max_number_cms_page_suggestions>0</max_number_cms_page_suggestions>
                 <show_complete_category_path>0</show_complete_category_path>
                 <category_link_type>direct</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>

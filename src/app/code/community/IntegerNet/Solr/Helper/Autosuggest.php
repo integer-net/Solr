@@ -177,7 +177,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory[]
      */
     public function findActiveCategories($storeId)
     {

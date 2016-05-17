@@ -3,47 +3,40 @@
  * integer_net Magento Module
  *
  * @category   IntegerNet
- * @package
+ * @package    IntegerNet_SolrSuggest
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
- * @author     Fabian Schmengler <fs@integer-net.de>
+ * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-
-namespace IntegerNet\SolrSuggest\Block;
-
+namespace IntegerNet\SolrCategories\Result;
 
 final class CategorySuggestion
 {
     /**
      * @var string
      */
-    private $title;
+    private $queryText;
     /**
      * @var int
      */
     private $numResults;
-    /**
-     * @var string
-     */
-    private $url;
 
     /**
-     * @param string $title
+     * CategorySuggestion constructor.
+     * @param string $queryText
      * @param int $numResults
-     * @param string $url
      */
-    public function __construct($title, $numResults, $url)
+    public function __construct($queryText, $numResults)
     {
-        $this->title = $title;
+        $this->queryText = $queryText;
         $this->numResults = $numResults;
-        $this->url = $url;
     }
 
     /**
      * @return string
      */
-    public function getTitle()
+    public function getQueryText()
     {
-        return $this->title;
+        return $this->queryText;
     }
 
     /**
@@ -52,14 +45,6 @@ final class CategorySuggestion
     public function getNumResults()
     {
         return $this->numResults;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
     }
 
 }

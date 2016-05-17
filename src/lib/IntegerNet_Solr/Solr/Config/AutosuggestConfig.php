@@ -37,6 +37,10 @@ final class AutosuggestConfig
      */
     private $maxNumberCategorySuggestions;
     /**
+     * @var int
+     */
+    private $maxNumberCmsPageSuggestions;
+    /**
      * @var bool
      */
     private $showCompleteCategoryPath;
@@ -55,18 +59,20 @@ final class AutosuggestConfig
      * @param int $maxNumberSearchwordSuggestions
      * @param int $maxNumberProductSuggestions
      * @param int $maxNumberCategorySuggestions
+     * @param int $maxNumberCmsPageSuggestions
      * @param bool $showCompleteCategoryPath
      * @param string $categoryLinkType
      * @param $attributeFilterSuggestions
      */
     public function __construct($active, $usePhpFile, $maxNumberSearchwordSuggestions, $maxNumberProductSuggestions,
-                                $maxNumberCategorySuggestions, $showCompleteCategoryPath, $categoryLinkType, $attributeFilterSuggestions)
+                                $maxNumberCategorySuggestions, $maxNumberCmsPageSuggestions, $showCompleteCategoryPath, $categoryLinkType, $attributeFilterSuggestions)
     {
         $this->active = $active;
         $this->usePhpFile = $usePhpFile;
         $this->maxNumberSearchwordSuggestions = (int)$maxNumberSearchwordSuggestions;
         $this->maxNumberProductSuggestions = (int)$maxNumberProductSuggestions;
         $this->maxNumberCategorySuggestions = (int)$maxNumberCategorySuggestions;
+        $this->maxNumberCmsPageSuggestions = (int)$maxNumberCmsPageSuggestions;
         $this->showCompleteCategoryPath = $showCompleteCategoryPath;
         $this->categoryLinkType = $categoryLinkType;
         $this->attributeFilterSuggestions = $attributeFilterSuggestions;
@@ -110,6 +116,14 @@ final class AutosuggestConfig
     public function getMaxNumberCategorySuggestions()
     {
         return $this->maxNumberCategorySuggestions;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxNumberCmsPageSuggestions()
+    {
+        return $this->maxNumberCmsPageSuggestions;
     }
 
     /**

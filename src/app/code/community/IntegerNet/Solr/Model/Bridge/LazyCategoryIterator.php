@@ -135,6 +135,8 @@ class IntegerNet_Solr_Model_Bridge_LazyCategoryIterator implements CategoryItera
         if (is_array($categoryIds)) {
             $categoryCollection->addAttributeToFilter('entity_id', array('in' => $categoryIds));
         }
+        $baseCategoryId = Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId();
+        $categoryCollection->addAttributeToFilter('path', array('like' => '1/' . $baseCategoryId . '/%'));
 
         if (!is_null($pageSize)) {
             $categoryCollection->setPageSize($pageSize);

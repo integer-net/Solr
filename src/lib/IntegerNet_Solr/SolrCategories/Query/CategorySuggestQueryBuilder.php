@@ -81,7 +81,7 @@ class CategorySuggestQueryBuilder implements QueryBuilder
         $this->getEventDispatcher()->dispatch('integernet_solr_update_query_text', array('transport' => $transportObject));
 
         $searchString = new SearchString($transportObject->getQueryText());
-        $queryText = $searchString->getEscapedString();
+        $queryText = $searchString->getEscapedString() . ' OR ' . $searchString->getEscapedString();
 
         $isFuzzyActive = true;
         $sensitivity = 0.8;

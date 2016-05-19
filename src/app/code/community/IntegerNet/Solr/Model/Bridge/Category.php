@@ -8,8 +8,9 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 use IntegerNet\SolrCategories\Implementor\Category;
+use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 
-class IntegerNet_Solr_Model_Bridge_Category implements Category
+class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
 {
     /**
      * @var Mage_Catalog_Model_Category

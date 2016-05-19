@@ -14,6 +14,7 @@
 
     <catalogsearch_result_index>
         <reference name="left">
+            <remove name="mana.catalogsearch.leftnav" />
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
                 <name>catalogsearch.leftnav</name>
             </action>

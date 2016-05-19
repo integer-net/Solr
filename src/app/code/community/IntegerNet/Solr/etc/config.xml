@@ -50,6 +50,12 @@
                     <autocomplete>IntegerNet_Solr_Block_Autosuggest</autocomplete>
                 </rewrite>
             </catalogsearch>
+            
+            <mana_filters>
+                <rewrite>
+                    <search>IntegerNet_Solr_Block_Mana_Filters_Search</search>
+                </rewrite>
+            </mana_filters>
         </blocks>
 
         <helpers>

@@ -13,8 +13,11 @@
     </default>
 
     <catalogsearch_result_index>
+        <remove name="mana.catalogsearch.leftnav" />
+        <remove name="amshopby.navleft" />
+        <remove name="amshopby.navtop" />
+        <remove name="amshopby.bottom" />
         <reference name="left">
-            <remove name="mana.catalogsearch.leftnav" />
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
                 <name>catalogsearch.leftnav</name>
             </action>

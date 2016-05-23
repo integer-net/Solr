@@ -95,7 +95,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
         $logMock = $this->_mockLog();
         $logMock->expects($this->at(3))->method('debug')->with(
-            $this->stringContains('name_t:"tshirt"~100^5 short_description_t_mv:"tshirt"~100^1'));
+            $this->stringContains('name_t:"tshirt"~100^5 OR short_description_t_mv:"tshirt"~100^1'));
         $logMock->expects($this->at(4))->method('debug')->with(
             'Filter Query: store_id:1 AND is_visible_in_search_i:1');
 

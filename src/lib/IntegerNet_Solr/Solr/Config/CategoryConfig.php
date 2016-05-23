@@ -10,6 +10,10 @@ namespace IntegerNet\Solr\Config;
  */
 final class CategoryConfig
 {
+    const FILTER_POSITION_DEFAULT = 0;
+    const FILTER_POSITION_LEFT = 1;
+    const FILTER_POSITION_TOP = 2;
+
     /**
      * @var bool
      */

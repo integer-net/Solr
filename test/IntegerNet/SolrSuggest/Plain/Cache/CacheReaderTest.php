@@ -9,6 +9,8 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\Solr\Config\Stub\CategoryConfigBuilder;
+use IntegerNet\Solr\Config\Stub\CmsConfigBuilder;
 use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
@@ -63,7 +65,9 @@ class CacheReaderTest extends \PHPUnit_Framework_TestCase
             AutosuggestConfigBuilder::defaultConfig()->build(),
             FuzzyConfigBuilder::defaultConfig()->build(),
             FuzzyConfigBuilder::defaultConfig()->build(),
-            ResultConfigBuilder::defaultConfig()->build()
+            ResultConfigBuilder::defaultConfig()->build(),
+            CategoryConfigBuilder::defaultConfig()->build(),
+            CmsConfigBuilder::defaultConfig()->build()
         );
         return [
             [self::$defaultStoreId, $defaultConfig]

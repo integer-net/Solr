@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\CategoryConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -10,9 +12,6 @@
 
 class IntegerNet_Solr_Model_Source_FilterPosition
 {
-    const FILTER_POSITION_DEFAULT = 0;
-    const FILTER_POSITION_LEFT = 1;
-    const FILTER_POSITION_TOP = 2;
 
     /**
      * Options getter
@@ -23,11 +22,11 @@ class IntegerNet_Solr_Model_Source_FilterPosition
     {
         return array(
             array(
-                'value' => self::FILTER_POSITION_LEFT,
+                'value' => CategoryConfig::FILTER_POSITION_LEFT,
                 'label' => Mage::helper('integernet_solr')->__('Left column (Magento default)')
             ),
             array(
-                'value' => self::FILTER_POSITION_TOP,
+                'value' => CategoryConfig::FILTER_POSITION_TOP,
                 'label' => Mage::helper('integernet_solr')->__('Content column (above products)')
             ),
         );

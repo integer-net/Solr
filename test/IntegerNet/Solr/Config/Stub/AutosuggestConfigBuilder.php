@@ -19,6 +19,7 @@ class AutosuggestConfigBuilder
     private $maxNumberSearchWordSuggestions = self::MAX_NUMBER_SEARCHWORD_SUGGESTIONS;
     private $maxNumberProductSuggestions = 5;
     private $maxNumberCategorySuggestions = 8;
+    private $maxNumberCmsPageSuggestions = 0;
     private $showCompleteCategoryPath = 0;
     private $categoryLinkType = 'filter';
     private $attributeFilterSuggestions = array();
@@ -79,6 +80,16 @@ class AutosuggestConfigBuilder
     }
 
     /**
+     * @param int $maxNumberCmsPageSuggestions
+     * @return AutosuggestConfigBuilder
+     */
+    public function withMaxNumberCmsPageSuggestions($maxNumberCmsPageSuggestions)
+    {
+        $this->maxNumberCmsPageSuggestions = $maxNumberCmsPageSuggestions;
+        return $this;
+    }
+
+    /**
      * @param int $showCompleteCategoryPath
      * @return AutosuggestConfigBuilder
      */
@@ -113,7 +124,7 @@ class AutosuggestConfigBuilder
     public function build()
     {
         return new AutosuggestConfig($this->active, $this->usePhpFile, $this->maxNumberSearchWordSuggestions,
-            $this->maxNumberProductSuggestions, $this->maxNumberCategorySuggestions, $this->showCompleteCategoryPath,
-            $this->categoryLinkType, $this->attributeFilterSuggestions);
+            $this->maxNumberProductSuggestions, $this->maxNumberCategorySuggestions, $this->maxNumberCmsPageSuggestions,
+            $this->showCompleteCategoryPath, $this->categoryLinkType, $this->attributeFilterSuggestions);
     }
 }

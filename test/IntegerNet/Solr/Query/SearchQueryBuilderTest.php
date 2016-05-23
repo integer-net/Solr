@@ -88,7 +88,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
             ],
             'alternative' => [1, ResultConfigBuilder::alternativeConfig()->build(), FuzzyConfigBuilder::inactiveConfig()->build(),
                 FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
-                new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0 category_name_t_mv:""foo bar""~100^1', 0, 24, [
+                new Query(1, 'attribute1_t:""foo bar""~100^0 OR attribute2_t:""foo bar""~100^0 OR category_name_t_mv:""foo bar""~100^1', 0, 24, [
                         'q.op' => ResultsConfig::SEARCH_OPERATOR_OR,
                         'fq' => "store_id:1 AND is_visible_in_search_i:1",
                         'sort' => 'attribute1_s desc',

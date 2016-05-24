@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\CategoryConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -21,25 +23,25 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     {
         switch ($this->getNameInLayout()) {
             case 'catalogsearch.solr.leftnav':
-                return Mage::getStoreConfig('integernet_solr/results/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT;
+                return Mage::getStoreConfig('integernet_solr/results/filter_position') == CategoryConfig::FILTER_POSITION_LEFT;
             case 'catalogsearch.solr.topnav':
-                return Mage::getStoreConfig('integernet_solr/results/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP;
+                return Mage::getStoreConfig('integernet_solr/results/filter_position') == CategoryConfig::FILTER_POSITION_TOP;
             case 'catalog.solr.leftnav':
                 switch ($this->_getCurrentCategory()->getData('filter_position')) {
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_DEFAULT:
-                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT:
+                    case CategoryConfig::FILTER_POSITION_DEFAULT:
+                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == CategoryConfig::FILTER_POSITION_LEFT;
+                    case CategoryConfig::FILTER_POSITION_LEFT:
                         return true;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP:
+                    case CategoryConfig::FILTER_POSITION_TOP:
                         return false;
                 }
             case 'catalog.solr.topnav':
                 switch ($this->_getCurrentCategory()->getData('filter_position')) {
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_DEFAULT:
-                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT:
+                    case CategoryConfig::FILTER_POSITION_DEFAULT:
+                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == CategoryConfig::FILTER_POSITION_TOP;
+                    case CategoryConfig::FILTER_POSITION_LEFT:
                         return false;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP:
+                    case CategoryConfig::FILTER_POSITION_TOP:
                         return true;
                 }
         }

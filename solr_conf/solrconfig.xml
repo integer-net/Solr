@@ -166,9 +166,6 @@
                     class="solr.DocumentAnalysisRequestHandler"
                     startup="lazy" />
 
-    <requestHandler name="/admin/"
-                    class="solr.admin.AdminHandlers" />
-
     <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
         <lst name="invariants">
             <str name="q">solrpingquery</str>

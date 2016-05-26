@@ -207,7 +207,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     }
 
                 }
-                if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filters_alphabetically')) {
+                if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filter_options_alphabetically')) {
                     ksort($this->_categoryFilterItems);
                 }
             }
@@ -356,7 +356,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     $items[$optionLabel] = $item;
                 }
             }
-            if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filters_alphabetically')) {
+            if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filter_options_alphabetically')) {
                 ksort($items);
             }
         }

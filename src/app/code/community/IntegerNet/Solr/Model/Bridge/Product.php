@@ -58,7 +58,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
 
     public function getSolrBoost()
     {
-        $this->_product->getData('solr_boost');
+        return $this->_product->getData('solr_boost');
     }
 
     public function getPrice()

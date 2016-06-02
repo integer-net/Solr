@@ -182,6 +182,7 @@ class ProductIndexer
             'content_type' => self::CONTENT_TYPE,
             'is_visible_in_catalog_i' => $product->isVisibleInCatalog(),
             'is_visible_in_search_i' => $product->isVisibleInSearch(),
+            'has_special_price' => $product->hasSpecialPrice(),
         ));
 
         $this->_addBoostToProductData($product, $productData);

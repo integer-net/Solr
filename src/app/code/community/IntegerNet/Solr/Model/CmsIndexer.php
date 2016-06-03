@@ -39,7 +39,10 @@ class IntegerNet_Solr_Model_CmsIndexer
     {
         $this->_reindexPages(null, true);
     }
-    
+
+    /**
+     * @param Varien_Event_Observer $observer
+     */
     public function cmsPageSaveAfter(Varien_Event_Observer $observer)
     {
         /** @var Mage_Cms_Model_Page $page */
@@ -58,6 +61,16 @@ class IntegerNet_Solr_Model_CmsIndexer
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
+    }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     */
+    public function cmsPageDeleteAfter(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Cms_Model_Page $page */
+        $page = $observer->getObject();
+        $this->_pageIndexer->deleteIndex(array($page->getId()));
     }
 
     /**

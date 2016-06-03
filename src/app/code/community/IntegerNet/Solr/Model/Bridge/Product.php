@@ -56,9 +56,14 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
             Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds()));
     }
 
+    public function hasSpecialPrice()
+    {
+        return intval($this->_product->getPrice() > $this->_product->getFinalPrice());
+    }
+
     public function getSolrBoost()
     {
-        $this->_product->getData('solr_boost');
+        return $this->_product->getData('solr_boost');
     }
 
     public function getPrice()

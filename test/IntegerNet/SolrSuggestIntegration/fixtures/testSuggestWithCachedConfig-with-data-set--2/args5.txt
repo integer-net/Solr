@@ -1,0 +1,1 @@
+a:5:{i:0;i:3;i:1;s:16:"bath OR bath~0.8";i:2;i:0;i:3;i:4;i:4;a:5:{s:4:"q.op";s:3:"AND";s:2:"fq";s:32:"content_type:page AND store_id:3";s:2:"fl";s:23:"title_t, url_s_nonindex";s:4:"sort";s:10:"score desc";s:7:"defType";s:7:"edismax";}}

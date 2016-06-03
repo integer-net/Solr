@@ -150,13 +150,13 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
                         if ($this->broaden) {
 
                             foreach ($searchValue as $value) {
-                                $queryText .= ($isFirst) ? '' : ' ';
+                                $queryText .= ($isFirst) ? '' : ' OR ';
                                 $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
                                 $isFirst = false;
                             }
 
                         } else {
-                            $queryText .= ($isFirst) ? '' : ' ';
+                            $queryText .= ($isFirst) ? '' : ' OR ';
                             $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
                             $isFirst = false;
                         }
@@ -171,13 +171,13 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
             if ($this->broaden) {
 
                 foreach ($searchValue as $value) {
-                    $queryText .= ($isFirst) ? '' : ' ';
+                    $queryText .= ($isFirst) ? '' : ' OR ';
                     $queryText .= $fieldName . ':"' . trim($value) . '"~100' . $boost;
                     $isFirst = false;
                 }
 
             } else {
-                $queryText .= ($isFirst) ? '' : ' ';
+                $queryText .= ($isFirst) ? '' : ' OR ';
                 $queryText .= $fieldName . ':"' . trim($searchValue) . '"~100' . $boost;
             }
         }

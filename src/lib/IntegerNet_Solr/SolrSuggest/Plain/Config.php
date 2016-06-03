@@ -16,6 +16,7 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Config\CmsConfig;
 use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\SerializableConfig;
@@ -61,6 +62,10 @@ final class Config implements SerializableConfig
      * @var CmsConfig
      */
     private $cmsConfig;
+    /**
+     * @var CategoryConfig
+     */
+    private $categoryConfig;
 
     /**
      * @param StoreConfig $storeConfig
@@ -71,9 +76,21 @@ final class Config implements SerializableConfig
      * @param FuzzyConfig $fuzzySearchConfig
      * @param FuzzyConfig $fuzzyAutosuggestConfig
      * @param ResultsConfig $resultsConfig
+     * @param CategoryConfig $categoryConfig
      * @param CmsConfig $cmsConfig
      */
-    public function __construct(StoreConfig $storeConfig, GeneralConfig $generalConfig, ServerConfig $serverConfig, IndexingConfig $indexingConfig, AutosuggestConfig $autosuggestConfig, FuzzyConfig $fuzzySearchConfig, FuzzyConfig $fuzzyAutosuggestConfig, ResultsConfig $resultsConfig, CmsConfig $cmsConfig)
+    public function __construct(
+        StoreConfig $storeConfig, 
+        GeneralConfig $generalConfig, 
+        ServerConfig $serverConfig, 
+        IndexingConfig $indexingConfig, 
+        AutosuggestConfig $autosuggestConfig, 
+        FuzzyConfig $fuzzySearchConfig, 
+        FuzzyConfig $fuzzyAutosuggestConfig, 
+        ResultsConfig $resultsConfig, 
+        CategoryConfig $categoryConfig,
+        CmsConfig $cmsConfig
+    )
     {
         $this->storeConfig = $storeConfig;
         $this->generalConfig = $generalConfig;
@@ -83,6 +100,7 @@ final class Config implements SerializableConfig
         $this->fuzzySearchConfig = $fuzzySearchConfig;
         $this->fuzzyAutosuggestConfig = $fuzzyAutosuggestConfig;
         $this->resultsConfig = $resultsConfig;
+        $this->categoryConfig = $categoryConfig;
         $this->cmsConfig = $cmsConfig;
     }
 
@@ -167,6 +185,16 @@ final class Config implements SerializableConfig
     }
 
     /**
+     * Returns category configuration
+     *
+     * @return CategoryConfig
+     */
+    public function getCategoryConfig()
+    {
+        return $this->categoryConfig;
+    }
+
+    /**
      * Returns cms configuration
      *
      * @return CmsConfig
@@ -187,6 +215,7 @@ final class Config implements SerializableConfig
             $other->getFuzzySearchConfig(),
             $other->getFuzzyAutosuggestConfig(),
             $other->getResultsConfig(),
+            $other->getCategoryConfig(),
             $other->getCmsConfig()
         );
     }

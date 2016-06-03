@@ -182,6 +182,7 @@ class ProductIndexer
             'content_type' => self::CONTENT_TYPE,
             'is_visible_in_catalog_i' => $product->isVisibleInCatalog(),
             'is_visible_in_search_i' => $product->isVisibleInSearch(),
+            'has_special_price_i' => $product->hasSpecialPrice(),
         ));
 
         $this->_addBoostToProductData($product, $productData);
@@ -220,6 +221,12 @@ class ProductIndexer
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
+
+            if ($attribute->getAttributeCode() == 'price') {
+                $price = $product->getPrice();
+                $productData->setData('price_f', floatval($price));
+                continue;
+            }
 
             $facetFieldName = $attribute->getAttributeCode() . '_facet';
             if ($product->getData($attribute->getAttributeCode())) {
@@ -286,11 +293,6 @@ class ProductIndexer
                         }
                     }
                 }
-            }
-
-            if ($attribute->getAttributeCode() == 'price') {
-                $price = $product->getPrice();
-                $productData->setData('price_f', floatval($price));
             }
         }
     }

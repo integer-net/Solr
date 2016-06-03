@@ -19,6 +19,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected $_categoryFilterItems = null;
 
     protected $_currentCategory = null;
+    
+    protected $_numberFilterOptionsDisplayed = 0;
 
     /**
      * @return Mage_Catalog_Model_Entity_Attribute
@@ -129,7 +131,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             ->addAttributeToFilter('level', $currentCategory->getLevel() + 1)
             ->addAttributeToFilter('path', array('like' => $currentCategory->getPath() . '/%'))
             ->setOrder('position', 'asc');
-        
+
         return $childrenCategories;
     }
 
@@ -139,6 +141,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected function _getCategoryFilterItems()
     {
         if (is_null($this->_categoryFilterItems)) {
+
+            $this->_categoryFilterItems = array();
 
             $facetName = 'category';
             if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$facetName})) {
@@ -150,11 +154,13 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     $childrenCategories = $this->_getCurrentChildrenCategories();
 
                     foreach ($childrenCategories as $childCategory) {
+                        
                         $childCategoryId = $childCategory->getId();
                         if (isset($categoryFacets->{$childCategoryId})) {
                             $item = new Varien_Object();
                             $item->setCount($categoryFacets->{$childCategoryId});
-                            $item->setLabel($this->_getCheckboxHtml('cat', $childCategoryId) . ' ' . $childCategory->getName());
+                            $optionLabel = $childCategory->getName();
+                            $item->setLabel($this->_getCheckboxHtml('cat', $childCategoryId) . ' ' . $optionLabel);
                             $item->setUrl($this->_getUrl($childCategoryId));
                             $item->setIsChecked($this->_isSelected('cat', $childCategoryId));
                             $item->setType('category');
@@ -169,7 +175,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                             ));
 
                             if (!$item->getIsDisabled()) {
-                                $this->_categoryFilterItems[] = $item;
+                                $this->_categoryFilterItems[$optionLabel] = $item;
                             }
                         }
                     }
@@ -177,14 +183,16 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 } else {
 
                     foreach ((array)$categoryFacets as $optionId => $optionCount) {
+
                         $item = new Varien_Object();
                         $item->setCount($optionCount);
-                        $item->setLabel($this->_getCheckboxHtml('cat', $optionId) . ' ' . Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore()));
+                        $optionLabel = Mage::getResourceSingleton('catalog/category')->getAttributeRawValue($optionId, 'name', Mage::app()->getStore());
+                        $item->setLabel($this->_getCheckboxHtml('cat', $optionId) . ' ' . $optionLabel);
                         $item->setUrl($this->_getUrl($optionId));
                         $item->setIsChecked($this->_isSelected('cat', $optionId));
                         $item->setType('category');
                         $item->setOptionId($optionId);
-                        
+
                         Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                             'item' => $item,
                             'solr_result' => $this->_getSolrResult(),
@@ -193,9 +201,17 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                         ));
 
                         if (!$item->getIsDisabled()) {
-                            $this->_categoryFilterItems[] = $item;
+                            if ($this->_isMaxNumberFilterOptionsExceeded()) {
+                                break;
+                            }
+
+                            $this->_categoryFilterItems[$optionLabel] = $item;
                         }
                     }
+
+                }
+                if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filter_options_alphabetically')) {
+                    ksort($this->_categoryFilterItems);
                 }
             }
         }
@@ -216,9 +232,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
 
             $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
 
-            $i = 0;
             foreach ($attributeFacetData as $range => $rangeCount) {
-                $i++;
+
                 if (!$rangeCount) {
                     continue;
                 }
@@ -249,6 +264,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 ));
 
                 if (!$item->getIsDisabled()) {
+                    if ($this->_isMaxNumberFilterOptionsExceeded()) {
+                        break;
+                    }
+
                     $items[] = $item;
                 }
             }
@@ -257,19 +276,20 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
 
             foreach ($attributeFacetData['counts'] as $rangeStart => $rangeCount) {
+
                 $item = new Varien_Object();
                 $item->setCount($rangeCount);
                 $rangeEnd = $rangeStart + $attributeFacetData['gap'];
                 $item->setLabel($this->_getCheckboxHtml('price', floatval($rangeStart) . '-' . floatval($rangeEnd)) . ' ' . Mage::helper('catalog')->__(
-                    '%s - %s',
-                    $store->formatPrice($rangeStart),
-                    $store->formatPrice($rangeEnd)
-                ));
+                        '%s - %s',
+                        $store->formatPrice($rangeStart),
+                        $store->formatPrice($rangeEnd)
+                    ));
                 $item->setUrl($this->_getRangeUrl($rangeStart, $rangeEnd));
                 $item->setIsChecked($this->_isSelected('price', floatval($rangeStart) . '-' . floatval($rangeEnd)));
                 $item->setType('range');
                 $item->setOptionId(floatval($rangeStart) . '-' . floatval($rangeEnd));
-                
+
                 Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                     'item' => $item,
                     'solr_result' => $this->_getSolrResult(),
@@ -278,6 +298,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 ));
 
                 if (!$item->getIsDisabled()) {
+                    if ($this->_isMaxNumberFilterOptionsExceeded()) {
+                        break;
+                    }
+
                     $items[] = $item;
                 }
             }
@@ -299,6 +323,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
 
             foreach ($attributeFacets as $optionId => $optionCount) {
+
                 if (!$optionCount) {
                     continue;
                 }
@@ -312,7 +337,8 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 }
                 $item = new Varien_Object();
                 $item->setCount($optionCount);
-                $item->setLabel($this->_getCheckboxHtml($attributeCode, $optionId) . ' ' . $this->getAttribute()->getSource()->getOptionText($optionId));
+                $optionLabel = $this->getAttribute()->getSource()->getOptionText($optionId);
+                $item->setLabel($this->_getCheckboxHtml($attributeCode, $optionId) . ' ' . $optionLabel);
                 $item->setUrl($this->_getUrl($optionId));
                 $item->setIsChecked($this->_isSelected($attributeCode, $optionId));
                 $item->setType('attribute');
@@ -327,8 +353,15 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 ));
 
                 if (!$item->getIsDisabled()) {
-                    $items[] = $item;
+                    if ($this->_isMaxNumberFilterOptionsExceeded()) {
+                        break;
+                    }
+
+                    $items[$optionLabel] = $item;
                 }
+            }
+            if (Mage::getStoreConfigFlag('integernet_solr/results/sort_filter_options_alphabetically')) {
+                ksort($items);
             }
         }
 
@@ -423,6 +456,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
+        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+
+            return 'catalog/category/view';
+        }
         return 'catalogsearch/result/*';
     }
 
@@ -433,5 +470,29 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function sortItems($a, $b) {
         return strcmp($a->getData('text'), $b->getData('text'));
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _isMaxNumberFilterOptionsExceeded()
+    {
+        $maxNumberFilterOptions = intval(Mage::getStoreConfig('integernet_solr/results/max_number_filter_options'));
+        if ($maxNumberFilterOptions == 0) {
+            return false;
+        }
+        if (++$this->_numberFilterOptionsDisplayed > $maxNumberFilterOptions) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return IntegerNet_Solr_Block_Result_Layer_Filter
+     */
+    public function reset()
+    {
+        $this->_numberFilterOptionsDisplayed = 0;
+        return $this;
     }
 }

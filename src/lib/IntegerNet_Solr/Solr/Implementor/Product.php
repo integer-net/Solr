@@ -28,6 +28,8 @@ interface Product
 
     public function isVisibleInSearch();
 
+    public function hasSpecialPrice();
+
     public function getSolrBoost();
 
     public function getPrice();

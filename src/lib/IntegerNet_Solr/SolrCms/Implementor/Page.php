@@ -30,4 +30,6 @@ interface Page
     public function getContent();
     
     public function getTitle();
+
+    public function getUrl();
 }

@@ -21,6 +21,7 @@ class IntegerNet_Solr_Model_Eav_Source_FilterableAttribute extends Mage_Eav_Mode
             'value' => '',
             'label' => '',
         ));
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
         $attributes = Mage::getSingleton('integernet_solr/bridge_attributeRepository')
             ->getFilterableInCatalogAttributes(Mage::app()->getStore()->getId());
 

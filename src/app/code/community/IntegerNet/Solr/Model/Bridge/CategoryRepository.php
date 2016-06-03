@@ -10,13 +10,30 @@
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
+use IntegerNet\SolrCategories\Implementor\CategoryRepository;
+use IntegerNet\SolrCategories\Implementor\CategoryIterator;
 
-class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRepository, SuggestCategoryRepository
+class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRepository, SuggestCategoryRepository, CategoryRepository
 {
     protected $_pathCategoryIds = array();
     protected $_excludedCategoryIds = array();
 
     protected $_categoryNames = array();
+
+    /**
+     * @var int
+     */
+    protected $_pageSize;
+
+    /**
+     * @param int $pageSize
+     * @return $this
+     */
+    public function setPageSizeForIndex($pageSize)
+    {
+        $this->_pageSize = $pageSize;
+        return $this;
+    }
 
     /**
      * @param $categoryIds
@@ -171,7 +188,7 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
     /**
      * @prarm int $storeId
      * @param int[] $categoryIds
-     * @return \IntegerNet\Solr\Implementor\Category[]
+     * @return \IntegerNet\SolrSuggest\Implementor\SuggestCategory[]
      */
     public function findActiveCategoriesByIds($storeId, $categoryIds)
     {
@@ -199,5 +216,15 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
         );
     }
 
-
+    /**
+     * Return page iterator, which may implement lazy loading
+     *
+     * @param int $storeId Pages will be returned that are visible in this store and with store specific values
+     * @param null|int[] $categoryIds filter by category ids
+     * @return CategoryIterator
+     */
+    public function getCategoriesForIndex($storeId, $categoryIds = null)
+    {
+        return new IntegerNet_Solr_Model_Bridge_LazyCategoryIterator($storeId, $categoryIds, $this->_pageSize);
+    }
 }

@@ -9,6 +9,8 @@
  */
 namespace IntegerNet\SolrSuggest\Plain\Cache;
 
+use IntegerNet\Solr\Config\Stub\CategoryConfigBuilder;
+use IntegerNet\Solr\Config\Stub\CmsConfigBuilder;
 use IntegerNet\SolrSuggest\Plain\Config;
 use IntegerNet\Solr\Config\Stub\AutosuggestConfigBuilder;
 use IntegerNet\Solr\Config\Stub\FuzzyConfigBuilder;
@@ -191,7 +193,9 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 AutosuggestConfigBuilder::defaultConfig()->build(),
                 FuzzyConfigBuilder::defaultConfig()->build(),
                 FuzzyConfigBuilder::defaultConfig()->build(),
-                ResultConfigBuilder::defaultConfig()->build()
+                ResultConfigBuilder::defaultConfig()->build(),
+                CategoryConfigBuilder::defaultConfig()->build(),
+                CmsConfigBuilder::defaultConfig()->build()
             ),
             '/path/to/magento/var/generated/integernet_solr/template.phtml',
             $filterableAttributes,
@@ -210,7 +214,9 @@ class CacheWriterTest extends \PHPUnit_Framework_TestCase
                 AutosuggestConfigBuilder::defaultConfig()->withMaxNumberCategorySuggestions(0)->build(),
                 FuzzyConfigBuilder::inactiveConfig()->build(),
                 FuzzyConfigBuilder::defaultConfig()->build(),
-                ResultConfigBuilder::alternativeConfig()->build()
+                ResultConfigBuilder::alternativeConfig()->build(),
+                CategoryConfigBuilder::defaultConfig()->build(),
+                CmsConfigBuilder::defaultConfig()->build()
             ),
             '/path/to/magento/var/generated/integernet_solr/store_3/template.phtml',
             $filterableAttributes,

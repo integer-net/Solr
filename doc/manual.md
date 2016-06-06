@@ -449,7 +449,7 @@ For each category, you can change the position of filters, overwriting the defau
 
 Events
 ---------------------
-In order to further customize the module, we integrated several events which can be observed by an another module. The following events are included in IntegerNet_Solr:
+In order to further customize the module, we integrated several events which can be observed by another module. The following events are included in IntegerNet_Solr:
 
 - integernet_solr_get_product_data
 - integernet_solr_update_query_text
@@ -459,7 +459,7 @@ In order to further customize the module, we integrated several events which can
 - integernet_solr_product_collection_load_after
 - integernet_solr_can_index_product
 
-For further information about these events, their parameters and usage, as well as an example module, please see our [blog post](https://www.integer-net.com/utilizing-events-of-integernet_solr-an-example/).
+For further information about these events, their parameters and usage, as well as a sample module, please see our [blog post](https://www.integer-net.com/utilizing-events-of-integernet_solr-an-example/).
 
 Possible Problems and their solutions
 -------------------------------------

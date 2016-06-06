@@ -19,7 +19,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected $_categoryFilterItems = null;
 
     protected $_currentCategory = null;
-    
+
     protected $_numberFilterOptionsDisplayed = 0;
 
     /**
@@ -201,7 +201,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                             if ($this->_isMaxNumberFilterOptionsExceeded()) {
                                 break;
                             }
-
+    
                             $this->_categoryFilterItems[$optionLabel] = $item;
                         }
                     }
@@ -258,6 +258,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'range',
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
@@ -292,6 +293,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'range',
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
@@ -346,13 +348,14 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'attribute',
                     'entity_id' => $optionId,
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
                     if ($this->_isMaxNumberFilterOptionsExceeded()) {
                         break;
                     }
-
+    
                     $items[$optionLabel] = $item;
                 }
             }

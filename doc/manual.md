@@ -44,7 +44,7 @@ Features
 Requirements
 ------------
 - **Magento Community Edition** 1.6 to 1.9 or **Magento Enterprise Edition** 1.11 to 1.14
-- **Solr** 4.x or 5.x
+- **Solr** 4.x to 6.x
 - **PHP** 5.3 to 5.5 (5.5 recommended), probably compatible with PHP 5.6 and 7.0 as well (not tested yet)
 
 Installation
@@ -446,6 +446,20 @@ Even if you don't use IntegerNet_Solr to load product lists on category pages, y
 
 ### Position of Filters
 For each category, you can change the position of filters, overwriting the default value from the IntegerNet_Solr configuration. Filters can be displayed either in the left column next to the product list or above the product list.
+
+Events
+---------------------
+In order to further customize the module, we integrated several events which can be observed by an another module. The following events are included in IntegerNet_Solr:
+
+- integernet_solr_get_product_data
+- integernet_solr_update_query_text
+- integernet_solr_before_search_request
+- integernet_solr_after_search_request
+- integernet_solr_product_collection_load_before
+- integernet_solr_product_collection_load_after
+- integernet_solr_can_index_product
+
+For further information about these events, their parameters and usage, as well as an example module, please see our [blog post](https://www.integer-net.com/utilizing-events-of-integernet_solr-an-example/).
 
 Possible Problems and their solutions
 -------------------------------------

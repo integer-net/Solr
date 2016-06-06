@@ -57,7 +57,7 @@
 "Higher number means better indexing performance. Reduce if you are getting memory errors.","Höhere Anzahl ergibt eine bessere Performance bei der Indizierung. Reduzieren Sie die Anzahl, wenn Sie Speicherfehler erhalten."
 "Exclude this Category from Solr Index","Diese Kategorie vom Solr-Index ausnehmen"
 "Exclude Child Categories from Solr Index","Kind-Kategorien vom Solr-Index ausnehmen"
-"Exclude only Categories, not included Products","Nur Kategorien, nicht enthaltene Produkte"
+"Exclude only Categories, not included Products","Bezieht sich nur auf Kategorien, nicht die darin enthaltenen Produkte"
 "HTTP Transport Method","HTTP-Übertragungsmethode"
 "Please change if you are getting communication errors","Bitte wechseln, falls Sie Übertragungsfehler erhalten"
 "file_get_contents","file_get_contents"

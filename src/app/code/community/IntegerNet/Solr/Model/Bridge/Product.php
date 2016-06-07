@@ -158,8 +158,17 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
         if (!in_array($this->_product->getStore()->getWebsiteId(), $this->_product->getWebsiteIds())) {
             return false;
         }
-        if (!$this->_product->getStockItem()->getIsInStock() && !Mage::helper('cataloginventory')->isShowOutOfStock()) {
-            return false;
+        if (!Mage::helper('cataloginventory')->isShowOutOfStock()) {
+            /** @var Mage_CatalogInventory_Model_Stock_Item $stockItem */
+            if (!$this->_product->getStockItem()) {
+                $stockItem = Mage::getModel('cataloginventory/stock_item')
+                    ->loadByProduct($this->_product->getId());
+                $this->_product->setStockItem($stockItem);
+            }
+
+            if (!$this->_product->getStockItem()->getIsInStock()) {
+                return false;
+            }
         }
         return true;
 

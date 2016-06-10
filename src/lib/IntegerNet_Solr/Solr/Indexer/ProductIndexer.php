@@ -375,9 +375,14 @@ class ProductIndexer
                                 if (!is_array($fieldValue) && $childValue != $fieldValue) {
                                     $productData->setData($fieldName, array($fieldValue, $childValue));
                                 } else {
-                                    if (is_array($fieldValue) && !in_array($childValue, $fieldValue)) {
-                                        $fieldValue[] = $childValue;
-                                        $productData->setData($fieldName, $fieldValue);
+                                    if (!is_array($childValue)) {
+                                        $childValue = array($childValue);
+                                    }
+                                    foreach($childValue as $singleChildValue) {
+                                        if (is_array($fieldValue) && !in_array($singleChildValue, $fieldValue)) {
+                                            $fieldValue[] = $singleChildValue;
+                                            $productData->setData($fieldName, $fieldValue);
+                                        }
                                     }
                                 }
                             }

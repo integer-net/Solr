@@ -127,7 +127,7 @@ class ProductIndexer
                 }
 
                 $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
-                $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
+                $this->_indexProductCollection($emptyIndex, $productCollection, $storeId, $productIds);
 
                 $this->_getResource()->setUseSwapIndex(false);
             } catch (\Exception $e) {
@@ -206,12 +206,24 @@ class ProductIndexer
     /**
      * Get unique identifier for Solr
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param \IntegerNet\Solr\Implementor\Product $product
      * @return string
      */
     protected function _getSolrId($product)
     {
-        return $product->getId() . '_' . $product->getStoreId();
+        return $this->_getSolrIdByProductIdAndStoreId($product->getId(), $product->getStoreId());
+    }
+
+    /**
+     * Get unique identifier for Solr
+     *
+     * @param int $productId
+     * @param int $storeId
+     * @return string
+     */
+    protected function _getSolrIdByProductIdAndStoreId($productId, $storeId)
+    {
+        return $productId . '_' . $storeId;
     }
 
     /**
@@ -454,20 +466,29 @@ class ProductIndexer
     /**
      * @param boolean $emptyIndex
      * @param \IntegerNet\Solr\Implementor\ProductIterator $productCollection
+     * @param int[] $productIds
      * @param int $storeId
      * @return int
      */
-    protected function _indexProductCollection($emptyIndex, $productCollection, $storeId)
+    protected function _indexProductCollection($emptyIndex, $productCollection, $storeId, $productIds = array())
     {
         $combinedProductData = array();
         $idsForDeletion = array();
+        $productIds = array_flip($productIds);
 
         foreach ($productCollection as $product) {
+            if (isset($productIds[$product->getId()])) {
+                unset($productIds[$product->getId()]);
+            }
             if ($product->isIndexable()) {
                 $combinedProductData[] = $this->_getProductData($product);
             } else {
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
+        }
+        
+        foreach($productIds as $productId => $value) {
+            $idsForDeletion[] = $this->_getSolrIdByProductIdAndStoreId($productId, $storeId);
         }
 
         if (!$emptyIndex && sizeof($idsForDeletion)) {

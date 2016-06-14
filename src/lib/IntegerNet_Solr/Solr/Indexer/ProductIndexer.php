@@ -474,7 +474,7 @@ class ProductIndexer
     {
         $combinedProductData = array();
         $idsForDeletion = array();
-        $productIds = array_flip($productIds);
+        $productIds = array_flip((array)$productIds);
 
         foreach ($productCollection as $product) {
             if (isset($productIds[$product->getId()])) {

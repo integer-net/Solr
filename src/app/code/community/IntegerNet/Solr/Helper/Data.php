@@ -1,9 +1,6 @@
 <?php
 use IntegerNet\Solr\Implementor\Attribute;
-use IntegerNet\Solr\Implementor\AttributeRepository;
-use IntegerNet\Solr\Implementor\EventDispatcher;
-use IntegerNet\Solr\Implementor\HasUserQuery;
-use IntegerNet\SolrSuggest\Implementor\SearchUrl;
+
 /**
  * integer_net Magento Module
  *
@@ -14,6 +11,12 @@ use IntegerNet\SolrSuggest\Implementor\SearchUrl;
  */ 
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    protected $_bridgeFactory;
+
+    public function __construct()
+    {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
 
     /**
      * @deprecated use repository directly
@@ -22,7 +25,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getFilterableAttributes($useAlphabeticalSearch = true)
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
             ->getFilterableAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
     
@@ -33,7 +36,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
             ->getFilterableInSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
 
@@ -45,7 +48,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
             ->getFilterableInCatalogAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
 
     }
@@ -57,7 +60,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')
+        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
             ->getFilterableInCatalogOrSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
     }
 
@@ -67,7 +70,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getAttributeCodesToIndex()
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex();
+        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex();
     }
 
 
@@ -80,7 +83,7 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFieldName($attribute, $forSorting = false)
     {
         if (! $attribute instanceof Attribute) {
-            $attribute = new IntegerNet_Solr_Model_Bridge_Attribute($attribute);
+            $attribute = $this->_bridgeFactory->createAttribute($attribute);
         }
         $indexField = new \IntegerNet\Solr\Indexer\IndexField($attribute, $forSorting);
         return $indexField->getFieldName();

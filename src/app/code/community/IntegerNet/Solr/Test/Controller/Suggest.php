@@ -17,6 +17,8 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     protected function setUp()
     {
         parent::setUp();
+        //TODO test with category indexer and without
+        $this->app()->getStore(0)->setConfig('integernet_solr/category/is_indexer_active', 1);
         Mage::getModel('integernet_solr/indexer')->reindexAll();
     }
 

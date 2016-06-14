@@ -13,6 +13,7 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
 {
     const DEFAULT_STORE_ID = 1;
+    protected $_bridgeFactory;
     /**
      * Holds attribute instances with their Magento attributes as attached data
      *
@@ -43,6 +44,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
 
     public function __construct()
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_attributeStorage = new SplObjectStorage();
     }
 
@@ -55,7 +57,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function _registerAttribute(Mage_Catalog_Model_Resource_Eav_Attribute $magentoAttribute)
     {
-        $attribute = new IntegerNet_Solr_Model_Bridge_Attribute($magentoAttribute);
+        $attribute = $this->_bridgeFactory->createAttribute($magentoAttribute);
         $this->_attributeStorage->attach($attribute, $magentoAttribute);
         return $attribute;
     }

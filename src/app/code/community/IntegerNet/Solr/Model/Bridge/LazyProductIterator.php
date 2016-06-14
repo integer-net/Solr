@@ -16,6 +16,7 @@ use IntegerNet\Solr\Implementor\Product;
  */
 class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterator, OuterIterator
 {
+    protected $_bridgeFactory;
     /**
      * @var int
      */
@@ -58,6 +59,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
      */
     public function __construct($_storeId, $_productIdFilter, $_pageSize)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
         $this->_productIdFilter = $_productIdFilter;
         $this->_pageSize = $_pageSize;
@@ -115,7 +117,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
     {
         $product = $this->getInnerIterator()->current();
         $product->setStoreId($this->_storeId);
-        return new IntegerNet_Solr_Model_Bridge_Product($product);
+        return $this->_bridgeFactory->createProduct($product);
     }
 
     /**
@@ -138,7 +140,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
             ->addUrlRewrite()
             ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
             ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'))
-            ->addAttributeToSelect(Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex());
+            ->addAttributeToSelect(Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex());
 
         if (is_array($productIds)) {
             $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));

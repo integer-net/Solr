@@ -12,6 +12,13 @@ use IntegerNet\Solr\Implementor\ProductIterator;
 
 class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepository
 {
+    protected $_bridgeFactory;
+
+    public function __construct()
+    {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
+
     /**
      * @var int
      */
@@ -36,7 +43,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
-        return new IntegerNet_Solr_Model_Bridge_LazyProductIterator($storeId, $productIds, $this->_pageSize);
+        return $this->_bridgeFactory->createLazyProductIterator($storeId, $productIds, $this->_pageSize);
     }
 
 }

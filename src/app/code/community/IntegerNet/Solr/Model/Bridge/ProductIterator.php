@@ -12,12 +12,14 @@ use IntegerNet\Solr\Implementor\ProductIterator;
 
 class IntegerNet_Solr_Model_Bridge_ProductIterator extends IteratorIterator implements ProductIterator
 {
+    protected $_bridgeFactory;
 
     /**
      * @param Mage_Catalog_Model_Resource_Product_Collection $_collection
      */
     public function __construct(Mage_Catalog_Model_Resource_Product_Collection $_collection)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         parent::__construct($_collection->getIterator());
     }
 
@@ -26,7 +28,7 @@ class IntegerNet_Solr_Model_Bridge_ProductIterator extends IteratorIterator impl
      */
     public function current()
     {
-        return new IntegerNet_Solr_Model_Bridge_Product($this->getInnerIterator()->current());
+        return $this->_bridgeFactory->createProduct($this->getInnerIterator()->current());
     }
 
 }

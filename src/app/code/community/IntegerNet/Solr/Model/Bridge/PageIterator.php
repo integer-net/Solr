@@ -12,12 +12,14 @@ use IntegerNet\SolrCms\Implementor\PageIterator;
 
 class IntegerNet_Solr_Model_Bridge_PageIterator extends IteratorIterator implements PageIterator
 {
+    protected $_bridgeFactory;
 
     /**
      * @param Mage_Cms_Model_Resource_Page_Collection $_collection
      */
     public function __construct(Mage_Cms_Model_Resource_Page_Collection $_collection)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         parent::__construct($_collection->getIterator());
     }
 
@@ -26,7 +28,7 @@ class IntegerNet_Solr_Model_Bridge_PageIterator extends IteratorIterator impleme
      */
     public function current()
     {
-        return new IntegerNet_Solr_Model_Bridge_Page($this->getInnerIterator()->current());
+        return $this->_bridgeFactory->createPage($this->getInnerIterator()->current());
     }
 
 }

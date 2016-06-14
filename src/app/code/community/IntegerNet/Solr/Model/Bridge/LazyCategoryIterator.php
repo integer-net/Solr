@@ -16,6 +16,7 @@ use IntegerNet\SolrCategories\Implementor\Category;
  */
 class IntegerNet_Solr_Model_Bridge_LazyCategoryIterator implements CategoryIterator, OuterIterator
 {
+    protected $_bridgeFactory;
     /**
      * @var int
      */
@@ -58,6 +59,7 @@ class IntegerNet_Solr_Model_Bridge_LazyCategoryIterator implements CategoryItera
      */
     public function __construct($_storeId, $_categoryIdFilter, $_categorySize)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
         $this->_categoryIdFilter = $_categoryIdFilter;
         $this->_categorySize = $_categorySize;
@@ -115,7 +117,7 @@ class IntegerNet_Solr_Model_Bridge_LazyCategoryIterator implements CategoryItera
     {
         $category = $this->getInnerIterator()->current();
         $category->setStoreId($this->_storeId);
-        return new IntegerNet_Solr_Model_Bridge_Category($category);
+        return $this->_bridgeFactory->createCategory($category);
     }
 
     /**

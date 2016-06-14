@@ -76,7 +76,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                     $this->_filters[] = $categoryFilter;
                 }
             }
-            foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
+            foreach (Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 /** @var Mage_Catalog_Model_Category $currentCategory */

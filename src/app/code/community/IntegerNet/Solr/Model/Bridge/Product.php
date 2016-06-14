@@ -12,6 +12,7 @@ use IntegerNet\Solr\Implementor\Attribute;
 
 class IntegerNet_Solr_Model_Bridge_Product implements Product
 {
+    protected $_bridgeFactory;
     /**
      * @var Mage_Catalog_Model_Product
      */
@@ -22,6 +23,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
      */
     public function __construct(Mage_Catalog_Model_Product $_product)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_product = $_product;
     }
 
@@ -83,7 +85,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
 
     public function getSearchableAttributeValue(Attribute $attribute)
     {
-        $magentoAttribute = Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getMagentoAttribute($attribute);
+        $magentoAttribute = Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getMagentoAttribute($attribute);
         $value = trim(strip_tags($magentoAttribute->getFrontend()->getValue($this->_product)));
         $attributeCode = $attribute->getAttributeCode();
         if ($magentoAttribute->getData('backend_type') == 'int'
@@ -125,9 +127,9 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
             ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect(Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex());
+            ->addAttributeToSelect(Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex());
 
-        return new IntegerNet_Solr_Model_Bridge_ProductIterator($childProductCollection);
+        return $this->_bridgeFactory->createProductIterator($childProductCollection);
 
     }
 

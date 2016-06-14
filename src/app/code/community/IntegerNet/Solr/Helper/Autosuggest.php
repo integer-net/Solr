@@ -23,7 +23,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     public function __construct()
     {
-        $this->_storeEmulation = Mage::getModel('integernet_solr/bridge_storeEmulation');
+        $this->_storeEmulation = Mage::getModel('integernet_solr/bridge_factory')->createStoreEmulation();
     }
 
 

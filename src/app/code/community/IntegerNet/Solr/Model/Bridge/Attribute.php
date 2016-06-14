@@ -28,7 +28,7 @@ final class IntegerNet_Solr_Model_Bridge_Attribute implements Attribute
     public function __construct(Mage_Catalog_Model_Resource_Eav_Attribute $attribute)
     {
         $this->_attribute = $attribute;
-        $this->_source = new IntegerNet_Solr_Model_Bridge_Source($this->_attribute->getSource());
+        $this->_source = Mage::getModel('integernet_solr/bridge_factory')->createAttributeSource($this->_attribute->getSource());
     }
     /**
      * @return string

@@ -19,6 +19,15 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
     protected $_excludedCategoryIds = array();
 
     protected $_categoryNames = array();
+    /**
+     * @var IntegerNet_Solr_Model_Bridge_Factory
+     */
+    protected $_bridgeFactory;
+
+    public function __construct()
+    {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
 
     /**
      * @var int
@@ -210,7 +219,7 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
                 $categoryPathNames = $this->getCategoryNames($categoryPathIds, 0);
                 $categoryPathNames[] = $category->getName();
 
-                return new IntegerNet_Solr_Model_Bridge_Category($category, $categoryPathNames);
+                return $this->_bridgeFactory->createCategory($category, $categoryPathNames);
             },
             $categoryCollection->getItems()
         );
@@ -225,6 +234,6 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
      */
     public function getCategoriesForIndex($storeId, $categoryIds = null)
     {
-        return new IntegerNet_Solr_Model_Bridge_LazyCategoryIterator($storeId, $categoryIds, $this->_pageSize);
+        return $this->_bridgeFactory->createLazyCategoryIterator($storeId, $categoryIds, $this->_pageSize);
     }
 }

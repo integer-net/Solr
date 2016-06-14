@@ -32,6 +32,6 @@ class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Ca
         foreach ($config as $path => $value) {
             Mage::getConfig()->setNode($path, $value);
         }
-        Mage::helper('integernet_solr/factory')->getProductIndexer()->reindex();
+        Mage::helper('integernet_solr')->factory()->getProductIndexer()->reindex();
     }
 }

@@ -30,7 +30,7 @@ class IntegerNet_Solr_Model_Result
 
     function __construct()
     {
-        $this->_solrRequest = Mage::helper('integernet_solr/factory')->getSolrRequest();
+        $this->_solrRequest = Mage::helper('integernet_solr')->factory()->getSolrRequest();
         if ($this->_solrRequest instanceof HasFilter) {
             $this->_filterQueryBuilder = $this->_solrRequest->getFilterQueryBuilder();
             $this->_addCategoryFilters();

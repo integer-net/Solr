@@ -15,7 +15,27 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function __construct()
     {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
+
+    /**
+     * Use this method to access the autosuggest helper, this way it is assured that the autoloader is registered
+     *
+     * @return IntegerNet_Solr_Helper_Autosuggest
+     */
+    public function autosuggest()
+    {
+        return Mage::helper('integernet_solr/autosuggest');
+    }
+    /**
+     * Use this method to access the factory helper, this way it is assured that the autoloader is registered
+     *
+     * @return IntegerNet_Solr_Helper_Factory
+     */
+    public function factory()
+    {
+        return Mage::helper('integernet_solr/factory');
     }
 
     /**

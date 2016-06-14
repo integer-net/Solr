@@ -44,21 +44,21 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
 
             try {
                 if (in_array('product', $entityTypes)) {
-                    $indexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
+                    $indexer = Mage::helper('integernet_solr')->factory()->getProductIndexer();
                     $indexer->reindex(null, $emptyIndex, $storeIds);
                     $storeIdsString = implode(', ', $storeIds);
                     echo "Solr product index rebuilt for Stores {$storeIdsString}.\n";
                 }
 
                 if (in_array('page', $entityTypes)) {
-                    $indexer = Mage::helper('integernet_solr/factory')->getPageIndexer();
+                    $indexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
                     $indexer->reindex(null, $emptyIndex, $storeIds);
                     $storeIdsString = implode(', ', $storeIds);
                     echo "Solr page index rebuilt for Stores {$storeIdsString}.\n";
                 }
 
                 if (in_array('category', $entityTypes)) {
-                    $indexer = Mage::helper('integernet_solr/factory')->getCategoryIndexer();
+                    $indexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
                     $indexer->reindex(null, $emptyIndex, $storeIds);
                     $storeIdsString = implode(', ', $storeIds);
                     echo "Solr category index rebuilt for Stores {$storeIdsString}.\n";

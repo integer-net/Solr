@@ -355,6 +355,6 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     protected function _getAutosuggestHelper()
     {
-        return Mage::helper('integernet_solr/autosuggest');
+        return Mage::helper('integernet_solr')->autosuggest();
     }
 }

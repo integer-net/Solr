@@ -20,7 +20,7 @@ class IntegerNet_Solr_Test_Helper_Factory extends EcomDev_PHPUnit_Test_Case
      */
     public function shouldCreateSolrResourceWithStoreConfiguration()
     {
-        $resource = Mage::helper('integernet_solr/factory')->getSolrResource();
+        $resource = Mage::helper('integernet_solr')->factory()->getSolrResource();
         $this->assertInstanceOf(ResourceFacade::class, $resource);
         $storeConfigs = [
             $resource->getStoreConfig(1),   // default store view

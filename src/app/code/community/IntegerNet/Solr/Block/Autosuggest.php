@@ -33,7 +33,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
         $this->highlighter = new HtmlStringHighlighter();
-        $this->resultFactory = Mage::helper('integernet_solr/factory');
+        $this->resultFactory = Mage::helper('integernet_solr')->factory();
     }
 
     /**
@@ -157,12 +157,12 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
              */
             return new IntegerNet_Solr_Autosuggest_Custom();
         }
-        $cacheReader = Mage::helper('integernet_solr/factory')->getCacheReader();
+        $cacheReader = Mage::helper('integernet_solr')->factory()->getCacheReader();
         $storeId = Mage::app()->getStore()->getId();
         try {
             $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
         } catch (\IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException $e) {
-            Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+            Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
             $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
         }
         return $customHelperFactory->getCustomHelper($this, $cacheReader);

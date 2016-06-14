@@ -9,8 +9,9 @@
  */
 
 /**
- * All classes that implement interfaces from the library are instantiated here to ensure
- * that our autoloader is initialized
+ * Classes that implement interfaces from the library are instantiated here to ensure
+ * that our autoloader is initialized. Also this factory allows to rewrite bridge classes that are
+ * not instantiated with Mage::getModel().
  */
 class IntegerNet_Solr_Model_Bridge_Factory
 {

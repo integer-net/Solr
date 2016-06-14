@@ -69,7 +69,7 @@ class IntegerNet_Solr_Model_Observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
 
         if (!Mage::getStoreConfigFlag('integernet_solr/connection_check/is_active')) {
             return;
@@ -132,7 +132,7 @@ class IntegerNet_Solr_Model_Observer
      */
     protected function _getPingResult()
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
         return (boolean)$solr->ping();
     }
 
@@ -143,7 +143,7 @@ class IntegerNet_Solr_Model_Observer
         if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
             /** @var Mage_Catalog_Model_Product $product */
             $product = $observer->getProduct();
-            Mage::helper('integernet_solr/factory')->getProductIndexer()->deleteIndex(array($product->getId()));
+            Mage::helper('integernet_solr')->factory()->getProductIndexer()->deleteIndex(array($product->getId()));
         }
     }
 
@@ -158,7 +158,7 @@ class IntegerNet_Solr_Model_Observer
         if (!is_array($tags) || sizeof($tags)) {
             return;
         }
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
     }
 
     /**
@@ -166,7 +166,7 @@ class IntegerNet_Solr_Model_Observer
      */
     public function storeSolrConfig()
     {
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
     }
 
     /**

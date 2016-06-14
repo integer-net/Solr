@@ -37,7 +37,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function storeSolrConfig()
     {
-        $factory = Mage::helper('integernet_solr/factory');
+        $factory = Mage::helper('integernet_solr')->factory();
         $factory->getCacheWriter()->write($factory->getStoreConfig());
     }
 

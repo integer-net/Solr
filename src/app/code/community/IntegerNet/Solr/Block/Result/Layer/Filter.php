@@ -224,7 +224,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         $items = array();
 
         $store = Mage::app()->getStore();
-        $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
+        $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->attribute()->getFieldName($this->getAttribute());
         if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
 
             $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};

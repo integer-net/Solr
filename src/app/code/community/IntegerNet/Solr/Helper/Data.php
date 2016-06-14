@@ -1,5 +1,4 @@
 <?php
-use IntegerNet\Solr\Implementor\Attribute;
 
 /**
  * integer_net Magento Module
@@ -8,29 +7,29 @@ use IntegerNet\Solr\Implementor\Attribute;
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
+
+/**
+ * Use the methods of this class to instantiate other helpers, this way it is ensured that the autoloader
+ * is registered before.
+ */
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    protected $_bridgeFactory;
 
     public function __construct()
     {
         IntegerNet_Solr_Helper_Autoloader::createAndRegister();
-        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
     }
 
     /**
-     * Use this method to access the autosuggest helper, this way it is assured that the autoloader is registered
-     *
      * @return IntegerNet_Solr_Helper_Autosuggest
      */
     public function autosuggest()
     {
         return Mage::helper('integernet_solr/autosuggest');
     }
+
     /**
-     * Use this method to access the factory helper, this way it is assured that the autoloader is registered
-     *
      * @return IntegerNet_Solr_Helper_Factory
      */
     public function factory()
@@ -39,74 +38,11 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @deprecated use repository directly
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
+     * @return IntegerNet_Solr_Helper_Attribute
      */
-    public function getFilterableAttributes($useAlphabeticalSearch = true)
+    public function attribute()
     {
-        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
-            ->getFilterableAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
-    }
-    
-    /**
-     * @deprecated use repository directly
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
-     */
-    public function getFilterableInSearchAttributes($useAlphabeticalSearch = true)
-    {
-        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
-            ->getFilterableInSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
-    }
-
-
-    /**
-     * @deprecated use repository directly
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
-     */
-    public function getFilterableInCatalogAttributes($useAlphabeticalSearch = true)
-    {
-        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
-            ->getFilterableInCatalogAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
-
-    }
-
-    /**
-     * @deprecated use repository directly
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
-     */
-    public function getFilterableInCatalogOrSearchAttributes($useAlphabeticalSearch = true)
-    {
-        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()
-            ->getFilterableInCatalogOrSearchAttributes(Mage::app()->getStore()->getId(), $useAlphabeticalSearch);
-    }
-
-    /**
-     * @deprecated use repository directly
-     * @return string[]
-     */
-    public function getAttributeCodesToIndex()
-    {
-        return Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex();
-    }
-
-
-    /**
-     * @deprecated use IndexField directly
-     * @param Attribute $attribute
-     * @param bool $forSorting
-     * @return string
-     */
-    public function getFieldName($attribute, $forSorting = false)
-    {
-        if (! $attribute instanceof Attribute) {
-            $attribute = $this->_bridgeFactory->createAttribute($attribute);
-        }
-        $indexField = new \IntegerNet\Solr\Indexer\IndexField($attribute, $forSorting);
-        return $indexField->getFieldName();
+        return Mage::helper('integernet_solr/attribute');
     }
 
     /**

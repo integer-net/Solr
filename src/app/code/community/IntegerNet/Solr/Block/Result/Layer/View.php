@@ -14,6 +14,12 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     protected $_filters = null;
     protected $_currentCategory = null;
 
+    protected function _construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+        parent::_construct();
+    }
+
     /**
      * Check availability display layer block
      *

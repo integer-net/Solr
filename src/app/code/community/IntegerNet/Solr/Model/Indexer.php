@@ -51,8 +51,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      */
     protected function _construct()
     {
-        $autoloader = new IntegerNet_Solr_Helper_Autoloader();
-        $autoloader->createAndRegister();
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
 
         $this->_productIndexer = Mage::helper('integernet_solr/factory')->getProductIndexer();
         $this->_categoryIndexer = Mage::helper('integernet_solr/factory')->getCategoryIndexer();

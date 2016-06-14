@@ -12,6 +12,10 @@ use IntegerNet\Solr\Config\CategoryConfig;
 
 class IntegerNet_Solr_Model_Source_FilterPosition
 {
+    public function __construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+    }
 
     /**
      * Options getter

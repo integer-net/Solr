@@ -47,5 +47,18 @@ final class CategoryParamsBuilder extends AbstractParamsBuilder
         return parent::getCurrentSortField();
     }
 
+    /**
+     * @return array
+     */
+    protected function getFacetFieldCodes()
+    {
+        $codes = array('category');
+
+        foreach($this->attributeRespository->getFilterableInCatalogAttributes($this->getStoreId()) as $attribute) {
+            $codes[] = $attribute->getAttributeCode() . '_facet';
+        }
+        return $codes;
+    }
+
 
 }

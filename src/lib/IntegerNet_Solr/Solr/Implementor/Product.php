@@ -45,10 +45,4 @@ interface Product
     public function getSearchableAttributeValue(Attribute $attribute);
 
     public function getCategoryIds();
-
-    /**
-     * @deprecated use ProductRepository::getChildProducts() instead
-     * @return ProductIterator
-     */
-    public function getChildren();
 }

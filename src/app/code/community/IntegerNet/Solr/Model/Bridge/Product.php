@@ -107,33 +107,6 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
 
 
     /**
-     * @return \IntegerNet\Solr\Implementor\ProductIterator
-     */
-    public function getChildren()
-    {
-        $childProductIds = $this->_product->getTypeInstance(true)->getChildrenIds($this->_product->getId());
-
-        if (sizeof($childProductIds) && is_array(current($childProductIds))) {
-            $childProductIds = current($childProductIds);
-        }
-
-        if (!sizeof($childProductIds)) {
-            Mage::throwException('Product ' . $this->_product->getSku() . ' doesn\'t have any child products.');
-        }
-
-        /** @var $childProductCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $childProductCollection = Mage::getResourceModel('catalog/product_collection')
-            ->setStoreId($this->_product->getStoreId())
-            ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
-            ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-            ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect(Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex());
-
-        return $this->_bridgeFactory->createProductIterator($childProductCollection);
-
-    }
-
-    /**
      * @return int
      */
     public function getSolrId()

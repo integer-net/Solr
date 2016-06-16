@@ -135,15 +135,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
     /**
      * @return array
      */
-    private function getFacetFieldCodes()
-    {
-        $codes = array('category');
-
-        foreach($this->attributeRespository->getFilterableAttributes($this->getStoreId()) as $attribute) {
-            $codes[] = $attribute->getAttributeCode() . '_facet';
-        }
-        return $codes;
-    }
+    abstract protected function getFacetFieldCodes();
 
     /**
      * @param string $attributeToReset
@@ -197,14 +189,6 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
                 $sortFieldForSolr = $sortField . '_s';
         }
         return $sortFieldForSolr;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isCategoryPage()
-    {
-        return $this->categoryId != null;
     }
 
     /**

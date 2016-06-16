@@ -146,7 +146,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
 
                 $categoryFacets = $this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
 
-                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
                     $childrenCategories = $this->_getCurrentChildrenCategories();
 
@@ -455,7 +455,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
             return 'catalog/category/view';
         }

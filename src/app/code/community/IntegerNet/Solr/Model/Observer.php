@@ -322,7 +322,7 @@ class IntegerNet_Solr_Model_Observer
         }
         $stateBlock = null;
         $robotOptions = explode(',', Mage::getStoreConfig('integernet_solr/seo/hide_from_robots'));
-        if ($helper->isSearchPage()) {
+        if ($helper->page()->isSearchPage()) {
             if (in_array('search_results_all', $robotOptions)) {
                 $block->setData('robots', 'NOINDEX,NOFOLLOW');
                 return;
@@ -332,7 +332,7 @@ class IntegerNet_Solr_Model_Observer
             }
             /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
             $stateBlock = $block->getLayout()->getBlock('catalogsearch.solr.layer.state');
-        } elseif ($helper->isCategoryPage() && $helper->isCategoryDisplayActive()) {
+        } elseif ($helper->page()->isCategoryPage() && $helper->isCategoryDisplayActive()) {
             if (!in_array('categories_filtered', $robotOptions)) {
                 return;
             }

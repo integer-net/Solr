@@ -32,7 +32,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
             return parent::applyFilterToCollection($filter, $value);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::applyFilterToCollection($filter, $value);
         }
 
@@ -64,7 +64,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
             return parent::getCount($filter);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getCount($filter);
         }
 

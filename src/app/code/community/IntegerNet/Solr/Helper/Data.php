@@ -58,11 +58,11 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
         
-        if ($this->isCategoryPage() && !$this->isCategoryDisplayActive()) {
+        if ($this->page()->isCategoryPage() && !$this->isCategoryDisplayActive()) {
             return false;
         }
 
-        if (!$this->isSolrResultPage()) {
+        if (!$this->page()->isSolrResultPage()) {
             return false;
         }
 
@@ -70,31 +70,38 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @return IntegerNet_Solr_Helper_Page
+     */
+    public function page()
+    {
+        return Mage::helper('integernet_solr/page');
+    }
+
+    /**
      * @return bool
+     * @deprecated use Page helper instead: page()->isSearchPage()
      */
     public function isSearchPage()
     {
-        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
-            && Mage::app()->getRequest()->getControllerName() == 'result';
+        return $this->page()->isSearchPage();
     }
 
     /**
      * @return bool
+     * @deprecated use Page helper instead: page()->isCategoryPage()
      */
     public function isCategoryPage()
     {
-        return (Mage::app()->getRequest()->getModuleName() == 'catalog' && Mage::app()->getRequest()->getControllerName() == 'category')
-            || (Mage::app()->getRequest()->getModuleName() == 'solr' && Mage::app()->getRequest()->getControllerName() == 'category');
+        return $this->page()->isCategoryPage();
     }
 
     /**
      * @return bool
+     * @deprecated use Page helper instead: page()->isSolrResultPage()
      */
     public function isSolrResultPage()
     {
-        return Mage::app()->getRequest()->getModuleName() == 'catalogsearch'
-        || Mage::app()->getRequest()->getModuleName() == 'solr'
-        || $this->isCategoryPage();
+        return $this->page()->isSolrResultPage();
     }
 
     /**

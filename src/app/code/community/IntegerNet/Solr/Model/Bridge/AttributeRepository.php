@@ -110,7 +110,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
             return $this->getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch);
         } else {
             return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);

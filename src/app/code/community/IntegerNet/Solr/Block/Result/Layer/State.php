@@ -159,7 +159,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
             return 'catalog/category/view';
         }

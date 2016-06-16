@@ -135,7 +135,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $logger = new NullLogger;
         }
 
-        $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
+        $isCategoryPage = Mage::helper('integernet_solr')->page()->isCategoryPage();
         $applicationContext = new ApplicationContext(
             $this->_getAttributeRepository(),
             $config->getResultsConfig(),

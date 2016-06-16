@@ -30,7 +30,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
             return parent::getMaxPrice($filter);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getMaxPrice($filter);
         }
 
@@ -56,7 +56,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
             return parent::getCount($filter, $range);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getCount($filter, $range);
         }
 
@@ -101,7 +101,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
             return parent::applyPriceRange($filter);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::applyPriceRange($filter);
         }
 

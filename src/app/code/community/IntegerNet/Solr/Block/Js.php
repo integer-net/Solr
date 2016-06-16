@@ -19,7 +19,7 @@ class IntegerNet_Solr_Block_Js extends Mage_Core_Block_Template
             return false;
         }
         
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
             if (!Mage::helper('integernet_solr')->isCategoryDisplayActive()) {
                 return false;
             }

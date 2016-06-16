@@ -460,7 +460,7 @@ class ProductIndexer
      */
     protected function _getChildProductsCollection($product)
     {
-        return $product->getChildren();
+        return $this->_productRepository->getChildProducts($product);
     }
 
     /**

@@ -28,6 +28,9 @@ interface AttributeRepository
     public function getSearchableAttributes($storeId);
 
     /**
+     * Return filterable attributes in current context (catalog or search)
+     *
+     * @deprecated use getFilterableInSearchAttributes() or getFilterableInCatalogAttributes() directly!
      * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]

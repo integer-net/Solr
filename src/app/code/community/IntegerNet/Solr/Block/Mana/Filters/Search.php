@@ -11,7 +11,7 @@ class IntegerNet_Solr_Block_Mana_Filters_Search extends Mana_Filters_Block_Searc
 {
     public function delayedPrepareLayout()
     {
-        if (Mage::helper('integernet_solr')->isActive()) {
+        if (Mage::helper('integernet_solr')->module()->isActive()) {
 
             return $this;
         }

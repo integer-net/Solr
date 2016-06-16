@@ -92,7 +92,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
-        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
+        if (Mage::helper('integernet_solr')->module()->isActive() && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
@@ -118,7 +118,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
-        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
+        if (Mage::helper('integernet_solr')->module()->isActive() && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
@@ -317,7 +317,7 @@ class IntegerNet_Solr_Model_Observer
     {
         /** @var $helper IntegerNet_Solr_Helper_Data */
         $helper = Mage::helper('integernet_solr');
-        if (!$helper->isActive()) {
+        if (!$helper->module()->isActive()) {
             return;
         }
         $stateBlock = null;

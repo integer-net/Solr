@@ -10,8 +10,11 @@
  */
 
 /**
- * Use the methods of this class to instantiate other helpers, this way it is ensured that the autoloader
+ * This class is only meant to be used as proxy for other helpers with concrete responsibilities.
+ *
+ * Use the methods to instantiate other helpers, this way it is ensured that the autoloader
  * is registered before.
+ *
  */
 class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
 {
@@ -46,27 +49,11 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return bool
+     * @return IntegerNet_Solr_Helper_Module
      */
-    public function isActive()
+    public function module()
     {
-        if (!Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
-            return false;
-        }
-
-        if (!$this->isLicensed()) {
-            return false;
-        }
-        
-        if ($this->page()->isCategoryPage() && !$this->isCategoryDisplayActive()) {
-            return false;
-        }
-
-        if (!$this->page()->isSolrResultPage()) {
-            return false;
-        }
-
-        return true;
+        return Mage::helper('integernet_solr/module');
     }
 
     /**
@@ -75,6 +62,15 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     public function page()
     {
         return Mage::helper('integernet_solr/page');
+    }
+
+    /**
+     * @return bool
+     * @deprecated use Module helper instead: module()->isActive()
+     */
+    public function isActive()
+    {
+        return $this->module()->isActive();
     }
 
     /**
@@ -112,49 +108,4 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfigFlag('integernet_solr/category/is_active');
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     */
-    public function isKeyValid($key)
-    {
-        if (!$key) {
-            return true;
-        }
-        $key = trim(strtolower($key));
-        $key = str_replace(array('-', '_', ' '), '', $key);
-        
-        if (strlen($key) != 10) {
-            return false;
-        }
-        
-        $hash = md5($key);
-        
-        return substr($hash, -3) == 'f11';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLicensed()
-    {
-        if (!$this->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
-
-            if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
-
-                $diff = time() - $installTimestamp;
-                if (($diff < 0) || ($diff > 2419200)) {
-
-                    Mage::log('The IntegerNet_Solr module is not correctly licensed. Please enter your license key at System -> Configuration -> Solr or contact us via http://www.integer-net.com/solr-magento/.', Zend_Log::WARN, 'exception.log');
-                    return false;
-
-                } else if ($diff > 1209600) {
-
-                    Mage::log('The IntegerNet_Solr module is not correctly licensed. Please enter your license key at System -> Configuration -> Solr or contact us via http://www.integer-net.com/solr-magento/.', Zend_Log::WARN, 'exception.log');
-                }
-            }
-        }
-
-        return true;
-    }
 }

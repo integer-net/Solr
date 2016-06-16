@@ -154,7 +154,7 @@ class IntegerNet_Solr_Model_Configuration
             }
 
         } else {
-            if (!Mage::helper('integernet_solr')->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+            if (!Mage::helper('integernet_solr')->module()->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
     
                 if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
 

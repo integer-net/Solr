@@ -28,7 +28,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function applyFilterToCollection($filter, $value)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::applyFilterToCollection($filter, $value);
         }
 
@@ -60,7 +60,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function getCount($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getCount($filter);
         }
 

@@ -9,6 +9,7 @@
  */
 
 use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Indexer\IndexField;
 
 /**
  * @deprecated
@@ -33,7 +34,15 @@ class IntegerNet_Solr_Helper_Attribute
         if (! $attribute instanceof Attribute) {
             $attribute = $this->_bridgeFactory->createAttribute($attribute);
         }
-        $indexField = new \IntegerNet\Solr\Indexer\IndexField($attribute, $forSorting);
+        $indexField = new IndexField($attribute, $this->_getEventDispatcher(), $forSorting);
         return $indexField->getFieldName();
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Event
+     */
+    protected function _getEventDispatcher()
+    {
+        return Mage::helper('integernet_solr/event');
     }
 }

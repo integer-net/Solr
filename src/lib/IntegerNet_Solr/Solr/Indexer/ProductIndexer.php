@@ -258,7 +258,7 @@ class ProductIndexer
                         break;
                 }
 
-                $indexField = new IndexField($attribute);
+                $indexField = new IndexField($attribute, $this->_eventDispatcher);
                 $fieldName = $indexField->getFieldName();
                 if (!$productData->hasData($fieldName)) {
                     $value = $product->getSearchableAttributeValue($attribute);
@@ -351,7 +351,7 @@ class ProductIndexer
                 continue;
             }
 
-            $indexField = new IndexField($attribute);
+            $indexField = new IndexField($attribute, $this->_eventDispatcher);
             $fieldName = $indexField->getFieldName();
 
             $solrBoost = floatval($attribute->getSolrBoost());

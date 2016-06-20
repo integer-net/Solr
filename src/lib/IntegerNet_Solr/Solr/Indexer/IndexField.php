@@ -10,6 +10,8 @@
 namespace IntegerNet\Solr\Indexer;
 
 use IntegerNet\Solr\Implementor\Attribute;
+use IntegerNet\Solr\Event\Transport;
+use IntegerNet\Solr\Implementor\EventDispatcher;
 
 class IndexField
 {
@@ -22,22 +24,38 @@ class IndexField
      */
     private $forSorting;
     /**
-     * @param Attribute $attribute
-     * @@param boolean $forSorting
+     * @var EventDispatcher
      */
-    public function __construct(Attribute $attribute, $forSorting = false)
+    private $eventDispatcher;
+
+    /**
+     * @param Attribute $attribute
+     * @param EventDispatcher $eventDispatcher
+     * @param boolean $forSorting
+     */
+    public function __construct(Attribute $attribute, EventDispatcher $eventDispatcher, $forSorting = false)
     {
         $this->attribute = $attribute;
         $this->forSorting = $forSorting;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function forSorting($forSorting = true)
     {
-        return new self($this->attribute, $forSorting);
+        return new self($this->attribute, $this->eventDispatcher, $forSorting);
     }
 
     public function getFieldName()
     {
+        $transportObject = new Transport(array(
+            'fieldname' => '',
+        ));
+
+        $this->getEventDispatcher()->dispatch('integernet_solr_get_fieldname', array(
+            'attribute' => $this->attribute, 
+            'transport' => $transportObject
+        ));
+
         if ($this->attribute->getUsedForSortBy()) {
             switch ($this->attribute->getBackendType()) {
                 case 'decimal':
@@ -63,4 +81,11 @@ class IndexField
         }
     }
 
+    /**
+     * @return EventDispatcher
+     */
+    protected function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
 }

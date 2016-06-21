@@ -17,6 +17,14 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
 
     protected function _construct()
     {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
+            parent::_construct();
+        }
+
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_construct();
+        }
+
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
     }
     /**

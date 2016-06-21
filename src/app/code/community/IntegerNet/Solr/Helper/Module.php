@@ -23,6 +23,10 @@ class IntegerNet_Solr_Helper_Module
             return false;
         }
 
+        if (Mage::registry('is_autosuggest')) {
+            return true;
+        }
+
         if ($helper->page()->isCategoryPage() && !$helper->isCategoryDisplayActive()) {
             return false;
         }

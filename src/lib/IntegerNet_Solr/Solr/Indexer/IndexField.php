@@ -55,6 +55,10 @@ class IndexField
             'attribute' => $this->attribute, 
             'transport' => $transportObject
         ));
+        
+        if ($fieldName = $transportObject->getData('fieldname')) {
+            return $fieldName;
+        }
 
         if ($this->attribute->getUsedForSortBy()) {
             switch ($this->attribute->getBackendType()) {
@@ -64,6 +68,12 @@ class IndexField
                 case 'text':
                     return $this->attribute->getAttributeCode() . '_t';
 
+                case 'int':
+                    if ($this->attribute->getInputType() != 'select') {
+                        return $this->attribute->getAttributeCode() . '_i';
+                    }
+                    // fallthrough intended
+                
                 default:
                     return ($this->forSorting) ? $this->attribute->getAttributeCode() . '_s' : $this->attribute->getAttributeCode() . '_t';
             }
@@ -75,6 +85,11 @@ class IndexField
                 case 'text':
                     return $this->attribute->getAttributeCode() . '_t_mv';
 
+                case 'int':
+                    if ($this->attribute->getInputType() != 'select') {
+                        return $this->attribute->getAttributeCode() . '_i_mv';
+                    }
+                // fallthrough intended
                 default:
                     return $this->attribute->getAttributeCode() . '_t_mv';
             }

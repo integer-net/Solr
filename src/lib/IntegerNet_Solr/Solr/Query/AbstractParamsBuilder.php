@@ -186,6 +186,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
                 $sortFieldForSolr = 'price_f';
                 break;
             default:
+                
                 $sortFieldForSolr = $sortField . '_s';
         }
         return $sortFieldForSolr;

@@ -191,6 +191,8 @@ class ProductIndexer
 
         $this->_addSearchDataToProductData($product, $productData);
 
+        $this->_addSortingDataToProductData($product, $productData);
+
         $this->_addResultHtmlToProductData($product, $productData);
 
         $this->_addCategoryProductPositionsToProductData($product, $productData);
@@ -409,6 +411,28 @@ class ProductIndexer
         }
     }
 
+
+
+    /**
+     * @param Product $product
+     * @param IndexDocument $productData
+     */
+    protected function _addSortingDataToProductData(Product $product, IndexDocument $productData)
+    {
+        foreach ($this->_attributeRepository->getSortableAttributes($product->getStoreId()) as $attribute) {
+
+            $indexField = new IndexField($attribute, $this->_eventDispatcher, true);
+            $fieldName = $indexField->getFieldName();
+
+            if (!$productData->getData($fieldName)
+                && $product->getAttributeValue($attribute)
+                && $value = $product->getSearchableAttributeValue($attribute)
+            ) {
+                $productData->setData($fieldName, $value);
+            }
+        }
+    }
+    
     /**
      * @param Product $product
      * @param IndexDocument $productData

@@ -84,6 +84,14 @@ final class IntegerNet_Solr_Model_Bridge_Attribute implements Attribute
     }
 
     /**
+     * @return string
+     */
+    public function getInputType()
+    {
+        return $this->_attribute->getFrontendInput();
+    }
+
+    /**
      * @return bool
      */
     public function getUsedForSortBy()

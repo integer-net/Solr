@@ -33,14 +33,14 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
     protected $_filterableInCatalogAttributes = array();
 
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_sortableAttributes = array();
+
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_varcharProductAttributes = null;
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_varcharCategoryAttributes = null;
-
-    /** @var Mage_Eav_Model_Entity_Attribute[] */
-    protected $_sortableAttributes = null;
 
     public function __construct()
     {
@@ -89,18 +89,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /**
      * @return Attribute[]
      */
-    public function getSortableAttributes()
+    public function getSortableAttributes($storeId)
     {
-        if (is_null($this->_sortableAttributes)) {
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_sortableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter('used_for_sort_by', self::DEFAULT_STORE_ID)
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-        }
+        $this->_prepareSortableAttributeCollection($storeId);
 
-        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes, self::DEFAULT_STORE_ID);
+        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes[$storeId], $storeId);
     }
 
     /**
@@ -228,9 +222,11 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     {
         $this->_prepareFilterableInCatalogOrSearchAttributeCollection(true, self::DEFAULT_STORE_ID);
         $this->_prepareSearchableAttributeCollection(self::DEFAULT_STORE_ID);
+        $this->_prepareSortableAttributeCollection(self::DEFAULT_STORE_ID);
         return array_merge(
             $this->_filterableInCatalogOrSearchAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code'),
-            $this->_searchableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code')
+            $this->_searchableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code'),
+            $this->_sortableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code')
         );
     }
 
@@ -294,6 +290,19 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                 ));
         }
     }
+
+    protected function _prepareSortableAttributeCollection($storeId)
+    {
+        if (! isset($this->_sortableAttributes[$storeId])) {
+
+            $this->_sortableAttributes[$storeId] = 
+                Mage::getResourceModel('catalog/product_attribute_collection')
+                    ->addFieldToFilter('used_for_sort_by', 1)
+                    ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
+        }
+    }
+
     protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection, $storeId)
     {
         $self = $this;

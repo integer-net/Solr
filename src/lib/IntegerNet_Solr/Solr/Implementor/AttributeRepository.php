@@ -29,6 +29,12 @@ interface AttributeRepository
 
     /**
      * @param int $storeId
+     * @return Attribute[]
+     */
+    public function getSortableAttributes($storeId);
+
+    /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */

@@ -60,10 +60,10 @@ interface AttributeRepository
     public function getAttributeCodesToIndex();
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return Attribute
      * @throws Exception
      */
-    public function getAttributeByCode($storeId, $attributeCode);
+    public function getAttributeByCode($attributeCode, $storeId);
 }

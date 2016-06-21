@@ -127,12 +127,12 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return AttributeInterface
      * @throws Exception
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
         $attributes = $this->findFilterableInSearchAttributes($storeId);
         if (! isset($attributes[$attributeCode])) {

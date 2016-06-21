@@ -231,12 +231,11 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     }
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return Attribute
-     * @deprecated not part of AttributeRepository interface anymore, should not be needed
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
         $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
         $attribute->setStoreId($storeId);

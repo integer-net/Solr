@@ -168,7 +168,8 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $factory = new AutosuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
-                $storeId
+                $storeId,
+                $this->_getEventDispatcher()
             );
         } else {
             $applicationContext

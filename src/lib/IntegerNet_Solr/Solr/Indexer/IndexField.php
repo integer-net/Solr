@@ -60,7 +60,7 @@ class IndexField
             return $fieldName;
         }
 
-        if ($this->attribute->getUsedForSortBy()) {
+        if ($this->attribute->getUsedForSortBy() || $this->forSorting) {
             switch ($this->attribute->getBackendType()) {
                 case 'decimal':
                     return $this->attribute->getAttributeCode() . '_f';

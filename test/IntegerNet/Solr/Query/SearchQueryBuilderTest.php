@@ -54,7 +54,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
 //        );
         $attributeRepositoryStub = new AttributeRepositoryStub();
         $paramsBuilder = new SearchParamsBuilder($attributeRepositoryStub, $filterQueryBuilder, $paginationStub,
-            $resultsConfig, $fuzzyConfig, $storeId);
+            $resultsConfig, $fuzzyConfig, $storeId, $eventDispatcherMock);
         $searchQueryBuilder = new SearchQueryBuilder($searchString, $fuzzyConfig, $resultsConfig, $attributeRepositoryStub, $paginationStub,
             $paramsBuilder, $storeId, $eventDispatcherMock);
         $actualQuery = $searchQueryBuilder->build();

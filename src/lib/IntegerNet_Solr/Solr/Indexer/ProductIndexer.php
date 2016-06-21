@@ -23,7 +23,7 @@ use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 class ProductIndexer
 {
     const CONTENT_TYPE = 'product';
-    
+
     /** @var  int */
     private $_defaultStoreId;
     /**
@@ -198,7 +198,7 @@ class ProductIndexer
         $this->_addCategoryProductPositionsToProductData($product, $productData);
 
         $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array(
-            'product' => $product, 
+            'product' => $product,
             'product_data' => $productData
         ));
 
@@ -276,7 +276,7 @@ class ProductIndexer
                     }
                 }
             }
-            
+
             $hasChildProducts = true;
             try {
                 $childProducts = $this->_getChildProductsCollection($product);
@@ -425,14 +425,14 @@ class ProductIndexer
             $fieldName = $indexField->getFieldName();
 
             if (!$productData->getData($fieldName)
-                && $product->getAttributeValue($attribute)
-                && $value = $product->getSearchableAttributeValue($attribute)
+                && strlen($product->getAttributeValue($attribute))
+                && strlen($value = $product->getSearchableAttributeValue($attribute))
             ) {
                 $productData->setData($fieldName, $value);
             }
         }
     }
-    
+
     /**
      * @param Product $product
      * @param IndexDocument $productData
@@ -510,7 +510,7 @@ class ProductIndexer
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
         }
-        
+
         foreach($productIds as $productId => $value) {
             $idsForDeletion[] = $this->_getSolrIdByProductIdAndStoreId($productId, $storeId);
         }

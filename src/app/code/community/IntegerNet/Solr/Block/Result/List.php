@@ -20,6 +20,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
             return parent::_getProductCollection();
         }
 
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_getProductCollection();
+        }
+
         if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
             return Mage::getSingleton('integernet_solr/result_collection');
         }
@@ -53,6 +57,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
     {
         if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::_beforeToHtml();
+        }
+
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_beforeToHtml();
         }
 
         $toolbar = $this->getToolbarBlock();

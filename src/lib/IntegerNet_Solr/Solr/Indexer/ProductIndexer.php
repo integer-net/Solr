@@ -521,7 +521,6 @@ class ProductIndexer
 
         if (sizeof($combinedProductData)) {
             $this->_getResource()->addDocuments($storeId, $combinedProductData);
-            return $storeId;
         }
         return $storeId;
     }

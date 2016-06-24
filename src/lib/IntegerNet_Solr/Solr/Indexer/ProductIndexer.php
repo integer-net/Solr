@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 namespace IntegerNet\Solr\Indexer;
+use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Implementor\StoreEmulation;
 use IntegerNet\Solr\Resource\ResourceFacade;
@@ -23,7 +24,7 @@ use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 class ProductIndexer
 {
     const CONTENT_TYPE = 'product';
-    
+
     /** @var  int */
     private $_defaultStoreId;
     /**
@@ -126,8 +127,8 @@ class ProductIndexer
                     $pageSize = 100;
                 }
 
-                $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
-                $this->_indexProductCollection($emptyIndex, $productCollection, $storeId);
+                $productIterator = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
+                $this->_indexProductCollection($emptyIndex, $productIterator, $storeId, $productIds);
 
                 $this->_getResource()->setUseSwapIndex(false);
             } catch (\Exception $e) {
@@ -168,7 +169,7 @@ class ProductIndexer
      * Generate single product data for Solr
      *
      * @param Product $product
-     * @return array
+     * @return IndexDocument
      */
     protected function _getProductData(Product $product)
     {
@@ -182,6 +183,7 @@ class ProductIndexer
             'content_type' => self::CONTENT_TYPE,
             'is_visible_in_catalog_i' => $product->isVisibleInCatalog(),
             'is_visible_in_search_i' => $product->isVisibleInSearch(),
+            'has_special_price_i' => $product->hasSpecialPrice(),
         ));
 
         $this->_addBoostToProductData($product, $productData);
@@ -190,27 +192,41 @@ class ProductIndexer
 
         $this->_addSearchDataToProductData($product, $productData);
 
+        $this->_addSortingDataToProductData($product, $productData);
+
         $this->_addResultHtmlToProductData($product, $productData);
 
         $this->_addCategoryProductPositionsToProductData($product, $productData);
 
         $this->_eventDispatcher->dispatch('integernet_solr_get_product_data', array(
-            'product' => $product, 
+            'product' => $product,
             'product_data' => $productData
         ));
 
-        return $productData->getData();
+        return $productData;
     }
 
     /**
      * Get unique identifier for Solr
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param \IntegerNet\Solr\Implementor\Product $product
      * @return string
      */
     protected function _getSolrId($product)
     {
-        return $product->getId() . '_' . $product->getStoreId();
+        return $this->_getSolrIdByProductIdAndStoreId($product->getId(), $product->getStoreId());
+    }
+
+    /**
+     * Get unique identifier for Solr
+     *
+     * @param int $productId
+     * @param int $storeId
+     * @return string
+     */
+    protected function _getSolrIdByProductIdAndStoreId($productId, $storeId)
+    {
+        return $productId . '_' . $storeId;
     }
 
     /**
@@ -220,6 +236,12 @@ class ProductIndexer
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
+
+            if ($attribute->getAttributeCode() == 'price') {
+                $price = $product->getPrice();
+                $productData->setData('price_f', floatval($price));
+                continue;
+            }
 
             $facetFieldName = $attribute->getAttributeCode() . '_facet';
             if ($product->getData($attribute->getAttributeCode())) {
@@ -239,7 +261,7 @@ class ProductIndexer
                         break;
                 }
 
-                $indexField = new IndexField($attribute);
+                $indexField = new IndexField($attribute, $this->_eventDispatcher);
                 $fieldName = $indexField->getFieldName();
                 if (!$productData->hasData($fieldName)) {
                     $value = $product->getSearchableAttributeValue($attribute);
@@ -255,7 +277,7 @@ class ProductIndexer
                     }
                 }
             }
-            
+
             $hasChildProducts = true;
             try {
                 $childProducts = $this->_getChildProductsCollection($product);
@@ -286,11 +308,6 @@ class ProductIndexer
                         }
                     }
                 }
-            }
-
-            if ($attribute->getAttributeCode() == 'price') {
-                $price = $product->getPrice();
-                $productData->setData('price_f', floatval($price));
             }
         }
     }
@@ -337,7 +354,7 @@ class ProductIndexer
                 continue;
             }
 
-            $indexField = new IndexField($attribute);
+            $indexField = new IndexField($attribute, $this->_eventDispatcher);
             $fieldName = $indexField->getFieldName();
 
             $solrBoost = floatval($attribute->getSolrBoost());
@@ -373,9 +390,14 @@ class ProductIndexer
                                 if (!is_array($fieldValue) && $childValue != $fieldValue) {
                                     $productData->setData($fieldName, array($fieldValue, $childValue));
                                 } else {
-                                    if (is_array($fieldValue) && !in_array($childValue, $fieldValue)) {
-                                        $fieldValue[] = $childValue;
-                                        $productData->setData($fieldName, $fieldValue);
+                                    if (!is_array($childValue)) {
+                                        $childValue = array($childValue);
+                                    }
+                                    foreach($childValue as $singleChildValue) {
+                                        if (is_array($fieldValue) && !in_array($singleChildValue, $fieldValue)) {
+                                            $fieldValue[] = $singleChildValue;
+                                            $productData->setData($fieldName, $fieldValue);
+                                        }
                                     }
                                 }
                             }
@@ -387,6 +409,28 @@ class ProductIndexer
 
         if (!$productData->getData('price_f')) {
             $productData->setData('price_f', 0.00);
+        }
+    }
+
+
+
+    /**
+     * @param Product $product
+     * @param IndexDocument $productData
+     */
+    protected function _addSortingDataToProductData(Product $product, IndexDocument $productData)
+    {
+        foreach ($this->_attributeRepository->getSortableAttributes($product->getStoreId()) as $attribute) {
+
+            $indexField = new IndexField($attribute, $this->_eventDispatcher, true);
+            $fieldName = $indexField->getFieldName();
+
+            if (!$productData->getData($fieldName)
+                && strlen($product->getAttributeValue($attribute))
+                && strlen($value = $product->getSearchableAttributeValue($attribute))
+            ) {
+                $productData->setData($fieldName, $value);
+            }
         }
     }
 
@@ -441,35 +485,40 @@ class ProductIndexer
      */
     protected function _getChildProductsCollection($product)
     {
-        return $product->getChildren();
+        return $this->_productRepository->getChildProducts($product);
     }
 
     /**
      * @param boolean $emptyIndex
-     * @param \IntegerNet\Solr\Implementor\ProductIterator $productCollection
+     * @param PagedProductIterator $productIterator
+     * @param int[] $productIds
      * @param int $storeId
      * @return int
      */
-    protected function _indexProductCollection($emptyIndex, $productCollection, $storeId)
+    protected function _indexProductCollection($emptyIndex, PagedProductIterator $productIterator, $storeId, $productIds = array())
     {
-        $combinedProductData = array();
         $idsForDeletion = array();
+        $documentQueue = new IndexDocumentQueue($this->_resource, $storeId);
+        $productIds = array_flip((array)$productIds);
 
-        foreach ($productCollection as $product) {
+        $productIterator->setPageCallback([$documentQueue, 'flush']);
+        foreach ($productIterator as $product) {
+            if (isset($productIds[$product->getId()])) {
+                unset($productIds[$product->getId()]);
+            }
             if ($product->isIndexable()) {
-                $combinedProductData[] = $this->_getProductData($product);
+                $documentQueue->add($this->_getProductData($product));
             } else {
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
         }
 
-        if (!$emptyIndex && sizeof($idsForDeletion)) {
-            $this->_getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
+        foreach ($productIds as $productId => $value) {
+            $idsForDeletion[] = $this->_getSolrIdByProductIdAndStoreId($productId, $storeId);
         }
 
-        if (sizeof($combinedProductData)) {
-            $this->_getResource()->addDocuments($storeId, $combinedProductData);
-            return $storeId;
+        if (!$emptyIndex && sizeof($idsForDeletion)) {
+            $this->_getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
         }
         return $storeId;
     }

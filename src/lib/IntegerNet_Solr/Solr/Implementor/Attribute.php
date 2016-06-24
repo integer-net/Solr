@@ -59,6 +59,11 @@ interface Attribute
     public function getBackendType();
 
     /**
+     * @return string
+     */
+    public function getInputType();
+
+    /**
      * @return bool
      */
     public function getUsedForSortBy();

@@ -32,4 +32,18 @@ final class AutosuggestParamsBuilder extends AbstractParamsBuilder
         return $params;
     }
 
+    /**
+     * @return array
+     */
+    protected function getFacetFieldCodes()
+    {
+        $codes = array('category');
+
+        foreach($this->attributeRespository->getFilterableInSearchAttributes($this->getStoreId()) as $attribute) {
+            $codes[] = $attribute->getAttributeCode() . '_facet';
+        }
+        return $codes;
+    }
+
+
 }

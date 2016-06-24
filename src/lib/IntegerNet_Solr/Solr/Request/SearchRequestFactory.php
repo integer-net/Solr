@@ -70,7 +70,8 @@ class SearchRequestFactory extends RequestFactory
             $this->getPagination(),
             $this->getResultsConfig(),
             $this->getFuzzyConfig(),
-            $this->getStoreId()
+            $this->getStoreId(),
+            $this->getEventDispatcher()
         );
     }
 

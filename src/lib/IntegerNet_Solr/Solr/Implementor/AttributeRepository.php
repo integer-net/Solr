@@ -29,10 +29,9 @@ interface AttributeRepository
 
     /**
      * @param int $storeId
-     * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
-    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true);
+    public function getSortableAttributes($storeId);
 
     /**
      * @param int $storeId
@@ -61,10 +60,10 @@ interface AttributeRepository
     public function getAttributeCodesToIndex();
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return Attribute
      * @throws Exception
      */
-    public function getAttributeByCode($storeId, $attributeCode);
+    public function getAttributeByCode($attributeCode, $storeId);
 }

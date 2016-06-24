@@ -52,6 +52,7 @@ class IntegerNet_Solr_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
 
     private function instantiateCustomHelper()
     {
+        $this->setCurrentStore(1);
         $block = $this->app()->getLayout()->createBlock('integernet_solr/autosuggest');
         $this->assertInstanceOf(IntegerNet_Solr_Helper_Custom::class, $block->getCustomHelper());
     }

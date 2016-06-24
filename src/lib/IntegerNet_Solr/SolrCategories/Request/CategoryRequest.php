@@ -115,7 +115,7 @@ class CategoryRequest implements Request, HasFilter
                 'params' => $query->getParams(),
             ));
 
-            $this->eventDispatcher->dispatch('integernet_solr_before_search_request', array('transport' => $transportObject));
+            $this->eventDispatcher->dispatch('integernet_solr_before_category_request', array('transport' => $transportObject));
 
             $parentResult = $this->getResource()->search(
                 $transportObject->getStoreId(),

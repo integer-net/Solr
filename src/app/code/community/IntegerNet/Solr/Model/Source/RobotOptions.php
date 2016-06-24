@@ -36,7 +36,7 @@ class IntegerNet_Solr_Model_Source_RobotOptions
             ),
             array(
                 'value' => self::ROBOT_OPTION_CATEGORIES_FILTERED,
-                'label' => Mage::helper('integernet_solr')->__('Categoy Page with active Filters'),
+                'label' => Mage::helper('integernet_solr')->__('Category Page with active Filters'),
             ),
         );
     }

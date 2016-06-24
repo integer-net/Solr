@@ -42,14 +42,19 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher $eventDispatcherMock */
         $eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcher::class);
-        $eventDispatcherMock->expects($this->once())->method('dispatch')->with(
-            'integernet_solr_update_query_text', $this->equalTo(
+        $eventDispatcherMock->expects($this->at(0))->method('dispatch')->with(
+            'integernet_solr_update_query_text',
+            $this->equalTo(
                 ['transport' => new Transport(['query_text' => $searchString->getRawString()])]
             )
         );
+//        $eventDispatcherMock->expects($this->at(1))->method('dispatch')->with(
+//            'integernet_solr_get_fieldname',
+//            $this->anything()
+//        );
         $attributeRepositoryStub = new AttributeRepositoryStub();
         $paramsBuilder = new SearchParamsBuilder($attributeRepositoryStub, $filterQueryBuilder, $paginationStub,
-            $resultsConfig, $fuzzyConfig, $storeId);
+            $resultsConfig, $fuzzyConfig, $storeId, $eventDispatcherMock);
         $searchQueryBuilder = new SearchQueryBuilder($searchString, $fuzzyConfig, $resultsConfig, $attributeRepositoryStub, $paginationStub,
             $paramsBuilder, $storeId, $eventDispatcherMock);
         $actualQuery = $searchQueryBuilder->build();
@@ -88,7 +93,7 @@ class SearchQueryBuilderTest extends PHPUnit_Framework_TestCase
             ],
             'alternative' => [1, ResultConfigBuilder::alternativeConfig()->build(), FuzzyConfigBuilder::inactiveConfig()->build(),
                 FilterQueryBuilder::noFilterQueryBuilder($defaultResultConfig), PaginationStub::alternativePagination(), new SearchString('"foo bar"'),
-                new Query(1, 'attribute1_t:""foo bar""~100^0 attribute2_t:""foo bar""~100^0 category_name_t_mv:""foo bar""~100^1', 0, 24, [
+                new Query(1, 'attribute1_t:""foo bar""~100^0 OR attribute2_t:""foo bar""~100^0 OR category_name_t_mv:""foo bar""~100^1', 0, 24, [
                         'q.op' => ResultsConfig::SEARCH_OPERATOR_OR,
                         'fq' => "store_id:1 AND is_visible_in_search_i:1",
                         'sort' => 'attribute1_s desc',

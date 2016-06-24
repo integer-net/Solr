@@ -13,6 +13,7 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepository
 {
     const DEFAULT_STORE_ID = 1;
+    protected $_bridgeFactory;
     /**
      * Holds attribute instances with their Magento attributes as attached data
      *
@@ -32,17 +33,18 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
     protected $_filterableInCatalogAttributes = array();
 
+    /** @var Mage_Catalog_Model_Resource_Product_Attribute_Collection[] */
+    protected $_sortableAttributes = array();
+
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_varcharProductAttributes = null;
 
     /** @var Mage_Eav_Model_Entity_Attribute[] */
     protected $_varcharCategoryAttributes = null;
 
-    /** @var Mage_Eav_Model_Entity_Attribute[] */
-    protected $_sortableAttributes = null;
-
     public function __construct()
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_attributeStorage = new SplObjectStorage();
     }
 
@@ -55,7 +57,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function _registerAttribute(Mage_Catalog_Model_Resource_Eav_Attribute $magentoAttribute)
     {
-        $attribute = new IntegerNet_Solr_Model_Bridge_Attribute($magentoAttribute);
+        $attribute = $this->_bridgeFactory->createAttribute($magentoAttribute);
         $this->_attributeStorage->attach($attribute, $magentoAttribute);
         return $attribute;
     }
@@ -87,18 +89,12 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     /**
      * @return Attribute[]
      */
-    public function getSortableAttributes()
+    public function getSortableAttributes($storeId)
     {
-        if (is_null($this->_sortableAttributes)) {
 
-            /** @var $attributes Mage_Catalog_Model_Resource_Product_Attribute_Collection */
-            $this->_sortableAttributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                ->addFieldToFilter('used_for_sort_by', self::DEFAULT_STORE_ID)
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
-            ;
-        }
+        $this->_prepareSortableAttributeCollection($storeId);
 
-        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes, self::DEFAULT_STORE_ID);
+        return $this->_getAttributeArrayFromCollection($this->_sortableAttributes[$storeId], $storeId);
     }
 
     /**
@@ -108,7 +104,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
      */
     public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
             return $this->getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch);
         } else {
             return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
@@ -226,19 +222,20 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     {
         $this->_prepareFilterableInCatalogOrSearchAttributeCollection(true, self::DEFAULT_STORE_ID);
         $this->_prepareSearchableAttributeCollection(self::DEFAULT_STORE_ID);
+        $this->_prepareSortableAttributeCollection(self::DEFAULT_STORE_ID);
         return array_merge(
             $this->_filterableInCatalogOrSearchAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code'),
-            $this->_searchableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code')
+            $this->_searchableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code'),
+            $this->_sortableAttributes[self::DEFAULT_STORE_ID]->getColumnValues('attribute_code')
         );
     }
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return Attribute
-     * @deprecated not part of AttributeRepository interface anymore, should not be needed
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
         $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
         $attribute->setStoreId($storeId);
@@ -292,6 +289,19 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                 ));
         }
     }
+
+    protected function _prepareSortableAttributeCollection($storeId)
+    {
+        if (! isset($this->_sortableAttributes[$storeId])) {
+
+            $this->_sortableAttributes[$storeId] = 
+                Mage::getResourceModel('catalog/product_attribute_collection')
+                    ->addFieldToFilter('used_for_sort_by', 1)
+                    ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+            ;
+        }
+    }
+
     protected function _getAttributeArrayFromCollection(Mage_Eav_Model_Resource_Entity_Attribute_Collection $collection, $storeId)
     {
         $self = $this;

@@ -7,9 +7,9 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-namespace IntegerNet\Solr\Implementor;
+namespace IntegerNet\SolrSuggest\Implementor;
 
-interface Category
+interface SuggestCategory
 {
     /**
      * @return int

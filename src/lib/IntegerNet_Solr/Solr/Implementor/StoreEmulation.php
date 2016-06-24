@@ -14,6 +14,7 @@ interface StoreEmulation
     /**
      * Starts environment emulation for given store. Previously emulated environments are stopped before new emulation starts.
      *
+     * @deprecated use runInStore() instead
      * @param int $storeId
      * @return void
      */
@@ -22,7 +23,17 @@ interface StoreEmulation
     /**
      * Stops any active store emulation
      *
+     * @deprecated use runInStore() instead
      * @return void
      */
     public function stop();
+
+    /**
+     * Executes callback with environment emulation for given store. Emulation is stopped in any case (Exception or successful execution).
+     *
+     * @param $storeId
+     * @param callable $callback
+     * @return void
+     */
+    public function runInStore($storeId, $callback);
 }

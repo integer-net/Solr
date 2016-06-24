@@ -54,6 +54,11 @@ class IntegerNet_Solr_Model_Observer
         if ($block instanceof Mage_Page_Block_Html_Head) {
             $this->_adjustRobots($block);
         }
+
+        if ($block instanceof Mage_Page_Block_Html) {
+            $_class = 'solr-filter-'. Mage::helper('integernet_solr/filter')->getFilterPosition();
+            $block->addBodyClass($_class);
+        };
     }
 
     /**
@@ -64,7 +69,7 @@ class IntegerNet_Solr_Model_Observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
 
         if (!Mage::getStoreConfigFlag('integernet_solr/connection_check/is_active')) {
             return;
@@ -87,7 +92,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
-        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
+        if (Mage::helper('integernet_solr')->module()->isActive() && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
@@ -113,7 +118,7 @@ class IntegerNet_Solr_Model_Observer
         /** @var Mage_Core_Controller_Varien_Action $action */
         $action = $observer->getControllerAction();
 
-        if (Mage::helper('integernet_solr')->isActive() && $order = $action->getRequest()->getParam('order')) {
+        if (Mage::helper('integernet_solr')->module()->isActive() && $order = $action->getRequest()->getParam('order')) {
             if ($order === 'relevance') {
                 $_GET['order'] = 'position';
             }
@@ -127,7 +132,7 @@ class IntegerNet_Solr_Model_Observer
      */
     protected function _getPingResult()
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
         return (boolean)$solr->ping();
     }
 
@@ -138,7 +143,7 @@ class IntegerNet_Solr_Model_Observer
         if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
             /** @var Mage_Catalog_Model_Product $product */
             $product = $observer->getProduct();
-            Mage::helper('integernet_solr/factory')->getProductIndexer()->deleteIndex(array($product->getId()));
+            Mage::helper('integernet_solr')->factory()->getProductIndexer()->deleteIndex(array($product->getId()));
         }
     }
 
@@ -153,7 +158,7 @@ class IntegerNet_Solr_Model_Observer
         if (!is_array($tags) || sizeof($tags)) {
             return;
         }
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
     }
 
     /**
@@ -161,7 +166,7 @@ class IntegerNet_Solr_Model_Observer
      */
     public function storeSolrConfig()
     {
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
     }
 
     /**
@@ -312,12 +317,12 @@ class IntegerNet_Solr_Model_Observer
     {
         /** @var $helper IntegerNet_Solr_Helper_Data */
         $helper = Mage::helper('integernet_solr');
-        if (!$helper->isActive()) {
+        if (!$helper->module()->isActive()) {
             return;
         }
         $stateBlock = null;
         $robotOptions = explode(',', Mage::getStoreConfig('integernet_solr/seo/hide_from_robots'));
-        if ($helper->isSearchPage()) {
+        if ($helper->page()->isSearchPage()) {
             if (in_array('search_results_all', $robotOptions)) {
                 $block->setData('robots', 'NOINDEX,NOFOLLOW');
                 return;
@@ -327,7 +332,7 @@ class IntegerNet_Solr_Model_Observer
             }
             /** @var IntegerNet_Solr_Block_Result_Layer_State $stateBlock */
             $stateBlock = $block->getLayout()->getBlock('catalogsearch.solr.layer.state');
-        } elseif ($helper->isCategoryPage() && $helper->isCategoryDisplayActive()) {
+        } elseif ($helper->page()->isCategoryPage() && $helper->isCategoryDisplayActive()) {
             if (!in_array('categories_filtered', $robotOptions)) {
                 return;
             }
@@ -340,5 +345,35 @@ class IntegerNet_Solr_Model_Observer
                 $block->setData('robots', 'NOINDEX,NOFOLLOW');
             }
         }
+    }
+
+    public function adminhtmlCmsPageEditTabContentPrepareForm(Varien_Event_Observer $observer)
+    {
+        $model = Mage::registry('cms_page');
+        $form = $observer->getForm();
+        $fieldset = $form->addFieldset('integernet_solr_fieldset', array('legend'=>Mage::helper('integernet_solr')->__('Solr'),'class'=>'fieldset-wide'));
+        $fieldset->addField('solr_exclude', 'select', array(
+            'name'      => 'solr_exclude',
+            'label'     => Mage::helper('integernet_solr')->__('Exclude this Page from Solr Index'),
+            'title'     => Mage::helper('integernet_solr')->__('Exclude this Page from Solr Index'),
+            'disabled'  => false,
+            'values' => Mage::getSingleton('adminhtml/system_config_source_yesno')->toOptionArray(),
+            'value'     => $model->getData('solr_exclude')
+        ));
+
+        $field = $fieldset->addField('solr_boost', 'text', array(
+            'name' => 'solr_boost',
+            'label' => Mage::helper('integernet_solr')->__('Solr Priority'),
+            'title' => Mage::helper('integernet_solr')->__('Solr Priority'),
+            'note' => Mage::helper('integernet_solr')->__('1 is default, use higher numbers for higher priority.'),
+            'class' => 'validate-number',
+            'value'     => $model->getData('solr_boost')
+        ));
+
+        // Set default value
+        if (!$model->getId()) {
+            $field->setValue('1.0000');
+        }
+
     }
 }

@@ -38,6 +38,7 @@ class AttributeRepositoryStub implements AttributeRepository
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
@@ -47,6 +48,7 @@ class AttributeRepositoryStub implements AttributeRepository
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
@@ -56,10 +58,20 @@ class AttributeRepositoryStub implements AttributeRepository
     }
 
     /**
+     * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Mage_Catalog_Model_Entity_Attribute[]
      */
     public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
+    {
+        throw new BadMethodCallException('not used in query builder');
+    }
+
+    /**
+     * @param int $storeId
+     * @return Mage_Catalog_Model_Entity_Attribute[]
+     */
+    public function getSortableAttributes($storeId)
     {
         throw new BadMethodCallException('not used in query builder');
     }
@@ -74,11 +86,12 @@ class AttributeRepositoryStub implements AttributeRepository
 
     /**
      * @param string $attributeCode
+     * @param int $storeId
      * @return Attribute
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
-        throw new BadMethodCallException('not used in query builder');
+        return new AttributeStub($attributeCode, '', 1, new SourceStub(), null, true, true, null, false, 'text');
     }
 
 }

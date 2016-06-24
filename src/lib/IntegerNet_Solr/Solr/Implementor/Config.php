@@ -16,6 +16,7 @@ use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Config\CmsConfig;
 
 /**
@@ -78,6 +79,13 @@ interface Config
      */
     public function getResultsConfig();
 
+    /**
+     * Returns category configuration
+     *
+     * @return CategoryConfig
+     */
+    public function getCategoryConfig();
+    
     /**
      * Returns cms page configuration
      *

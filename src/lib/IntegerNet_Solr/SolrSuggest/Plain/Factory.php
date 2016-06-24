@@ -29,6 +29,8 @@ use IntegerNet\SolrSuggest\Plain\Factory\LoggerFactory;
 use IntegerNet\SolrSuggest\Plain\Http\AutosuggestRequest;
 use IntegerNet\SolrSuggest\Request\AutosuggestRequestFactory;
 use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
+use IntegerNet\SolrCategories\Request\CategorySuggestRequestFactory;
+use IntegerNet\SolrCms\Request\CmsPageSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
 use Psr\Log\LoggerInterface;
@@ -102,6 +104,14 @@ class Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheRead
                 $applicationContext->setQuery($this->request);
                 $factory = new SearchTermSuggestRequestFactory($applicationContext, $this->getSolrResource(), $this->request->getStoreId());
                 break;
+            case self::REQUEST_MODE_CATEGORY_SUGGEST:
+                $applicationContext->setQuery($this->request);
+                $factory = new CategorySuggestRequestFactory($applicationContext, $this->getSolrResource(), $this->request->getStoreId());
+                break;
+            case self::REQUEST_MODE_CMS_PAGE_SUGGEST:
+                $applicationContext->setQuery($this->request);
+                $factory = new CmsPageSuggestRequestFactory($applicationContext, $this->getSolrResource(), $this->request->getStoreId());
+                break;
             default:
             case self::REQUEST_MODE_AUTOSUGGEST:
                 $applicationContext
@@ -123,12 +133,15 @@ class Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheRead
             $this->request->getStoreId(),
             $storeConfig->getGeneralConfig(),
             $storeConfig->getAutosuggestConfig(),
+            $storeConfig->getCategoryConfig(),
             $this->request,
             new SearchUrl($storeConfig->getStoreConfig()),
             new CategoryRepository($this->getLoadedCacheReader($storeId)),
             new AttributeRepository($this->getLoadedCacheReader($storeId)),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CATEGORY_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CMS_PAGE_SUGGEST)
         );
     }
 

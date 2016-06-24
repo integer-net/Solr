@@ -34,7 +34,7 @@ class IndexingConfigBuilder
 
     /**
      * @param int $pagesize
-     * @return IntegerNet_Solr_Config_Indexing_Builder
+     * @return $this
      */
     public function withPagesize($pagesize)
     {
@@ -44,7 +44,7 @@ class IndexingConfigBuilder
 
     /**
      * @param boolean $deleteDocumentsBeforeIndexing
-     * @return IntegerNet_Solr_Config_Indexing_Builder
+     * @return $this
      */
     public function withDeleteDocumentsBeforeIndexing($deleteDocumentsBeforeIndexing)
     {
@@ -54,7 +54,7 @@ class IndexingConfigBuilder
 
     /**
      * @param boolean $swapCores
-     * @return IntegerNet_Solr_Config_Indexing_Builder
+     * @return $this
      */
     public function withSwapCores($swapCores)
     {

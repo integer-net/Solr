@@ -16,7 +16,7 @@ interface ProductRepository
      *
      * @param int $storeId  Products will be returned that are visible in this store and with store specific values
      * @param null|int[] $productIds filter by product ids
-     * @return ProductIterator
+     * @return PagedProductIterator
      */
     public function getProductsForIndex($storeId, $productIds = null);
 
@@ -27,4 +27,13 @@ interface ProductRepository
      * @return ProductIterator
      */
     public function getChildProducts(Product $parent);
+
+    /**
+     * Set maximum number of products to load at once during index
+     *
+     * @param int $pageSize
+     * @return $this
+     */
+    public function setPageSizeForIndex($pageSize);
+
 }

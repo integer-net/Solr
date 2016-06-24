@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductRepository;
 use IntegerNet\Solr\Implementor\ProductIterator;
@@ -40,7 +41,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      *
      * @param int $storeId Products will be returned that are visible in this store and with store specific values
      * @param null|int[] $productIds filter by product ids
-     * @return ProductIterator
+     * @return PagedProductIterator
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {

@@ -7,14 +7,14 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-use IntegerNet\Solr\Implementor\ProductIterator;
+use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\Product;
 
 /**
  * Product iterator implementation with lazy loading of multiple collections (chunking).
  * Collections are prepared to be used by the indexer.
  */
-class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterator, OuterIterator
+class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIterator, OuterIterator
 {
     protected $_bridgeFactory;
     /**
@@ -33,6 +33,10 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
      * @var int
      */
     protected $_currentPage;
+    /**
+     * @var callable
+     */
+    protected $_pageCallback;
     /**
      * @var Mage_Catalog_Model_Resource_Product_Collection
      */
@@ -66,6 +70,16 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
     }
 
     /**
+     * Define a callback that is called after each "page" iteration (i.e. finished inner iterator)
+     *
+     * @param callable $callback
+     */
+    public function setPageCallback($callback)
+    {
+        $this->_pageCallback = $callback;
+    }
+
+    /**
      * @return void Any returned value is ignored.
      */
     public function next()
@@ -87,14 +101,14 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
      */
     public function valid()
     {
-        if ($this->getInnerIterator()->valid()) {
+        if ($this->validInner()) {
             return true;
         } elseif ($this->_currentPage < $this->_collection->getLastPageNumber()) {
             $this->_currentPage++;
             $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdFilter, $this->_pageSize, $this->_currentPage);
             $this->_collectionIterator = $this->_collection->getIterator();
             $this->getInnerIterator()->rewind();
-            return $this->getInnerIterator()->valid();
+            return $this->validInner();
         }
         return false;
     }
@@ -169,5 +183,17 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements ProductIterato
         ));
 
         return $productCollection;
+    }
+
+    /**
+     * @return bool
+     */
+    private function validInner()
+    {
+        $valid = $this->getInnerIterator()->valid();
+        if (! $valid) {
+            call_user_func($this->_pageCallback, $this);
+        }
+        return $valid;
     }
 }

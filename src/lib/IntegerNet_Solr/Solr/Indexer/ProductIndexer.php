@@ -8,6 +8,7 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 namespace IntegerNet\Solr\Indexer;
+use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\ProductRenderer;
 use IntegerNet\Solr\Implementor\StoreEmulation;
 use IntegerNet\Solr\Resource\ResourceFacade;
@@ -126,8 +127,8 @@ class ProductIndexer
                     $pageSize = 100;
                 }
 
-                $productCollection = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
-                $this->_indexProductCollection($emptyIndex, $productCollection, $storeId, $productIds);
+                $productIterator = $this->_productRepository->setPageSizeForIndex($pageSize)->getProductsForIndex($storeId, $productIds);
+                $this->_indexProductCollection($emptyIndex, $productIterator, $storeId, $productIds);
 
                 $this->_getResource()->setUseSwapIndex(false);
             } catch (\Exception $e) {
@@ -168,7 +169,7 @@ class ProductIndexer
      * Generate single product data for Solr
      *
      * @param Product $product
-     * @return array
+     * @return IndexDocument
      */
     protected function _getProductData(Product $product)
     {
@@ -202,7 +203,7 @@ class ProductIndexer
             'product_data' => $productData
         ));
 
-        return $productData->getData();
+        return $productData;
     }
 
     /**
@@ -489,38 +490,35 @@ class ProductIndexer
 
     /**
      * @param boolean $emptyIndex
-     * @param \IntegerNet\Solr\Implementor\ProductIterator $productCollection
+     * @param PagedProductIterator $productIterator
      * @param int[] $productIds
      * @param int $storeId
      * @return int
      */
-    protected function _indexProductCollection($emptyIndex, $productCollection, $storeId, $productIds = array())
+    protected function _indexProductCollection($emptyIndex, PagedProductIterator $productIterator, $storeId, $productIds = array())
     {
-        $combinedProductData = array();
         $idsForDeletion = array();
+        $documentQueue = new IndexDocumentQueue($this->_resource, $storeId);
         $productIds = array_flip((array)$productIds);
 
-        foreach ($productCollection as $product) {
+        $productIterator->setPageCallback([$documentQueue, 'flush']);
+        foreach ($productIterator as $product) {
             if (isset($productIds[$product->getId()])) {
                 unset($productIds[$product->getId()]);
             }
             if ($product->isIndexable()) {
-                $combinedProductData[] = $this->_getProductData($product);
+                $documentQueue->add($this->_getProductData($product));
             } else {
                 $idsForDeletion[] = $this->_getSolrId($product);
             }
         }
 
-        foreach($productIds as $productId => $value) {
+        foreach ($productIds as $productId => $value) {
             $idsForDeletion[] = $this->_getSolrIdByProductIdAndStoreId($productId, $storeId);
         }
 
         if (!$emptyIndex && sizeof($idsForDeletion)) {
             $this->_getResource()->deleteByMultipleIds($storeId, $idsForDeletion);
-        }
-
-        if (sizeof($combinedProductData)) {
-            $this->_getResource()->addDocuments($storeId, $combinedProductData);
         }
         return $storeId;
     }

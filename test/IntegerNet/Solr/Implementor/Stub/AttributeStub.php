@@ -24,8 +24,6 @@ class AttributeStub implements Attribute
     private $source;
     /** @var  string */
     private $backendType;
-    /** @var  string */
-    private $inputType;
     /** @var  bool */
     private $isSearchable;
     /** @var  bool */
@@ -127,22 +125,6 @@ class AttributeStub implements Attribute
     public function getBackendType()
     {
         return $this->backendType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getInputType()
-    {
-        return $this->inputType;
-    }
-
-    /**
-     * @param string $inputType
-     */
-    public function setInputType($inputType)
-    {
-        $this->inputType = $inputType;
     }
 
     /**

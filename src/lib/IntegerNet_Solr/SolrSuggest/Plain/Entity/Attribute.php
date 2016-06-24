@@ -95,11 +95,6 @@ final class Attribute implements SerializableAttribute
         return 'varchar';
     }
 
-    public function getInputType()
-    {
-        return '';
-    }
-
     public function getUsedForSortBy()
     {
         return $this->usedForSortBy;

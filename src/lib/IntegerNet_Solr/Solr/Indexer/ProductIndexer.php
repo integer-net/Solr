@@ -285,7 +285,7 @@ class ProductIndexer
                 $hasChildProducts = false;
             }
 
-            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
+            if ($hasChildProducts && $attribute->getBackendType() != Attribute::BACKEND_TYPE_DECIMAL) {
 
                 foreach($childProducts as $childProduct) {
                     /** @var $childProduct Product */
@@ -375,7 +375,7 @@ class ProductIndexer
                 }
             }
 
-            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
+            if ($hasChildProducts && $attribute->getBackendType() != Attribute::BACKEND_TYPE_DECIMAL) {
 
                 foreach($childProducts as $childProduct) {
                     /** @var $childProduct Product */

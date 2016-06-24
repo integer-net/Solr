@@ -62,34 +62,35 @@ class IndexField
 
         if ($this->attribute->getUsedForSortBy() || $this->forSorting) {
             switch ($this->attribute->getBackendType()) {
-                case 'decimal':
+                case Attribute::BACKEND_TYPE_DECIMAL:
                     return $this->attribute->getAttributeCode() . '_f';
 
-                case 'text':
+                case Attribute::BACKEND_TYPE_TEXT:
                     return $this->attribute->getAttributeCode() . '_t';
 
-                case 'int':
-                    if ($this->attribute->getInputType() != 'select') {
+                case Attribute::BACKEND_TYPE_INT:
+                    if ($this->attribute->getFacetType() !== Attribute::FACET_TYPE_SELECT) {
                         return $this->attribute->getAttributeCode() . '_i';
                     }
                     // fallthrough intended
-                
+                case Attribute::BACKEND_TYPE_VARCHAR:
                 default:
                     return ($this->forSorting) ? $this->attribute->getAttributeCode() . '_s' : $this->attribute->getAttributeCode() . '_t';
             }
         } else {
             switch ($this->attribute->getBackendType()) {
-                case 'decimal':
+                case Attribute::BACKEND_TYPE_DECIMAL:
                     return $this->attribute->getAttributeCode() . '_f_mv';
 
-                case 'text':
+                case Attribute::BACKEND_TYPE_TEXT:
                     return $this->attribute->getAttributeCode() . '_t_mv';
 
-                case 'int':
-                    if ($this->attribute->getInputType() != 'select') {
+                case Attribute::BACKEND_TYPE_INT:
+                    if ($this->attribute->getFacetType() != Attribute::FACET_TYPE_SELECT) {
                         return $this->attribute->getAttributeCode() . '_i_mv';
                     }
                 // fallthrough intended
+                case Attribute::BACKEND_TYPE_VARCHAR:
                 default:
                     return $this->attribute->getAttributeCode() . '_t_mv';
             }

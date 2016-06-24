@@ -26,7 +26,7 @@ use IntegerNet\SolrSuggest\Block\AttributeSuggestion;
 use IntegerNet\SolrSuggest\Block\ProductSuggestion;
 use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 use IntegerNet\SolrCms\Block\CmsPageSuggestion;
-use IntegerNet\SolrCategories\Block\CategorySuggestion;
+use IntegerNet\SolrSuggest\Block\CategorySuggestion;
 use IntegerNet\SolrSuggest\Implementor\SearchUrl;
 
 class AutosuggestResult

@@ -286,12 +286,16 @@ class IntegerNet_Solr_Model_Observer
         if (!sizeof($filters)) {
             return;
         }
+        
+        $store = Mage::app()->getStore();
 
         /** @var Mage_Catalog_Model_Resource_Category_Collection $matchingCategoryCollection */
         $matchingCategoryCollection = Mage::getResourceModel('catalog/category_collection');
         $matchingCategoryCollection
+            ->setStoreId($store->getId())
             ->addAttributeToFilter($filters)
             ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('path', array('like' => '1/' . $store->getGroup()->getRootCategoryId() . '/%'))
             ->addAttributeToSelect('url_key');
 
         if ($matchingCategoryCollection->getSize() == 1) {

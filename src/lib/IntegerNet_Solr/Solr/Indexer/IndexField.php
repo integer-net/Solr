@@ -69,7 +69,7 @@ class IndexField
                     return $this->attribute->getAttributeCode() . '_t';
 
                 case Attribute::BACKEND_TYPE_INT:
-                    if ($this->attribute->getFacetType() !== Attribute::FACET_TYPE_SELECT) {
+                    if (($this->attribute->getFacetType() !== Attribute::FACET_TYPE_SELECT) && ($this->attribute->getFacetType() !== Attribute::FACET_TYPE_BOOLEAN)) {
                         return $this->attribute->getAttributeCode() . '_i';
                     }
                     // fallthrough intended
@@ -86,7 +86,7 @@ class IndexField
                     return $this->attribute->getAttributeCode() . '_t_mv';
 
                 case Attribute::BACKEND_TYPE_INT:
-                    if ($this->attribute->getFacetType() != Attribute::FACET_TYPE_SELECT) {
+                    if (($this->attribute->getFacetType() !== Attribute::FACET_TYPE_SELECT) && ($this->attribute->getFacetType() !== Attribute::FACET_TYPE_BOOLEAN)) {
                         return $this->attribute->getAttributeCode() . '_i_mv';
                     }
                 // fallthrough intended

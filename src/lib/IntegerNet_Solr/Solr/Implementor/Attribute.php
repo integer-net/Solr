@@ -26,6 +26,7 @@ interface Attribute
     const BACKEND_TYPE_VARCHAR = 'varchar';
 
     const FACET_TYPE_SELECT = 'select';
+    const FACET_TYPE_BOOLEAN = 'boolean';
     const FACET_TYPE_MULTISELECT = 'multiselect';
 
     /**

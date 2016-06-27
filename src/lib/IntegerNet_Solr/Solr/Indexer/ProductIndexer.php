@@ -247,6 +247,7 @@ class ProductIndexer
             if ($product->getData($attribute->getAttributeCode())) {
 
                 switch ($attribute->getFacetType()) {
+                    case Attribute::FACET_TYPE_BOOLEAN:
                     case Attribute::FACET_TYPE_SELECT:
                         $rawValue = $product->getAttributeValue($attribute);
                         if ($rawValue && $this->_isInteger($rawValue)) {

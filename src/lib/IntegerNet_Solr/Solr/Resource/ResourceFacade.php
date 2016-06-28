@@ -112,7 +112,7 @@ class ResourceFacade
      */
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
-        $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params);
+        $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params, \Apache_Solr_Service::METHOD_POST);
         return new ResponseDecorator($response);
     }
 

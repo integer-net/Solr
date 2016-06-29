@@ -44,6 +44,10 @@ class ResultConfigBuilder
      * @var float[]
      */
     private $customPriceIntervals = [10,20,50,100,200,300,400,500];
+    /**
+     * @var bool
+     */
+    private $showCategoryFilter = true;
 
     public static function defaultConfig()
     {
@@ -120,6 +124,6 @@ class ResultConfigBuilder
     public function build()
     {
         return new ResultsConfig($this->useCustomPriceIntervals, $this->searchOperator, $this->priorityCategories, $this->priceStepSize,
-            $this->maxPrice, $this->useCustomPriceIntervals, $this->customPriceIntervals);
+            $this->maxPrice, $this->useCustomPriceIntervals, $this->customPriceIntervals, $this->showCategoryFilter);
     }
 }

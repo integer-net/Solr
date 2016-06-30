@@ -100,7 +100,7 @@
 "Solr Connection to swap core established successfully.","Verbindung zum Austausch-Core des Solr-Servers erfolgreich aufgebaut."
 "Test search request issued successfully.","Test-Suchanfrage erfolgreich abgesetzt."
 "Test search request failed.","Test-Suchanfrage fehlgeschlagen."
-"Maybe the configuration files are not installed correctly on the Solr server.","Möglicherweise sind die Konfigurationsdateien nicht korrekt auf dem Solr-Server eingespielt."
+"Probably the configuration files are not installed correctly on the Solr server.","Wahrscheinlich sind die Konfigurationsdateien nicht korrekt auf dem Solr-Server eingespielt."
 "Test search request to swap core issued successfully.","Test-Suchanfrage zum Austausch-Core des Solr-Servers erfolgreich abgesetzt."
 "Test search request to swap core failed.","Test-Suchanfrage zum Austausch-Core des Solr-Servers fehlgeschlagen."
 "Maybe the configuration files are not installed correctly on the Solr swap core.","Möglicherweise sind die Konfigurationsdateien nicht korrekt auf dem Austausch-Core des Solr-Servers eingespielt."

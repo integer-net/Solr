@@ -256,8 +256,8 @@ class IntegerNet_Solr_Model_Configuration
             $this->_addErrorMessage(
                 Mage::helper('integernet_solr')->__('Test search request failed.')
             );
-            $this->_addNoticeMessage(
-                Mage::helper('integernet_solr')->__('Maybe the configuration files are not installed correctly on the Solr server.')
+            $this->_addErrorMessage(
+                Mage::helper('integernet_solr')->__('Probably the configuration files are not installed correctly on the Solr server.')
             );
             $this->_addNoticeMessage(
                 Mage::helper('integernet_solr')->__('You can get a meaningful error message from the tab "Logging" on the Solr Admin Interface.')

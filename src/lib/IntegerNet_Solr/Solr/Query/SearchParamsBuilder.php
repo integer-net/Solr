@@ -16,7 +16,10 @@ final class SearchParamsBuilder extends AbstractParamsBuilder
      */
     protected function getFacetFieldCodes()
     {
-        $codes = array('category');
+        $codes = array();
+        if ($this->resultsConfig->isShowCategoryFilter()) {
+            $codes = array('category');
+        }
 
         foreach($this->attributeRespository->getFilterableInSearchAttributes($this->getStoreId()) as $attribute) {
             $codes[] = $attribute->getAttributeCode() . '_facet';

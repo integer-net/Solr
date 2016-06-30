@@ -164,6 +164,9 @@ class FilterQueryBuilder
                 if ($attributeCode == $attributeToReset) {
                     continue;
                 }
+                if ((!is_array($value)) && strpos($value, ',') !== false) {
+                    $value = explode(',', $value);
+                }
                 if (is_array($value)) {
                     $filterQuery .= ' AND (';
                     $filterQueryParts = array();

@@ -148,7 +148,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
     {
         if (! isset($this->_filterableInCatalogAttributes[$storeId][intval($useAlphabeticalSearch)])) {
 
-            $this->_filterableInCatalogAttributes[$storeId] = Mage::getResourceModel('catalog/product_attribute_collection')
+            $this->_filterableInCatalogAttributes[$storeId][intval($useAlphabeticalSearch)] = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addStoreLabel($storeId)
                 ->addIsFilterableFilter()
                 ->addFieldToFilter('attribute_code', array('nin' => array('status')))

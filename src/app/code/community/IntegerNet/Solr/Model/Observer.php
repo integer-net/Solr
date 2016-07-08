@@ -235,7 +235,10 @@ class IntegerNet_Solr_Model_Observer
             $product = Mage::getModel('catalog/product');
             if ($productId = $product->getIdBySku($query)) {
                 $product->load($productId);
-                if ($product->isVisibleInSiteVisibility()) {
+                if ($product->isVisibleInSiteVisibility()
+                    && $product->isAvailable()
+                    && in_array(Mage::app()->getWebsite(), $product->getWebsiteIds())
+                ) {
                     return $product->getProductUrl();
                 }
             }
@@ -258,6 +261,7 @@ class IntegerNet_Solr_Model_Observer
         $matchingProductCollection = Mage::getResourceModel('catalog/product_collection');
         $matchingProductCollection
             ->addStoreFilter()
+            ->addWebsiteFilter()
             ->addAttributeToFilter($filters)
             ->addAttributeToFilter('visibility', array('in' => Mage::getSingleton('catalog/product_visibility')->getVisibleInSearchIds()))
             ->addAttributeToSelect('url_key');
@@ -291,12 +295,16 @@ class IntegerNet_Solr_Model_Observer
         if (!sizeof($filters)) {
             return;
         }
+        
+        $store = Mage::app()->getStore();
 
         /** @var Mage_Catalog_Model_Resource_Category_Collection $matchingCategoryCollection */
         $matchingCategoryCollection = Mage::getResourceModel('catalog/category_collection');
         $matchingCategoryCollection
+            ->setStoreId($store->getId())
             ->addAttributeToFilter($filters)
             ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('path', array('like' => '1/' . $store->getGroup()->getRootCategoryId() . '/%'))
             ->addAttributeToSelect('url_key');
 
         if ($matchingCategoryCollection->getSize() == 1) {

@@ -19,7 +19,7 @@ interface IndexCategoryRepository
     public function getCategoryNames($categoryIds, $storeId);
 
     /**
-     * Get category ids of assigned categories and all parents
+     * Get category ids of assigned categories and all parents and without excluded categories
      *
      * @param Product $product
      * @return int[]

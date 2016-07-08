@@ -352,6 +352,7 @@
                 <use_html_from_solr>0</use_html_from_solr>
                 <search_operator>AND</search_operator>
                 <filter_position>1</filter_position>
+                <show_category_filter>1</show_category_filter>
                 <priority_categories>2</priority_categories>
                 <max_number_filter_options>0</max_number_filter_options>
                 <use_ajax_for_filter_results>0</use_ajax_for_filter_results>

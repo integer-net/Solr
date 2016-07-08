@@ -221,7 +221,8 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
                 $this->_getConfig($prefix . 'price_step_size'),
                 $this->_getConfig($prefix . 'max_price'),
                 $this->_getConfigFlag($prefix . 'use_custom_price_intervals'),
-                explode(',', $this->_getConfig($prefix . 'custom_price_intervals'))
+                explode(',', $this->_getConfig($prefix . 'custom_price_intervals')),
+                $this->_getConfigFlag($prefix . 'show_category_filter')
             );
         }
         return $this->_results;

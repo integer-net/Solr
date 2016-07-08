@@ -75,6 +75,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                         $filter->setAttribute($attribute);
                         $filter->setName($attribute->getStoreLabel());
                         $filter->setLabel($optionLabel);
+                        $filter->setOptionId($optionId);
                         $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode(), $optionId));
                         $this->_activeFilters[] = $filter;
                     }

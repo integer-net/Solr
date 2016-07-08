@@ -247,6 +247,7 @@ class ProductIndexer
             if ($product->getData($attribute->getAttributeCode())) {
 
                 switch ($attribute->getFacetType()) {
+                    case Attribute::FACET_TYPE_BOOLEAN:
                     case Attribute::FACET_TYPE_SELECT:
                         $rawValue = $product->getAttributeValue($attribute);
                         if ($rawValue && $this->_isInteger($rawValue)) {
@@ -285,7 +286,7 @@ class ProductIndexer
                 $hasChildProducts = false;
             }
 
-            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
+            if ($hasChildProducts && $attribute->getBackendType() != Attribute::BACKEND_TYPE_DECIMAL) {
 
                 foreach($childProducts as $childProduct) {
                     /** @var $childProduct Product */
@@ -375,7 +376,7 @@ class ProductIndexer
                 }
             }
 
-            if ($hasChildProducts && $attribute->getBackendType() != 'decimal') {
+            if ($hasChildProducts && $attribute->getBackendType() != Attribute::BACKEND_TYPE_DECIMAL) {
 
                 foreach($childProducts as $childProduct) {
                     /** @var $childProduct Product */

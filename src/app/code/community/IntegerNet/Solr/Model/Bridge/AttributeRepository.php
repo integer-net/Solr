@@ -123,7 +123,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $this->_filterableInSearchAttributes[$storeId][intval($useAlphabeticalSearch)] = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addStoreLabel($storeId)
                 ->addIsFilterableInSearchFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+                ->addFieldToFilter('attribute_code', array('nin' => array('status', 'image_label', 'small_image_label', 'thumbnail_label')))
             ;
 
             if ($useAlphabeticalSearch) {
@@ -151,7 +151,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
             $this->_filterableInCatalogAttributes[$storeId][intval($useAlphabeticalSearch)] = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->addStoreLabel($storeId)
                 ->addIsFilterableFilter()
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')))
+                ->addFieldToFilter('attribute_code', array('nin' => array('status', 'image_label', 'small_image_label', 'thumbnail_label')))
             ;
 
             if ($useAlphabeticalSearch) {
@@ -263,7 +263,7 @@ class IntegerNet_Solr_Model_Bridge_AttributeRepository implements AttributeRepos
                         array('gt' => 0),
                     )
                 )
-                ->addFieldToFilter('attribute_code', array('nin' => array('status')));
+                ->addFieldToFilter('attribute_code', array('nin' => array('status', 'image_label', 'small_image_label', 'thumbnail_label')));
 
             if ($useAlphabeticalSearch) {
                 $this->_filterableInCatalogOrSearchAttributes[$storeId]

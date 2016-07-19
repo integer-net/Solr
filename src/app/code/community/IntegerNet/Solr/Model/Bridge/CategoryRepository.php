@@ -87,8 +87,10 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
 
         $foundCategoryIds = array();
         foreach($categoryIds as $categoryId) {
-            $categoryPathIds = $this->_pathCategoryIds[$storeId][$categoryId];
-            $foundCategoryIds = array_merge($foundCategoryIds, $categoryPathIds);
+            if (isset($this->_pathCategoryIds[$storeId][$categoryId])) {
+                $categoryPathIds = $this->_pathCategoryIds[$storeId][$categoryId];
+                $foundCategoryIds = array_merge($foundCategoryIds, $categoryPathIds);
+            }
         }
 
         $foundCategoryIds = array_unique($foundCategoryIds);

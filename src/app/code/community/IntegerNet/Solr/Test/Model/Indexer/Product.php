@@ -34,4 +34,5 @@ class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Ca
         }
         Mage::helper('integernet_solr')->factory()->getProductIndexer()->reindex();
     }
+
 }

@@ -470,7 +470,7 @@ class AutosuggestResult
     protected function _getCategoryUrl(SuggestCategory $category)
     {
         $linkType = $this->autosuggestConfig->getCategoryLinkType();
-        if ($linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
+        if ($linkType === AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
             return $this->searchUrl->getUrl($this->getQuery(), array('cat' => $category->getId()));
         }
 

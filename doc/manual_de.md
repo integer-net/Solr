@@ -11,6 +11,8 @@ Features
 #### Allgemein
 - Rechtschreibkorrektur, unscharfe Suche
 - Zeigt zuerst exakte Suchergebnisse an und anschließend Suchergebnisse zu ähnlichen Suchbegriffen
+- Mehrfachauswahl von Filterwerten
+- Filter können links oder oberhalb der Produktliste angezeigt werden
 - Vollständige Unterstützung der Multistore-Funktionalität von Magento
 - Kompatibel zu den Magento-Standard-Themes default, modern und rwd
 - Nutzung eines einzigen Solr-Kerns für mehrere Magento-Storeviews oder mehrerer Kerne
@@ -19,8 +21,8 @@ Features
 - Prüft Erreichbarkeit und Konfiguration des Solr-Servers
 
 #### Suchvorschlagsfenster
-- Erscheint nach dem Eintippen der ersten Buchstaben in das Suchfeld
-- Zeigt Produktvorschläge, Kategorievorschläge, Attributvorschläge und Suchwortvorschläge
+- Erscheint nach dem Eintippen der ersten zwei Buchstaben in das Suchfeld
+- Zeigt Produktvorschläge, Kategorievorschläge, Attributvorschläge, CMS-Seitenvorschläge und Suchwortvorschläge
 - Anzahl der Suchvorschläge jeden Typs ist in der Magento-Konfiguration einstellbar
 - Anzuzeigende Attribute können in der Konfiguration definiert werden
 - Für eine schnellere Suchvorschau werden die Requests an Magento vorbeigeleitet
@@ -35,6 +37,8 @@ Features
 #### Modifizierung der Suchergebnisse
 - Anpassung der Unschärfe ("Fuzzyness")
 - Erlaubt das Boosten bestimmter Produkte und Attribute
+- Ermöglicht das Ausschließen einzelner Kategorien, Produkte und CMS-Seiten von den Suchergebnissen
+- Weiterleitung zur passenden Produkt- oder Kategorieseite bei exakter Übereinstimmung mit dem Suchbegriff 
 - Stellt Events zur Modifizierung des Indizierungsprozesses und der Suchergebnisse bereit
 
 #### Kategorieseiten
@@ -42,7 +46,7 @@ Features
 
 Systemvoraussetzungen
 ------------
-- **Magento Community Edition** 1.6 bis 1.9 oder **Magento Enterprise Edition** 1.11 bis 1.14
+- **Magento Community Edition** 1.7 bis 1.9 oder **Magento Enterprise Edition** 1.12 bis 1.14
 - **Solr** 4.x bis 6.x
 - **PHP** 5.3 bis 5.5 (5.5 empfohlen), voraussichtlich kompatibel zu PHP 5.6 und 7.0 (noch nicht getestet)
 
@@ -74,12 +78,12 @@ Die in Solr gespeicherten Daten beinhalten die folgenden Informationen:
 - Store-ID
 - Kategorie-IDs
 - Inhalt aller Produktattribute, die in Magento als "durchsuchbar" markiert sind
-- Generiertes HTML für das Suchvorschau-Fenster, das die anzuzeigenden Daten und das Layout beinhaltet (z.B. Name, Preis, Produktbild, ...)
+- Generiertes HTML für das Suchvorschau-Fenster, das die anzuzeigenden Daten und das Layout beinhaltet (z. B. Name, Preis, Produktbild, ...)
 - Falls konfiguriert: Generiertes HTML für die Suchergebnisseite, einmal für den Gitter-Modus (Grid) und einmal für den Listen-Modus (List)
 - IDs aller Optionen der filterbaren Attribute für die Filternavigation
 
-Wenn Sie regelmäßig eine komplette Neuindizierung vornehmen, empfehlen wir Ihnen Die **Swap**-Funktionalität.
-Sie können das Modul so komfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`System -> Konfiguration -> Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).  
+Wenn Sie regelmäßig eine komplette Neuindizierung vornehmen, empfehlen wir Ihnen die **Swap**-Funktionalität.
+Sie können das Modul so konfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`System -> Konfiguration -> Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).  
 
 ### Suchvorschläge
 Wenn Sie die Suchvorschlags-Funktionalität nutzen, gibt es jedes Mal, wenn ein Kunde die ersten Buchstaben ins Suchfeld im Frontend eingetippt hat, einen AJAX-Aufruf. Die Antwort davon beinhaltet den HTML-Code des Suchvorschau-Fensters, welches Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. Die Ziel-URL des AJAX-Aufrufs ist unterschiedlich je nach der Konfigurationseinstellung unter `System -> Konfiguration -> Solr -> Suchvorschlags-Box -> Methode zum Ermitteln von Suchvorschlags-Informationen`:
@@ -93,11 +97,11 @@ Hierdurch wird per AJAX die separate PHP-Datei `autosuggest-mage.php` im Magento
 #### PHP ohne Magento-Instanziierung
 Mit dieser Methode wird eine andere PHP-Datei `autosuggest.php` im Magento-Hauptverzeichnis per AJAX direkt aufgerufen. Ein Großteil der Magento-Funktionalität wird dabei nicht verwendet, wodurch sie in den meisten Umgebungen deutlich schneller ist. Da dabei keine Datenbank-Abfragen ausgeführt werden, müssen alle Daten, die für das Suchvorschaufenster benötigt werden, entweder direkt vom Solr-Server oder aus einer Textdatei kommen. Das Modul generiert automatisch Textdateien, die die Informationen enthalten, die von der Suchvorschaufunktion benötigt werden:
 
-- Die Solr-Konfiguration (z.B. Zugangsdaten)
+- Die Solr-Konfiguration (z. B. Zugangsdaten)
 - Ein paar zusätzliche Konfigurationswerte
 - Alle Kategoriedaten (Namen, IDs und URLs)
 - Alle Attributdaten, die in der Konfiguration eingestellt sind (Optionsnamen, IDs und URLs)
-- Einige Zusatzinformation wie die Base-URL oder der Dateiname der Templatedatei (s.u.)
+- Einige Zusatzinformationen wie die Base-URL oder der Dateiname der Templatedatei (s. u.)
 - Eine Kopie der Datei `template/integernet/solr/result/autosuggest.phtml`, die in Ihrem Theme verwendet wird. Alle Übersetzungstexte sind darin bereits in die korrekte Sprache übersetzt.
 
 Die Informationen werden in der Datei `var/integernet_solr/store_x/config.txt` als serialisiertes Array gespeichert bzw. befinden sich in der Datei `var/integernet_solr/store_x/autosuggest.phtml`. Diese Dateien werden automatisch in einem der folgenden Fälle neu erzeugt:
@@ -110,7 +114,7 @@ Die Informationen werden in der Datei `var/integernet_solr/store_x/config.txt` a
 Wenn Sie also die gespeicherten Informationen erneuern lassen wollen, lösen Sie einen der drei obigen Fälle aus.
 
 Beachten Sie, dass Sie nicht alle Magento-Funktionen zur Verfügung haben werden, wenn Sie diese Methode verwenden. 
-Versuchen Sie, sich an die Methoden zu halten, die in `app/design/frontend/base/default/template/integernet/solr/autosuggest.phtml` verwendet werden. Z.B. können Sie keine statischen Blöcke oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
+Versuchen Sie, sich an die Methoden zu halten, die in `app/design/frontend/base/default/template/integernet/solr/autosuggest.phtml` verwendet werden. Beispielsweise können Sie keine statischen Blöcke oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
 
 Konfiguration
 -------------
@@ -218,7 +222,7 @@ Für den Versand der Benachrichtigung können Sie den E-Mail-Absender auswählen
 
 #### Anzahl Produkte pro Durchlauf
 
-Die hier eingetragene Anzahl Produkte wird bei der Indizierung (s.o.) gleichzeitig verarbeitet, entsprechend viele Produktdaten werden in einen einzigen Request zum Solr-Server aufgenommen. Von dieser Einstellung ist die Performance der Indizierung stark abhängig. Reduzieren Sie den Wert testweise, falls Sie Fehler bei der Indizierung erhalten.
+Die hier eingetragene Anzahl Produkte wird bei der Indizierung (s. o.) gleichzeitig verarbeitet, entsprechend viele Produktdaten werden in einen einzigen Request zum Solr-Server aufgenommen. Von dieser Einstellung ist die Performance der Indizierung stark abhängig. Reduzieren Sie den Wert testweise, falls Sie Fehler bei der Indizierung erhalten.
 
 #### Alle Solr-Indexeinträge vor Neuindizierung löschen
 
@@ -227,7 +231,7 @@ Wenn diese Einstellung aktiv ist, wird der Solr-Index zu Beginn einer vollständ
 
 #### Cores tauschen nach vollständiger Neuindizierung
 
-Wenn Sie regelmäßig den Index neu aufbauen (z.B. nächtlich), ist es sinnvoll, die Funktion zum Tauschen der Kerne einzusetzen und einen zweiten Kern zu verwenden. Aktivieren Sie in dem Fall diese Option und tragen Sie im Feld *Name des Cores, mit dem der aktive Core getauscht werden soll* den Namen des zweiten Kerns ein.
+Wenn Sie regelmäßig den Index neu aufbauen (z. B. nächtlich), ist es sinnvoll, die Funktion zum Tauschen der Kerne einzusetzen und einen zweiten Kern zu verwenden. Aktivieren Sie in dem Fall diese Option und tragen Sie im Feld *Name des Cores, mit dem der aktive Core getauscht werden soll* den Namen des zweiten Kerns ein.
 
 ### Unscharfe Suche 
 
@@ -239,8 +243,8 @@ Wenn diese Einstellung ausgeschaltet ist, werden nur exakte Suchtreffer registri
 
 #### Sensibilität für Suche
 
-Hier können Sie eintragen, wie empfindlich die unscharfe Suche sein soll. Der Wert muss zwischen 0 und 1 liegen, mit dem Punkt (.) als Dezimaltrennzeichen, also z.B. *0.75*. 
-Je niedriger der Wert, desto mehr Treffer werden Sie erhalten, da Schreibfehler großzügiger korrigiert werden und z.B. für die Eingabe "rot" auch der Wert "rosa" akzeptiert wird, der von den Buchstaben her relativ ähnlich ist. 
+Hier können Sie eintragen, wie empfindlich die unscharfe Suche sein soll. Der Wert muss zwischen 0 und 1 liegen, mit dem Punkt (.) als Dezimaltrennzeichen, also z. B. *0.75*. 
+Je niedriger der Wert, desto mehr Treffer werden Sie erhalten, da Schreibfehler großzügiger korrigiert werden und z. B. für die Eingabe "rot" auch der Wert "rosa" akzeptiert wird, der von den Buchstaben her relativ ähnlich ist. 
 Testen Sie hier einen möglichst guten Wert für Ihren Shop aus. 
 Wir empfehlen Werte zwischen 0.6 und 0.9.
 
@@ -271,16 +275,24 @@ Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche für Su
 
 Wenn diese Eigenschaft aktiviert ist, wird der HTML-Code, der bei den Suchergebnissen ein Produkt darstellt, bereits bei der Indizierung erzeugt. Diese dauert dadurch natürlich etwas länger, dafür erfolgt die Ausgabe bei den Suchergebnissen schneller, da dieser Teil nicht mehr (mehrfach, da für mehrere Produkte) berechnet werden muss.
 
-Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, wenn die Daten in den Suchergebnissen benutzer- oder benutzergruppenabhängig dargestellt werden müssen, also wenn z.B. die Preise je nach Kundengruppe unterschiedlich sind. In diesem Fall deaktivieren Sie diese Einstellung bitte.
+Wir empfehlen daher, diese Einstellung zu aktivieren. Eine Ausnahme liegt vor, wenn die Daten in den Suchergebnissen benutzer- oder benutzergruppenabhängig dargestellt werden müssen, also wenn z. B. die Preise je nach Kundengruppe unterschiedlich sind. In diesem Fall deaktivieren Sie diese Einstellung bitte.
 
 #### Such-Operator
 
-Hier haben Sie die Wahl zwischen *UND* und *ODER*. Der Such-Operator wird eingesetzt, wenn es mehr als einen Suchbegriff in der Anfrage gibt, z.B. "rotes Shirt". Bei *UND* werden nur Ergebnisse ausgegeben, die auf beide (bzw. alle) Suchbegriffe passen, bei *ODER* werden dafür auch Ergebnisse ausgegeben, die nur auf einen der Suchbegriffe passen. 
+Hier haben Sie die Wahl zwischen *UND* und *ODER*. Der Such-Operator wird eingesetzt, wenn es mehr als einen Suchbegriff in der Anfrage gibt, z. B. "rotes Shirt". Bei *UND* werden nur Ergebnisse ausgegeben, die auf beide (bzw. alle) Suchbegriffe passen, bei *ODER* werden dafür auch Ergebnisse ausgegeben, die nur auf einen der Suchbegriffe passen. 
 In den meisten Fällen ist *UND* die bessere Einstellung.
 
 #### Position der Filter
 
 Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden. Letztere ist empfehlenswert bei einem eher schmalen Template.
+
+#### Maximalanzahl Filteroptionen pro Filter
+
+Gibt es für Filter sehr viele Filteroptionen, kann aus Gründen der Übersichtlichkeit die Zahl der angezeigten Filteroptionen eingeschränkt werden. Wird hier der Wert "0" eingetragen, werden alle Filteroptionen angezeigt.
+
+#### Filteroptionen alphabetisch sortieren
+
+Normalerweise werden die Filteroptionen nach der Anzahl der Treffer sortiert. In einigen Fällen ist es sinnvoll, sie stattdessen alphabetisch zu sortieren. Die alphabetische Sortierung kann über dieses Feld aktiviert werden.
 
 #### Solr-Priorität von Kategorienamen
 
@@ -289,24 +301,24 @@ Der Standardwert ist 1. Wenn Sie einen höheren Wert eintragen, werden Kategorie
 
 #### Größe der Preis-Schritte
 
-Diese Einstellung ist für den Preisfilter wichtig. Hier kann man einstellen, in welchen Schritten die einzelnen Intervalle definiert sein sollen. So führt z.B. *10* zu den Intervallen *0,00-10,00*, *10,00-20,00*, *20,00-30,00* usw.
+Diese Einstellung ist für den Preisfilter wichtig. Hier kann man einstellen, in welchen Schritten die einzelnen Intervalle definiert sein sollen. So führt z. B. *10* zu den Intervallen *0,00-10,00*, *10,00-20,00*, *20,00-30,00* usw.
  
 #### Obergrenze der Preis-Schritte
 
 Auch diese Einstellung ist für die Steuerung des Preisfilters gedacht. Hierüber wird das oberste Intervall definiert. Beim Wert *200* wäre das also *ab 200,00*. In diesem Intervall werden alle Produkte zusammen gefasst, die mehr als 200,00 kosten.
 
-#### Individuelle Preisintervalle verwenden
-Wenn Sie keine lineare Einteilung der Intervalle wünschen und mindestens Solr 4.10 einsetzen, können Sie hier die gewünschten Intervallgrenzen für den Preisfilter individuell einstellen. Beim Beispiel *10,20,50,100,200,300,400,500* wären das die Schritte *0,00-10,00*, *10,00-20,00*, *20,00-50,00* usw. bis *400,00-500,00* und *ab 500,00*. 
-
-#### Weiterleitung zur Produktseite bei 100% Übereinstimmung mit einem dieser Attribute
+#### Weiterleitung zur Produktseite bei 100 % Übereinstimmung mit einem dieser Attribute
 
 Wird als Suchbegriff ein Wert eingegeben, der mit einem wichtigen Attributwert eines Produkts exakt übereinstimmt, können Sie für diesen Fall eine direkte Weiterleitung zum Produkt aktivieren. Dadurch wird der Weg zum Produkt weiter verkürzt, indem das Anzeigen der Suchergebnisseite übersprungen wird.
 Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zum Produkt eindeutig ist.
 
-#### Weiterleitung zur Kategorieseite bei 100% Übereinstimmung mit einem dieser Attribute
+#### Weiterleitung zur Kategorieseite bei 100 % Übereinstimmung mit einem dieser Attribute
 
 Wie bei der direkten Weiterleitung zu Produkten können Sie auch eine Weiterleitung zu exakt übereinstimmenden Kategorieseiten aktivieren.
 Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zur Kategorie eindeutig ist.
+
+#### Individuelle Preisintervalle verwenden
+Wenn Sie keine lineare Einteilung der Intervalle wünschen und mindestens Solr 4.10 einsetzen, können Sie hier die gewünschten Intervallgrenzen für den Preisfilter individuell einstellen. Beim Beispiel *10,20,50,100,200,300,400,500* wären das die Schritte *0,00-10,00*, *10,00-20,00*, *20,00-50,00* usw. bis *400,00-500,00* und *ab 500,00*. 
 
 ### Kategorieseiten
 
@@ -320,6 +332,18 @@ Wird diese Funktion aktiviert, ist danach eine Reindizierung des Solr Suchindex 
 #### Position der Filter
 
 Unabhängig von der Position der Filter auf den Suchergebnisseiten können Sie für Kategorien eine andere Anordnung der Filter auswählen. Zur Wahl stehen die Anzeige links neben den Produkten und oberhalb der Produkte.  Dies ist ein Standardwert, der durch eine Konfiguration in der Kategorie selbst überschrieben werden kann.
+
+#### Solr für die Indizierung von Kategorie-Seiten verwenden
+
+Wenn diese Funktion aktiviert ist, werden Kategorien in den Suchvorschlägen angezeigt, deren Namen oder Beschreibungen zum Suchbegriff passen. Für eine feinere Einstellung der vorgeschlagenen Kategorien können Sie einzelne Kategorien vom Index ausschließen.  
+
+### CMS
+
+![CMS-Seiten](http://www.integer-net.com/download/solr/integernet-solr-config-category-display-de.png)
+
+#### Solr für die Indizierung von CMS-Seiten verwenden
+
+Um CMS-Seiten in den Suchvorschlägen anzuzeigen, muss diese Funktion aktiviert sein. Sie funktioniert ähnlich wie die oben genannte Indizierung der Kategorien. Für eine feinere Einstellung können auch hier einzelne CMS-Seiten vom Index ausgeschlossen werden.
 
 ### Suchvorschlags-Box
 
@@ -337,7 +361,7 @@ Diese Einstellung wurde bereits oben im Kapitel ["Technischer Ablauf"](#technisc
 
 #### Maximale Anzahl Suchwort-Vorschläge
 
-Die Anzahl der Suchwort-Vorschläge in der Suchvorschlags-Box. Abhängig von Ihren Produkten wird der eingegebene Suchbegriff um sinnvolle Varianten ergänzt. Bei Eingabe von "re" im Demo-Shop erscheinen z.B. die folgenden Vorschläge: *regular…*, *resistant…*, *refined…*, *red…*.
+Die Anzahl der Suchwort-Vorschläge in der Suchvorschlags-Box. Abhängig von Ihren Produkten wird der eingegebene Suchbegriff um sinnvolle Varianten ergänzt. Bei Eingabe von "re" im Demo-Shop erscheinen z. B. die folgenden Vorschläge: *regular…*, *resistant…*, *refined…*, *red…*.
  
 #### Maximale Anzahl Produkt-Vorschläge
 
@@ -345,7 +369,11 @@ Die Anzahl der in der Suchvorschau angezeigten Produkte.
 
 #### Maximale Anzahl Kategorie-Vorschläge
 
-Die Anzahl der in der Suchvorschau angezeigten Kategorien. Dies sind die Kategorien, die am besten zu den gefundenen Produkten passen.
+Die Anzahl der in der Suchvorschau angezeigten Kategorien. Wenn die Funktion "Solr für die Indizierung von Kategorie-Seiten verwenden" ebenfalls aktiviert ist, werden jene Kategorien angezeigt, deren Namen und Beschreibungen zum Suchbegriff passen. Andernfalls werden die Kategorien aufgeführt, in denen zum Suchbegriff passende Produkte enthalten sind.
+
+#### Maximale Anzahl CMS-Seiten-Vorschläge
+
+Die Anzahl der in der Suchvorschau angezeigten CMS-Seiten. Diese Vorschläge können nur dann angezeigt werden, wenn für die Funktion "Solr für die Indizierung von CMS-Seiten verwenden" der Wert auf "Ja" gesetzt ist.
 
 #### Kompletten Kategorie-Pfad anzeigen
 
@@ -405,14 +433,31 @@ Dafür gibt es das neue Produktattribut "Solr-Priorität" im Tab "Solr" der Prod
 
 Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchbegriffen passt, weiter oben oder weiter unten zu platzieren als seine Standard-Position. Wir empfehlen hier Werte zwischen 0.5 und höchstens 10. Der Mechanismus ist der gleiche wie beim Boosting von Attributen. Eine Neuindizierung ist nach der Anpassung nicht erforderlich, sofern die Index-Aktualisierung aktiviert ist.
 
-### Ausschließen von Kategorien
+### Ausschließen von CMS-Seiten
 
-Bei Bedarf gibt es die Option, Kategorien von der Solr-Suche auszuschließen. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen Kategorie im Tab "Solr".
+Wenn gewünscht, können einzelne CMS-Seiten von den Suchergebnissen ausgeschlossen werden. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen CMS-Seite im Tab "Solr".
 
-![Kategorie-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-de.png)
+![CMS-Seiten-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-cms-exclude-de.png)
 
-Es können entweder einzelne Kategorien oder Kategorien samt ihrer untergeordneten Kindkategorien aus der Suche ausgeschlossen werden. 
-In den Suchvorschlägen werden die auf diese Art ausgeschlossenen Kategorien nicht mehr angeboten. Die Produkte dieser Kategorien werden jedoch weiterhin als Suchergebnisse angezeigt. 
+Setzen Sie im Feld "Diese Seite vom Solr-Index ausschließen" den Wert auf "Ja", wird die CMS-Seite nicht in den Suchergebnissen angezeigt.
+Im Feld "Solr-Priorität" können Sie durch die Eingabe einer Zahl, die größer als 1 ist, dieser CMS-Seite ein höheres Gewicht in den Suchergebnissen geben.
+
+Kategorieanpassungen
+---------------------
+
+![Kategorieansicht](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-de.png)
+
+### Diese Kategorie vom Solr-Index ausnehmen
+Bei Bedarf gibt es die Option, Kategorien von der Solr-Suche auszuschließen. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen Kategorie im Tab "Solr". Wird der Wert auf "Ja" gesetzt, erscheint diese Kategorie nicht mehr als Vorschlag in den Suchvorschlägen.
+
+### Kind-Kategorien vom Solr-Index ausnehmen
+Neben dem Ausschließen einer Kategorie aus dem Index können auch nur deren untergeordnete Kindkategorien aus der Suche ausgeschlossen werden. In den Suchvorschlägen werden die auf diese Art ausgeschlossenen Kategorien nicht mehr angeboten. Die Produkte dieser Kategorien werden jedoch weiterhin als Suchergebnisse angezeigt. 
+
+### Filter entfernen
+Selbst wenn IntegerNet_Solr nicht zum Laden der Produkte auf Kategorieseiten genutzt wird, können Sie das Modul nutzen um unnötige Filter von bestimmten Kategorieseiten zu entfernen. Zum Beispiel können Sie so verhindern, dass der Filter "Geschlecht" auf der Kategorieseite für Herrenbekleidung angezeigt wird.  
+
+### Position der Filter
+Für jede Kategorie können Sie bestimmen, wo die Filter angezeigt werden, auch abweichend vom Standardwert, den Sie in der Konfiguration von IntegerNet_Solr hinterlegen. Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden.
 
 Template-Anpassungen
 --------------------
@@ -446,17 +491,6 @@ Versuchen Sie, sich an die in `app/design/frontend/base/default/template/integer
 
 Wenn Sie Produkt-, Kategorie-, Attribut- oder Suchwortvorschläge in der Suchvorschaufunktion nicht verwenden, schalten Sie sie bitte auch in der Konfiguration aus, um die Performance zu verbessern.
 
-Kategorieanpassungen
----------------------
-
-![Category View](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-de.png)
-
-### Filter entfernen
-Selbst wenn IntegerNet_Solr nicht zum Laden der Produkte auf Kategorieseiten genutzt wird, können Sie das Modul nutzen um unnötige Filter von bestimmten Kategorieseiten zu entfernen. Zum Beispiel können Sie so verhindern, dass der Filter "Geschlecht" auf der Kategorieseite für Herrenbekleidung angezeigt wird.  
-
-### Position der Filter
-Für jede Kategorie können Sie bestimmen, wo die Filter angezeigt werden, auch abweichend vom Standardwert, den Sie in der Konfiguration von IntegerNet_Solr hinterlegen. Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden.
-
 Events
 ---------------------
 Zur Anpassung des Moduls sind verschiedene Events integriert, die von einem externen Modul per Observer aufgegriffen werden können. Folgende Events sind in IntegerNet_Solr enthalten:
@@ -483,4 +517,4 @@ Mögliche Probleme und Lösungsansätze
     Schalten Sie `Suchergebnisse -> HTML vom Solr-Index verwenden` in der Konfiguration aus. Dadurch wird der HTML-Code bei jedem Aufruf neu generiert. Beachten Sie bitte, dass das die Performance der Suchergebnisseite beeinflusst.
 
 4. **Die Produktdaten im Suchvorschaufenster sollten für verschiedene Kundengruppen unterschiedlich aussehen, sehen aber überall gleich aus**
-    Da der produktabhängige HTML-Code immer im Solr-Index gespeichert wird, ist das leider nicht möglich. Versuchen Sie, das HTML in `template/integernet/solr/autosuggest/item.phtml` so anzupassen, dass es keine kundenspezifischen Informationen (z.B. Preise) mehr enthält.
+    Da der produktabhängige HTML-Code immer im Solr-Index gespeichert wird, ist das leider nicht möglich. Versuchen Sie, das HTML in `template/integernet/solr/autosuggest/item.phtml` so anzupassen, dass es keine kundenspezifischen Informationen (z. B. Preise) mehr enthält.

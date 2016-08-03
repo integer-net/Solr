@@ -152,3 +152,4 @@
 "Content column (above products)","Inhaltsspalte (oberhalb der Produkte)"
 "Default Value from Configuration","Standardwert aus der Konfiguration"
 "Use Solr to index cms pages","Solr für die Indizierung von CMS-Seiten verwenden"
+"Exclude this Page from Solr Index","Diese Seite vom Solr-Index ausschließen"

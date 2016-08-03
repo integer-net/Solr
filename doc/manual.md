@@ -306,9 +306,6 @@ This setting is used by the price filter. You can set the steps which are used f
 
 This setting is used for the price filter as well. This value defines the topmost interval. If set to *200*, this would be *from 200.00*. All products which cost more than 200.00 will be combined in this interval.
 
-#### Use Custom Price Intervals
-If you don't want to have a linear arrangement of intervals and you are using Solr 4.10 or above, you can set the desired interval borders for the price filter individually here. In the example *10,20,50,100,200,300,400,500* this would be the intervals *0.00-10.00*, *10.00-20.00*, *20.00-50.00* and so on until *400.00-500.00* and *from 500.00*. 
-
 #### Redirect to product page on direct match in one of these attributes
 
 If the entered search term is an exact match with an important attribute of a product, you can here activate a direct redirect to the matching product page. As a result, the way to the product is shortened, because you skip the step of showing the search results page.
@@ -317,6 +314,9 @@ It is recommended to only use this redirect for attributes which have unique val
 #### Redirect to category page on direct match in one of these attributes
 
 Just like a redirect to a product page, you can also activate redirects for search terms which exactly match a category's attribute. Please make sure to only use this feature for attributes which allow for unambiguous matching with a category page. 
+
+#### Use Custom Price Intervals
+If you don't want to have a linear arrangement of intervals and you are using Solr 4.10 or above, you can set the desired interval borders for the price filter individually here. In the example *10,20,50,100,200,300,400,500* this would be the intervals *0.00-10.00*, *10.00-20.00*, *20.00-50.00* and so on until *400.00-500.00* and *from 500.00*. 
 
 ### Category Pages
 
@@ -336,7 +336,7 @@ When you activate this setting, categories that match the search term will be di
 
 ### CMS
 
-![CMS Pages](http://www.integer-net.com/download/solr/integernet-solr-config-category-display-en.png)
+![CMS Pages](http://www.integer-net.com/download/solr/integernet-solr-config-CMS-en.png)
 
 #### Use Solr to index cms pages
 
@@ -431,7 +431,7 @@ With that, you have the possibility to position a product, as far as it matches 
 
 If you would prefer to exclude certain CMS Pages from search results, the settings to do so can be found in the corresponding CMS page in the tab named "Solr".
 
-![CMS Page View](http://www.integer-net.de/download/solr/integernet-solr-cms-exclude-en.png)
+![CMS Page View](http://www.integer-net.de/download/solr/integernet-solr-CMS-exclude-en.png)
 
 Set "Exclude this Page from Solr Index" to "Yes" to exclude the page from search results.
 Use the field "Solr Priority" to weight this page more heavily in the search results. The higher the entered number, the higher the boost factor for this CMS page.

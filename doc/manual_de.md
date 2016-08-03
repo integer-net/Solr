@@ -339,7 +339,7 @@ Wenn diese Funktion aktiviert ist, werden Kategorien in den Suchvorschlägen ang
 
 ### CMS
 
-![CMS-Seiten](http://www.integer-net.com/download/solr/integernet-solr-config-category-display-de.png)
+![CMS-Seiten](http://www.integer-net.com/download/solr/integernet-solr-config-CMS-de.png)
 
 #### Solr für die Indizierung von CMS-Seiten verwenden
 
@@ -437,7 +437,7 @@ Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchbegriffe
 
 Wenn gewünscht, können einzelne CMS-Seiten von den Suchergebnissen ausgeschlossen werden. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen CMS-Seite im Tab "Solr".
 
-![CMS-Seiten-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-cms-exclude-de.png)
+![CMS-Seiten-Ansicht](http://www.integer-net.de/download/solr/integernet-solr-CMS-exclude-de.png)
 
 Setzen Sie im Feld "Diese Seite vom Solr-Index ausschließen" den Wert auf "Ja", wird die CMS-Seite nicht in den Suchergebnissen angezeigt.
 Im Feld "Solr-Priorität" können Sie durch die Eingabe einer Zahl, die größer als 1 ist, dieser CMS-Seite ein höheres Gewicht in den Suchergebnissen geben.

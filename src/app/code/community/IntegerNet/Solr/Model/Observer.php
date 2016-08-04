@@ -355,6 +355,11 @@ class IntegerNet_Solr_Model_Observer
         }
     }
 
+    /**
+     * Add new fields to CMS Page edit form
+     * 
+     * @param Varien_Event_Observer $observer
+     */
     public function adminhtmlCmsPageEditTabContentPrepareForm(Varien_Event_Observer $observer)
     {
         $model = Mage::registry('cms_page');

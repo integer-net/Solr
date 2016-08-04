@@ -239,7 +239,7 @@ class IntegerNet_Solr_Model_Observer
                 $product->load($productId);
                 if ($product->isVisibleInSiteVisibility()
                     && $product->isAvailable()
-                    && in_array(Mage::app()->getWebsite(), $product->getWebsiteIds())
+                    && in_array(Mage::app()->getWebsite()->getId(), $product->getWebsiteIds())
                 ) {
                     return $product->getProductUrl();
                 }

@@ -141,10 +141,12 @@ class IntegerNet_Solr_Model_Observer
         /** @var $indexer Mage_Index_Model_Process */
         $indexer = Mage::getModel('index/process')->load('integernet_solr', 'indexer_code');
         if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
-            /** @var Mage_Catalog_Model_Product $product */
-            $product = $observer->getProduct();
-            Mage::helper('integernet_solr')->factory()->getProductIndexer()->deleteIndex(array($product->getId()));
+            return;
         }
+        
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = $observer->getProduct();
+        Mage::helper('integernet_solr')->factory()->getProductIndexer()->deleteIndex(array($product->getId()));
     }
 
     /**

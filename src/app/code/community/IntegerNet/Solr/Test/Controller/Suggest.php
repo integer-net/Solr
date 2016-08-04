@@ -17,11 +17,14 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     protected function setUp()
     {
         parent::setUp();
+        //TODO test with category indexer and without
+        $this->app()->getStore(0)->setConfig('integernet_solr/category/is_indexer_active', 1);
         Mage::getModel('integernet_solr/indexer')->reindexAll();
     }
 
     /**
      * @test
+     * @dataProvider dataAutoSuggestBox
      * @singleton core/session
      * @singleton catalog/session
      * @singleton customer/session
@@ -34,9 +37,12 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      * @loadFixture catalog
      * @doNotIindexAll
      */
-    public function shouldShowAutosuggestBox()
+    public function shouldShowAutosuggestBox($config, $expectedInBody)
     {
         $this->setCurrentStore('default');
+        foreach ($config as $path => $value) {
+            $this->app()->getStore()->setConfig($path, $value);
+        }
         // We need to reload the attribute config in store scope, has been loaded during reindex,
         // in admin scope, so that attribute labels are missing
         Mage::unregister('_singleton/eav/config');
@@ -51,6 +57,10 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
         $this->assertResponseBodyContains('<div class="attributes-box">', 'Attribute container');
         $this->assertResponseBodyContains('<strong>Manufacturer1</strong>', 'Attribute container content');
         $this->assertResponseBodyContains('/catalogsearch/result/?manufacturer=5&amp;q=war">Herbert George Wells</a>', 'Link to attribute search');
+
+        foreach ($expectedInBody as $expected) {
+            $this->assertResponseBodyContains($expected);
+        }
     }
 
     /**
@@ -82,5 +92,30 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
         $this->assertResponseBodyContains('<div class="attributes-box">', 'Attribute container');
         $this->assertResponseBodyContains('<strong>Manufacturer2</strong>', 'Attribute container content');
         $this->assertResponseBodyContains('/catalogsearch/result/?manufacturer=5&amp;q=Hodor"><span class="highlight">Hodor</span> <span class="highlight">Hodor</span> <span class="highlight">Hodor</span></a>', 'Link to attribute search');
+    }
+
+    /**
+     * Data provider
+     */
+    public static function dataAutoSuggestBox()
+    {
+        return [
+            'category_link_type_direct' => [
+                'config' => [
+                    'integernet_solr/autosuggest/category_link_type' => \IntegerNet\Solr\Config\AutosuggestConfig::CATEGORY_LINK_TYPE_DIRECT
+                ],
+                'expectedInBody' => [
+                    'catalog/category/view/s/sci-fi/id/22/'
+                ]
+            ],
+            'category_link_type_filter' => [
+                'config' => [
+                    'integernet_solr/autosuggest/category_link_type' => \IntegerNet\Solr\Config\AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER
+                ],
+                'expectedInBody' => [
+                    'catalogsearch/result/?cat=22&q=war'
+                ]
+            ],
+        ];
     }
 }

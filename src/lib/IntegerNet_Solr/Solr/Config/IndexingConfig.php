@@ -27,7 +27,6 @@ final class IndexingConfig
      * @param int $pagesize
      * @param bool $deleteDocumentsBeforeIndexing
      * @param bool $swapCores
-     * @param string $swapCore
      */
     public function __construct($pagesize, $deleteDocumentsBeforeIndexing, $swapCores)
     {

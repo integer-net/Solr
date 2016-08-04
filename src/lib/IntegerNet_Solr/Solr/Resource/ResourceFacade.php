@@ -17,6 +17,7 @@ use Apache_Solr_HttpTransport_FileGetContents;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\Indexer\IndexDocument;
 
 /**
  * Solr resource, facade for Apache_Solr library
@@ -243,7 +244,7 @@ class ResourceFacade
 
     /**
      * @param int $storeId
-     * @param array[] $combinedData
+     * @param array[]|IndexDocument[] $combinedData
      * @return Apache_Solr_Response
      */
     public function addDocuments($storeId, $combinedData)

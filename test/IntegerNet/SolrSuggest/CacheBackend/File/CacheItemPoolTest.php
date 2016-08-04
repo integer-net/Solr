@@ -158,6 +158,8 @@ class CacheItemPoolTest extends \PHPUnit_Framework_TestCase
         return [
             ['./item/sub_item', '._item_sub__item', 'item'],
             ['/', '_'],
+            ['\\', '_'],
+            ['item\\sub_item', 'item_sub__item'],
             ['_', '__', '_'],
             ['dir/../item', 'dir_.._item', 'item'],
             ['../cache/item', '.._cache_item', 'item'],

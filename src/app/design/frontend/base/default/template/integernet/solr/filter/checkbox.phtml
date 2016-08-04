@@ -10,5 +10,5 @@
 /** @var IntegerNet_Solr_Block_Result_Layer_Checkbox $this */
 ?>
 <?php if (!$this->getIsTopNav()): ?>
-<input type="checkbox" name="" value="" <?php if ($this->getIsChecked()): ?>checked="checked"<?php endif ?> />
+<input id="solr_<?php echo $this->getAttributeCode() ?>_<?php echo $this->getOptionId() ?>" type="checkbox" name="" value="" <?php if ($this->getIsChecked()): ?>checked="checked"<?php endif ?> />
 <?php endif ?>

@@ -15,6 +15,7 @@ use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\StoreConfig;
 use IntegerNet\Solr\Config\CmsConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Implementor\Config;
 
 /**
@@ -54,6 +55,10 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
      * @var ResultsConfig
      */
     protected $_results;
+    /**
+     * @var CategoryConfig
+     */
+    protected $_category;
     /**
      * @var CmsConfig
      */
@@ -155,8 +160,9 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
                 $this->_getConfig($prefix . 'max_number_searchword_suggestions'),
                 $this->_getConfig($prefix . 'max_number_product_suggestions'),
                 $this->_getConfig($prefix . 'max_number_category_suggestions'),
+                $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
-                $this->_getConfigFlag($prefix . 'category_link_type'),
+                $this->_getConfig($prefix . 'category_link_type'),
                 @unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
             );
         }
@@ -215,7 +221,8 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
                 $this->_getConfig($prefix . 'price_step_size'),
                 $this->_getConfig($prefix . 'max_price'),
                 $this->_getConfigFlag($prefix . 'use_custom_price_intervals'),
-                explode(',', $this->_getConfig($prefix . 'custom_price_intervals'))
+                explode(',', $this->_getConfig($prefix . 'custom_price_intervals')),
+                $this->_getConfigFlag($prefix . 'show_category_filter')
             );
         }
         return $this->_results;
@@ -235,6 +242,24 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             );
         }
         return $this->_cms;
+    }
+
+    /**
+     * Returns search results configuration
+     *
+     * @return CategoryConfig
+     */
+    public function getCategoryConfig()
+    {
+        if ($this->_category === null) {
+            $prefix = 'integernet_solr/category/';
+            $this->_category = new CategoryConfig(
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'filter_position'),
+                $this->_getConfigFlag($prefix . 'is_indexer_active')
+            );
+        }
+        return $this->_category;
     }
 
 

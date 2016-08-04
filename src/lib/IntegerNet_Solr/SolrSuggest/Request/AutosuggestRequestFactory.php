@@ -34,7 +34,8 @@ class AutosuggestRequestFactory extends SearchRequestFactory
             $this->getPagination(),
             $this->getResultsConfig(),
             $this->getFuzzyConfig(),
-            $this->getStoreId()
+            $this->getStoreId(),
+            $this->getEventDispatcher()
         );
     }
 }

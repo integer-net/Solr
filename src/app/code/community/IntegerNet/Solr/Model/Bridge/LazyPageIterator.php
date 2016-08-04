@@ -16,6 +16,7 @@ use IntegerNet\SolrCms\Implementor\Page;
  */
 class IntegerNet_Solr_Model_Bridge_LazyPageIterator implements PageIterator, OuterIterator
 {
+    protected $_bridgeFactory;
     /**
      * @var int
      */
@@ -58,6 +59,7 @@ class IntegerNet_Solr_Model_Bridge_LazyPageIterator implements PageIterator, Out
      */
     public function __construct($_storeId, $_pageIdFilter, $_pageSize)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
         $this->_pageIdFilter = $_pageIdFilter;
         $this->_pageSize = $_pageSize;
@@ -115,7 +117,7 @@ class IntegerNet_Solr_Model_Bridge_LazyPageIterator implements PageIterator, Out
     {
         $page = $this->getInnerIterator()->current();
         $page->setStoreId($this->_storeId);
-        return new IntegerNet_Solr_Model_Bridge_Page($page);
+        return $this->_bridgeFactory->createPage($page);
     }
 
     /**

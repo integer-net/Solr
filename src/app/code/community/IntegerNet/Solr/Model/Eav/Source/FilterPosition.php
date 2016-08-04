@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\CategoryConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -10,6 +12,11 @@
 
 class IntegerNet_Solr_Model_Eav_Source_FilterPosition extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
 {
+    public function __construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+    }
+
     /**
      * Options getter
      *
@@ -18,7 +25,7 @@ class IntegerNet_Solr_Model_Eav_Source_FilterPosition extends Mage_Eav_Model_Ent
     public function getAllOptions()
     {
         $options = array(array(
-            'value' => IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_DEFAULT,
+            'value' => CategoryConfig::FILTER_POSITION_DEFAULT,
             'label' => Mage::helper('integernet_solr')->__('Default Value from Configuration'),
         ));
         

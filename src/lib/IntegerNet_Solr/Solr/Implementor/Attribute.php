@@ -20,7 +20,13 @@ namespace IntegerNet\Solr\Implementor;
  */
 interface Attribute
 {
+    const BACKEND_TYPE_INT = 'int';
+    const BACKEND_TYPE_DECIMAL = 'decimal';
+    const BACKEND_TYPE_TEXT = 'text';
+    const BACKEND_TYPE_VARCHAR = 'varchar';
+
     const FACET_TYPE_SELECT = 'select';
+    const FACET_TYPE_BOOLEAN = 'boolean';
     const FACET_TYPE_MULTISELECT = 'multiselect';
 
     /**
@@ -54,7 +60,7 @@ interface Attribute
     public function getIsSearchable();
 
     /**
-     * @return string
+     * @return string See constants. 'decimal', 'text', 'int', or 'varchar' (default)
      */
     public function getBackendType();
 

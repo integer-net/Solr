@@ -14,7 +14,7 @@ class IntegerNet_Solr_Block_Result_Layer extends Mage_Core_Block_Abstract
      */
     public function getState()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
             if ($block = $this->getLayout()->getBlock('catalog.solr.layer.state')) {
                 return $block;
             }

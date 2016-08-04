@@ -16,7 +16,7 @@ class IntegerNet_Solr_Model_Catalog_Layer extends Mage_Catalog_Model_Layer
      */
     public function getProductCollection()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getProductCollection();
         }
 
@@ -36,7 +36,7 @@ class IntegerNet_Solr_Model_Catalog_Layer extends Mage_Catalog_Model_Layer
      */
     public function getFilterableAttributes()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getFilterableAttributes();
         }
 

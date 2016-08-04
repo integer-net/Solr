@@ -1,4 +1,6 @@
 <?php
+use IntegerNet\Solr\Config\CategoryConfig;
+
 /**
  * integer_net Magento Module
  *
@@ -10,6 +12,13 @@
 class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
 {
     protected $_filters = null;
+    protected $_currentCategory = null;
+
+    protected function _construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+        parent::_construct();
+    }
 
     /**
      * Check availability display layer block
@@ -20,25 +29,25 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     {
         switch ($this->getNameInLayout()) {
             case 'catalogsearch.solr.leftnav':
-                return Mage::getStoreConfig('integernet_solr/results/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT;
+                return Mage::getStoreConfig('integernet_solr/results/filter_position') == CategoryConfig::FILTER_POSITION_LEFT;
             case 'catalogsearch.solr.topnav':
-                return Mage::getStoreConfig('integernet_solr/results/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP;
+                return Mage::getStoreConfig('integernet_solr/results/filter_position') == CategoryConfig::FILTER_POSITION_TOP;
             case 'catalog.solr.leftnav':
                 switch ($this->_getCurrentCategory()->getData('filter_position')) {
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_DEFAULT:
-                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT:
+                    case CategoryConfig::FILTER_POSITION_DEFAULT:
+                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == CategoryConfig::FILTER_POSITION_LEFT;
+                    case CategoryConfig::FILTER_POSITION_LEFT:
                         return true;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP:
+                    case CategoryConfig::FILTER_POSITION_TOP:
                         return false;
                 }
             case 'catalog.solr.topnav':
                 switch ($this->_getCurrentCategory()->getData('filter_position')) {
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_DEFAULT:
-                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_LEFT:
+                    case CategoryConfig::FILTER_POSITION_DEFAULT:
+                        return Mage::getStoreConfig('integernet_solr/category/filter_position') == CategoryConfig::FILTER_POSITION_TOP;
+                    case CategoryConfig::FILTER_POSITION_LEFT:
                         return false;
-                    case IntegerNet_Solr_Model_Source_FilterPosition::FILTER_POSITION_TOP:
+                    case CategoryConfig::FILTER_POSITION_TOP:
                         return true;
                 }
         }
@@ -69,11 +78,11 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
 
                 $categoryFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
                 $categoryFilter = $this->_getCategoryFilter($categoryFacets);
-                if ($categoryFilter->getHtml()) {
+                if ($categoryFilter->getItemsCount() && trim($categoryFilter->getHtml())) {
                     $this->_filters[] = $categoryFilter;
                 }
             }
-            foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
+            foreach (Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 /** @var Mage_Catalog_Model_Category $currentCategory */
@@ -90,17 +99,26 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                 if (isset($this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName})) {
 
                     $attributeFacets = (array)$this->_getSolrResult()->facet_counts->facet_fields->{$attributeCodeFacetName};
-                    $this->_filters[] = $this->_getFilter($attribute, $attributeFacets);
+                    $filter = $this->_getFilter($attribute, $attributeFacets);
+                    if ($filter->getItemsCount() && trim($filter->getHtml())) {
+                        $this->_filters[] = $filter;
+                    }
                 }
-                $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($attribute);
+                $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->attribute()->getFieldName($attribute);
                 if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
 
                     $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
-                    $this->_filters[] = $this->_getIntervalFilter($attribute, $attributeFacetData);
+                    $filter = $this->_getIntervalFilter($attribute, $attributeFacetData);
+                    if ($filter->getItemsCount() && trim($filter->getHtml())) {
+                        $this->_filters[] = $filter;
+                    }
                 } elseif (isset($this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName})) {
 
                     $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_ranges->{$attributeCodeFacetRangeName};
-                    $this->_filters[] = $this->_getRangeFilter($attribute, $attributeFacetData);
+                    $filter = $this->_getRangeFilter($attribute, $attributeFacetData);
+                    if ($filter->getItemsCount() && trim($filter->getHtml())) {
+                        $this->_filters[] = $filter;
+                    }
                 }
             }
         }
@@ -119,7 +137,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
         $filter->setItemsCount(sizeof($attributeFacets));
         $filter->setIdentifier($attribute->getAttributeCode());
         $filter->setHtml(
-            $this->getChild('filter')
+            $this->_getFilterBlock()
                 ->setData('is_category', false)
                 ->setData('is_range', false)
                 ->setData('attribute', $attribute)
@@ -140,7 +158,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
         $filter->setItemsCount(sizeof($attributeFacetData));
         $filter->setIdentifier($attribute->getAttributeCode());
         $filter->setHtml(
-            $this->getChild('filter')
+            $this->_getFilterBlock()
                 ->setData('is_category', false)
                 ->setData('is_range', true)
                 ->setData('attribute', $attribute)
@@ -161,7 +179,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
         $filter->setItemsCount(sizeof($attributeFacetData['counts']));
         $filter->setIdentifier($attribute->getAttributeCode());
         $filter->setHtml(
-            $this->getChild('filter')
+            $this->_getFilterBlock()
                 ->setData('is_category', false)
                 ->setData('is_range', true)
                 ->setData('attribute', $attribute)
@@ -182,7 +200,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
         $filter->setIdentifier('category');
 
         /** @var IntegerNet_Solr_Block_Result_Layer_Filter $filterBlock */
-        $filterBlock = $this->getChild('filter')
+        $filterBlock = $this->_getFilterBlock()
             ->setData('is_category', true);
         if (sizeof($filterBlock->getItems())) {
             $filter->setHtml(
@@ -216,18 +234,21 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     protected function _getCurrentCategory()
     {
         if (is_null($this->_currentCategory)) {
-            if ($filteredCategoryId = Mage::app()->getRequest()->getParam('cat')) {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::getModel('catalog/category')->load($filteredCategoryId);
-            } else {
-                /** @var Mage_Catalog_Model_Category $currentCategory */
-                $this->_currentCategory = Mage::registry('current_category');
-                if (is_null($this->_currentCategory)) {
-                    $this->_currentCategory = false;
-                }
+            /** @var Mage_Catalog_Model_Category $currentCategory */
+            $this->_currentCategory = Mage::registry('current_category');
+            if (is_null($this->_currentCategory)) {
+                $this->_currentCategory = false;
             }
         }
 
         return $this->_currentCategory;
+    }
+
+    /**
+     * @return IntegerNet_Solr_Block_Result_Layer_Filter
+     */
+    protected function _getFilterBlock()
+    {
+        return $this->getChild('filter')->reset();
     }
 }

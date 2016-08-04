@@ -14,7 +14,7 @@ class IntegerNet_Solr_Adminhtml_SolrController extends Mage_Adminhtml_Controller
         Mage::getSingleton('adminhtml/session')->addSuccess(
             $this->__('The Solr Autosuggest Cache has been flushed and rebuilt successfully.')
         );
-        Mage::helper('integernet_solr/autosuggest')->storeSolrConfig();
+        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
         $this->_redirectReferer();
     }
 

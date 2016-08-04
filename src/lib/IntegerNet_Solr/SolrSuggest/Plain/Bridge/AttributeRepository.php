@@ -99,9 +99,19 @@ class AttributeRepository implements AttributeRepositoryInterface
     /**
      * @param int $storeId
      * @param bool $useAlphabeticalSearch
-     * @return Mage_Catalog_Model_Entity_Attribute[]
+     * @return AttributeInterface[]
      */
     public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
+    {
+        // not used in autosuggest
+        return array();
+    }
+
+    /**
+     * @param int $storeId
+     * @return AttributeInterface[]
+     */
+    public function getSortableAttributes($storeId)
     {
         // not used in autosuggest
         return array();
@@ -117,12 +127,12 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
-     * @param int $storeId
      * @param string $attributeCode
+     * @param int $storeId
      * @return AttributeInterface
      * @throws Exception
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
         $attributes = $this->findFilterableInSearchAttributes($storeId);
         if (! isset($attributes[$attributeCode])) {

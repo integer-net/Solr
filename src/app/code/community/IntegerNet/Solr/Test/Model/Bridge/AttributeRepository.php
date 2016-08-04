@@ -21,7 +21,7 @@ class IntegerNet_Solr_Test_Model_Bridge_AttributeRepository extends EcomDev_PHPU
     public function shouldLoadAttributesWithStoreValues($storeId, array $expectedSearchableAttributes,
                                                         array $expectedFilterableAttributes)
     {
-        $attributeRepository = Mage::getModel('integernet_solr/bridge_attributeRepository');
+        $attributeRepository = Mage::getModel('integernet_solr/bridge_factory')->createAttributeRepository();
         $this->assertAttributeArrayContains($expectedSearchableAttributes,
             $attributeRepository->getSearchableAttributes($storeId), 'getSearchableAttributes');
 

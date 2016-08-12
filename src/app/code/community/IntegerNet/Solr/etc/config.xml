@@ -259,9 +259,6 @@
                 <integernet_solr_filter>
                     <file>integernet/solr/filter.xml</file>
                 </integernet_solr_filter>
-                <integernet_solr_additiona>
-                    <file>integernet/solr/tabs.xml</file>
-                </integernet_solr_additiona>
             </updates>
         </layout>
 

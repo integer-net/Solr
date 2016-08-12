@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <IntegerNet_SolrPro>
+            <version>1.6.0.2</version>
+        </IntegerNet_SolrPro>
+    </modules>
+    <global>
+        <models>
+            <integernet_solrpro>
+                <class>IntegerNet_SolrPro_Model</class>
+                <resourceModel>integernet_solrpro_resource</resourceModel>
+            </integernet_solrpro>
+
+            <integernet_solrpro_resource>
+                <class>IntegerNet_SolrPro_Model_Resource</class>
+            </integernet_solrpro_resource>
+        </models>
+
+        <blocks>
+            <integernet_solrpro>
+                <class>IntegerNet_SolrPro_Block</class>
+            </integernet_solrpro>
+        </blocks>
+
+        <helpers>
+            <integernet_solrpro>
+                <class>IntegerNet_SolrPro_Helper</class>
+            </integernet_solrpro>
+        </helpers>
+    </global>
+
+    <frontend>
+        <translate>
+            <modules>
+                <integernet_solrpro>
+                    <files>
+                        <default>IntegerNet_SolrPro.csv</default>
+                    </files>
+                </integernet_solrpro>
+            </modules>
+        </translate>
+
+        <layout>
+            <updates>
+                <integernet_solrpro_tabs>
+                    <file>integernet/solr/tabs.xml</file>
+                </integernet_solrpro_tabs>
+            </updates>
+        </layout>
+    </frontend>
+
+    <phpunit>
+        <suite>
+            <modules>
+                <IntegerNet_SolrPro/>
+            </modules>
+        </suite>
+    </phpunit>
+</config>

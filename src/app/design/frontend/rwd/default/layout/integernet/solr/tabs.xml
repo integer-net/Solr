@@ -10,8 +10,8 @@
                 <action method="insert">
                     <name>breadcrumbs</name>
                 </action>
-                <block type="integernet_solr/result_tabs" name="catalogsearch.solr.tabs" after="breadcrumbs"
-                       template="integernet/solr/result/tabs.phtml" />
+                <block type="integernet_solrpro/tabs" name="catalogsearch.solr.tabs" after="breadcrumbs"
+                       template="integernet/solr/tabs.phtml" />
             </block>
         </reference>
     </catalogsearch_result_index>

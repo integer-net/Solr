@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <catalogsearch_result_index>
+        <reference name="root">
+            <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
+                <name>breadcrumbs</name>
+            </action>
+            <block ifconfig="integernet_solr/general/is_active" type="core/text_list" name="catalogsearch.solr.breadcrumbs" as="breadcrumbs">
+                <action method="insert">
+                    <name>breadcrumbs</name>
+                </action>
+                <block type="integernet_solr/result_tabs" name="catalogsearch.solr.tabs" after="breadcrumbs"
+                       template="integernet/solr/result/tabs.phtml" />
+            </block>
+        </reference>
+    </catalogsearch_result_index>
+</layout>

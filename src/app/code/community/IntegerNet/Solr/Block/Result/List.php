@@ -10,6 +10,14 @@
 class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
 {
     /**
+     * @return int
+     */
+    public function getFoundProductsCount()
+    {
+        return $this->_getProductCollection()->getSize();
+    }
+
+    /**
      * Retrieve loaded category collection
      *
      * @return IntegerNet_Solr_Model_Result_Collection|IntegerNet_Solr_Model_Resource_Catalog_Product_Collection

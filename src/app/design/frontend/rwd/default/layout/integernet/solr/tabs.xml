@@ -14,5 +14,8 @@
                        template="integernet/solr/tabs.phtml" />
             </block>
         </reference>
+        <reference name="content">
+            <block type="integernet_solrpro/result_cms" name="catalogsearch.solr.tab.cms" before="*" template="integernet/solr/tabs/cms.phtml" />
+        </reference>
     </catalogsearch_result_index>
 </layout>

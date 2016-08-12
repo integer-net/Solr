@@ -29,9 +29,9 @@ return AppConfig::defaultConfig()
      *
      * This is only used if you don't specify a path to an external autoloader (i.e. composer)
      *
-     * use real directory of current file in case of symlinks
+     * use symlinked directory of current file in case of symlinks
      */
-    ->withLibBaseDir(__DIR__ . '/lib/IntegerNet_Solr')
+    ->withLibBaseDir(getcwd() . '/lib/IntegerNet_Solr')
     /*
      * Base directory for cache.
      *

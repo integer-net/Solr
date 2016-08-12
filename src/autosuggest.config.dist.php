@@ -29,9 +29,9 @@ return AppConfig::defaultConfig()
      *
      * This is only used if you don't specify a path to an external autoloader (i.e. composer)
      *
-     * use directory relative to cwd (Magento root)
+     * use real directory of current file in case of symlinks
      */
-    ->withLibBaseDir('lib/IntegerNet_Solr')
+    ->withLibBaseDir(__DIR__ . '/lib/IntegerNet_Solr')
     /*
      * Base directory for cache.
      *

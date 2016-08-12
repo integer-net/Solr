@@ -16,30 +16,28 @@ use IntegerNet\SolrSuggest\Plain\Bridge\Category;
 class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     implements TemplateRepository, SerializableCategoryRepository
 {
-    protected $_modelIdentifiers = array(
-        'integernet_solr/suggestion_collection',
-        'integernet_solr/result',
-        'integernet_solr/query',
-        'integernet_solr/result_pagination_autosuggest',
-        'integernet_solr/suggestion',
-    );
+    /**
+     * @var IntegerNet_Solr_Model_Bridge_StoreEmulation
+     */
+    protected $_storeEmulation;
 
-    protected $_resourceModelIdentifiers = array(
-    );
+    public function __construct()
+    {
+        $this->_storeEmulation = Mage::getModel('integernet_solr/bridge_factory')->createStoreEmulation();
+    }
+
 
     public function getTemplate()
     {
         return 'integernet/solr/autosuggest.phtml';
     }
 
-    protected $_initialEnvironmentInfo = null;
-
     /**
      * Store Solr configuration in serialized text field so it can be accessed from autosuggest later
      */
     public function storeSolrConfig()
     {
-        $factory = Mage::helper('integernet_solr/factory');
+        $factory = Mage::helper('integernet_solr')->factory();
         $factory->getCacheWriter()->write($factory->getStoreConfig());
     }
 
@@ -49,14 +47,9 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function getTemplateByStoreId($storeId)
     {
-        $initialStoreId = Mage::app()->getStore()->getId();
-        $this->_emulateStore($storeId);
-
+        $this->_storeEmulation->start($storeId);
         $template = new Template($this->getTemplateFile($storeId));
-
-        $this->_emulateStore($initialStoreId);
-        $this->_stopStoreEmulation();
-
+        $this->_storeEmulation->stop();
         return $template;
     }
 
@@ -161,31 +154,6 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param int $storeId
-     * @throws Mage_Core_Exception
-     */
-    protected function _emulateStore($storeId)
-    {
-        $newLocaleCode = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $storeId);
-        Mage::app()->getLocale()->setLocaleCode($newLocaleCode);
-        Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
-        $this->_currentStoreId = $storeId;
-        $this->_initialEnvironmentInfo = Mage::getSingleton('core/app_emulation')->startEnvironmentEmulation($storeId);
-        $this->_isEmulated = true;
-        Mage::getDesign()->setStore($storeId);
-        Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
-    }
-
-    protected function _stopStoreEmulation()
-    {
-        if ($this->_initialEnvironmentInfo) {
-            Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($this->_initialEnvironmentInfo);
-        }
-    }
-
-    /**
      * Translate all occurences of $this->__('...') with translated text
      *
      * @param string $templateContents
@@ -209,7 +177,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
 
     /**
      * @param int $storeId
-     * @return \IntegerNet\SolrSuggest\Implementor\SerializableCategory[]
+     * @return \IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory[]
      */
     public function findActiveCategories($storeId)
     {

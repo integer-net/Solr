@@ -10,11 +10,15 @@
 use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
+use IntegerNet\SolrCategories\Request\CategorySuggestRequestFactory;
+use IntegerNet\SolrCms\Indexer\PageIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
+use IntegerNet\SolrCms\Request\CmsPageSuggestRequestFactory;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
 use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory;
 use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
@@ -31,6 +35,15 @@ use Psr\Log\NullLogger;
 
 class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheReaderFactory, AppFactory
 {
+    /**
+     * @var IntegerNet_Solr_Model_Bridge_Factory
+     */
+    protected $_bridgeFactory;
+
+    public function __construct()
+    {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
 
     /**
      * Returns new configured Solr recource. Instantiation separate from RequestFactory
@@ -40,7 +53,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     public function getSolrResource()
     {
-        $storeConfig = $this->getStoreConfig();
+        $storeConfig = $this->getStoreConfigWithAdmin();
         return new ResourceFacade($storeConfig);
     }
 
@@ -56,11 +69,50 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $defaultStoreId,
             $this->getStoreConfig(),
             $this->getSolrResource(),
-            Mage::helper('integernet_solr/event'),
-            Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
+            $this->_getEventDispatcher(),
+            $this->_getAttributeRepository(),
             $this->_getIndexCategoryRepository(),
-            Mage::getModel('integernet_solr/bridge_productRepository'),
-            Mage::getModel('integernet_solr/bridge_productRenderer')
+            $this->_bridgeFactory->createProductRepository(),
+            $this->_bridgeFactory->createProductRenderer(),
+            $this->_bridgeFactory->createStoreEmulation()
+        );
+    }
+
+    /**
+     * Returns new product indexer.
+     *
+     * @return CategoryIndexer
+     */
+    public function getCategoryIndexer()
+    {
+        $defaultStoreId = Mage::app()->getStore(true)->getId();
+        return new CategoryIndexer(
+            $defaultStoreId,
+            $this->getStoreConfig(),
+            $this->getSolrResource(),
+            $this->_getEventDispatcher(),
+            $this->_bridgeFactory->createCategoryRepository(),
+            $this->_bridgeFactory->createCategoryRenderer(),
+            $this->_bridgeFactory->createStoreEmulation()
+        );
+    }
+
+    /**
+     * Returns new product indexer.
+     *
+     * @return PageIndexer
+     */
+    public function getPageIndexer()
+    {
+        $defaultStoreId = Mage::app()->getStore(true)->getId();
+        return new PageIndexer(
+            $defaultStoreId,
+            $this->getStoreConfig(),
+            $this->getSolrResource(),
+            $this->_getEventDispatcher(),
+            $this->_bridgeFactory->createPageRepository(),
+            $this->_bridgeFactory->createPageRenderer(),
+            $this->_bridgeFactory->createStoreEmulation()
         );
     }
 
@@ -75,7 +127,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         $storeId = Mage::app()->getStore()->getId();
         $config = new IntegerNet_Solr_Model_Config_Store($storeId);
         if ($config->getGeneralConfig()->isLog()) {
-            $logger = Mage::helper('integernet_solr/log');
+            $logger = $this->_getLogger();
             if ($logger instanceof IntegerNet_Solr_Helper_Log) {
                 $logger->setFile(
                     $requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST ? 'solr_suggest.log' : 'solr.log'
@@ -85,21 +137,21 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             $logger = new NullLogger;
         }
 
-        $isCategoryPage = Mage::helper('integernet_solr')->isCategoryPage();
+        $isCategoryPage = Mage::helper('integernet_solr')->page()->isCategoryPage();
         $applicationContext = new ApplicationContext(
-            Mage::getSingleton('integernet_solr/bridge_attributeRepository'),
+            $this->_getAttributeRepository(),
             $config->getResultsConfig(),
             $config->getAutosuggestConfig(),
-            Mage::helper('integernet_solr/event'),
+            $this->_getEventDispatcher(),
             $logger
         );
         if (Mage::app()->getLayout() && $block = Mage::app()->getLayout()->getBlock('product_list_toolbar')) {
-            $pagination = Mage::getModel('integernet_solr/bridge_pagination_toolbar', $block);
+            $pagination = $this->_bridgeFactory->createPaginationToolbar($block);
             $applicationContext->setPagination($pagination);
         }
         /** @var RequestFactory $factory */
         if ($requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST) {
-            $applicationContext->setQuery(Mage::helper('integernet_solr/searchterm'));
+            $applicationContext->setQuery($this->_getSearchTermHelper());
             $factory = new SearchTermSuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
@@ -114,21 +166,37 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         } elseif ($requestMode === self::REQUEST_MODE_AUTOSUGGEST) {
             $applicationContext
                 ->setFuzzyConfig($config->getFuzzyAutosuggestConfig())
-                ->setQuery(Mage::helper('integernet_solr/searchtermSynonym'));
+                ->setQuery($this->_getSearchTermSynonymHelper());
             $factory = new AutosuggestRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
-                $storeId
+                $storeId,
+                $this->_getEventDispatcher()
             );
         } else {
-            $applicationContext
-                ->setFuzzyConfig($config->getFuzzySearchConfig())
-                ->setQuery(Mage::helper('integernet_solr/searchtermSynonym'));
-            $factory = new SearchRequestFactory(
-                $applicationContext,
-                $this->getSolrResource(),
-                $storeId
-            );
+            switch ($requestMode) {
+                case self::REQUEST_MODE_SEARCHTERM_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new SearchTermSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                case self::REQUEST_MODE_CATEGORY_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new CategorySuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                case self::REQUEST_MODE_CMS_PAGE_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new CmsPageSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                default:
+                    $applicationContext
+                        ->setFuzzyConfig($config->getFuzzySearchConfig())
+                        ->setQuery($this->_getSearchTermSynonymHelper());
+                    $factory = new SearchRequestFactory(
+                        $applicationContext,
+                        $this->getSolrResource(),
+                        $storeId
+                    );
+            }
         }
         return $factory->createRequest();
     }
@@ -137,6 +205,21 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      * @return Config[]
      */
     public function getStoreConfig()
+    {
+        $storeConfig = array();
+        foreach (Mage::app()->getStores(false) as $store) {
+            /** @var Mage_Core_Model_Store $store */
+            if ($store->getIsActive()) {
+                $storeConfig[$store->getId()] = new IntegerNet_Solr_Model_Config_Store($store->getId());
+            }
+        }
+        return $storeConfig;
+    }
+
+    /**
+     * @return Config[]
+     */
+    public function getStoreConfigWithAdmin()
     {
         $storeConfig = array();
         foreach (Mage::app()->getStores(true) as $store) {
@@ -166,12 +249,15 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
             Mage::app()->getStore()->getId(),
             $storeConfig->getGeneralConfig(),
             $storeConfig->getAutosuggestConfig(),
-            Mage::helper('integernet_solr/searchterm'),
-            Mage::helper('integernet_solr/searchUrl'),
+            $storeConfig->getCategoryConfig(),
+            $this->_getSearchTermHelper(),
+            $this->_getSearchUrlHelper(),
             $this->_getSuggestCategoryRepository(),
             $this->_getAttributeRepository(),
             $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST)
+            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CATEGORY_SUGGEST),
+            $this->getSolrRequest(self::REQUEST_MODE_CMS_PAGE_SUGGEST)
         );
     }
 
@@ -199,11 +285,11 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         );
         return new CacheWriter(
             $this->_getCacheStorage(),
-            new AttributesToSerializableAttributes($this->_getAttributeRepository(), Mage::helper('integernet_solr/event'), $autosuggestConfigByStore),
-            Mage::helper('integernet_solr/autosuggest'),
+            new AttributesToSerializableAttributes($this->_getAttributeRepository(), $this->_getEventDispatcher(), $autosuggestConfigByStore),
+            $this->_getAutosuggestHelper(),
             new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
-            Mage::helper('integernet_solr/event'),
-            Mage::helper('integernet_solr/autosuggest')
+            $this->_getEventDispatcher(),
+            $this->_getAutosuggestHelper()
         );
     }
 
@@ -223,7 +309,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     protected function _getAttributeRepository()
     {
-        return Mage::getSingleton('integernet_solr/bridge_attributeRepository');
+        return $this->_bridgeFactory->getAttributeRepository();
     }
 
     /**
@@ -231,7 +317,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     protected function _getIndexCategoryRepository()
     {
-        return Mage::getSingleton('integernet_solr/bridge_categoryRepository');
+        return $this->_bridgeFactory->getCategoryRepository();
     }
 
     /**
@@ -239,6 +325,54 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
      */
     protected function _getSuggestCategoryRepository()
     {
-        return Mage::getSingleton('integernet_solr/bridge_categoryRepository');
+        return $this->_bridgeFactory->getCategoryRepository();
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Event
+     */
+    protected function _getEventDispatcher()
+    {
+        return Mage::helper('integernet_solr/event');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_SearchtermSynonym
+     */
+    protected function _getSearchTermSynonymHelper()
+    {
+        return Mage::helper('integernet_solr/searchtermSynonym');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Searchterm
+     */
+    protected function _getSearchTermHelper()
+    {
+        return Mage::helper('integernet_solr/searchterm');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_SearchUrl
+     */
+    protected function _getSearchUrlHelper()
+    {
+        return Mage::helper('integernet_solr/searchUrl');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Log
+     */
+    protected function _getLogger()
+    {
+        return Mage::helper('integernet_solr/log');
+    }
+
+    /**
+     * @return IntegerNet_Solr_Helper_Autosuggest
+     */
+    protected function _getAutosuggestHelper()
+    {
+        return Mage::helper('integernet_solr')->autosuggest();
     }
 }

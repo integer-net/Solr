@@ -15,6 +15,8 @@ class IntegerNet_Solr_Autosuggest
             die('Store ID not given.');
         }
 
+        $this->initAutoload();
+
         $storeId = intval($_GET['store_id']);
         Mage::app()->setCurrentStore($storeId);
 
@@ -23,12 +25,19 @@ class IntegerNet_Solr_Autosuggest
         Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
     }
 
+    private function initAutoload()
+    {
+        $autoloader = new IntegerNet_Solr_Helper_Autoloader();
+        $autoloader->createAndRegister();
+    }
+
     public function getHtml()
     {
         if (!isset($_GET['q'])) {
             die('Query not given.');
         }
 
+        Mage::register('is_autosuggest', true);
         $block = Mage::app()->getLayout()->createBlock('integernet_solr/autosuggest');
 
         return $block->toHtml();
@@ -38,6 +47,6 @@ class IntegerNet_Solr_Autosuggest
 require_once 'app/Mage.php';
 umask(0);
 
-$autosuggest = new \IntegerNet\SolrSuggest\Plain\Bootstrap();
+$autosuggest = new IntegerNet_Solr_Autosuggest();
 
 echo $autosuggest->getHtml();

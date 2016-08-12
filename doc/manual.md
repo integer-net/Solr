@@ -12,6 +12,8 @@ Features
 #### General
 - Correction of spelling, fuzzy search
 - Displays exact search results first, followed by results to similar search terms
+- Select multiple filter values
+- Filters can be displayed left or above product lists
 - Supports multi store functionality of Magento completely
 - Compatible with default, modern and rwd themes of Magento
 - Can use one Solr core for several Magento store views or separate cores 
@@ -20,8 +22,8 @@ Features
 - Checks connection and configuration of Solr server
 
 #### Autosuggest window
-- Appears after the first letters have been typed into the search form
-- Displays product suggestions, category suggestions, attribute suggestions and keyword suggestions
+- Appears after the first two letters have been typed into the search form
+- Displays product suggestions, category suggestions, attribute suggestions, CMS page suggestions and keyword suggestions
 - Number of suggestions for each type is configurable in the Magento backend
 - Attributes to display can be defined in configuration
 - Can skip Magento instantiation and use PHP only for faster results
@@ -34,8 +36,10 @@ Features
 - Automatic update of Solr index on create/edit/delete of products
 
 #### Modification of search results
-- Modify "fuzzyness"
+- Modify "fuzziness"
 - Allows boosting of products and attributes
+- Enables the exclusion of certain categories, products and CMS pages from search results
+- Redirects to product and category pages for exact matches with search term
 - Provides events for modifying indexing process and search requests
 
 #### Category Pages
@@ -43,8 +47,8 @@ Features
 
 Requirements
 ------------
-- **Magento Community Edition** 1.6 to 1.9 or **Magento Enterprise Edition** 1.11 to 1.14
-- **Solr** 4.x or 5.x
+- **Magento Community Edition** 1.7 to 1.9 or **Magento Enterprise Edition** 1.12 to 1.14
+- **Solr** 4.x to 6.x
 - **PHP** 5.3 to 5.5 (5.5 recommended), probably compatible with PHP 5.6 and 7.0 as well (not tested yet)
 
 Installation
@@ -53,11 +57,11 @@ Installation
 2. Copy the files from the `solr_conf` dir of the module repository to the `conf` dir of your Solr core
 3. Reload the Solr core (or all of Solr)
 4. (If activated: deactivate the Magento compiler)
-5. Copy the files and dirs from the `src` directory of the module repository into your Magento installation. If you are using **modman** and/or **composer** you can find a `modman` file and a `composer.json` in the root directory.
+5. Copy the files and directories from the `src` directory of the module repository into your Magento installation. If you are using **modman** and/or **composer** you can find a `modman` file and a `composer.json` in the root directory.
 6. Clear the Magento cache
-7. (Recompile and reactivate the Magento compiler - it is not recommended to use the compiler mode of Magento, independant of the IntegerNet_Solr module)
+7. (Recompile and reactivate the Magento compiler - it is not recommended to use the compiler mode of Magento, independent of the IntegerNet_Solr module)
 8. Go to the Magento backend, go to `System -> Configuration -> Solr`.
-9. Enter the Solr access data and configure the module (see below)
+9. Enter the Solr access data and configure the module ([see below](#solr-server-data))
 10. Click **Save Config**. The connection to the Solr server will automatically be tested. You'll get a success or error message about that.
 11. If you are using the Magento Enterprise Edition, you have to switch off the integrated Solr engine by switching `System -> Configuration -> Catalog -> Catalog Search -> Search Engine` to `MySql Fulltext`.
 12. Reindex the integernet_solr index. We recommend doing this via shell. Go to the `shell` dir and call `php -f indexer.php -- --reindex integernet_solr`
@@ -146,6 +150,8 @@ Attention: there will be no internet connection to a license server. As soon as 
 If this switch is activated, all requests to the Solr server will be saved in a log file. This affects the autosuggest function and the search results. You can find the logs in the directory `/var/log` with the file names `solr.log` respectively `solr_suggestions.log`.
 
 The log files are used for bug tracing and for optimization of search results only. As the files can get pretty large with a frequently used search function, we usually recommend switching off logging on live environments.
+
+<a name="solr-server-data"></a>
 
 ### Server
 
@@ -260,13 +266,13 @@ In case the entered value is 0 or empty, fuzzy search will always be performed.
 
 ### Search Results
 
-![Search Results](http://www.integer-net.com/download/solr/integernet-solr-config-results-en.png)
+![Search Results](http://www.integer-net.com/download/solr/integernet-solr-config-search-results-en.png)
 
 #### Use HTML from Solr Index
 
 If this setting is activated, the HTML code which displays a single product in the search results will already be generated during indexing. Of course, this will take a bit longer, but on the other hand, the output will be faster in the search results. This is because this part won't have to be generated on the fly for every product.
 
-Thus, we recommend to activate this setting. There is an exception if the product data in the search results should be displayed customer dependant or customer group dependant, i.e. if the prices differ for the different customer groups.
+Thus, we recommend to activate this setting. There is an exception if the product data in the search results should be displayed customer dependent or customer group dependent, i.e. if the prices differ for the different customer groups.
 Please deactivate this setting in that case.
 
 #### Search Operator
@@ -275,6 +281,23 @@ You can choose between *AND* and *OR*. The search operator is used if there is m
 When using *OR*, results which match only one of the search words will be displayed.
 In most cases, *AND* is the better setting.
 
+#### Position of Filters
+
+Filters can be displayed either in the left column next to the list of products or above the products. The latter is recommended if you have a rather narrow template.
+
+#### Maximum number of Filter Options per Filter
+
+If there are many filter options for a filter, for the sake of clarity you can limit the number of displayed filter values. Entering the value "0" means that all filter values will be displayed.
+
+#### Sort Filter Options alphabetically
+
+Usually filter options are sorted by number of results. In some cases it makes sense to sort them alphabetically instead. To activate alphabetical sorting, set the value to "Yes".
+
+#### Solr Priority of Category Names
+
+Configure with which priority category names are handled in the Solr index. For example, if the search term "black shirts" should primarily return those products as search results which are contained in a category named "shirts", you might want to enter a higher value than 1.
+The default value is 1. If you enter a higher value, category names have a higher priority in the Solr index.
+
 #### Size of Price Steps
 
 This setting is used by the price filter. You can set the steps which are used for the single intervals. I.e. *10* leads to the intervals *0.00-10.00*, *10.00-20.00*, *20.00-30.00* and so on.
@@ -282,6 +305,15 @@ This setting is used by the price filter. You can set the steps which are used f
 #### Upper Limit of Price Steps
 
 This setting is used for the price filter as well. This value defines the topmost interval. If set to *200*, this would be *from 200.00*. All products which cost more than 200.00 will be combined in this interval.
+
+#### Redirect to product page on direct match in one of these attributes
+
+If the entered search term is an exact match with an important attribute of a product, you can here activate a direct redirect to the matching product page. As a result, the way to the product is shortened, because you skip the step of showing the search results page.
+It is recommended to only use this redirect for attributes which have unique values for each product.   
+
+#### Redirect to category page on direct match in one of these attributes
+
+Just like a redirect to a product page, you can also activate redirects for search terms which exactly match a category's attribute. Please make sure to only use this feature for attributes which allow for unambiguous matching with a category page. 
 
 #### Use Custom Price Intervals
 If you don't want to have a linear arrangement of intervals and you are using Solr 4.10 or above, you can set the desired interval borders for the price filter individually here. In the example *10,20,50,100,200,300,400,500* this would be the intervals *0.00-10.00*, *10.00-20.00*, *20.00-50.00* and so on until *400.00-500.00* and *from 500.00*. 
@@ -293,6 +325,22 @@ If you don't want to have a linear arrangement of intervals and you are using So
 #### Use Solr to display products on category pages
 
 If you activate this setting, Solr will be used to displayed products on category pages. Especially for stores with a huge amount of products or filterable attributes for layered navigation, this will speed up the load time of category pages.   
+
+#### Position of Filter
+
+Independent of the filters' position on search result pages, you can choose where to display filters on category pages: either in the left column next to the products or above the products. This is a default value which can be overwritten by the category's configuration.
+
+#### Use Solr to index category pages
+
+When you activate this setting, categories that match the search term will be displayed in the autosuggest box. To finetune suggested categories, you can exclude single categories from being indexed.  
+
+### CMS
+
+![CMS Pages](http://www.integer-net.com/download/solr/integernet-solr-config-CMS-en.png)
+
+#### Use Solr to index cms pages
+
+When activated, matching CMS pages are displayed in the autosuggest box. It works similar to indexing categories. To finetune suggested CMS pages, you can exclude single CMS pages from being indexed.  
 
 ### Autosuggest Box
 
@@ -316,12 +364,16 @@ The number of products which will be displayed in the autosuggest window.
 
 #### Maximum number of category suggestions
 
-The number of categories which will be displayed in the autosuggest window. Those are the categories which appear most in the found products.
+The number of categories which will be displayed in the autosuggest window. If "Use Solr to index category pages" is activated, too, the displayed categories are those whose name and description match the search term. If not, only those categories are displayed which contain products matching the search term.
+
+#### Maximum number of cms page suggestions
+
+The number of CMS pages which will be displayed in the autosuggest window. This feature only works, if "Use Solr to index cms pages" is set to "Yes".
 
 #### Show complete category path
 
 If this setting is active, not only the category names will be displayed, but their parent categories as a path as well.
-For example, this will be "Electronics > Cameras > Accessories" instead of "Accessoires".
+For example, this will be "Electronics > Cameras > Accessories" instead of "Accessories".
 
 #### Type of Category Links
 
@@ -334,6 +386,12 @@ The link which is behind the displayed categories. It can be:
 You can enter an arbitrary number of attributes here which will be displayed in the autosuggest window, including the options which are contained in most of the corresponding products. For every row you can select the attribute and the number of displayed options. Additionally you can define the sorting of the attributes - the attribute with the lowest value in the "Sorting" field will be shown first.
 
 Only attributes with the property "Use In Search Results Layered Navigation" will be selectable.
+
+### SEO 
+
+![SEO](http://www.integer-net.de/download/solr/integernet-solr-config-seo-en.png)
+
+Here you are able to select which of the pages processed by IntegerNet_Solr shall be hidden from bots and search engines. As a results, these pages' meta element robots has the value "NOINDEX,NOFOLLOW". Please note that this configuration may have a great impact on your store's ranking in search engine results.   
 
 Modifying the sequence of search results
 ----------------------------------------------
@@ -369,14 +427,31 @@ Therefore, the new product attribute "Solr priority" is used. You can see it in 
 
 With that, you have the possibility to position a product, as far as it matches the search word(s), further up or down, relative to its default position. We recommend using values between 0.5 and 10 (maximum). The mechanism is the same as with the boosting of attributes. Though, a reindexing isn't necessary after you have adjusted this value for one or more product(s), as far as automatic index updates are activated.
 
-### Excluding of Categories
+### Excluding certain CMS Pages
 
-If need be you can exclude categories from Solr search results. The necessary settings can be found in your Magento backend in the corresponding category in the tab named "Solr".
+If you would prefer to exclude certain CMS Pages from search results, the settings to do so can be found in the corresponding CMS page in the tab named "Solr".
+
+![CMS Page View](http://www.integer-net.de/download/solr/integernet-solr-CMS-exclude-en.png)
+
+Set "Exclude this Page from Solr Index" to "Yes" to exclude the page from search results.
+Use the field "Solr Priority" to weight this page more heavily in the search results. The higher the entered number, the higher the boost factor for this CMS page.
+
+Category adjustments
+---------------------
 
 ![Category View](http://www.integer-net.de/download/solr/integernet-solr-category-exclude-en.png)
 
-You can exclude single categories or categories together with their child categories. 
-The excluded categories will no longer be shown in the search suggestions. However, all products connected to the excluded categories will still be shown as product suggestions and as search results.
+### Exclude this Category from Solr Index
+If need be you can exclude categories from Solr search results. The necessary settings can be found in your Magento backend in the corresponding category in the tab named "Solr". When the value is set to "Yes", this category will no longer be displayed in the autosuggest window.
+
+### Exclude Child Categories from Solr Index
+Next to excluding a category, you can also opt to exlude all child categories. The excluded categories will no longer be shown in the search suggestions. However, all products connected to the excluded categories will still be shown as product suggestions and as search results.
+
+### Remove Filters
+Even if you don't use IntegerNet_Solr to load product lists on category pages, you can use the extension's feature to remove unnecessary filters from a category page. For example, you can thus prevent the filter "Gender" from being shown on a category page for male clothing.  
+
+### Position of Filters
+For each category, you can change the position of filters, overwriting the default value from the IntegerNet_Solr configuration. Filters can be displayed either in the left column next to the product list or above the product list.
 
 Template adjustments
 --------------------
@@ -398,13 +473,27 @@ Most probably you already have a template for the search results page. Usually i
 Replace `list` with `grid` depending on the part you are replacing.
 You should switch off the configuration option `Search Results -> Use HTML from Solr Index` while modifying the template files. If you have this option activated, you have to do a full reindex after activating / changing a list or grid template file.
 
-### Autosuggest page
+### Autosuggest box
 You can copy and modify the `template/integernet/solr/autosuggest.phtml` and `template/integernet/solr/autosuggest/item.phtml` files to modify the appearance of the autosuggest window. Attention: as the generated HTML for each product is stored in the Solr index, you'll have to reindex after you made changes to the `template/integernet/solr/autosuggest/item.phtml` file.
 
 Pay attention: as the autosuggest functionality isn't delivered by Magento but by a raw PHP version in order to improve performance, you cannot use all Magento functions in your `template/integernet/solr/result/autosuggest.phtml`. 
 Try to stick to the functions which are used in `app/design/frontend/base/default/template/integernet/solr/result/autosuggest.phtml`. As the HTML is generated by Magento instead, you can use all Magento functions in your `template/integernet/solr/result/autosuggest.phtml`.
 
 If you aren't using product, category, attribute or keyword suggestions on your autosuggest page, please switch them off in configuration as well because this will improve the performance.
+
+Events
+---------------------
+In order to further customize the module, we integrated several events which can be observed by another module. The following events are included in IntegerNet_Solr:
+
+- integernet_solr_get_product_data
+- integernet_solr_update_query_text
+- integernet_solr_before_search_request
+- integernet_solr_after_search_request
+- integernet_solr_product_collection_load_before
+- integernet_solr_product_collection_load_after
+- integernet_solr_can_index_product
+
+For further information about these events, their parameters and usage, as well as a sample module, please see our [blog post](https://www.integer-net.com/utilizing-events-of-integernet_solr-an-example/).
 
 Possible Problems and their solutions
 -------------------------------------

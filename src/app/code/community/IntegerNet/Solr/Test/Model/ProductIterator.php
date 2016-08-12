@@ -21,6 +21,7 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
      */
     public function shouldLazyloadCollections($idFilter, $pageSize, $expectedProductIds)
     {
+        $expectedInnerIteratorCount = (int) ceil(count($expectedProductIds) / $pageSize);
         // Magento needs a customer session to work with product collections :-/
         // and replacing it with a mock causes side effects with other tests :-(
         // these lines above accidentally have the same amount of characters :-)
@@ -28,6 +29,10 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
         $iterator = new IntegerNet_Solr_Model_Bridge_LazyProductIterator(1, $idFilter, $pageSize);
         $actualProductIds = [];
         $guard = 0;
+        $callbackMock = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
+        $callbackMock->expects($this->exactly($expectedInnerIteratorCount))
+            ->method('__invoke');
+        $iterator->setPageCallback($callbackMock);
         foreach ($iterator as $product)
         {
             $actualProductIds[]= $product->getId();
@@ -37,6 +42,7 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
             }
         }
         $this->assertEquals($expectedProductIds, $actualProductIds, 'product ids', 0.0, 10, false, true);
+        $this->assertEventDispatchedExactly('integernet_solr_product_collection_load_after', $expectedInnerIteratorCount);
     }
 
     /**

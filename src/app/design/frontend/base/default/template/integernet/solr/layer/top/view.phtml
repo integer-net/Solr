@@ -1,29 +1,14 @@
 <?php
 /**
- * Magento Enterprise Edition
+ * integer_net Magento Module
  *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Magento Enterprise Edition License
- * that is bundled with this package in the file LICENSE_EE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.magentocommerce.com/license/enterprise-edition
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Magento to newer
- * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
- *
- * @category    design
- * @package     base_default
- * @copyright   Copyright (c) 2014 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://www.magentocommerce.com/license/enterprise-edition
+ * @category   IntegerNet
+ * @package    IntegerNet_Solr
+ * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 ?>
+
 <?php
 /**
  * Category layered navigation
@@ -32,28 +17,51 @@
  */
 ?>
 <?php if($this->canShowBlock()): ?>
-<div class="block block-layered-nav">
+<div class="block block-filter-nav">
     <div class="block-title">
         <strong><span><?php echo $this->__('Shop By') ?></span></strong>
     </div>
-    <div class="block-content">
-        <?php echo $this->getStateHtml() ?>
+    <div class="block-content toggle-content">
         <?php if ($this->getLayer()->getState()->getFilters()): ?>
             <div class="actions"><a href="<?php echo $this->getClearUrl() ?>"><?php echo $this->__('Clear All') ?></a></div>
         <?php endif; ?>
         <?php if($this->canShowOptions()): ?>
-            <p class="block-subtitle"><?php echo $this->__('Shopping Options') ?></p>
-            <dl id="narrow-by-list">
+            <p class="block-subtitle block-subtitle--filter"><?php echo $this->__('Filter') ?></p>
+
+            <div class="filter">
                 <?php $_filters = $this->getFilters() ?>
                 <?php foreach ($_filters as $_filter): ?>
-                <?php if($_filter->getItemsCount()): ?>
-                    <dt><?php echo $this->__($_filter->getName()) ?></dt>
-                    <dd><?php echo $_filter->getHtml() ?></dd>
-                <?php endif; ?>
+                    <?php if($_filter->getItemsCount()): ?>
+                        <dl class="filter-item">
+                            <dt class="filter-title"><?php echo $this->__($_filter->getName()) ?></dt>
+                            <dd class="filter-content">
+                                <div class="filter-list">
+                                    <?php echo $_filter->getHtml() ?>
+                                </div>
+                            </dd>
+                        </dl>
+                    <?php endif; ?>
                 <?php endforeach; ?>
-            </dl>
-            <script type="text/javascript">decorateDataList('narrow-by-list')</script>
+            </div>
+
+            <script>
+                (function(){
+                    var filters = $$('.filter-title');
+                    filters.each(function(filter){
+                        filter.on('click', function(event){
+                            var item = filter.up('.filter-item');
+                            var sibs = item.siblings();
+                            sibs.each(function(element){
+                                element.removeClassName('filter-item--active');
+                            });
+                            filter.up('.filter-item').toggleClassName('filter-item--active');
+                        })
+                    })
+                })()
+            </script>
         <?php endif; ?>
+        <?php echo $this->getStateHtml() ?>
     </div>
+    <?php echo $this->getChildHtml('solr.loader') ?>
 </div>
 <?php endif; ?>

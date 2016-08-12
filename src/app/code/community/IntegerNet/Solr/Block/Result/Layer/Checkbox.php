@@ -13,6 +13,8 @@
  *
  * @method boolean getIsChecked()
  * @method IntegerNet_Solr_Block_Result_Layer_Checkbox setIsChecked(boolean $value)
+ * @method boolean getIsTopNav()
+ * @method IntegerNet_Solr_Block_Result_Layer_Checkbox setIsTopNav(boolean $value)
  * @method int getOptionId()
  * @method IntegerNet_Solr_Block_Result_Layer_Checkbox setOptionId(int $value)
  * @method string getAttributeCode()

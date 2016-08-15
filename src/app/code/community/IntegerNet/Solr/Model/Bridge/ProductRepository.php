@@ -51,11 +51,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
-        // hier child ids für alle product ids laden, zusammen mit zurdnung parent => child, Zuordnung wird als ass. array
-        // im repository ($this->associatíons) gespeichert, der iterator wird ebenfalls hier gespeichert ($this->currentIterator)
-        // id arrays je nach pagesize zerlegen und ($productIdsChunks, $childIdsChunks) statt ($productIds, $pageSize) übergeben
-        // 
-        // class ProductIdChunk { array $parentIds, array $childIds }
+        Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
         
         $associations = $this->_getAssociations($productIds);
         $allProductIds = $this->_getAllProductIds($productIds);
@@ -63,8 +59,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
         /** @var IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks */
         $productIdChunks = $this->_getProductIdChunks($allProductIds, $associations);
 
-        // im lazy product iterator: beim laden des jeweiligen chunks werden auch alle children geladen (2. collection)
-        $this->_currentIterator = $this->_bridgeFactory->createLazyProductIterator($storeId, $productIds, $this->_pageSize);
+        $this->_currentIterator = $this->_bridgeFactory->createLazyProductIterator($storeId, $productIdChunks);
         return $this->_currentIterator;
     }
 
@@ -72,43 +67,43 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      * Return product iterator for child products
      *
      * @param Product|IntegerNet_Solr_Model_Bridge_Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
-     * @return ProductIterator
+     * @return Varien_Data_Collection
      */
     public function getChildProducts(Product $parent)
     {
-        // Zugriff auf $this->associations, keine weiteren DB Abfragen
-        // exception werfen wenn produkt nicht in den associations vorhanden
         $magentoProduct = $parent->getMagentoProduct();
-        $childProductIds = $magentoProduct->getTypeInstance(true)->getChildrenIds($magentoProduct->getId());
 
-        if (sizeof($childProductIds) && is_array(current($childProductIds))) {
-            $childProductIds = current($childProductIds);
+        if (!isset($this->_associations[$magentoProduct->getId()])) {
+            // Exception will be caught; this happens regularily if no children are present
+            Mage::throwException('Children Products for product ' . $magentoProduct->getId() . ' haven\'t been preloaded.');
         }
-
-        if (!sizeof($childProductIds)) {
-            Mage::throwException('Product ' . $magentoProduct->getSku() . ' doesn\'t have any child products.');
+        $childProductIds = $this->_associations[$magentoProduct->getId()];
+        
+        $childProductCollection = new Varien_Data_Collection();
+        foreach($childProductIds as $childProductId) {
+            /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
+            $productCollection = $this->_currentIterator->getDataSource();
+            /** @var Mage_Catalog_Model_Product $childProduct */
+            $childProduct = $productCollection->getItemById($childProductId);
+            if (is_null($childProduct)) {
+                Mage::throwException('Child Product ' . $childProductId . ' for product ' . $magentoProduct->getId() . ' isn\'t included in the collection.');
+            }
+            if ($childProduct->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+                $childProductCollection->addItem($childProduct);
+            }
         }
-
-        /** @var $childProductCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $childProductCollection = Mage::getResourceModel('catalog/product_collection');
-        $childProductCollection
-            ->setStoreId($magentoProduct->getStoreId())
-            ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
-            ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-            ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect(Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex());
-
+        
         return $this->_bridgeFactory->createProductIterator($childProductCollection);
-
     }
 
     /**
      * @param null|int[] $productIds
-     * @return int[] An array with parent_id as key and children ids as value 
+     * @return int[][] An array with parent_id as key and children ids as value 
      */
     protected function _getAssociations($productIds)
     {
         if (is_null($this->_associations)) {
+            
             /** @var $configurableResourceTypeModel IntegerNet_Solr_Model_Resource_Catalog_Product_Type_Configurable */
             $configurableResourceTypeModel = Mage::getResourceModel('integernet_solr/catalog_product_type_configurable');
             $this->_associations = $configurableResourceTypeModel->getChildrenIdsForMultipleParents($productIds);
@@ -167,8 +162,6 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
             $currentChunkSize += $productCount;
         }
         $productIdChunks[] = new IntegerNet_Solr_Model_Bridge_ProductIdChunk($currentParentIds, $currentChildrenIds);
-        Mage::log($productIdChunks);
-        die();
         return $productIdChunks;
     }
 }

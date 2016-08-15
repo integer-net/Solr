@@ -17,4 +17,6 @@ interface PagedProductIterator extends ProductIterator
      * @param callable $callback
      */
     public function setPageCallback($callback);
+    
+    public function getDataSource();
 }

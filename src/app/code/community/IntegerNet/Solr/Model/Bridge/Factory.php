@@ -177,22 +177,21 @@ class IntegerNet_Solr_Model_Bridge_Factory
     }
 
     /**
-     * @param Mage_Catalog_Model_Resource_Product_Collection $childProductCollection
+     * @param Varien_Data_Collection $childProductCollection
      * @return IntegerNet_Solr_Model_Bridge_ProductIterator
      */
-    public function createProductIterator(Mage_Catalog_Model_Resource_Product_Collection $childProductCollection)
+    public function createProductIterator(Varien_Data_Collection $childProductCollection)
     {
         return new IntegerNet_Solr_Model_Bridge_ProductIterator($childProductCollection);
     }
 
     /**
      * @param int $storeId store id for the collections
-     * @param int[]|null $productIds array of product ids to be loaded, or null for all product ids
-     * @param int $pageSize Number of products per loaded collection (chunk)
+     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks parent and children product ids to be loaded
      * @return IntegerNet_Solr_Model_Bridge_LazyProductIterator
      */
-    public function createLazyProductIterator($storeId, $productIds, $pageSize)
+    public function createLazyProductIterator($storeId, $productIdChunks)
     {
-        return new IntegerNet_Solr_Model_Bridge_LazyProductIterator($storeId, $productIds, $pageSize);
+        return new IntegerNet_Solr_Model_Bridge_LazyProductIterator($storeId, $productIdChunks);
     }
 }

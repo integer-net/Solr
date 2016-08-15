@@ -40,4 +40,18 @@ class IntegerNet_Solr_Model_Bridge_ProductIdChunk
     {
         return $this->childrenIds;
     }
+
+    /**
+     * @return int[]
+     */
+    public function getAllIds()
+    {
+        $productIds = $this->parentIds;
+        foreach($this->childrenIds as $parentId => $childrenIds) {
+            foreach($childrenIds as $childId) {
+                $productIds[] = $childId;
+            } 
+        }
+        return $productIds;
+    }
 }

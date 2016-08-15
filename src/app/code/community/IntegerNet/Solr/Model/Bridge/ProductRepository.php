@@ -54,10 +54,12 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
         Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
         
         $associations = $this->_getAssociations($productIds);
-        $allProductIds = $this->_getAllProductIds($productIds);
+        if (is_null($productIds)) {
+            $productIds = $this->_getAllProductIds();
+        }
 
         /** @var IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks */
-        $productIdChunks = $this->_getProductIdChunks($allProductIds, $associations);
+        $productIdChunks = $this->_getProductIdChunks($productIds, $associations);
 
         $this->_currentIterator = $this->_bridgeFactory->createLazyProductIterator($storeId, $productIdChunks);
         return $this->_currentIterator;
@@ -67,7 +69,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      * Return product iterator for child products
      *
      * @param Product|IntegerNet_Solr_Model_Bridge_Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
-     * @return Varien_Data_Collection
+     * @return ProductIterator
      */
     public function getChildProducts(Product $parent)
     {
@@ -119,18 +121,13 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
     }
 
     /**
-     * @param int[] $productIds
      * @return int[]
      */
-    protected function _getAllProductIds($productIds)
+    protected function _getAllProductIds()
     {
         /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = Mage::getResourceModel('catalog/product_collection');
-        if (is_array($productIds)) {
-            $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
-        }
-        $productIds = $productCollection->getAllIds();
-        return $productIds;
+        return $productCollection->getAllIds();
     }
 
     /**
@@ -145,11 +142,11 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
         $currentChildrenIds = array();
         $currentChunkSize = 0;
         foreach ($allProductIds as $key => $productId) {
-            $productCount = 1;
+            $parentAndChildrenProductCount = 1;
             if (isset($associations[$productId])) {
-                $productCount += sizeof($associations[$productId]);
+                $parentAndChildrenProductCount += sizeof($associations[$productId]);
             }
-            if ($currentChunkSize > 0 && $currentChunkSize + $productCount > $this->_pageSize) {
+            if ($currentChunkSize > 0 && $currentChunkSize + $parentAndChildrenProductCount > $this->_pageSize) {
                 $productIdChunks[] = new IntegerNet_Solr_Model_Bridge_ProductIdChunk($currentParentIds, $currentChildrenIds);
                 $currentParentIds = array();
                 $currentChildrenIds = array();
@@ -159,7 +156,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
             if (isset($associations[$productId])) {
                 $currentChildrenIds[$productId] = $associations[$productId];
             }
-            $currentChunkSize += $productCount;
+            $currentChunkSize += $parentAndChildrenProductCount;
         }
         $productIdChunks[] = new IntegerNet_Solr_Model_Bridge_ProductIdChunk($currentParentIds, $currentChildrenIds);
         return $productIdChunks;

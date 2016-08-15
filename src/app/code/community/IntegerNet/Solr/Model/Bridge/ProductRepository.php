@@ -45,6 +45,13 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
+        // hier child ids für alle product ids laden, zusammen mit zurdnung parent => child, Zuordnung wird als ass. array
+        // im repository ($this->associatíons) gespeichert, der iterator wird ebenfalls hier gespeichert ($this->currentIterator)
+        // id arrays je nach pagesize zerlegen und ($productIdsChunks, $childIdsChunks) statt ($productIds, $pageSize) übergeben
+        // 
+        // class ProductIdChunk { array $parentIds, array $childIds }
+        
+        // im lazy product iterator: beim laden des jeweiligen chunks werden auch alle children geladen (2. collection)
         return $this->_bridgeFactory->createLazyProductIterator($storeId, $productIds, $this->_pageSize);
     }
 
@@ -56,6 +63,8 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      */
     public function getChildProducts(Product $parent)
     {
+        // Zugriff auf $this->associations, keine weiteren DB Abfragen
+        // exception werfen wenn produkt nicht in den associations vorhanden
         $magentoProduct = $parent->getMagentoProduct();
         $childProductIds = $magentoProduct->getTypeInstance(true)->getChildrenIds($magentoProduct->getId());
 

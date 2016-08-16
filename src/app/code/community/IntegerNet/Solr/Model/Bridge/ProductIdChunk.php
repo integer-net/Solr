@@ -60,7 +60,7 @@ class IntegerNet_Solr_Model_Bridge_ProductIdChunk
                 $productIds[] = $childId;
             } 
         }
-        return $productIds;
+        return array_unique($productIds);
     }
 
     /**

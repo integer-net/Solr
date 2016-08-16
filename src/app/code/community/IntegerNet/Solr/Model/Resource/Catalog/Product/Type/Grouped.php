@@ -30,7 +30,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Type_Grouped extends Mage_C
             ->from(array('l' => $this->getMainTable()), array('product_id', 'linked_product_id'))
             ->where('link_type_id = :link_type_id');
         if (!is_null($parentIds)) {
-            $bind[':product_ids'] = $parentIds;
+            $bind[':product_ids'] = implode(',', $parentIds);
             $select->where('product_id IN (:product_ids)');
         }
         

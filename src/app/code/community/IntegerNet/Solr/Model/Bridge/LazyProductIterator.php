@@ -18,21 +18,17 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 {
     protected $_bridgeFactory;
     /**
+     * @var IntegerNet_Solr_Model_Bridge_ProductIdChunk[]
+     */
+    protected $_productIdChunks;
+    /**
      * @var int
      */
     protected $_storeId;
     /**
-     * @var null|int[]
-     */
-    protected $_productIdFilter;
-    /**
      * @var int
      */
-    protected $_pageSize;
-    /**
-     * @var int
-     */
-    protected $_currentPage;
+    protected $_currentChunkId;
     /**
      * @var callable
      */
@@ -58,15 +54,12 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $_storeId store id for the collections
-     * @param int[]|null $_productIdFilter array of product ids to be loaded, or null for all product ids
-     * @param int $_pageSize Number of products per loaded collection (chunk)
-     */
-    public function __construct($_storeId, $_productIdFilter, $_pageSize)
+     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $_productIdChunks parent and children product ids to be loaded     */
+    public function __construct($_storeId, $_productIdChunks)
     {
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
-        $this->_productIdFilter = $_productIdFilter;
-        $this->_pageSize = $_pageSize;
+        $this->_productIdChunks = $_productIdChunks;
     }
 
     /**
@@ -103,9 +96,9 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
     {
         if ($this->validInner()) {
             return true;
-        } elseif ($this->_currentPage < $this->_collection->getLastPageNumber()) {
-            $this->_currentPage++;
-            $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdFilter, $this->_pageSize, $this->_currentPage);
+        } elseif ($this->_currentChunkId < sizeof($this->_productIdChunks) - 1) {
+            $this->_currentChunkId++;
+            $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdChunks, $this->_currentChunkId);
             $this->_collectionIterator = $this->_collection->getIterator();
             $this->getInnerIterator()->rewind();
             return $this->validInner();
@@ -118,8 +111,8 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
      */
     public function rewind()
     {
-        $this->_currentPage = 1;
-        $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdFilter, $this->_pageSize, $this->_currentPage);
+        $this->_currentChunkId = 0;
+        $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdChunks, $this->_currentChunkId);
         $this->_collectionIterator = $this->_collection->getIterator();
         $this->_collectionIterator->rewind();
     }
@@ -136,34 +129,30 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $storeId
-     * @param int[]|null $productIds
-     * @param int $pageSize
-     * @param int $pageNumber
+     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks
+     * @param int $chunkId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    private static function getProductCollection($storeId, $productIds = null, $pageSize = null, $pageNumber = 0)
+    private static function getProductCollection($storeId, $productIdChunks, $chunkId = 0)
     {
-        Mage::app()->getStore($storeId)->setConfig('catalog/frontend/flat_catalog_product', 0);
-
-        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $productCollection = Mage::getResourceModel('catalog/product_collection')
+        $productAttributes = array_unique(array_merge(
+            Mage::getSingleton('catalog/config')->getProductAttributes(),
+            array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'),
+            Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex()
+        ));
+        
+        /** @var $productCollection IntegerNet_Solr_Model_Resource_Catalog_Product_Indexing_Collection */
+        $productCollection = Mage::getResourceModel('integernet_solr/catalog_product_indexing_collection')
             ->setStoreId($storeId)
             ->addMinimalPrice()
             ->addFinalPrice()
             ->addTaxPercents()
             ->addUrlRewrite()
-            ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
-            ->addAttributeToSelect(array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'))
-            ->addAttributeToSelect(Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex());
-
-        if (is_array($productIds)) {
-            $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
-        }
-
-        if (!is_null($pageSize)) {
-            $productCollection->setPageSize($pageSize);
-            $productCollection->setCurPage($pageNumber);
-        }
+            ->addAttributeToSelect($productAttributes);
+        
+        $productIdChunk = $productIdChunks[$chunkId];
+        $productIds = $productIdChunk->getAllIds();
+        $productCollection->addAttributeToFilter('entity_id', array('in' => $productIds));
 
         Mage::dispatchEvent('integernet_solr_product_collection_load_before', array(
             'collection' => $productCollection
@@ -195,5 +184,13 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
             call_user_func($this->_pageCallback, $this);
         }
         return $valid;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    public function getDataSource()
+    {
+        return $this->_collection;
     }
 }

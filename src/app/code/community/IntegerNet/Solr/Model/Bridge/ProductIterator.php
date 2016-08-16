@@ -15,9 +15,9 @@ class IntegerNet_Solr_Model_Bridge_ProductIterator extends IteratorIterator impl
     protected $_bridgeFactory;
 
     /**
-     * @param Mage_Catalog_Model_Resource_Product_Collection $_collection
+     * @param Varien_Data_Collection $_collection
      */
-    public function __construct(Mage_Catalog_Model_Resource_Product_Collection $_collection)
+    public function __construct(Varien_Data_Collection $_collection)
     {
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         parent::__construct($_collection->getIterator());

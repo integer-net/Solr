@@ -88,7 +88,8 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
             /** @var Mage_Catalog_Model_Product $childProduct */
             $childProduct = $productCollection->getItemById($childProductId);
             if (is_null($childProduct)) {
-                Mage::throwException('Child Product ' . $childProductId . ' for product ' . $magentoProduct->getId() . ' isn\'t included in the collection.');
+                Mage::log('Child Product ' . $childProductId . ' for product ' . $magentoProduct->getId() . ' isn\'t included in the collection.', Zend_Log::ERR, Mage::getStoreConfig('dev/log/exception_file'));
+                continue;
             }
             if ($childProduct->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
                 $childProductCollection->addItem($childProduct);
@@ -138,27 +139,23 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
     protected function _getProductIdChunks($allProductIds, $associations)
     {
         $productIdChunks = array();
-        $currentParentIds = array();
-        $currentChildrenIds = array();
-        $currentChunkSize = 0;
+        $currentChunk = new IntegerNet_Solr_Model_Bridge_ProductIdChunk();
+        $productIdChunks[] = $currentChunk;
         foreach ($allProductIds as $key => $productId) {
             $parentAndChildrenProductCount = 1;
             if (isset($associations[$productId])) {
                 $parentAndChildrenProductCount += sizeof($associations[$productId]);
             }
-            if ($currentChunkSize > 0 && $currentChunkSize + $parentAndChildrenProductCount > $this->_pageSize) {
-                $productIdChunks[] = new IntegerNet_Solr_Model_Bridge_ProductIdChunk($currentParentIds, $currentChildrenIds);
-                $currentParentIds = array();
-                $currentChildrenIds = array();
-                $currentChunkSize = 0;
+            if ($currentChunk->getSize() > 0 && $currentChunk->getSize() + $parentAndChildrenProductCount > $this->_pageSize) {
+                $currentChunk = new IntegerNet_Solr_Model_Bridge_ProductIdChunk();
+                $productIdChunks[] = $currentChunk;
             }
-            $currentParentIds[] = $productId;
             if (isset($associations[$productId])) {
-                $currentChildrenIds[$productId] = $associations[$productId];
+                $currentChunk->addProductIds($productId, $associations[$productId]);
+            } else {
+                $currentChunk->addProductIds($productId);
             }
-            $currentChunkSize += $parentAndChildrenProductCount;
         }
-        $productIdChunks[] = new IntegerNet_Solr_Model_Bridge_ProductIdChunk($currentParentIds, $currentChildrenIds);
         return $productIdChunks;
     }
 }

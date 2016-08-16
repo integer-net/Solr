@@ -10,19 +10,19 @@
 class IntegerNet_Solr_Model_Bridge_ProductIdChunk
 {
     /** @var  int[] */
-    protected $parentIds;
+    protected $parentIds = array();
 
     /** @var  int[][] */
-    protected $childrenIds;
+    protected $childrenIds = array();
+    
+    protected $size = 0;
 
     /**
-     * @param int[] $parentIds
-     * @param int[][] $childrenIds
      */
-    public function __construct($parentIds, $childrenIds)
+    public function __construct()
     {
-        $this->parentIds = $parentIds;
-        $this->childrenIds = $childrenIds;
+        $this->parentIds = array();
+        $this->childrenIds = array();
     }
     
     /**
@@ -42,6 +42,14 @@ class IntegerNet_Solr_Model_Bridge_ProductIdChunk
     }
 
     /**
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->size;
+    }
+
+    /**
      * @return int[]
      */
     public function getAllIds()
@@ -53,5 +61,18 @@ class IntegerNet_Solr_Model_Bridge_ProductIdChunk
             } 
         }
         return $productIds;
+    }
+
+    /**
+     * @param int $parentId
+     * @param int[] $childrenIds
+     */
+    public function addProductIds($parentId, $childrenIds = array()) 
+    {
+        $this->parentIds[] = $parentId;
+        if (sizeof($childrenIds)) {
+            $this->childrenIds[$parentId] = $childrenIds;
+        }
+        $this->size += sizeof($childrenIds) + 1;
     }
 }

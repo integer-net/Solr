@@ -141,8 +141,8 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
             Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getAttributeCodesToIndex()
         ));
         
-        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $productCollection = Mage::getResourceModel('catalog/product_collection')
+        /** @var $productCollection IntegerNet_Solr_Model_Resource_Catalog_Product_Indexing_Collection */
+        $productCollection = Mage::getResourceModel('integernet_solr/catalog_product_indexing_collection')
             ->setStoreId($storeId)
             ->addMinimalPrice()
             ->addFinalPrice()

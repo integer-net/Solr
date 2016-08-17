@@ -15,7 +15,7 @@
 <?php if ($url = $this->getAjaxBaseUrl()): ?>
     <script type="text/javascript">
         document.observe("dom:loaded", function() {
-            var solrResult = new SolrResult('<?php echo $url ?>');
+            var solrResult = new SolrTabs('<?php echo $url ?>');
         });
     </script>
 <?php endif ?>

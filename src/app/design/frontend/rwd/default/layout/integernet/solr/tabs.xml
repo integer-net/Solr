@@ -6,6 +6,10 @@
             <action method="addCss" ifconfig="integernet_solr/general/is_active">
                 <stylesheet>integernet/solr/css/tabs.css</stylesheet>
             </action>
+            <action method="addItem" ifconfig="integernet_solr/general/is_active">
+                <type>skin_js</type>
+                <name>integernet/solr/js/tabs.js</name>
+            </action>
         </reference>
         <reference name="root">
             <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
@@ -21,7 +25,7 @@
             </block>
         </reference>
         <reference name="content">
-            <block type="integernet_solrpro/result_cms" name="catalogsearch.solr.tab.cms" before="*"
+            <block type="integernet_solrpro/result_cms" name="catalogsearch.solr.tab.cms" after="*"
                    template="integernet/solr/tabs/cms.phtml"/>
         </reference>
     </catalogsearch_result_index>

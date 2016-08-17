@@ -15,24 +15,31 @@
 
 <?php if ($this->canShowTabs()): ?>
 
-<div class="solr-tabs-container">
+<div class="solr-tabs-container" id="solr_tabs_container">
 
-    <div class="solr-tab" id="solr_tab_products">
+    <div class="solr-tab">
         <a href="#" class="active" id="solr_tab_link_products"><?php echo $this->__('Products (%s)', $this->getProductResultCount()) ?></a>
     </div>
 
     <?php if ($this->getCategoryResultCount()): ?>
-        <div class="solr-tab" id="solr_tab_category">
-            <a href="#" id="solr_tab_link_category"><?php echo $this->__('Categories (%s)', $this->getCategoryResultCount()) ?></a>
+        <div class="solr-tab">
+            <a href="#" id="solr_tab_link_categories"><?php echo $this->__('Categories (%s)', $this->getCategoryResultCount()) ?></a>
         </div>
     <?php endif ?>
 
     <?php if ($this->getCmsResultCount()): ?>
-    <div class="solr-tab" id="solr_tab_cms">
+    <div class="solr-tab">
         <a href="#" id="solr_tab_link_cms"><?php echo $this->__('Contents (%s)', $this->getCmsResultCount()) ?></a>
     </div>
     <?php endif ?>
 
 </div>
+
+<script type="text/javascript">
+    var tabs = new SolrTabs();
+    Event.observe(window, "load", function() {
+        tabs.activateTab('<?php echo $this->getActiveTabName() ?>');
+    });
+</script>
 
 <?php endif ?>

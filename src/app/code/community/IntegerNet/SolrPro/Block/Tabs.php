@@ -45,4 +45,15 @@ class IntegerNet_SolrPro_Block_Tabs extends Mage_Core_Block_Template
     {
         return 0;
     }
+
+    public function getActiveTabName()
+    {
+        if($this->getProductResultCount()) {
+            return 'solr_tab_link_products';
+        }
+        if($this->getCategoryResultCount()) {
+            return 'solr_tab_link_categories';
+        }
+        return 'solr_tab_link_cms';
+    }
 }

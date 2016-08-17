@@ -5,7 +5,7 @@
 <div class="solr-search-result-cms" id="solr_tab_content_cms" style="display: none;">
 
     <?php $_iterator = 0; ?>
-    <ol class="solr-cms-list products-list" id="colr_cms_list">
+    <ol class="solr-cms-list products-list" id="solr_cms_list">
         <?php $i=0; foreach ($cmsCollection as $cmsPageDocument): ?>
             <?php $title = $this->getCmsPageTitle($cmsPageDocument) ?>
             <?php $url = $this->getCmsPageUrl($cmsPageDocument); ?>
@@ -41,5 +41,5 @@
             </li>
         <?php endforeach ?>
     </ol>
-    <script type="text/javascript">decorateList('colr_cms_list', 'none-recursive')</script>
+    <script type="text/javascript">decorateList('solr_cms_list', 'none-recursive')</script>
 </div>

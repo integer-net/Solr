@@ -39,11 +39,12 @@ class IntegerNet_SolrPro_Block_Tabs extends Mage_Core_Block_Template
 
     /**
      * @return int
-     * @todo implement
      */
     public function getCategoryResultCount()
     {
-        return 0;
+        /** @var IntegerNet_SolrPro_Block_Result_Cms $categoriesResultsBlock */
+        $categoriesResultsBlock = $this->getLayout()->getBlock('catalogsearch.solr.tab.categories');
+        return $categoriesResultsBlock->getResultsCollection()->getSize();
     }
 
     public function getActiveTabName()

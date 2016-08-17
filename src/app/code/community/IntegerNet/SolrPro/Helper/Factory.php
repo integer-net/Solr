@@ -12,6 +12,7 @@ use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
 use IntegerNet\SolrCategories\Request\CategorySuggestRequestFactory;
+use IntegerNet\SolrCategories\Request\CategorySearchRequestFactory;
 use IntegerNet\SolrCms\Indexer\PageIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
@@ -174,6 +175,10 @@ class IntegerNet_SolrPro_Helper_Factory implements SolrRequestFactory, Autosugge
                 case self::REQUEST_MODE_CMS_PAGE:
                     $applicationContext->setQuery($this->_getSearchTermHelper());
                     $factory = new CmsPageRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                case self::REQUEST_MODE_CATEGORY_SEARCH:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new CategorySearchRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
                     break;
                 default:
                     $applicationContext

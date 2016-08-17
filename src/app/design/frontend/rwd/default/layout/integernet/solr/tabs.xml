@@ -27,6 +27,8 @@
         <reference name="content">
             <block type="integernet_solrpro/result_cms" name="catalogsearch.solr.tab.cms" after="*"
                    template="integernet/solr/tabs/cms.phtml"/>
+            <block type="integernet_solrpro/result_categories" name="catalogsearch.solr.tab.categories" after="*"
+                   template="integernet/solr/tabs/categories.phtml"/>
         </reference>
     </catalogsearch_result_index>
 </layout>

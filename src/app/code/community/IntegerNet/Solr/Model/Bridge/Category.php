@@ -12,6 +12,8 @@ use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 
 class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
 {
+    const ABSTRACT_MAX_LENGTH = 100;
+
     /**
      * @var Mage_Catalog_Model_Category
      */
@@ -20,6 +22,8 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
      * @var string[]
      */
     protected $_categoryPathNames = array();
+
+    protected $_description = null;
 
     /**
      * @param Mage_Catalog_Model_Category $category
@@ -60,18 +64,30 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
      */
     public function getDescription()
     {
-        $description = $this->_category->getDescription();
-        switch ($this->_category->getDisplayMode()) {
-            case Mage_Catalog_Model_Category::DM_PAGE:
-            case Mage_Catalog_Model_Category::DM_MIXED:
-                if ($blockId = $this->_category->getLandingPage()) {
-                    $block = Mage::getModel('cms/block')->load($blockId);
-                    if ($block->getId() && $block->getIsActive()) {
-                        $description .= ' ' .  Mage::helper('cms')->getPageTemplateProcessor()->filter($block->getContent());
+        if (is_null($this->_description)) {
+            $this->_description = $this->_category->getDescription();
+            switch ($this->_category->getDisplayMode()) {
+                case Mage_Catalog_Model_Category::DM_PAGE:
+                case Mage_Catalog_Model_Category::DM_MIXED:
+                    if ($blockId = $this->_category->getLandingPage()) {
+                        $block = Mage::getModel('cms/block')->load($blockId);
+                        if ($block->getId() && $block->getIsActive()) {
+                            $this->_description .= ' ' . Mage::helper('cms')->getPageTemplateProcessor()->filter($block->getContent());
+                        }
                     }
-                }
+            }
         }
-        return $description;
+        return $this->_description;
+    }
+
+    public function getAbstract()
+    {
+        $content = preg_replace(array('/\s{2,}/', '/[\t\n]+/'), ' ', $this->getDescription());
+        $content = trim(strip_tags(html_entity_decode($content)));
+        if (strlen($content) > self::ABSTRACT_MAX_LENGTH) {
+            $content = substr($content, 0, self::ABSTRACT_MAX_LENGTH) . '&hellip;';
+        }
+        return $content;
     }
 
     /**
@@ -81,6 +97,19 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
     public function getPath($separator)
     {
         return implode($separator, $this->_categoryPathNames);
+    }
+
+    public function getPathExcludingCurrentCategory($separator)
+    {
+        $pathIds = $this->_category->getPathIds();
+        $pathParts = array();
+        array_shift($pathIds);
+        array_shift($pathIds);
+        array_pop($pathIds);
+        foreach($pathIds as $pathId) {
+            $pathParts[] = $this->_category->getResource()->getAttributeRawValue($pathId, 'name', $this->getStoreId());
+        }
+        return implode($separator, $pathParts);
     }
 
     public function getStoreId()
@@ -101,7 +130,23 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
         return $this->_category->getData('solr_boost');
     }
 
-
+    /**
+     * Use first image in content area as page image
+     *
+     * @return string
+     */
+    public function getImageUrl()
+    {
+        if ($imageUrl = $this->_category->getImageUrl()) {
+            return $imageUrl;
+        }
+        $content = $this->getDescription();
+        preg_match('/<img.+src=\"(.*)\"/U', $content, $results);
+        if (isset($results[1])) {
+            return $results[1];
+        }
+        return '';
+    }
 
     /**
      * @param int $storeId

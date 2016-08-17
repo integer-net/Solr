@@ -66,7 +66,7 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
 
     public function getAbstract()
     {
-        $content = strip_tags(nl2br($this->getContent()));
+        $content = trim(strip_tags(html_entity_decode(str_replace(array("\r", "\n", "\t"), '', $this->getContent()))));
         if (strlen($content) > self::ABSTRACT_MAX_LENGTH) {
             $content = substr($content, 0, self::ABSTRACT_MAX_LENGTH) . '&hellip;';
         }

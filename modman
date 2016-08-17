@@ -14,9 +14,10 @@ src/app/locale/de_DE/template/email/*                               app/locale/d
 src/app/locale/en_US/template/email/*                               app/locale/en_US/template/email/
 src/shell/integernet-solr-check-configuration.php                   shell/integernet-solr-check-configuration.php
 src/shell/integernet-solr.php                                       shell/integernet-solr.php
-src/skin/frontend/base/default/integernet/solr/*                    skin/frontend/base/default/integernet/solr/
-src/skin/frontend/default/modern/integernet/solr/*                  skin/frontend/default/modern/integernet/solr/
-src/skin/frontend/rwd/default/integernet/solr/*                     skin/frontend/rwd/default/integernet/solr/
+src/skin/frontend/base/default/integernet/solr/css/*                skin/frontend/base/default/integernet/solr/css/
+src/skin/frontend/base/default/integernet/solr/js/*                 skin/frontend/base/default/integernet/solr/js/
+src/skin/frontend/default/modern/integernet/solr/css/*              skin/frontend/default/modern/integernet/solr/css/
+src/skin/frontend/rwd/default/integernet/solr/css/*                 skin/frontend/rwd/default/integernet/solr/css/
 src/skin/adminhtml/default/default/integernet/solr/*                skin/adminhtml/default/default/integernet/solr/
 src/autosuggest.php                                                 autosuggest.php
 src/autosuggest.config.dist.php                                     autosuggest.config.dist.php

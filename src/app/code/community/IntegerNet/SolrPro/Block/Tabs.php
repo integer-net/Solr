@@ -11,11 +11,10 @@ class IntegerNet_SolrPro_Block_Tabs extends Mage_Core_Block_Template
 {
     /**
      * @return bool
-     * @todo implement
      */
     public function canShowTabs()
     {
-        return true;
+        return $this->getCmsResultCount() + $this->getCategoryResultCount() > 0;
     }
 
     /**
@@ -26,5 +25,24 @@ class IntegerNet_SolrPro_Block_Tabs extends Mage_Core_Block_Template
         /** @var IntegerNet_Solr_Block_Result_List $productResultsBlock */
         $productResultsBlock = $this->getLayout()->getBlock('search_result_list');
         return $productResultsBlock->getFoundProductsCount();
+    }
+
+    /**
+     * @return int
+     */
+    public function getCmsResultCount()
+    {
+        /** @var IntegerNet_SolrPro_Block_Result_Cms $cmsResultsBlock */
+        $cmsResultsBlock = $this->getLayout()->getBlock('catalogsearch.solr.tab.cms');
+        return $cmsResultsBlock->getResultsCollection()->getSize();
+    }
+
+    /**
+     * @return int
+     * @todo implement
+     */
+    public function getCategoryResultCount()
+    {
+        return 0;
     }
 }

@@ -18,28 +18,6 @@ class IntegerNet_SolrPro_Block_Result_Cms extends Mage_Catalog_Block_Product_Abs
     }
 
     /**
-     * Retrieve product amount per row
-     *
-     * @return int
-     */
-    public function getColumnCount()
-    {
-        if (!$this->_getData('column_count')) {
-            $pageLayout = $this->getPageLayout();
-            if ($pageLayout && $this->getColumnCountLayoutDepend($pageLayout->getCode())) {
-                $this->setData(
-                    'column_count',
-                    $this->getColumnCountLayoutDepend($pageLayout->getCode())
-                );
-            } else {
-                $this->setData('column_count', $this->_defaultColumnCount);
-            }
-        }
-
-        return (int) $this->_getData('column_count');
-    }
-
-    /**
      * @param Apache_Solr_Document $document
      * @return string
      */

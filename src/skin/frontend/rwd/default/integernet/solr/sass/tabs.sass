@@ -1,0 +1,32 @@
+$c-white:         #ffffff
+$c-grey:          #f4f4f4
+$c-grey--dark:    #cccccc
+
+
+.solr-tabs-container
+  width: 100%
+  height: 40px
+  margin-bottom: 40px
+  border-bottom: 1px solid $c-grey--dark
+
+  .solr-tab
+    float: left
+    margin: 0 10px 0 0
+    padding: 0
+    text-align: center
+
+    a
+      border: 1px solid $c-grey--dark
+      width: 200px
+      height: 40px
+      background: $c-grey
+      display: block
+      padding: 10px 40px 10px 40px
+
+      &.active
+        border-bottom: 1px solid $c-white
+        background: $c-white
+
+      &:hover
+        background: $c-grey--dark
+        text-decoration: none

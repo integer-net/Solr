@@ -1,11 +1,43 @@
 <?php /* @var $this IntegerNet_SolrPro_Block_Result_Cms */ ?>
 
-CMS
+<?php $cmsCollection = $this->getResultsCollection() ?>
 
-<pre>
-<?php foreach($this->getResultsCollection() as $result): ?>
+<div class="solr-search-result-cms">
 
-    <?php print_r($result); ?>
+    <?php $_iterator = 0; ?>
+    <ol class="solr-cms-list products-list" id="colr_cms_list">
+        <?php $i=0; foreach ($cmsCollection as $cmsPageDocument): ?>
+            <?php $title = $this->getCmsPageTitle($cmsPageDocument) ?>
+            <?php $url = $this->getCmsPageUrl($cmsPageDocument); ?>
+            <li class="item<?php if( ++$_iterator == sizeof($cmsCollection) ): ?> last<?php endif; ?>">
+                <?php if ($imageUrl = $this->getCmsPageImageUrl($cmsPageDocument)): ?>
+                <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
+                    <?php $_imgSize = 210; ?>
+                    <img id="cms-collection-image-<?php echo $cmsPageDocument->getId(); ?>"
+                         src="<?php echo $imageUrl ?>"
+                         alt="<?php echo $this->stripTags($title) ?>" />
+                </a>
+                <?php endif ?>
+                <div class="product-shop">
+                    <div class="f-fix">
+                        <div class="product-primary">
+                            <?php $_cmsPageNameStripped = $this->stripTags($title, null, true); ?>
+                            <h2 class="product-name"><a href="<?php echo $url ?>" title="<?php echo $_cmsPageNameStripped; ?>"><?php echo $title ?></a></h2>
+                        </div>
+                        <div class="product-secondary">
 
-<?php endforeach ?>
-</pre>
+                        </div>
+                        <div class="product-secondary">
+                            <p class="action"><a title="<?php echo $this->quoteEscape($this->__('View Details')) ?>" class="button" href="<?php echo $url ?>"><?php echo $this->__('View Details') ?></a></p>
+                        </div>
+                        <div class="desc std">
+                            <!-- Short Description -->
+                            <a href="<?php echo $url ?>" title="<?php echo $_cmsPageNameStripped ?>" class="link-learn"><?php echo $this->__('Learn More') ?></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach ?>
+    </ol>
+    <script type="text/javascript">decorateList('colr_cms_list', 'none-recursive')</script>
+</div>

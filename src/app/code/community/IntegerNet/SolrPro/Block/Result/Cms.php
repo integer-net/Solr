@@ -30,6 +30,15 @@ class IntegerNet_SolrPro_Block_Result_Cms extends Mage_Catalog_Block_Product_Abs
      * @param Apache_Solr_Document $document
      * @return string
      */
+    public function getCmsPageAbstract($document)
+    {
+        return $document->abstract_t_nonindex;
+    }
+
+    /**
+     * @param Apache_Solr_Document $document
+     * @return string
+     */
     public function getCmsPageUrl($document)
     {
         return $document->url_s_nonindex;

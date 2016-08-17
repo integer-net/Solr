@@ -11,10 +11,13 @@ use IntegerNet\SolrCms\Implementor\Page;
 
 class IntegerNet_Solr_Model_Bridge_Page implements Page
 {
+    const ABSTRACT_MAX_LENGTH = 100;
     /**
      * @var Mage_Cms_Model_Page
      */
     protected $_page;
+
+    protected $_content = null;
 
     /**
      * @param Mage_Cms_Model_Page $_page
@@ -55,12 +58,39 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
     
     public function getContent()
     {
-        return Mage::helper('cms')->getPageTemplateProcessor()->filter($this->_page->getData('content'));
+        if (is_null($this->_content)) {
+            $this->_content = Mage::helper('cms')->getPageTemplateProcessor()->filter($this->_page->getData('content'));
+        }
+        return $this->_content;
+    }
+
+    public function getAbstract()
+    {
+        $content = strip_tags(nl2br($this->getContent()));
+        if (strlen($content) > self::ABSTRACT_MAX_LENGTH) {
+            $content = substr($content, 0, self::ABSTRACT_MAX_LENGTH) . '&hellip;';
+        }
+        return $content;
     }
 
     public function getUrl()
     {
         return Mage::helper('cms/page')->getPageUrl($this->getId());
+    }
+
+    /**
+     * Use first image in content area as page image
+     *
+     * @return string
+     */
+    public function getImageUrl()
+    {
+        $content = $this->getContent();
+        preg_match('/<img.+src=\"(.*)\"/U', $content, $results);
+        if (isset($results[1])) {
+            return $results[1];
+        }
+        return '';
     }
 
     /**

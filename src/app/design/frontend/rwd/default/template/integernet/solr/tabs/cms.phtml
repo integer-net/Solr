@@ -13,9 +13,12 @@
                 <?php if ($imageUrl = $this->getCmsPageImageUrl($cmsPageDocument)): ?>
                 <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
                     <?php $_imgSize = 210; ?>
-                    <img id="cms-collection-image-<?php echo $cmsPageDocument->getId(); ?>"
+                    <img
                          src="<?php echo $imageUrl ?>"
-                         alt="<?php echo $this->stripTags($title) ?>" />
+                         alt="<?php echo $this->stripTags($title) ?>"
+                         width="<?php echo $_imgSize ?>"
+                         height="<?php echo $_imgSize ?>"
+                    />
                 </a>
                 <?php endif ?>
                 <div class="product-shop">
@@ -31,7 +34,7 @@
                             <p class="action"><a title="<?php echo $this->quoteEscape($this->__('View Details')) ?>" class="button" href="<?php echo $url ?>"><?php echo $this->__('View Details') ?></a></p>
                         </div>
                         <div class="desc std">
-                            <!-- Short Description -->
+                            <?php echo $this->getCmsPageAbstract($cmsPageDocument) ?>
                             <a href="<?php echo $url ?>" title="<?php echo $_cmsPageNameStripped ?>" class="link-learn"><?php echo $this->__('Learn More') ?></a>
                         </div>
                     </div>

@@ -337,11 +337,8 @@
             </indexing>
             <fuzzy>
                 <is_active>1</is_active>
-                <is_active_autosuggest>1</is_active_autosuggest>
                 <sensitivity>0.8</sensitivity>
-                <sensitivity_autosuggest>0.8</sensitivity_autosuggest>
                 <minimum_results>0</minimum_results>
-                <minimum_results_autosuggest>0</minimum_results_autosuggest>
             </fuzzy>
             <results>
                 <use_html_from_solr>0</use_html_from_solr>

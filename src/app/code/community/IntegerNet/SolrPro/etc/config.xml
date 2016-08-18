@@ -50,6 +50,18 @@
         </layout>
     </frontend>
 
+    <adminhtml>
+        <translate>
+            <modules>
+                <integernet_solrpro>
+                    <files>
+                        <default>IntegerNet_SolrPro.csv</default>
+                    </files>
+                </integernet_solrpro>
+            </modules>
+        </translate>
+    </adminhtml>
+
     <default>
         <integernet_solr>
             <connection_check>
@@ -57,6 +69,11 @@
                 <send_email_on_nth_failure>1</send_email_on_nth_failure>
                 <email_template>integernet_solr_connection_check_email_template</email_template>
             </connection_check>
+            <fuzzy>
+                <is_active_autosuggest>1</is_active_autosuggest>
+                <sensitivity_autosuggest>0.8</sensitivity_autosuggest>
+                <minimum_results_autosuggest>0</minimum_results_autosuggest>
+            </fuzzy>
             <results>
                 <use_ajax_for_filter_results>0</use_ajax_for_filter_results>
             </results>

@@ -5,7 +5,7 @@
             <groups>
                 <general>
                     <fields>
-                        <license_key translate="label,comment" module="integernet_solr">
+                        <license_key translate="label,comment" module="integernet_solrpro">
                             <label>License Key</label>
                             <frontend_type>text</frontend_type>
                             <comment><![CDATA[Example: AAAAA-BBBBB. Will be necessary two weeks after install.]]></comment>
@@ -17,7 +17,7 @@
                     </fields>
                 </general>
 
-                <connection_check translate="label" module="integernet_solr">
+                <connection_check translate="label" module="integernet_solrpro">
                     <label>Connection Check</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>25</sort_order>
@@ -91,7 +91,7 @@
                     </fields>
                 </connection_check>
 
-                <solr_theme translate="label">
+                <solr_theme translate="label" module="integernet_solrpro">
                     <label>Theme</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>38</sort_order>
@@ -112,9 +112,55 @@
                     </fields>
                 </solr_theme>
 
+                <fuzzy>
+                    <fields>
+                        <is_active_autosuggest translate="label" module="integernet_solrpro">
+                            <label>Is active for Autosuggest</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </is_active_autosuggest>
+                        <sensitivity_autosuggest translate="label" module="integernet_solrpro">
+                            <label>Sensitivity for Autosuggest</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+                            <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
+                        </sensitivity_autosuggest>
+                        <minimum_results_autosuggest translate="label" module="integernet_solrpro">
+                            <label>Number of Sufficient Direct Search Results for Autosuggest</label>
+                            <comment>If there are at least this many search results for autosuggest, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_active_autosuggest>1</is_active_autosuggest></depends>
+                        </minimum_results_autosuggest>
+                    </fields>
+                </fuzzy>
+
                 <results>
                     <fields>
-                        <use_ajax_for_filter_results translate="label,comment">
+                        <use_html_from_solr translate="label,comment" module="integernet_solrpro">
+                            <label>Use HTML from Solr Index</label>
+                            <comment><![CDATA[Advantages: faster search<br />Disadvantages: slower indexing, no user dependant results]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_html_from_solr>
+                        <use_ajax_for_filter_results translate="label,comment" module="integernet_solrpro">
                             <label>Use AJAX for filter results</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -126,7 +172,7 @@
                     </fields>
                 </results>
 
-                <category translate="label" module="integernet_solr">
+                <category translate="label" module="integernet_solrpro">
                     <label>Category Pages</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>60</sort_order>
@@ -165,7 +211,7 @@
                     </fields>
                 </category>
 
-                <cms translate="label" module="integernet_solr">
+                <cms translate="label" module="integernet_solrpro">
                     <label>CMS</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>70</sort_order>
@@ -175,7 +221,7 @@
                     <fields>
                         <is_active translate="label,comment">
                             <label>Use Solr to index cms pages</label>
-                            <comment>Used for autosuggest</comment>
+                            <comment>Used for autosuggest and search results</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>
@@ -186,7 +232,7 @@
                     </fields>
                 </cms>
 
-                <autosuggest translate="label">
+                <autosuggest translate="label" module="integernet_solrpro">
                     <label>Autosuggest Box</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>80</sort_order>

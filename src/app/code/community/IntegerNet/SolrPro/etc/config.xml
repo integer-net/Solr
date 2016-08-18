@@ -50,6 +50,45 @@
         </layout>
     </frontend>
 
+    <default>
+        <integernet_solr>
+            <connection_check>
+                <check_connection>0</check_connection>
+                <send_email_on_nth_failure>1</send_email_on_nth_failure>
+                <email_template>integernet_solr_connection_check_email_template</email_template>
+            </connection_check>
+            <results>
+                <use_ajax_for_filter_results>0</use_ajax_for_filter_results>
+            </results>
+            <category>
+                <is_active>0</is_active>
+                <filter_position>1</filter_position>
+                <is_indexer_active>0</is_indexer_active>
+            </category>
+            <cms>
+                <is_active>0</is_active>
+            </cms>
+            <autosuggest>
+                <is_active>1</is_active>
+                <use_php_file_in_home_dir>1</use_php_file_in_home_dir>
+                <max_number_searchword_suggestions>5</max_number_searchword_suggestions>
+                <max_number_product_suggestions>3</max_number_product_suggestions>
+                <max_number_category_suggestions>0</max_number_category_suggestions>
+                <max_number_cms_page_suggestions>0</max_number_cms_page_suggestions>
+                <show_complete_category_path>1</show_complete_category_path>
+                <category_link_type>direct</category_link_type>
+                <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
+            </autosuggest>
+            <solr_theme>
+                <loader_style>solr-system</loader_style>
+            </solr_theme>
+            <dev>
+                <register_autoloader>1</register_autoloader>
+                <autoloader_basepath>lib/IntegerNet_Solr</autoloader_basepath>
+            </dev>
+        </integernet_solr>
+    </default>
+
     <phpunit>
         <suite>
             <modules>

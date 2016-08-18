@@ -10,15 +10,17 @@
             <?php $title = $this->getCategoryTitle($categoriesPageDocument) ?>
             <?php $url = $this->getCategoryUrl($categoriesPageDocument); ?>
             <li class="item<?php if( ++$_iterator == sizeof($categoriesCollection) ): ?> last<?php endif; ?>">
-                <?php if ($imageUrl = $this->getCategoryImageUrl($categoriesPageDocument)): ?>
-                <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
-                    <?php $_imgSize = 210; ?>
+                <?php $_imgWidth = 210; ?>
+                <?php $_imgHeight = 120; ?>
+                <?php if ($imageUrl = $this->getCategoryImageUrl($categoriesPageDocument, $_imgWidth, $_imgHeight)): ?>
+                    <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
                     <img
                          src="<?php echo $imageUrl ?>"
                          alt="<?php echo $this->stripTags($title) ?>"
-                         width="<?php echo $_imgSize ?>"
+                         width="<?php echo $_imgWidth ?>"
+                         height="<?php echo $_imgHeight ?>"
                     />
-                </a>
+                    </a>
                 <?php endif ?>
                 <div class="product-shop">
                     <div class="f-fix">

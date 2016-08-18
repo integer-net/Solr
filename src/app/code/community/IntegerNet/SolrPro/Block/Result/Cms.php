@@ -46,12 +46,14 @@ class IntegerNet_SolrPro_Block_Result_Cms extends Mage_Catalog_Block_Product_Abs
 
     /**
      * @param Apache_Solr_Document $document
+     * @param int $width
+     * @param int $height
      * @return string
      */
-    public function getCmsPageImageUrl($document)
+    public function getCmsPageImageUrl($document, $width, $height)
     {
-        if (isset($document->image_url_s_nonindex)) {
-            return $document->image_url_s_nonindex;
+        if (isset($document->image_url_s_nonindex) && ($imageUrl = $document->image_url_s_nonindex)) {
+            return $this->helper('integernet_solrpro/timage')->init($imageUrl)->resize($width, $height);
         }
         return '';
     }

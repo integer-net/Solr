@@ -10,15 +10,17 @@
             <?php $title = $this->getCmsPageTitle($cmsPageDocument) ?>
             <?php $url = $this->getCmsPageUrl($cmsPageDocument); ?>
             <li class="item<?php if( ++$_iterator == sizeof($cmsCollection) ): ?> last<?php endif; ?>">
-                <?php if ($imageUrl = $this->getCmsPageImageUrl($cmsPageDocument)): ?>
-                <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
-                    <?php $_imgSize = 135; ?>
-                    <img
-                         src="<?php echo $imageUrl ?>"
-                         alt="<?php echo $this->stripTags($title) ?>"
-                         width="<?php echo $_imgSize ?>"
-                    />
-                </a>
+                <?php $_imgWidth = 135; ?>
+                <?php $_imgHeight = 135; ?>
+                <?php if ($imageUrl = $this->getCmsPageImageUrl($cmsPageDocument, $_imgWidth, $_imgHeight)): ?>
+                    <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
+                        <img
+                            src="<?php echo $imageUrl ?>"
+                            alt="<?php echo $this->stripTags($title) ?>"
+                            width="<?php echo $_imgWidth ?>"
+                            height="<?php echo $_imgHeight ?>"
+                        />
+                    </a>
                 <?php endif ?>
                 <div class="product-shop">
                     <div class="f-fix">

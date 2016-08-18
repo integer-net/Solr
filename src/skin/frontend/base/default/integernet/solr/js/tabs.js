@@ -8,7 +8,8 @@ SolrTabs.prototype = {
         var self = this;
         this.container = $('solr_tabs_container');
         this.container.select('.solr-tab a').each(function(tabLinkItem) {
-            tabLinkItem.observe('click', function(item) {
+            tabLinkItem.observe('click', function(event) {
+                event.preventDefault();
                 self.activateTab(tabLinkItem.id);
             })
         });

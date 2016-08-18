@@ -51,6 +51,16 @@
     </frontend>
 
     <adminhtml>
+        <events>
+            <clean_catalog_images_cache_after>
+                <observers>
+                    <timage_clean_cache>
+                        <class>integernet_solrpro/observer</class>
+                        <method>cleanImageCache</method>
+                    </timage_clean_cache>
+                </observers>
+            </clean_catalog_images_cache_after>
+        </events>
         <translate>
             <modules>
                 <integernet_solrpro>

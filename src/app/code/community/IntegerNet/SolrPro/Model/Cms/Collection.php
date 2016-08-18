@@ -57,7 +57,12 @@ class IntegerNet_SolrPro_Model_Cms_Collection extends Varien_Data_Collection
         if (is_null($this->_totalRecords)) {
             $this->_totalRecords = 0;
             if (Mage::getStoreConfigFlag('integernet_solr/cms/use_in_search_results')) {
-                $this->_totalRecords = $this->_getSolrResult()->response->numFound;
+                $maxNumberResults = Mage::getStoreConfig('integernet_solr/cms/max_number_results');
+                if ($maxNumberResults) {
+                    $this->_totalRecords = min($maxNumberResults, $this->_getSolrResult()->response->numFound);
+                } else {
+                    $this->_totalRecords = $this->_getSolrResult()->response->numFound;
+                }
             }
         }
         return intval($this->_totalRecords);

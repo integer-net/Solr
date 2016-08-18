@@ -28,9 +28,33 @@
                 <class>IntegerNet_SolrPro_Helper</class>
             </integernet_solrpro>
         </helpers>
+
+        <events>
+            <application_clean_cache>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/observer</class>
+                        <method>applicationCleanCache</method>
+                    </integernet_solr>
+                </observers>
+            </application_clean_cache>
+        </events>
     </global>
 
     <frontend>
+        <events>
+            <controller_action_predispatch_catalog_category_view>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/observer</class>
+                        <method>controllerActionPredispatchCatalogCategoryView</method>
+                    </integernet_solr>
+                </observers>
+            </controller_action_predispatch_catalog_category_view>
+        </events>
+
         <translate>
             <modules>
                 <integernet_solrpro>
@@ -52,6 +76,15 @@
 
     <adminhtml>
         <events>
+            <admin_system_config_changed_section_integernet_solr>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/observer</class>
+                        <method>adminSystemConfigChangedSectionIntegernetSolr</method>
+                    </integernet_solr>
+                </observers>
+            </admin_system_config_changed_section_integernet_solr>
             <clean_catalog_images_cache_after>
                 <observers>
                     <timage_clean_cache>
@@ -60,7 +93,26 @@
                     </timage_clean_cache>
                 </observers>
             </clean_catalog_images_cache_after>
+            <admin_session_user_login_success>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/observer</class>
+                        <method>adminSessionUserLoginSuccess</method>
+                    </integernet_solr>
+                </observers>
+            </admin_session_user_login_success>
+            <adminhtml_cms_page_edit_tab_main_prepare_form>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/observer</class>
+                        <method>adminhtmlCmsPageEditTabContentPrepareForm</method>
+                    </integernet_solr>
+                </observers>
+            </adminhtml_cms_page_edit_tab_main_prepare_form>
         </events>
+
         <translate>
             <modules>
                 <integernet_solrpro>
@@ -71,6 +123,27 @@
             </modules>
         </translate>
     </adminhtml>
+
+    <crontab>
+        <jobs>
+            <integernet_solr_rebuild_config>
+                <schedule>
+                    <cron_expr>0 3 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integernet_solrpro/observer::storeSolrConfig</model>
+                </run>
+            </integernet_solr_rebuild_config>
+            <integernet_solr_check_server_connection>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>integernet_solrori/observer::checkSolrServerConnection</model>
+                </run>
+            </integernet_solr_check_server_connection>
+        </jobs>
+    </crontab>
 
     <default>
         <integernet_solr>

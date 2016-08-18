@@ -368,7 +368,7 @@
                         <attribute_filter_suggestions translate="label">
                             <label>Attribute Filter Suggestions</label>
                             <comment>0 = show all</comment>
-                            <frontend_model>integernet_solr/config_attributeFilterSuggestions</frontend_model>
+                            <frontend_model>integernet_solrpro/config_attributeFilterSuggestions</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>80</sort_order>
                             <show_in_default>1</show_in_default>

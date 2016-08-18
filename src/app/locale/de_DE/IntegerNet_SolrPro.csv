@@ -64,7 +64,7 @@
 "Attribute","Attribut"
 "Maximum number of suggestions","Max. Anzahl Vorschläge"
 "Sorting","Sortierung"
-"IntegerNet_Solr::Add","Hinzufügen"
+"IntegerNet_SolrPro::Add","Hinzufügen"
 "Exclude this Page from Solr Index","Diese Seite vom Solr-Index ausschließen"
 "Show complete category path","Kompletten Kategorie-Pfad anzeigen"
 "Use HTML from Solr Index","HTML vom Solr-Index verwenden"

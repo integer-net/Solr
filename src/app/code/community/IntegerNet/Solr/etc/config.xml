@@ -98,16 +98,6 @@
                 </observers>
             </catalog_product_delete_after>
 
-            <application_clean_cache>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>applicationCleanCache</method>
-                    </integernet_solr>
-                </observers>
-            </application_clean_cache>
-
             <controller_front_init_before>
                 <observers>
                     <integernet_solr>
@@ -198,33 +188,6 @@
                     </integernet_solr>
                 </observers>
             </adminhtml_catalog_product_attribute_edit_prepare_form>
-            <admin_system_config_changed_section_integernet_solr>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>adminSystemConfigChangedSectionIntegernetSolr</method>
-                    </integernet_solr>
-                </observers>
-            </admin_system_config_changed_section_integernet_solr>
-            <admin_session_user_login_success>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>adminSessionUserLoginSuccess</method>
-                    </integernet_solr>
-                </observers>
-            </admin_session_user_login_success>
-            <adminhtml_cms_page_edit_tab_main_prepare_form>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>adminhtmlCmsPageEditTabContentPrepareForm</method>
-                    </integernet_solr>
-                </observers>
-            </adminhtml_cms_page_edit_tab_main_prepare_form>
         </events>
     </adminhtml>
 
@@ -282,15 +245,6 @@
                     </integernet_solr>
                 </observers>
             </controller_action_predispatch_catalogsearch_result_index>
-            <controller_action_predispatch_catalog_category_view>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/observer</class>
-                        <method>controllerActionPredispatchCatalogCategoryView</method>
-                    </integernet_solr>
-                </observers>
-            </controller_action_predispatch_catalog_category_view>
             <catalog_block_product_list_collection>
                 <observers>
                     <review>
@@ -300,27 +254,6 @@
             </catalog_block_product_list_collection>
         </events>
     </frontend>
-
-    <crontab>
-        <jobs>
-            <integernet_solr_rebuild_config>
-                <schedule>
-                    <cron_expr>0 3 * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>integernet_solr/observer::storeSolrConfig</model>
-                </run>
-            </integernet_solr_rebuild_config>
-            <integernet_solr_check_server_connection>
-                <schedule>
-                    <cron_expr>*/5 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>integernet_solr/observer::checkSolrServerConnection</model>
-                </run>
-            </integernet_solr_check_server_connection>
-        </jobs>
-    </crontab>
 
     <default>
         <integernet_solr>

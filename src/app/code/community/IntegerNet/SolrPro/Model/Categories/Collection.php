@@ -26,7 +26,9 @@ class IntegerNet_SolrPro_Model_Categories_Collection extends Varien_Data_Collect
      */
     public function loadData($printQuery = false, $logQuery = false)
     {
-        $this->_items = $this->_getSolrResult()->response->docs;
+        if (Mage::getStoreConfigFlag('integernet_solr/category/use_in_search_results')) {
+            $this->_items = $this->_getSolrResult()->response->docs;
+        }
 
         return $this;
     }
@@ -53,7 +55,10 @@ class IntegerNet_SolrPro_Model_Categories_Collection extends Varien_Data_Collect
     {
         $this->load();
         if (is_null($this->_totalRecords)) {
-            $this->_totalRecords = $this->_getSolrResult()->response->numFound;
+            $this->_totalRecords = 0;
+            if (Mage::getStoreConfigFlag('integernet_solr/category/use_in_search_results')) {
+                $this->_totalRecords = $this->_getSolrResult()->response->numFound;
+            }
         }
         return intval($this->_totalRecords);
     }

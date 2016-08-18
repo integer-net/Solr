@@ -200,7 +200,7 @@
                         </filter_position>
                         <is_indexer_active translate="label,comment">
                             <label>Use Solr to index category pages</label>
-                            <comment>Used for autosuggest</comment>
+                            <comment>Used for autosuggest and search results</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>30</sort_order>
@@ -208,6 +208,26 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </is_indexer_active>
+                        <use_in_search_results translate="label,comment">
+                            <label>Display categories as search results</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_indexer_active>1</is_indexer_active></depends>
+                        </use_in_search_results>
+                        <max_number_results translate="label">
+                            <label>Maximum number of results</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><use_in_search_results>1</use_in_search_results></depends>
+                        </max_number_results>
                     </fields>
                 </category>
 
@@ -220,7 +240,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <is_active translate="label,comment">
-                            <label>Use Solr to index cms pages</label>
+                            <label>Use Solr to index CMS pages</label>
                             <comment>Used for autosuggest and search results</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -229,6 +249,26 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </is_active>
+                        <use_in_search_results translate="label,comment">
+                            <label>Display CMS pages as search results</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><is_active>1</is_active></depends>
+                        </use_in_search_results>
+                        <max_number_results translate="label">
+                            <label>Maximum number of results</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number validate-zero-or-greater</validate>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><use_in_search_results>1</use_in_search_results></depends>
+                        </max_number_results>
                     </fields>
                 </cms>
 

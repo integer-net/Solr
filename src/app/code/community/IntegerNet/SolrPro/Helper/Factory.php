@@ -173,11 +173,15 @@ class IntegerNet_SolrPro_Helper_Factory implements SolrRequestFactory, Autosugge
                     $factory = new CategorySuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
                     break;
                 case self::REQUEST_MODE_CMS_PAGE:
-                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $applicationContext
+                        ->setCmsConfig($config->getCmsConfig())
+                        ->setQuery($this->_getSearchTermHelper());
                     $factory = new CmsPageRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
                     break;
                 case self::REQUEST_MODE_CATEGORY_SEARCH:
-                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $applicationContext
+                        ->setCategoryConfig($config->getCategoryConfig())
+                        ->setQuery($this->_getSearchTermHelper());
                     $factory = new CategorySearchRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
                     break;
                 default:

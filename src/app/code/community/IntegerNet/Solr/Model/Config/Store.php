@@ -238,7 +238,9 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
         if ($this->_cms === null) {
             $prefix = 'integernet_solr/cms/';
             $this->_cms = new CmsConfig(
-                $this->_getConfigFlag($prefix . 'is_active')
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfigFlag($prefix . 'use_in_search_results'),
+                intval($this->_getConfig($prefix . 'max_number_results'))
             );
         }
         return $this->_cms;
@@ -256,7 +258,9 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             $this->_category = new CategoryConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'filter_position'),
-                $this->_getConfigFlag($prefix . 'is_indexer_active')
+                $this->_getConfigFlag($prefix . 'is_indexer_active'),
+                $this->_getConfigFlag($prefix . 'use_in_search_results'),
+                intval($this->_getConfig($prefix . 'max_number_results'))
             );
         }
         return $this->_category;

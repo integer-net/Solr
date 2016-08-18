@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <catalogsearch_result_index>
+        <reference name="head">
+            <action method="addCss" ifconfig="integernet_solr/general/is_active">
+                <stylesheet>integernet/solr/css/tabs.css</stylesheet>
+            </action>
+            <action method="addItem" ifconfig="integernet_solr/general/is_active">
+                <type>skin_js</type>
+                <name>integernet/solr/js/tabs.js</name>
+            </action>
+        </reference>
+        <reference name="root">
+            <action ifconfig="integernet_solr/general/is_active" method="unsetChild">
+                <name>breadcrumbs</name>
+            </action>
+            <block ifconfig="integernet_solr/general/is_active" type="core/text_list"
+                   name="catalogsearch.solr.breadcrumbs" as="breadcrumbs">
+                <action method="insert">
+                    <name>breadcrumbs</name>
+                </action>
+                <block type="integernet_solrpro/tabs" name="catalogsearch.solr.tabs" after="breadcrumbs"
+                       template="integernet/solr/tabs.phtml"/>
+            </block>
+        </reference>
+        <reference name="content">
+            <block type="integernet_solrpro/result_cms" name="catalogsearch.solr.tab.cms" after="*"
+                   template="integernet/solr/tabs/cms.phtml"/>
+            <block type="integernet_solrpro/result_categories" name="catalogsearch.solr.tab.categories" after="*"
+                   template="integernet/solr/tabs/categories.phtml"/>
+        </reference>
+    </catalogsearch_result_index>
+</layout>

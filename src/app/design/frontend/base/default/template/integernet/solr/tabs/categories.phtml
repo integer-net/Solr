@@ -1,0 +1,38 @@
+<?php /* @var $this IntegerNet_SolrPro_Block_Result_Categories */ ?>
+
+<?php $categoriesCollection = $this->getResultsCollection() ?>
+
+<div class="solr-search-result-categories" id="solr_tab_content_categories" style="display: none;">
+
+    <?php $_iterator = 0; ?>
+    <ol class="solr-categories-list products-list" id="solr_categories_list">
+        <?php $i=0; foreach ($categoriesCollection as $categoriesPageDocument): ?>
+            <?php $title = $this->getCategoryTitle($categoriesPageDocument) ?>
+            <?php $url = $this->getCategoryUrl($categoriesPageDocument); ?>
+            <li class="item<?php if( ++$_iterator == sizeof($categoriesCollection) ): ?> last<?php endif; ?>">
+                <?php if ($imageUrl = $this->getCategoryImageUrl($categoriesPageDocument)): ?>
+                <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
+                    <?php $_imgSize = 135; ?>
+                    <img
+                         src="<?php echo $imageUrl ?>"
+                         alt="<?php echo $this->stripTags($title) ?>"
+                         width="<?php echo $_imgSize ?>"
+                    />
+                </a>
+                <?php endif ?>
+                <div class="product-shop">
+                    <div class="f-fix">
+                        <p class="category-path"><?php echo $this->getCategoryPath($categoriesPageDocument) ?></p>
+                        <?php $_categoriesPageNameStripped = $this->stripTags($title, null, true); ?>
+                        <h2 class="product-name"><a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped; ?>"><?php echo $title ?></a></h2>
+                        <div class="desc std">
+                            <?php echo $this->getCategoryAbstract($categoriesPageDocument) ?>
+                            <a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped ?>" class="link-learn"><?php echo $this->__('Learn More') ?></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach ?>
+    </ol>
+    <script type="text/javascript">decorateList('solr_categories_list', 'none-recursive')</script>
+</div>

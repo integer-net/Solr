@@ -1,0 +1,37 @@
+<?php /* @var $this IntegerNet_SolrPro_Block_Result_Cms */ ?>
+
+<?php $cmsCollection = $this->getResultsCollection() ?>
+
+<div class="solr-search-result-cms" id="solr_tab_content_cms" style="display: none;">
+
+    <?php $_iterator = 0; ?>
+    <ol class="solr-cms-list products-list" id="solr_cms_list">
+        <?php $i=0; foreach ($cmsCollection as $cmsPageDocument): ?>
+            <?php $title = $this->getCmsPageTitle($cmsPageDocument) ?>
+            <?php $url = $this->getCmsPageUrl($cmsPageDocument); ?>
+            <li class="item<?php if( ++$_iterator == sizeof($cmsCollection) ): ?> last<?php endif; ?>">
+                <?php if ($imageUrl = $this->getCmsPageImageUrl($cmsPageDocument)): ?>
+                <a href="<?php echo $url ?>" title="<?php echo $this->stripTags($title, null, true) ?>" class="product-image">
+                    <?php $_imgSize = 135; ?>
+                    <img
+                         src="<?php echo $imageUrl ?>"
+                         alt="<?php echo $this->stripTags($title) ?>"
+                         width="<?php echo $_imgSize ?>"
+                    />
+                </a>
+                <?php endif ?>
+                <div class="product-shop">
+                    <div class="f-fix">
+                        <?php $_cmsPageNameStripped = $this->stripTags($title, null, true); ?>
+                        <h2 class="product-name"><a href="<?php echo $url ?>" title="<?php echo $_cmsPageNameStripped; ?>"><?php echo $title ?></a></h2>
+                        <div class="desc std">
+                            <?php echo $this->getCmsPageAbstract($cmsPageDocument) ?>
+                            <a href="<?php echo $url ?>" title="<?php echo $_cmsPageNameStripped ?>" class="link-learn"><?php echo $this->__('Learn More') ?></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach ?>
+    </ol>
+    <script type="text/javascript">decorateList('solr_cms_list', 'none-recursive')</script>
+</div>

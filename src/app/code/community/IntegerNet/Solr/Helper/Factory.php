@@ -11,12 +11,14 @@ use IntegerNet\Solr\Implementor\Config;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
+use IntegerNet\SolrCategories\Request\CategorySuggestRequestFactory;
 use IntegerNet\SolrCms\Indexer\PageIndexer;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\RequestFactory;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
+use IntegerNet\SolrCms\Request\CmsPageSuggestRequestFactory;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
 use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory;
 use IntegerNet\SolrSuggest\Implementor\Factory\CacheReaderFactory;
@@ -172,14 +174,29 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
                 $this->_getEventDispatcher()
             );
         } else {
-            $applicationContext
-                ->setFuzzyConfig($config->getFuzzySearchConfig())
-                ->setQuery($this->_getSearchTermSynonymHelper());
-            $factory = new SearchRequestFactory(
-                $applicationContext,
-                $this->getSolrResource(),
-                $storeId
-            );
+            switch ($requestMode) {
+                case self::REQUEST_MODE_SEARCHTERM_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new SearchTermSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                case self::REQUEST_MODE_CATEGORY_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new CategorySuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                case self::REQUEST_MODE_CMS_PAGE_SUGGEST:
+                    $applicationContext->setQuery($this->_getSearchTermHelper());
+                    $factory = new CmsPageSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
+                    break;
+                default:
+                    $applicationContext
+                        ->setFuzzyConfig($config->getFuzzySearchConfig())
+                        ->setQuery($this->_getSearchTermSynonymHelper());
+                    $factory = new SearchRequestFactory(
+                        $applicationContext,
+                        $this->getSolrResource(),
+                        $storeId
+                    );
+            }
         }
         return $factory->createRequest();
     }

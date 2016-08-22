@@ -70,7 +70,7 @@
 "HTTP Basic Authentication: Username","HTTP Basis-Authentifizierung: Benutzername"
 "HTTP Basic Authentication: Password","HTTP Basis-Authentifizierung: Passwort"
 "Exclude this Product from Solr Index","Dieses Produkt vom Solr-Index ausschließen"
-"Exclude this Page from Solr Index","Dieses Produkt vom Solr-Index ausschließen"
+"Exclude this Page from Solr Index","Diese Seite vom Solr-Index ausschließen"
 "Show complete category path","Kompletten Kategorie-Pfad anzeigen"
 "Size of Price Steps","Größe der Preis-Schritte"
 "i.e. 100","z.B. 100"

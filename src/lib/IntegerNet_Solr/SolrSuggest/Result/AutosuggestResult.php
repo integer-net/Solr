@@ -288,61 +288,43 @@ class AutosuggestResult
 
             $solrResponse = $this->getCategorySuggestResult();
             $collection = new CategorySuggestionCollection($solrResponse, $this->userQuery);
-            $query = $this->getQuery();
             mb_internal_encoding('UTF-8');
-            $title = mb_strtolower(trim($query));
 
-            $titles = array($title);
+            $categoryIds = array();
+
             foreach ($collection as $item) {
                 /** @var \Apache_Solr_Document $item */
 
-                if ($counter >= $maxNumberCategories) {
-                    break;
-                }
-
-                $title = trim($this->escapeHtml($item->name_t));
-                if (in_array($title, $titles)) {
-                    continue;
-                }
-
-                $titles[] = $title;
-                $counter++;
-
-                $_suggestion = new CategorySuggestion(
-                    $title,
-                    ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
-                    1,
-                    $item->url_s_nonindex
-                );
-
-                $categorySuggestions[] = $_suggestion;
+                $categoryIds[$item->product_id] = 1;
             }
 
-            if (sizeof($categorySuggestions)) {
-                $lastKey = max(array_keys($categorySuggestions));
-                $categorySuggestions[$lastKey] = $categorySuggestions[$lastKey]->appendRowClass('last');
-            }
         } else {
 
             $categoryIds = (array)$this->getSearchRequestResult()->facet_counts->facet_fields->category;
-            $categories = $this->categoryRepository->findActiveCategoriesByIds($this->storeId, $categoryIds);
+        }
+        
+        $categories = $this->categoryRepository->findActiveCategoriesByIds($this->storeId, array_keys($categoryIds));
 
-            foreach ($categoryIds as $categoryId => $numResults) {
-                if (isset($categories[$categoryId])) {
-                    if (++$counter > $maxNumberCategories) {
-                        break;
-                    }
-
-                    $category = $categories[$categoryId];
-                    $categorySuggestions[] = new CategorySuggestion(
-                        $this->escapeHtml($this->_getCategoryTitle($category)),
-                        '',
-                        $numResults,
-                        $this->_getCategoryUrl($category)
-                    );
-
+        foreach ($categoryIds as $categoryId => $numResults) {
+            if (isset($categories[$categoryId])) {
+                if (++$counter > $maxNumberCategories) {
+                    break;
                 }
+
+                $category = $categories[$categoryId];
+                $categorySuggestions[] = new CategorySuggestion(
+                    $this->escapeHtml($this->_getCategoryTitle($category)),
+                    ($counter % 2 ? 'odd' : 'even') . ($counter === 1 ? ' first' : ''),
+                    $numResults,
+                    $this->_getCategoryUrl($category)
+                );
+
             }
+        }
+
+        if (sizeof($categorySuggestions)) {
+            $lastKey = max(array_keys($categorySuggestions));
+            $categorySuggestions[$lastKey] = $categorySuggestions[$lastKey]->appendRowClass('last');
         }
 
         return $categorySuggestions;
@@ -470,7 +452,7 @@ class AutosuggestResult
     protected function _getCategoryUrl(SuggestCategory $category)
     {
         $linkType = $this->autosuggestConfig->getCategoryLinkType();
-        if ($linkType == AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
+        if ($linkType === AutosuggestConfig::CATEGORY_LINK_TYPE_FILTER) {
             return $this->searchUrl->getUrl($this->getQuery(), array('cat' => $category->getId()));
         }
 

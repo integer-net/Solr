@@ -235,6 +235,14 @@ class ProductIndexer
      */
     protected function _addFacetsToProductData(Product $product, IndexDocument $productData)
     {
+        $hasChildProducts = true;
+        try {
+            $childProducts = $this->_getChildProducts($product);
+        } catch (\Exception $e) {
+            $hasChildProducts = false;
+            $childProducts = array();
+        }
+
         foreach ($this->_attributeRepository->getFilterableInCatalogOrSearchAttributes($product->getStoreId()) as $attribute) {
 
             if ($attribute->getAttributeCode() == 'price') {
@@ -277,13 +285,6 @@ class ProductIndexer
                         }
                     }
                 }
-            }
-
-            $hasChildProducts = true;
-            try {
-                $childProducts = $this->_getChildProductsCollection($product);
-            } catch (\Exception $e) {
-                $hasChildProducts = false;
             }
 
             if ($hasChildProducts && $attribute->getBackendType() != Attribute::BACKEND_TYPE_DECIMAL) {
@@ -340,9 +341,10 @@ class ProductIndexer
     {
         $hasChildProducts = true;
         try {
-            $childProducts = $this->_getChildProductsCollection($product);
+            $childProducts = $this->_getChildProducts($product);
         } catch (\Exception $e) {
             $hasChildProducts = false;
+            $childProducts = array();
         }
 
         if (!$productData->getData('price_f')) {
@@ -484,7 +486,7 @@ class ProductIndexer
      * @param Product $product
      * @return ProductIterator
      */
-    protected function _getChildProductsCollection($product)
+    protected function _getChildProducts($product)
     {
         return $this->_productRepository->getChildProducts($product);
     }

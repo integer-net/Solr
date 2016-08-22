@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.6.0</version>
+            <version>1.6.0.4</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -378,7 +378,7 @@
                 <max_number_product_suggestions>3</max_number_product_suggestions>
                 <max_number_category_suggestions>0</max_number_category_suggestions>
                 <max_number_cms_page_suggestions>0</max_number_cms_page_suggestions>
-                <show_complete_category_path>0</show_complete_category_path>
+                <show_complete_category_path>1</show_complete_category_path>
                 <category_link_type>direct</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>

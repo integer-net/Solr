@@ -470,8 +470,18 @@ class IntegerNet_SolrPro_Helper_Timage extends Mage_Core_Helper_Abstract
         $mediaDir = Mage::getBaseDir('media');
         $mediaUrl = Mage::getBaseUrl('media');
 
-        $img = trim(str_replace(array($mediaUrl, '/', '\\'), DS, $img), DS);
-        $this->img = $mediaDir . DS . $img;
+        if (strpos($img, $mediaUrl) !== false) {
+            $img = trim(str_replace(array($mediaUrl, '/', '\\'), DS, $img), DS);
+            $this->img = $mediaDir . DS . $img;
+        } else {
+            // download file if on external server
+            $dirName = $mediaDir . DS . 'catalog' . DS . 'downloaded';
+            $this->img = $dirName . DS . basename($img);
+            if (!is_dir($dirName)) {
+                mkdir($dirName, 0777, true);
+            }
+            copy($img, $this->img);
+        }
 
         /**
          * First check this file on FS

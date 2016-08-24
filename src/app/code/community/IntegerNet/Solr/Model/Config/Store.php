@@ -240,7 +240,9 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
             $this->_cms = new CmsConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfigFlag($prefix . 'use_in_search_results'),
-                intval($this->_getConfig($prefix . 'max_number_results'))
+                intval($this->_getConfig($prefix . 'max_number_results')),
+                $this->_getConfigFlag($prefix . 'fuzzy_is_active'),
+                floatval($this->_getConfig($prefix . 'fuzzy_sensitivity'))
             );
         }
         return $this->_cms;
@@ -260,7 +262,9 @@ final class IntegerNet_Solr_Model_Config_Store implements Config
                 $this->_getConfig($prefix . 'filter_position'),
                 $this->_getConfigFlag($prefix . 'is_indexer_active'),
                 $this->_getConfigFlag($prefix . 'use_in_search_results'),
-                intval($this->_getConfig($prefix . 'max_number_results'))
+                intval($this->_getConfig($prefix . 'max_number_results')),
+                $this->_getConfigFlag($prefix . 'fuzzy_is_active'),
+                floatval($this->_getConfig($prefix . 'fuzzy_sensitivity'))
             );
         }
         return $this->_category;

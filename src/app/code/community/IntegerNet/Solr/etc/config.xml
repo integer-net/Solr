@@ -270,7 +270,7 @@
             </indexing>
             <fuzzy>
                 <is_active>1</is_active>
-                <sensitivity>0.8</sensitivity>
+                <sensitivity>0.75</sensitivity>
                 <minimum_results>0</minimum_results>
             </fuzzy>
             <results>

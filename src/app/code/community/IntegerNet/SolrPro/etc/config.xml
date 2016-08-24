@@ -154,7 +154,7 @@
             </connection_check>
             <fuzzy>
                 <is_active_autosuggest>1</is_active_autosuggest>
-                <sensitivity_autosuggest>0.8</sensitivity_autosuggest>
+                <sensitivity_autosuggest>0.75</sensitivity_autosuggest>
                 <minimum_results_autosuggest>0</minimum_results_autosuggest>
             </fuzzy>
             <results>
@@ -166,11 +166,15 @@
                 <is_indexer_active>0</is_indexer_active>
                 <use_in_search_results>1</use_in_search_results>
                 <max_number_results>10</max_number_results>
+                <fuzzy_is_active>1</fuzzy_is_active>
+                <fuzzy_sensitivity>0.75</fuzzy_sensitivity>
             </category>
             <cms>
                 <is_active>0</is_active>
                 <use_in_search_results>1</use_in_search_results>
                 <max_number_results>10</max_number_results>
+                <fuzzy_is_active>1</fuzzy_is_active>
+                <fuzzy_sensitivity>0.75</fuzzy_sensitivity>
             </cms>
             <autosuggest>
                 <is_active>1</is_active>

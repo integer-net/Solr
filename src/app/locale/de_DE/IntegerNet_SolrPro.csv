@@ -13,6 +13,7 @@
 "Is active for Autosuggest","Ist aktiv für Suchvorschläge"
 "Number of Sufficient Direct Search Results for Autosuggest","Anzahl ausreichender direkter Suchergebnisse für Suchvorschläge"
 "If there are at least this many search results for autosuggest, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.","Gibt es mindestens so viele direkte Suchergebnisse, wird keine unscharfe Suche durchgeführt. Wird der Wert 0 oder kein Wert eingetragen, wird die unscharfe Suche immer durchgeführt."
+"Fuzzy Search is active","Unscharfe Suche ist aktiv"
 "Sensitivity for Autosuggest","Sensibilität für Suchvorschläge"
 "Rebuild Solr Autosuggest Cache","Solr Suchvorschlagscache neu aufbauen"
 "Cache for Solr autosuggest function. Contains configuration and template of autosuggest box.","Cache für die Solr-Suchvorschlagsfunktion. Beinhaltet Konfiguration und Template der Suchvorschlags-Box."

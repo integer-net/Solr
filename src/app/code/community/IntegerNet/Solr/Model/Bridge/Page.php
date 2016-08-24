@@ -86,7 +86,7 @@ class IntegerNet_Solr_Model_Bridge_Page implements Page
     public function getImageUrl()
     {
         $content = $this->getContent();
-        preg_match('/<img.+src=\"(.*)\"/U', $content, $results);
+        preg_match('/<img.+src=\"http(.*)\"/U', $content, $results);
         if (isset($results[1])) {
             return $results[1];
         }

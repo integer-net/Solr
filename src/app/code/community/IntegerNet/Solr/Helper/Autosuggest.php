@@ -163,9 +163,11 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     {
         preg_match_all('$->__\(\'(.*)\'$', $templateContents, $results);
 
-        foreach($results[1] as $key => $search) {
+        foreach($results[1] as $key => $text) {
 
-            $replace = Mage::helper('integernet_solr')->__($search);
+            $translation = Mage::helper('integernet_solr')->__($text);
+            $search = $results[0][$key];
+            $replace = str_replace($text, $translation, $search);
             $templateContents = str_replace($search, $replace, $templateContents);
         }
 

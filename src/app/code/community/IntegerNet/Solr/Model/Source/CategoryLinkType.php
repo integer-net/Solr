@@ -12,6 +12,11 @@ use IntegerNet\Solr\Config\AutosuggestConfig;
 
 class IntegerNet_Solr_Model_Source_CategoryLinkType
 {
+    public function __construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+    }
+
     /**
      * Options getter
      *

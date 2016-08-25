@@ -12,6 +12,11 @@ use IntegerNet\Solr\Config\CategoryConfig;
 
 class IntegerNet_Solr_Model_Eav_Source_FilterPosition extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
 {
+    public function __construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+    }
+
     /**
      * Options getter
      *

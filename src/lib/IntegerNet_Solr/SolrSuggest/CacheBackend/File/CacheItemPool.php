@@ -214,11 +214,11 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     private function getFilePath($key)
     {
-        if (in_array(str_replace('\\', '', $key), array('.', '..'))) {
+        if (in_array(str_replace(['\\','/'], '', $key), array('.', '..'))) {
             throw new \IntegerNet\SolrSuggest\CacheBackend\InvalidArgumentException('Cache key not allowed');
         }
 
-        $charMap = array(DIRECTORY_SEPARATOR => '_', '_' => '__');
+        $charMap = array('/' => '_', '\\' => '_', '_' => '__');
         $filename = $this->rootDir . DIRECTORY_SEPARATOR . strtr($key, $charMap);
         if (!\is_dir(\dirname($filename))) {
             \mkdir(\dirname($filename), 0770);

@@ -37,7 +37,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
 
     protected function _beforeLoad()
     {
-        if (Mage::helper('integernet_solr')->isActive() && is_null($this->_solrResultCollection)) {
+        if (Mage::helper('integernet_solr')->module()->isActive() && is_null($this->_solrResultCollection)) {
             $this->setSolrResultCollection(Mage::getSingleton('integernet_solr/result_collection'));
         }
 
@@ -51,7 +51,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
      */
     protected function _afterLoad()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::_afterLoad();
         }
 
@@ -76,7 +76,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
      */
     public function getSize()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getSize();
         }
         return $this->getSolrResultCollection()->getSize();
@@ -96,7 +96,7 @@ class IntegerNet_Solr_Model_Resource_Catalog_Product_Collection extends Mage_Cat
             return parent::addAttributeToSort($attribute, $dir);
         }
 
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::addAttributeToSort($attribute, $dir);
         }
 

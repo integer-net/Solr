@@ -8,10 +8,8 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-namespace IntegerNet\SolrCategories\Block;
+namespace IntegerNet\SolrSuggest\Block;
 
-
-use IntegerNet\SolrSuggest\Block\SearchTermSuggestion;
 
 final class CategorySuggestion
 {

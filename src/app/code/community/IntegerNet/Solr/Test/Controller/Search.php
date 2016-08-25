@@ -62,6 +62,30 @@ class IntegerNet_Solr_Test_Controller_Search extends IntegerNet_Solr_Test_Contro
      * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
+    public function shouldShowChildrenSearchResult()
+    {
+        $this->dispatch('catalogsearch/result/index', ['q' => 'blue']);
+        $this->assertResponseBodyContains('Search results for \'blue\'');
+        $this->assertResponseBodyContains('1 Item(s)');
+        $this->assertResponseBodyContains('Product One');
+    }
+
+    /**
+     * @test
+     * @helper catalogsearch
+     * @registry current_category
+     * @registry current_entity_key
+     * @singleton catalog/layer
+     * @singleton core/session
+     * @singleton catalog/session
+     * @singleton customer/session
+     * @singleton reports/session
+     * @singleton integernet_solr/bridge_attributeRepository
+     * @singleton integernet_solr/bridge_categoryRepository
+     * @singleton integernet_solr/result
+     * @singleton integernet_solr/result_collection
+     * @loadFixture catalog
+     */
     public function shouldFilterSearchResult()
     {
         $this->dispatch('catalogsearch/result/index', ['q' => 'wells', 'cat' => '222']);

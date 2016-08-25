@@ -16,6 +16,7 @@ use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Indexer\IndexField;
 
 final class SearchQueryBuilder extends AbstractQueryBuilder
 {
@@ -45,6 +46,11 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
     private $resultsConfig;
 
     /**
+     * @var $eventDispatcher EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * @param FuzzyConfig $fuzzyConfig
      * @param ResultsConfig $resultsConfig
      * @param AttributeRepository $attributeRepository
@@ -59,6 +65,7 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
         $this->fuzzyConfig = $fuzzyConfig;
         $this->resultsConfig = $resultsConfig;
         $this->searchString = $searchString;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -199,29 +206,8 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
      */
     private function getFieldName(Attribute $attribute, $forSorting = false)
     {
-        if ($attribute->getUsedForSortBy()) {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t';
-
-                default:
-                    return ($forSorting) ? $attribute->getAttributeCode() . '_s' : $attribute->getAttributeCode() . '_t';
-            }
-        } else {
-            switch ($attribute->getBackendType()) {
-                case 'decimal':
-                    return $attribute->getAttributeCode() . '_f_mv';
-
-                case 'text':
-                    return $attribute->getAttributeCode() . '_t_mv';
-
-                default:
-                    return $attribute->getAttributeCode() . '_t_mv';
-            }
-        }
+        $indexField = new IndexField($attribute, $this->getEventDispatcher());
+        return $indexField->getFieldName();
     }
 
     /**
@@ -232,5 +218,11 @@ final class SearchQueryBuilder extends AbstractQueryBuilder
         return parent::getParamsBuilder();
     }
 
-
+    /**
+     * @return EventDispatcher
+     */
+    protected function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
 }

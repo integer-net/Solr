@@ -28,7 +28,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expectedLabel, $attribute->getSource()->getOptionText($expectedId), 'getSource()->getOptionText()');
         }
         $this->assertEquals($expectedValues['solr_boost'], $attribute->getSolrBoost(), 'getSolrBoost()');
-        $this->assertEquals('varchar', $attribute->getBackendType(), 'getBackendType() should always return varchar');
+        $this->assertEquals(Attribute::BACKEND_TYPE_VARCHAR, $attribute->getBackendType(), 'getBackendType() should always return varchar');
         $this->assertEquals(true, $attribute->getIsSearchable(), 'getIsSearchable() should always return true');
         $this->assertEquals($expectedValues['used_for_sortby'], $attribute->getUsedForSortBy(), 'getUsedForSortBy()');
         foreach ($expectedValues['custom_data'] as $expectedKey => $expectedValue) {

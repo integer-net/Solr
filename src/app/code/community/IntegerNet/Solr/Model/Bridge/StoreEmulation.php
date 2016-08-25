@@ -56,6 +56,25 @@ class IntegerNet_Solr_Model_Bridge_StoreEmulation implements StoreEmulation
         }
     }
 
+    /**
+     * Executes callback with environment emulation for given store. Emulation is stopped in any case (Exception or successful execution).
+     *
+     * @param $storeId
+     * @param callable $callback
+     * @throws Exception
+     */
+    public function runInStore($storeId, $callback)
+    {
+        $this->start($storeId);
+        try {
+            $callback();
+        } catch (Exception $e) {
+            $this->stop();
+            throw $e;
+        }
+        $this->stop();
+    }
+
     public function __destruct()
     {
         $this->stop();

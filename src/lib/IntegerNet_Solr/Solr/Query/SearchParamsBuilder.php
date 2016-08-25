@@ -11,5 +11,20 @@ namespace IntegerNet\Solr\Query;
 
 final class SearchParamsBuilder extends AbstractParamsBuilder
 {
+    /**
+     * @return array
+     */
+    protected function getFacetFieldCodes()
+    {
+        $codes = array();
+        if ($this->resultsConfig->isShowCategoryFilter()) {
+            $codes = array('category');
+        }
+
+        foreach($this->attributeRespository->getFilterableInSearchAttributes($this->getStoreId()) as $attribute) {
+            $codes[] = $attribute->getAttributeCode() . '_facet';
+        }
+        return $codes;
+    }
 
 }

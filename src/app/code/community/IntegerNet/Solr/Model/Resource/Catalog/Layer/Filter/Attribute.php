@@ -11,6 +11,23 @@
 class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage_Catalog_Model_Resource_Layer_Filter_Attribute
 {
     /**
+     * @var IntegerNet_Solr_Model_Bridge_Factory
+     */
+    protected $_bridgeFactory;
+
+    protected function _construct()
+    {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
+            parent::_construct();
+        }
+
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_construct();
+        }
+
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
+    }
+    /**
      * Apply attribute filter to product collection
      *
      * @param Mage_Catalog_Model_Layer_Filter_Attribute $filter
@@ -19,15 +36,15 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function applyFilterToCollection($filter, $value)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::applyFilterToCollection($filter, $value);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::applyFilterToCollection($filter, $value);
         }
 
-        $bridgeAttribute = new IntegerNet_Solr_Model_Bridge_Attribute($filter->getAttributeModel());
+        $bridgeAttribute = $this->_bridgeFactory->createAttribute($filter->getAttributeModel());
         
         $attributeFilters = Mage::registry('attribute_filters');
         if (!is_array($attributeFilters)) {
@@ -51,11 +68,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Attribute extends Mage
      */
     public function getCount($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getCount($filter);
         }
 
-        if (!Mage::helper('integernet_solr')->isSolrResultPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getCount($filter);
         }
 

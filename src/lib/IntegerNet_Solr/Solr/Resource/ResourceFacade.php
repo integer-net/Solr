@@ -17,6 +17,7 @@ use Apache_Solr_HttpTransport_FileGetContents;
 use Apache_Solr_Response;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\Config;
+use IntegerNet\Solr\Indexer\IndexDocument;
 
 /**
  * Solr resource, facade for Apache_Solr library
@@ -112,7 +113,7 @@ class ResourceFacade
      */
     public function search($storeId, $query, $offset = 0, $limit = 10, $params = array())
     {
-        $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params);
+        $response = $this->getSolrService($storeId)->search($query, $offset, $limit, $params, \Apache_Solr_Service::METHOD_POST);
         return new ResponseDecorator($response);
     }
 
@@ -243,7 +244,7 @@ class ResourceFacade
 
     /**
      * @param int $storeId
-     * @param array[] $combinedData
+     * @param array[]|IndexDocument[] $combinedData
      * @return Apache_Solr_Response
      */
     public function addDocuments($storeId, $combinedData)

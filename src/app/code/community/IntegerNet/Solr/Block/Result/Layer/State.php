@@ -29,7 +29,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                 }
             }
 
-            foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes($store->getId(), false) as $attribute) {
+            foreach (Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getFilterableAttributes($store->getId(), false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 $optionLabel = '';
@@ -75,6 +75,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
                         $filter->setAttribute($attribute);
                         $filter->setName($attribute->getStoreLabel());
                         $filter->setLabel($optionLabel);
+                        $filter->setOptionId($optionId);
                         $filter->setRemoveUrl($this->_getRemoveUrl($attribute->getAttributeCode(), $optionId));
                         $this->_activeFilters[] = $filter;
                     }
@@ -159,7 +160,7 @@ class IntegerNet_Solr_Block_Result_Layer_State extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
             return 'catalog/category/view';
         }

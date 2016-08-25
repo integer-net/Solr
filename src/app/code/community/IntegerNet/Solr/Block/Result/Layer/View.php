@@ -14,6 +14,12 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
     protected $_filters = null;
     protected $_currentCategory = null;
 
+    protected function _construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+        parent::_construct();
+    }
+
     /**
      * Check availability display layer block
      *
@@ -76,7 +82,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                     $this->_filters[] = $categoryFilter;
                 }
             }
-            foreach (Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
+            foreach (Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getFilterableAttributes(Mage::app()->getStore()->getId(), false) as $attribute) {
                 /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
 
                 /** @var Mage_Catalog_Model_Category $currentCategory */
@@ -98,7 +104,7 @@ class IntegerNet_Solr_Block_Result_Layer_View extends Mage_Core_Block_Template
                         $this->_filters[] = $filter;
                     }
                 }
-                $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($attribute);
+                $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->attribute()->getFieldName($attribute);
                 if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
 
                     $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};

@@ -11,7 +11,7 @@ class IntegerNet_Solr_Block_Js extends Mage_Core_Block_Template
 {
     public function getAjaxBaseUrl()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return false;
         }
         
@@ -19,7 +19,7 @@ class IntegerNet_Solr_Block_Js extends Mage_Core_Block_Template
             return false;
         }
         
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
             if (!Mage::helper('integernet_solr')->isCategoryDisplayActive()) {
                 return false;
             }

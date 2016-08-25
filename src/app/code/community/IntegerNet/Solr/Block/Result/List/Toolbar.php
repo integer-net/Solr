@@ -31,7 +31,7 @@ class IntegerNet_Solr_Block_Result_List_Toolbar extends Mage_Catalog_Block_Produ
      */
     protected function _getRoute()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
             return 'catalog/category/view';
         }

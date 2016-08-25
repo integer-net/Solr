@@ -26,10 +26,7 @@ class IntegerNet_Solr_Model_CmsIndexer
      */
     public function __construct()
     {
-        $autoloader = new IntegerNet_Solr_Helper_Autoloader();
-        $autoloader->createAndRegister();
-
-        $this->_pageIndexer = Mage::helper('integernet_solr/factory')->getPageIndexer();
+        $this->_pageIndexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
     }
 
     /**

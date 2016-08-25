@@ -12,6 +12,10 @@ use IntegerNet\Solr\Resource\HttpTransportMethod;
 
 class IntegerNet_Solr_Model_Source_HttpTransportMethod
 {
+    public function __construct()
+    {
+        IntegerNet_Solr_Helper_Autoloader::createAndRegister();
+    }
 
     /**
      * Options getter

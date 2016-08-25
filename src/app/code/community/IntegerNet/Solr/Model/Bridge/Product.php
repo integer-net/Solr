@@ -12,6 +12,7 @@ use IntegerNet\Solr\Implementor\Attribute;
 
 class IntegerNet_Solr_Model_Bridge_Product implements Product
 {
+    protected $_bridgeFactory;
     /**
      * @var Mage_Catalog_Model_Product
      */
@@ -22,6 +23,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
      */
     public function __construct(Mage_Catalog_Model_Product $_product)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_product = $_product;
     }
 
@@ -83,7 +85,7 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
 
     public function getSearchableAttributeValue(Attribute $attribute)
     {
-        $magentoAttribute = Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getMagentoAttribute($attribute);
+        $magentoAttribute = Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getMagentoAttribute($attribute);
         $value = trim(strip_tags($magentoAttribute->getFrontend()->getValue($this->_product)));
         $attributeCode = $attribute->getAttributeCode();
         if ($magentoAttribute->getData('backend_type') == 'int'
@@ -103,33 +105,6 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
         return $this->_product->getCategoryIds();
     }
 
-
-    /**
-     * @return \IntegerNet\Solr\Implementor\ProductIterator
-     */
-    public function getChildren()
-    {
-        $childProductIds = $this->_product->getTypeInstance(true)->getChildrenIds($this->_product->getId());
-
-        if (sizeof($childProductIds) && is_array(current($childProductIds))) {
-            $childProductIds = current($childProductIds);
-        }
-
-        if (!sizeof($childProductIds)) {
-            Mage::throwException('Product ' . $this->_product->getSku() . ' doesn\'t have any child products.');
-        }
-
-        /** @var $childProductCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $childProductCollection = Mage::getResourceModel('catalog/product_collection')
-            ->setStoreId($this->_product->getStoreId())
-            ->addAttributeToFilter('entity_id', array('in' => $childProductIds))
-            ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-            ->addAttributeToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE)
-            ->addAttributeToSelect(Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getAttributeCodesToIndex());
-
-        return new IntegerNet_Solr_Model_Bridge_ProductIterator($childProductCollection);
-
-    }
 
     /**
      * @return int
@@ -158,8 +133,17 @@ class IntegerNet_Solr_Model_Bridge_Product implements Product
         if (!in_array($this->_product->getStore()->getWebsiteId(), $this->_product->getWebsiteIds())) {
             return false;
         }
-        if (!$this->_product->getStockItem()->getIsInStock() && !Mage::helper('cataloginventory')->isShowOutOfStock()) {
-            return false;
+        if (!Mage::helper('cataloginventory')->isShowOutOfStock()) {
+            /** @var Mage_CatalogInventory_Model_Stock_Item $stockItem */
+            if (!$this->_product->getStockItem()) {
+                $stockItem = Mage::getModel('cataloginventory/stock_item')
+                    ->loadByProduct($this->_product->getId());
+                $this->_product->setStockItem($stockItem);
+            }
+
+            if (!$this->_product->getStockItem()->getIsInStock()) {
+                return false;
+            }
         }
         return true;
 

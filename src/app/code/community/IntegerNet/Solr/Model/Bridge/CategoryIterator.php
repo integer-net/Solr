@@ -12,12 +12,14 @@ use IntegerNet\SolrCategories\Implementor\CategoryIterator;
 
 class IntegerNet_Solr_Model_Bridge_CategoryIterator extends IteratorIterator implements CategoryIterator
 {
+    protected $_bridgeFactory;
 
     /**
      * @param Mage_Catalog_Model_Resource_Category_Collection $_collection
      */
     public function __construct(Mage_Catalog_Model_Resource_Category_Collection $_collection)
     {
+        $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         parent::__construct($_collection->getIterator());
     }
 
@@ -26,7 +28,7 @@ class IntegerNet_Solr_Model_Bridge_CategoryIterator extends IteratorIterator imp
      */
     public function current()
     {
-        return new IntegerNet_Solr_Model_Bridge_Category($this->getInnerIterator()->current());
+        return $this->_bridgeFactory->createCategory($this->getInnerIterator()->current());
     }
 
 }

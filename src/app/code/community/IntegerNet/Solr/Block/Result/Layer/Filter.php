@@ -19,7 +19,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
     protected $_categoryFilterItems = null;
 
     protected $_currentCategory = null;
-    
+
     protected $_numberFilterOptionsDisplayed = 0;
 
     /**
@@ -149,7 +149,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
 
                 $categoryFacets = $this->_getSolrResult()->facet_counts->facet_fields->{$facetName};
 
-                if (Mage::helper('integernet_solr')->isCategoryPage()) {
+                if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
                     $childrenCategories = $this->_getCurrentChildrenCategories();
 
@@ -204,7 +204,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                             if ($this->_isMaxNumberFilterOptionsExceeded()) {
                                 break;
                             }
-
+    
                             $this->_categoryFilterItems[$optionLabel] = $item;
                         }
                     }
@@ -227,7 +227,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
         $items = array();
 
         $store = Mage::app()->getStore();
-        $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->getFieldName($this->getAttribute());
+        $attributeCodeFacetRangeName = Mage::helper('integernet_solr')->attribute()->getFieldName($this->getAttribute());
         if (isset($this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName})) {
 
             $attributeFacetData = (array)$this->_getSolrResult()->facet_counts->facet_intervals->{$attributeCodeFacetRangeName};
@@ -261,6 +261,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'range',
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
@@ -295,6 +296,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'range',
                     'entity_id' => floatval($rangeStart) . '-' . floatval($rangeEnd),
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
@@ -350,13 +352,14 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                     'solr_result' => $this->_getSolrResult(),
                     'type' => 'attribute',
                     'entity_id' => $optionId,
+                    'entity' => $this->getAttribute(),
                 ));
 
                 if (!$item->getIsDisabled()) {
                     if ($this->_isMaxNumberFilterOptionsExceeded()) {
                         break;
                     }
-
+    
                     $items[$optionLabel] = $item;
                 }
             }
@@ -456,7 +459,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
      */
     protected function _getRoute()
     {
-        if (Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (Mage::helper('integernet_solr')->page()->isCategoryPage()) {
 
             return 'catalog/category/view';
         }

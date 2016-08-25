@@ -30,17 +30,19 @@ class AttributeStub implements Attribute
     private $usedForSortBy;
     /** @var  string */
     private $facetType;
+    /** @var  boolean */
+    private $isSortable;
 
     public static function sortableString($name)
     {
-        return new self($name, $name, 0, new SourceStub(), 'string', true, true, 'text');
+        return new self($name, $name, 0, new SourceStub(), 'string', true, true, 'text', true, 'text');
     }
     public static function filterable($name, array $options)
     {
-        return new self($name, $name, 0, new \IntegerNet\SolrSuggest\Plain\Entity\Source($options), 'int', true, false, 'int');
+        return new self($name, $name, 0, new \IntegerNet\SolrSuggest\Plain\Entity\Source($options), 'int', true, false, 'int', false, 'text');
     }
 
-    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source, $backendType, $isSearchable, $usedForSortBy, $facetType)
+    public function __construct($attributeCode, $storeLabel, $solrBoost, Source $source, $backendType, $isSearchable, $usedForSortBy, $facetType, $isSortable, $inputType)
     {
         $this->attributeCode = $attributeCode;
         $this->storeLabel = $storeLabel;
@@ -50,6 +52,7 @@ class AttributeStub implements Attribute
         $this->isSearchable = $isSearchable;
         $this->usedForSortBy = $usedForSortBy;
         $this->facetType = $facetType;
+        $this->isSortable = $isSortable;
     }
 
     /**

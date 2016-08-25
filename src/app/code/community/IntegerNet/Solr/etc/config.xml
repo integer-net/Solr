@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.6.0</version>
+            <version>1.6.0.5</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -147,6 +147,16 @@
                     </integernet_solr>
                 </observers>
             </cms_page_delete_commit_after>
+
+            <fastsimpleimport_reindex_products_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>afterFastSimpleImportReindex</method>
+                    </integernet_solr>
+                </observers>
+            </fastsimpleimport_reindex_products_after>
         </events>
 
         <resources>
@@ -352,6 +362,7 @@
                 <use_html_from_solr>0</use_html_from_solr>
                 <search_operator>AND</search_operator>
                 <filter_position>1</filter_position>
+                <show_category_filter>1</show_category_filter>
                 <priority_categories>2</priority_categories>
                 <max_number_filter_options>0</max_number_filter_options>
                 <use_ajax_for_filter_results>0</use_ajax_for_filter_results>
@@ -377,7 +388,7 @@
                 <max_number_product_suggestions>3</max_number_product_suggestions>
                 <max_number_category_suggestions>0</max_number_category_suggestions>
                 <max_number_cms_page_suggestions>0</max_number_cms_page_suggestions>
-                <show_complete_category_path>0</show_complete_category_path>
+                <show_complete_category_path>1</show_complete_category_path>
                 <category_link_type>direct</category_link_type>
                 <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
             </autosuggest>

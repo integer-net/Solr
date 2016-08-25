@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Implementor;
 interface Product
 {
     /**
-     * @return int
+     * @return string unique identifier for product data (id X store)
      */
     public function getSolrId();
     /**
@@ -36,12 +36,13 @@ interface Product
 
     public function getAttributeValue(Attribute $attribute);
 
+    /**
+     * Return searchable attribute value (localized values instead of ids, comma separated strings instead of arrays)
+     *
+     * @param Attribute $attribute
+     * @return string|null
+     */
     public function getSearchableAttributeValue(Attribute $attribute);
 
     public function getCategoryIds();
-
-    /**
-     * @return ProductIterator
-     */
-    public function getChildren();
 }

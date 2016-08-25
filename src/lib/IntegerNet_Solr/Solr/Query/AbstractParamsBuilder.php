@@ -10,11 +10,13 @@
 namespace IntegerNet\Solr\Query;
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
+use IntegerNet\Solr\Indexer\IndexField;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Request\HasFilter;
 use IntegerNet\Solr\Request\HasPagination;
+use IntegerNet\Solr\Implementor\EventDispatcher;
 
 abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPagination
 {
@@ -43,9 +45,13 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
      * @var $storeId int
      */
     private $storeId;
+    /**
+     * @var $eventDispatcher EventDispatcher
+     */
+    protected $eventDispatcher;
 
     public function __construct(AttributeRepository $attributeRepository, FilterQueryBuilder $filterQueryBuilder,
-                                Pagination $pagination, ResultsConfig $resultsConfig, FuzzyConfig $fuzzyConfig, $storeId)
+                                Pagination $pagination, ResultsConfig $resultsConfig, FuzzyConfig $fuzzyConfig, $storeId, $eventDispatcher)
     {
         $this->attributeRespository = $attributeRepository;
         $this->filterQueryBuilder = $filterQueryBuilder;
@@ -53,6 +59,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
         $this->resultsConfig = $resultsConfig;
         $this->fuzzyConfig = $fuzzyConfig;
         $this->storeId = (int) $storeId;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -135,15 +142,7 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
     /**
      * @return array
      */
-    private function getFacetFieldCodes()
-    {
-        $codes = array('category');
-
-        foreach($this->attributeRespository->getFilterableAttributes($this->getStoreId()) as $attribute) {
-            $codes[] = $attribute->getAttributeCode() . '_facet';
-        }
-        return $codes;
-    }
+    abstract protected function getFacetFieldCodes();
 
     /**
      * @param string $attributeToReset
@@ -194,17 +193,11 @@ abstract class AbstractParamsBuilder implements ParamsBuilder, HasFilter, HasPag
                 $sortFieldForSolr = 'price_f';
                 break;
             default:
-                $sortFieldForSolr = $sortField . '_s';
+                $attribute = $this->attributeRespository->getAttributeByCode($sortField, $this->storeId);
+                $indexField = new IndexField($attribute, $this->eventDispatcher, true);
+                $sortFieldForSolr = $indexField->getFieldName();
         }
         return $sortFieldForSolr;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isCategoryPage()
-    {
-        return $this->categoryId != null;
     }
 
     /**

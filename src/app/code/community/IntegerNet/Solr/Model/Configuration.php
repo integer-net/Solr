@@ -154,7 +154,7 @@ class IntegerNet_Solr_Model_Configuration
             }
 
         } else {
-            if (!Mage::helper('integernet_solr')->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
+            if (!Mage::helper('integernet_solr')->module()->isKeyValid(Mage::getStoreConfig('integernet_solr/general/license_key'))) {
     
                 if ($installTimestamp = Mage::getStoreConfig('integernet_solr/general/install_date')) {
 
@@ -211,7 +211,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canPingSolrServer($storeId)
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -224,7 +224,7 @@ class IntegerNet_Solr_Model_Configuration
             Mage::helper('integernet_solr')->__('Connection to Solr server established successfully.')
         );
 
-        $info = Mage::helper('integernet_solr/factory')->getSolrResource()->getInfo($storeId);
+        $info = Mage::helper('integernet_solr')->factory()->getSolrResource()->getInfo($storeId);
         if ($info instanceof Apache_Solr_Response) {
             if (isset($info->lucene->{'solr-spec-version'})) {
                 $solrVersion = $info->lucene->{'solr-spec-version'};
@@ -243,7 +243,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canIssueSearchRequest($storeId)
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');
@@ -256,8 +256,8 @@ class IntegerNet_Solr_Model_Configuration
             $this->_addErrorMessage(
                 Mage::helper('integernet_solr')->__('Test search request failed.')
             );
-            $this->_addNoticeMessage(
-                Mage::helper('integernet_solr')->__('Maybe the configuration files are not installed correctly on the Solr server.')
+            $this->_addErrorMessage(
+                Mage::helper('integernet_solr')->__('Probably the configuration files are not installed correctly on the Solr server.')
             );
             $this->_addNoticeMessage(
                 Mage::helper('integernet_solr')->__('You can get a meaningful error message from the tab "Logging" on the Solr Admin Interface.')
@@ -290,7 +290,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canPingSwapCore($storeId)
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->setUseSwapIndex()->getSolrService($storeId);
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->setUseSwapIndex()->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -311,7 +311,7 @@ class IntegerNet_Solr_Model_Configuration
      */
     protected function _canIssueSearchRequestToSwapCore($storeId)
     {
-        $solr = Mage::helper('integernet_solr/factory')->getSolrResource()->
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->
         setUseSwapIndex()->getSolrService($storeId);
 
         try {

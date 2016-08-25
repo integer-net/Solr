@@ -21,7 +21,7 @@ class IntegerNet_Solr_Model_Source_VarcharProductAttribute
             'value' => '',
             'label' => '',
         ));
-        $attributes = Mage::getSingleton('integernet_solr/bridge_attributeRepository')->getVarcharProductAttributes();
+        $attributes = Mage::getModel('integernet_solr/bridge_factory')->getAttributeRepository()->getVarcharProductAttributes();
 
         foreach($attributes as $attribute) { /** @var Mage_Catalog_Model_Entity_Attribute $attribute */
             $options[] = array(

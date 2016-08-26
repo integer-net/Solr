@@ -14,14 +14,6 @@
 class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Controller_Abstract
 {
 
-    protected function setUp()
-    {
-        parent::setUp();
-        //TODO test with category indexer and without
-        $this->app()->getStore(0)->setConfig('integernet_solr/category/is_indexer_active', 0);
-        Mage::getModel('integernet_solr/indexer')->reindexAll();
-    }
-
     /**
      * @test
      * @dataProvider dataAutoSuggestBox
@@ -38,13 +30,11 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      */
     public function shouldShowAutosuggestBox($config, $expectedInBody)
     {
+        $this->reindexWithConfig([
+            'integernet_solr/category/is_indexer_active' => 0
+        ]);
         $this->setCurrentStore('default');
-        foreach ($config as $path => $value) {
-            $this->app()->getStore()->setConfig($path, $value);
-        }
-        // We need to reload the attribute config in store scope, has been loaded during reindex,
-        // in admin scope, so that attribute labels are missing
-        Mage::unregister('_singleton/eav/config');
+        $this->applyConfig($config);
 
         $this->dispatch('catalogsearch/ajax/suggest', ['_query' => ['q' => 'war']]);
         $this->assertResponseBodyContains('<ul class="searchwords">', 'Search term suggest container');
@@ -56,6 +46,36 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
         $this->assertResponseBodyContains('<div class="attributes-box">', 'Attribute container');
         $this->assertResponseBodyContains('<strong>Manufacturer1</strong>', 'Attribute container content');
         $this->assertResponseBodyContains('/catalogsearch/result/?manufacturer=5&amp;q=war">Herbert George Wells</a>', 'Link to attribute search');
+
+        foreach ($expectedInBody as $expected) {
+            $this->assertResponseBodyContains($expected);
+        }
+    }
+    /**
+     * @test
+     * @dataProvider dataAutoSuggestBox
+     * @singleton core/session
+     * @singleton catalog/session
+     * @singleton customer/session
+     * @singleton reports/session
+     * @singleton integernet_solr/bridge_attributeRepository
+     * @singleton integernet_solr/bridge_categoryRepository
+     * @singleton integernet_solr/result
+     * @singleton integernet_solr/result_collection
+     * @helper catalogsearch
+     * @loadFixture catalog
+     */
+    public function shouldShowAutosuggestBoxWithCategoryIndexer($config, $expectedInBody)
+    {
+        $this->reindexWithConfig([
+            'integernet_solr/category/is_indexer_active' => 1
+        ]);
+        $this->setCurrentStore('default');
+        $this->applyConfig($config);
+
+        $this->dispatch('catalogsearch/ajax/suggest', ['_query' => ['q' => 'Science']]);
+        $this->assertResponseBodyContains('<div class="categories-box">', 'Category suggest container');
+        $this->assertResponseBodyContains('<span class="highlight">Science</span>-Fiction', 'Category suggest content');
 
         foreach ($expectedInBody as $expected) {
             $this->assertResponseBodyContains($expected);
@@ -77,6 +97,7 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      */
     public function shouldShowAutosuggestBoxLocalized()
     {
+        $this->reindexWithConfig([]);
         // We need to reload the attribute config in store scope, has been loaded during reindex,
         // in admin scope, so that attribute labels are missing
         Mage::unregister('_singleton/eav/config');
@@ -115,5 +136,27 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
                 ]
             ],
         ];
+    }
+
+    /**
+     * @param $config
+     */
+    private function applyConfig($config)
+    {
+        foreach ($config as $path => $value) {
+            $this->app()->getStore()->setConfig($path, $value);
+        }
+        // We need to reload the attribute config in store scope, has been loaded during reindex,
+        // in admin scope, so that attribute labels are missing
+        Mage::unregister('_singleton/eav/config');
+    }
+
+    /**
+     * @param $config
+     */
+    private function reindexWithConfig($config)
+    {
+        $this->applyConfig($config);
+        Mage::getModel('integernet_solr/indexer')->reindexAll();
     }
 }

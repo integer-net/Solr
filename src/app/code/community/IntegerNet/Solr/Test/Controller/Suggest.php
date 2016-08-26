@@ -46,17 +46,23 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     /**
      * @test
      * @loadFixture catalog
+     * @dataProvider dataAutoSuggestBox
      */
-    public function shouldShowAutosuggestBoxWithCategoryIndexer()
+    public function shouldShowAutosuggestBoxWithCategoryIndexer($config, $expectedInBody)
     {
         $this->reindexWithConfig([
             'integernet_solr/category/is_indexer_active' => 1
         ]);
         $this->setCurrentStore('default');
+        $this->applyConfig($config);
 
         $this->dispatch('catalogsearch/ajax/suggest', ['_query' => ['q' => 'Science']]);
         $this->assertResponseBodyContains('<div class="categories-box">', 'Category suggest container');
         $this->assertResponseBodyContains('<span class="highlight">Science</span>-Fiction', 'Category suggest content');
+
+        foreach ($expectedInBody as $expected) {
+            $this->assertResponseBodyContains($expected);
+        }
     }
 
     /**

@@ -35,7 +35,6 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      * @singleton integernet_solr/result_collection
      * @helper catalogsearch
      * @loadFixture catalog
-     * @doNotIindexAll
      */
     public function shouldShowAutosuggestBox($config, $expectedInBody)
     {
@@ -75,7 +74,6 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
      * @singleton integernet_solr/result_collection
      * @helper catalogsearch
      * @loadFixture catalog
-     * @doNotIindexAll
      */
     public function shouldShowAutosuggestBoxLocalized()
     {

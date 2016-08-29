@@ -17,7 +17,6 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
      * @test
      * @loadFixture catalog
      * @dataProvider dataIteratorParameters
-     * @singleton customer/session
      */
     public function shouldLazyloadCollections($idFilter, $pageSize, $expectedProductIds, $expectedInnerIteratorCount)
     {

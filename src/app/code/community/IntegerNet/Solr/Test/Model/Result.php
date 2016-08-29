@@ -13,6 +13,7 @@ use IntegerNet\Solr\Resource\SolrResponse;
 
 /**
  * @loadFixture config
+ * @doNotIndexAll
  */
 class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Controller
 {

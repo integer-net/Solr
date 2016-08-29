@@ -9,6 +9,7 @@
  */
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Model_Bridge_AttributeRepository extends EcomDev_PHPUnit_Test_Case

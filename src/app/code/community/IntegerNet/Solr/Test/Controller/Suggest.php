@@ -9,6 +9,7 @@
  */
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Controller_Abstract
@@ -17,15 +18,6 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     /**
      * @test
      * @dataProvider dataAutoSuggestBox
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
-     * @helper catalogsearch
      * @loadFixture catalog
      */
     public function shouldShowAutosuggestBox($config, $expectedInBody)
@@ -53,15 +45,6 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
     }
     /**
      * @test
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
-     * @helper catalogsearch
      * @loadFixture catalog
      */
     public function shouldShowAutosuggestBoxWithCategoryIndexer()
@@ -78,15 +61,6 @@ class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Contr
 
     /**
      * @test
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
-     * @helper catalogsearch
      * @loadFixture catalog
      */
     public function shouldShowAutosuggestBoxLocalized()

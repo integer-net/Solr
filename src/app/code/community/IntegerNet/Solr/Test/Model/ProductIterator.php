@@ -9,6 +9,7 @@
  */
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Case_Controller

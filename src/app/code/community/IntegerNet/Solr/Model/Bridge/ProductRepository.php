@@ -70,6 +70,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
      *
      * @param Product|IntegerNet_Solr_Model_Bridge_Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
      * @return ProductIterator
+     * @throws Mage_Core_Exception
      */
     public function getChildProducts(Product $parent)
     {
@@ -77,7 +78,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
 
         if (!isset($this->_associations[$magentoProduct->getId()])) {
             // Exception will be caught; this happens regularily if no children are present
-            Mage::throwException('Children Products for product ' . $magentoProduct->getId() . ' haven\'t been preloaded.');
+            throw new Mage_Core_Exception('Children Products for product ' . $magentoProduct->getId() . ' haven\'t been preloaded.');
         }
         $childProductIds = $this->_associations[$magentoProduct->getId()];
         

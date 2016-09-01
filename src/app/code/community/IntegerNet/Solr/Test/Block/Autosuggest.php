@@ -11,8 +11,6 @@ class IntegerNet_Solr_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
 {
     /**
      * @test
-     * @singleton core/session
-     * @singleton integernet_solr/observer
      */
     public function shouldLoadCustomHelperFromCacheWithEmptyCache()
     {
@@ -22,8 +20,6 @@ class IntegerNet_Solr_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
     }
     /**
      * @test
-     * @singleton core/session
-     * @singleton integernet_solr/observer
      */
     public function shouldLoadCustomHelperFromCacheWithPreparedCache()
     {

@@ -9,6 +9,7 @@
  */
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Controller_Abstract
@@ -23,17 +24,6 @@ class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Cont
 
     /**
      * @test
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldShowFilteredProductsInCategory()
@@ -48,17 +38,6 @@ class IntegerNet_Solr_Test_Controller_Category extends IntegerNet_Solr_Test_Cont
 
     /**
      * @test
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldShowProductsInCategory()

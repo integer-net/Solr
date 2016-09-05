@@ -8,6 +8,7 @@
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Controller_Configuration extends IntegerNet_Solr_Test_Controller_Abstract

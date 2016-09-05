@@ -11,6 +11,7 @@ use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Resource\ResourceFacade;
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  */
 class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Case_Controller
@@ -18,7 +19,6 @@ class IntegerNet_Solr_Test_Model_Indexer_Product extends EcomDev_PHPUnit_Test_Ca
     /**
      * @param array $config
      * @test
-     * @singleton customer/session
      * @dataProvider dataProvider
      * @dataProviderFile invalid-config.yaml
      * @expectedException Exception

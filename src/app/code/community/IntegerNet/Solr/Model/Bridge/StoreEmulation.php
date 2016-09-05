@@ -32,8 +32,13 @@ class IntegerNet_Solr_Model_Bridge_StoreEmulation implements StoreEmulation
         Mage::getSingleton('core/translate')->setLocale($newLocaleCode)->init(Mage_Core_Model_App_Area::AREA_FRONTEND, true);
         Mage::getDesign()->setStore($storeId);
         Mage::getDesign()->setPackageName();
-        $themeName = Mage::getStoreConfig('design/theme/default', $storeId);
-        Mage::getDesign()->setTheme($themeName);
+
+        Mage::getDesign()->setTheme(Mage::getStoreConfig('design/theme/default', $storeId));
+        foreach(array('layout', 'template', 'skin', 'locale') as $areaName) {
+            if ($themeName = Mage::getStoreConfig('design/theme/' . $areaName, $storeId)) {
+                Mage::getDesign()->setTheme($areaName, $themeName);
+            }
+        }
 
         $this->_unsecureBaseConfig[$storeId] = Mage::getStoreConfig('web/unsecure', $storeId);
         $store = Mage::app()->getStore($storeId);

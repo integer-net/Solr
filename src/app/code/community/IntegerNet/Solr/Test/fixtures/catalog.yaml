@@ -56,6 +56,7 @@ eav:
       level: 0
       children_count: 3
       is_active: 1
+      include_in_menu: 0
     - entity_id: 2 # Books Store category
       parent_id: 1
       path: 1/2
@@ -63,15 +64,21 @@ eav:
       level: 1
       children_count: 2
       is_active: 1
+      include_in_menu: 0
 # Books Store categories
     - entity_id: 21
       attribute_set_id: 3
       parent_id: 2
       path: 1/2/21
       name: Comedy
+      url_key: comedy
       level: 2
       children_count: 0
       is_active: 1
+      /stores:
+        store2:
+          name: "Comedy Store"
+          url_key: comedy-store
     - entity_id: 22
       attribute_set_id: 3
       parent_id: 2
@@ -113,6 +120,7 @@ eav:
       level: 1
       children_count: 1
       is_active: 1
+      include_in_menu: 0
   catalog_product:
     - entity_id: 1
       type_id: simple

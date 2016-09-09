@@ -210,7 +210,7 @@ class IntegerNet_Solr_Model_Bridge_CategoryRepository implements IndexCategoryRe
             ->addAttributeToSelect(array('name', 'url_key'))
             ->addAttributeToFilter('is_active', 1)
             ->addAttributeToFilter('include_in_menu', 1)
-            ->addAttributeToFilter('entity_id', array('in' => array_keys($categoryIds)));
+            ->addAttributeToFilter('entity_id', array('in' => $categoryIds));
         return array_map(
             function(Mage_Catalog_Model_Category $category) {
                 $categoryPathIds = $category->getPathIds();

@@ -66,16 +66,16 @@ class IntegerNet_Solr_Model_Bridge_Category implements Category, SuggestCategory
     {
         if (is_null($this->_description)) {
             $this->_description = $this->_category->getDescription();
-            switch ($this->_category->getDisplayMode()) {
-                case Mage_Catalog_Model_Category::DM_PAGE:
-                case Mage_Catalog_Model_Category::DM_MIXED:
-                    if ($blockId = $this->_category->getLandingPage()) {
-                        $block = Mage::getModel('cms/block')->load($blockId);
-                        if ($block->getId() && $block->getIsActive()) {
+        switch ($this->_category->getDisplayMode()) {
+            case Mage_Catalog_Model_Category::DM_PAGE:
+            case Mage_Catalog_Model_Category::DM_MIXED:
+                if ($blockId = $this->_category->getLandingPage()) {
+                    $block = Mage::getModel('cms/block')->load($blockId);
+                    if ($block->getId() && $block->getIsActive()) {
                             $this->_description .= ' ' . Mage::helper('cms')->getPageTemplateProcessor()->filter($block->getContent());
-                        }
                     }
-            }
+                }
+        }
         }
         return $this->_description;
     }

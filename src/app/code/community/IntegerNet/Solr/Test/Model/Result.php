@@ -12,7 +12,9 @@ use IntegerNet\Solr\Resource\ResponseDecorator;
 use IntegerNet\Solr\Resource\SolrResponse;
 
 /**
+ * @loadFixture registry
  * @loadFixture config
+ * @doNotIndexAll
  */
 class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Controller
 {
@@ -43,8 +45,6 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
     /**
      * @test
-     * @helper integernet_solr/factory
-     * @singleton integernet_solr/result
      */
     public function shouldTriggerSearchAndEvents()
     {
@@ -61,8 +61,6 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
     /**
      * @test
-     * @helper integernet_solr/factory
-     * @singleton integernet_solr/result
      */
     public function shouldTriggeSearchTwiceIfFuzzy()
     {
@@ -81,10 +79,6 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
     /**
      * @test
-     * @helper integernet_solr/factory
-     * @helper integernet_solr/log
-     * @helper catalogsearch
-     * @singleton integernet_solr/result
      */
     public function shouldUseParametersBasedOnToolbar()
     {
@@ -137,9 +131,6 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
     /**
      * @test
-     * @helper integernet_solr/factory
-     * @helper catalogsearch
-     * @singleton integernet_solr/result
      */
     public function shouldUseDefaultParametersWithoutToolbar()
     {
@@ -173,9 +164,6 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
 
     /**
      * @test
-     * @helper integernet_solr/factory
-     * @helper catalogsearch
-     * @singleton integernet_solr/result
      */
     public function shouldBroadenMultiwordSearchIfNoResults()
     {

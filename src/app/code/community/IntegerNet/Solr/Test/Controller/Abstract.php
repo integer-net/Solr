@@ -10,6 +10,14 @@
 
 abstract class IntegerNet_Solr_Test_Controller_Abstract extends EcomDev_PHPUnit_Test_Case_Controller
 {
+    public static function setUpBeforeClass()
+    {
+        Mage::register('isSecureArea', true);
+    }
+    public static function tearDownAfterClass()
+    {
+        Mage::unregister('isSecureArea');
+    }
     protected function setUp()
     {
         parent::setUp();

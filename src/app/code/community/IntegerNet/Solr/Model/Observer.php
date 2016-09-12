@@ -300,4 +300,21 @@ class IntegerNet_Solr_Model_Observer
         }
         return false;
     }
+
+    public function afterFastSimpleImportReindex(Varien_Event_Observer $observer)
+    {
+        /** @var $indexer Mage_Index_Model_Process */
+        $indexer = Mage::getModel('index/process')->load('integernet_solr', 'indexer_code');
+        if ($indexer->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
+            return;
+        }
+
+        $productIds = $observer->getEntityId();
+
+        if (empty($productIds)) {
+            return;
+        }
+
+        Mage::helper('integernet_solr')->factory()->getProductIndexer()->reindex($productIds);
+    }
 }

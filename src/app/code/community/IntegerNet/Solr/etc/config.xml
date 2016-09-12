@@ -2,7 +2,7 @@
 <config>
     <modules>
         <IntegerNet_Solr>
-            <version>1.6.0.2</version>
+            <version>1.6.0.5</version>
         </IntegerNet_Solr>
     </modules>
     <global>
@@ -137,6 +137,16 @@
                     </integernet_solr>
                 </observers>
             </cms_page_delete_commit_after>
+
+            <fastsimpleimport_reindex_products_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solr/observer</class>
+                        <method>afterFastSimpleImportReindex</method>
+                    </integernet_solr>
+                </observers>
+            </fastsimpleimport_reindex_products_after>
         </events>
 
         <resources>

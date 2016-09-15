@@ -178,7 +178,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     protected function _getTranslatedTemplate($templateContents)
     {
-        preg_match_all('$->__\(\'(.*)\'$', $templateContents, $results);
+        preg_match_all('$->__\(\'(.*?)\'$', $templateContents, $results);
 
         foreach($results[1] as $key => $search) {
 

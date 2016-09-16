@@ -11,6 +11,7 @@ use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\Product;
 use IntegerNet\Solr\Implementor\ProductRepository;
 use IntegerNet\Solr\Implementor\ProductIterator;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunk;
 
 class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepository
 {
@@ -58,7 +59,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
             $productIds = $this->_getAllProductIds();
         }
 
-        /** @var IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks */
+        /** @var ProductIdChunk[] $productIdChunks */
         $productIdChunks = $this->_getProductIdChunks($productIds, $associations);
 
         $this->_currentIterator = $this->_bridgeFactory->createLazyProductIterator($storeId, $productIdChunks);
@@ -135,12 +136,12 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
     /**
      * @param int[] $allProductIds
      * @param int[][] $associations
-     * @return IntegerNet_Solr_Model_Bridge_ProductIdChunk[]
+     * @return ProductIdChunk[]
      */
     protected function _getProductIdChunks($allProductIds, $associations)
     {
         $productIdChunks = array();
-        $currentChunk = new IntegerNet_Solr_Model_Bridge_ProductIdChunk();
+        $currentChunk = new ProductIdChunk();
         $productIdChunks[] = $currentChunk;
         foreach ($allProductIds as $key => $productId) {
             $parentAndChildrenProductCount = 1;
@@ -148,7 +149,7 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
                 $parentAndChildrenProductCount += sizeof($associations[$productId]);
             }
             if ($currentChunk->getSize() > 0 && $currentChunk->getSize() + $parentAndChildrenProductCount > $this->_pageSize) {
-                $currentChunk = new IntegerNet_Solr_Model_Bridge_ProductIdChunk();
+                $currentChunk = new ProductIdChunk();
                 $productIdChunks[] = $currentChunk;
             }
             if (isset($associations[$productId])) {

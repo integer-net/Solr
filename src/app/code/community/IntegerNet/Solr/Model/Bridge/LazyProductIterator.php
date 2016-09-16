@@ -9,6 +9,7 @@
  */
 use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunk;
 
 /**
  * Product iterator implementation with lazy loading of multiple collections (chunking).
@@ -18,7 +19,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 {
     protected $_bridgeFactory;
     /**
-     * @var IntegerNet_Solr_Model_Bridge_ProductIdChunk[]
+     * @var ProductIdChunk[]
      */
     protected $_productIdChunks;
     /**
@@ -54,7 +55,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $_storeId store id for the collections
-     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $_productIdChunks parent and children product ids to be loaded     */
+     * @param ProductIdChunk[] $_productIdChunks parent and children product ids to be loaded     */
     public function __construct($_storeId, $_productIdChunks)
     {
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
@@ -129,7 +130,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $storeId
-     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks
+     * @param ProductIdChunk[] $productIdChunks
      * @param int $chunkId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */

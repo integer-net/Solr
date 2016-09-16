@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Indexer\Data\ProductIdChunk;
 
 /**
  * Classes that implement interfaces from the library are instantiated here to ensure
@@ -187,7 +188,7 @@ class IntegerNet_Solr_Model_Bridge_Factory
 
     /**
      * @param int $storeId store id for the collections
-     * @param IntegerNet_Solr_Model_Bridge_ProductIdChunk[] $productIdChunks parent and children product ids to be loaded
+     * @param ProductIdChunk[] $productIdChunks parent and children product ids to be loaded
      * @return IntegerNet_Solr_Model_Bridge_LazyProductIterator
      */
     public function createLazyProductIterator($storeId, $productIdChunks)

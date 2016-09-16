@@ -158,4 +158,14 @@ class IntegerNet_SolrPro_Model_Observer
         $cacheDir = Mage::getBaseDir('media') . DS . 'catalog' . DS . 'cache';
         mageDelTree($cacheDir);
     }
+
+    /**
+     * @return bool
+     */
+    protected function _getPingResult()
+    {
+        $solr = Mage::helper('integernet_solr')->factory()->getSolrResource()->getSolrService(Mage::app()->getStore()->getId());
+        return (boolean)$solr->ping();
+    }
+
 }

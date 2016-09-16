@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
-class IntegerNet_Solr_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
+class IntegerNet_SolrPro_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
 {
     /**
      * @test
@@ -30,14 +30,14 @@ class IntegerNet_Solr_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Case
 
     private function setupObserverMock($proxyCacheRebuild)
     {
-        $observerMockBuilder = EcomDev_PHPUnit_Test_Case_Util::getGroupedClassMockBuilder($this, 'model', 'integernet_solr/observer')
+        $observerMockBuilder = EcomDev_PHPUnit_Test_Case_Util::getGroupedClassMockBuilder($this, 'model', 'integernet_solrpro/observer')
             ->setMethods(['applicationCleanCache']);
         if ($proxyCacheRebuild) {
             $observerMockBuilder->enableProxyingToOriginalMethods();
         }
         $observerMock = $observerMockBuilder->getMock();
         $observerMock->expects($this->once())->method('applicationCleanCache');
-        $this->replaceByMock('singleton', 'integernet_solr/observer', $observerMock);
+        $this->replaceByMock('singleton', 'integernet_solrpro/observer', $observerMock);
     }
 
     private function setupCache()

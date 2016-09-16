@@ -9,7 +9,7 @@
  */
 use IntegerNet\Solr\Implementor\PagedProductIterator;
 use IntegerNet\Solr\Implementor\Product;
-use IntegerNet\Solr\Indexer\Data\ProductIdChunk;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 
 /**
  * Product iterator implementation with lazy loading of multiple collections (chunking).
@@ -19,7 +19,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 {
     protected $_bridgeFactory;
     /**
-     * @var ProductIdChunk[]
+     * @var ProductIdChunks
      */
     protected $_productIdChunks;
     /**
@@ -55,12 +55,12 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $_storeId store id for the collections
-     * @param ProductIdChunk[] $_productIdChunks parent and children product ids to be loaded     */
-    public function __construct($_storeId, $_productIdChunks)
+     * @param ProductIdChunks $productIdChunks parent and children product ids to be loaded     */
+    public function __construct($_storeId, ProductIdChunks $productIdChunks)
     {
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
-        $this->_productIdChunks = $_productIdChunks;
+        $this->_productIdChunks = $productIdChunks;
     }
 
     /**
@@ -130,7 +130,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
 
     /**
      * @param int $storeId
-     * @param ProductIdChunk[] $productIdChunks
+     * @param ProductIdChunks $productIdChunks
      * @param int $chunkId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
@@ -213,7 +213,19 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
      */
     public function subset($ids)
     {
-        // TODO: Implement subset() method.
+        $dataCollection = new Varien_Data_Collection();
+        foreach($ids as $productId) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $product = $this->getDataSource()->getItemById($productId);
+            if (is_null($product)) {
+                throw new OutOfBoundsException('Associated product with ID ' . $productId . ' was not loaded in current chunk');
+            }
+            if ($product->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+                $dataCollection->addItem($product);
+            }
+        }
+
+        return $this->_bridgeFactory->createProductIterator($dataCollection);
     }
 
 

@@ -7,6 +7,7 @@
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
+use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 
 /**
  * @loadFixture registry
@@ -29,7 +30,12 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
         $productRepository = new IntegerNet_Solr_Model_Bridge_ProductRepository();
         $productRepository->setPageSizeForIndex($pageSize);
         
-        $iterator = $productRepository->getProductsForIndex(1, $idFilter);
+        $iterator = $productRepository->getProductsInChunks(1,
+            ProductIdChunks::withAssociationsTogether(
+                $idFilter ? $idFilter : $productRepository->getAllProductIds(),
+                [], $pageSize
+            )
+        );
         $actualProductIds = [];
         $guard = 0;
         $callbackMock = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
@@ -48,17 +54,6 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
         }
         $this->assertEquals($expectedProductIds, array_unique($actualProductIds), 'product ids', 0.0, 10, false, true);
         $this->assertEventDispatchedExactly('integernet_solr_product_collection_load_after', $expectedInnerIteratorCount);
-    }
-
-
-    /**
-     * @return int[]
-     */
-    protected function _getAllProductIds()
-    {
-        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $productCollection = Mage::getResourceModel('catalog/product_collection');
-        return $productCollection->getAllIds();
     }
 
     /**

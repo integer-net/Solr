@@ -188,10 +188,10 @@ class IntegerNet_Solr_Model_Bridge_Factory
 
     /**
      * @param int $storeId store id for the collections
-     * @param ProductIdChunk[] $productIdChunks parent and children product ids to be loaded
+     * @param \IntegerNet\Solr\Indexer\Data\ProductIdChunks $productIdChunks parent and children product ids to be loaded
      * @return IntegerNet_Solr_Model_Bridge_LazyProductIterator
      */
-    public function createLazyProductIterator($storeId, $productIdChunks)
+    public function createLazyProductIterator($storeId, \IntegerNet\Solr\Indexer\Data\ProductIdChunks $productIdChunks)
     {
         return new IntegerNet_Solr_Model_Bridge_LazyProductIterator($storeId, $productIdChunks);
     }

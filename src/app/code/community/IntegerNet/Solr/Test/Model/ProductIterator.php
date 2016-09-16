@@ -28,8 +28,7 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
         $this->customerSession(0);
 
         $productRepository = new IntegerNet_Solr_Model_Bridge_ProductRepository();
-        $productRepository->setPageSizeForIndex($pageSize);
-        
+
         $iterator = $productRepository->getProductsInChunks(1,
             ProductIdChunks::withAssociationsTogether(
                 $idFilter ? $idFilter : $productRepository->getAllProductIds(),

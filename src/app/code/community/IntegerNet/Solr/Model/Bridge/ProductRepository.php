@@ -24,21 +24,6 @@ class IntegerNet_Solr_Model_Bridge_ProductRepository implements ProductRepositor
     }
 
     /**
-     * @var int
-     */
-    protected $_pageSize;
-
-    /**
-     * @param int $pageSize
-     * @return $this
-     */
-    public function setPageSizeForIndex($pageSize)
-    {
-        $this->_pageSize = $pageSize;
-        return $this;
-    }
-
-    /**
      * Return product iterator which may implement lazy loading but must ensure that given chunks are loaded together
      *
      * @param int $storeId

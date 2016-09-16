@@ -65,9 +65,10 @@ class IntegerNet_Solr_Test_Model_ProductIterator extends EcomDev_PHPUnit_Test_Ca
     {
         return [
             'no_filter_pagesize_1' => [null, 1, [1, 2, 3, 21001, 22101, 22111, 22201], 7],
-            'no_filter_pagesize_3' => [null, 3, [1, 2, 3, 21001, 22101, 22111, 22201], 4],
-            'no_filter_pagesize_4' => [null, 4, [1, 2, 3, 21001, 22101, 22111, 22201], 3],
-            'no_filter_pagesize_5' => [null, 5, [1, 2, 3, 21001, 22101, 22111, 22201], 2],
+            'no_filter_pagesize_3' => [null, 3, [1, 2, 3, 21001, 22101, 22111, 22201], 3],
+            'no_filter_pagesize_6' => [null, 6, [1, 2, 3, 21001, 22101, 22111, 22201], 2],
+            'no_filter_pagesize_7' => [null, 7, [1, 2, 3, 21001, 22101, 22111, 22201], 1],
+            'no_filter_pagesize_8' => [null, 8, [1, 2, 3, 21001, 22101, 22111, 22201], 1],
             'filter_pagesize_1' => [[21000, 21001, 22101], 1, [21001, 22101], 3],
         ];
     }

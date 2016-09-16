@@ -194,4 +194,27 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
     {
         return $this->_collection;
     }
+
+    /**
+     * @return \IntegerNet\Solr\Indexer\Data\ProductIdChunk
+     */
+    public function currentChunk()
+    {
+        return $this->_productIdChunks[$this->_currentChunkId];
+    }
+
+    /**
+     * Returns an iterator for a subset of products. The ids must be part of the current chunk, otherwise an
+     * OutOfBoundsException will be thrown
+     *
+     * @param int[] $ids
+     * @return \IntegerNet\Solr\Implementor\ProductIterator
+     * @throws \OutOfBoundsException
+     */
+    public function subset($ids)
+    {
+        // TODO: Implement subset() method.
+    }
+
+
 }

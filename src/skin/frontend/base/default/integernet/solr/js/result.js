@@ -133,6 +133,10 @@ SolrResult.prototype = {
                 element.select('input[type=checkbox]').each(function(checkbox) {
                     checkbox.checked = !checkbox.checked;
                 });
+
+                element.select('.crossbox').each(function(checkbox) {
+                    checkbox.toggleClassName('crossbox--checked');
+                });
             });
         });
 

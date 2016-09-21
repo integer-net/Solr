@@ -60,6 +60,7 @@ class IntegerNet_Solr_Model_Bridge_Factory
     {
         return Mage::getModel('integernet_solr/bridge_categoryRepository');
     }
+
     /**
      * @return IntegerNet_Solr_Model_Bridge_CategoryRepository
      */

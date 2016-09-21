@@ -50,14 +50,14 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
                     echo "Solr product index rebuilt for Stores {$storeIdsString}.\n";
                 }
 
-                if (in_array('page', $entityTypes)) {
+                if (in_array('page', $entityTypes) && $this->_useCmsIndexer()) {
                     $indexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
                     $indexer->reindex(null, $emptyIndex, $storeIds);
                     $storeIdsString = implode(', ', $storeIds);
                     echo "Solr page index rebuilt for Stores {$storeIdsString}.\n";
                 }
 
-                if (in_array('category', $entityTypes)) {
+                if (in_array('category', $entityTypes) && $this->_useCategoryIndexer()) {
                     $indexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
                     $indexer->reindex(null, $emptyIndex, $storeIds);
                     $storeIdsString = implode(', ', $storeIds);
@@ -124,7 +124,30 @@ USAGE;
      */
     protected function _getDefaultEntityTypes()
     {
-        return array('product', 'category', 'page');
+        $entityTypes = array('product');
+        if ($this->_useCategoryIndexer()) {
+            $entityTypes[] = 'category';
+        }
+        if ($this->_useCmsIndexer()) {
+            $entityTypes[] = 'page';
+        }
+        return $entityTypes;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _useCategoryIndexer()
+    {
+        return Mage::getStoreConfigFlag('integernet_solr/category/is_indexer_active');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _useCmsIndexer()
+    {
+        return Mage::getStoreConfigFlag('integernet_solr/cms/is_active');
     }
 }
 

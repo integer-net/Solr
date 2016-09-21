@@ -118,26 +118,6 @@
                 </observers>
             </core_block_abstract_to_html_before>
 
-            <cms_page_save_commit_after>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/cmsIndexer</class>
-                        <method>cmsPageSaveAfter</method>
-                    </integernet_solr>
-                </observers>
-            </cms_page_save_commit_after>
-
-            <cms_page_delete_commit_after>
-                <observers>
-                    <integernet_solr>
-                        <type>singleton</type>
-                        <class>integernet_solr/cmsIndexer</class>
-                        <method>cmsPageDeleteAfter</method>
-                    </integernet_solr>
-                </observers>
-            </cms_page_delete_commit_after>
-
             <fastsimpleimport_reindex_products_after>
                 <observers>
                     <integernet_solr>

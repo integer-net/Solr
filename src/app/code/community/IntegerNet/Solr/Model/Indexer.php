@@ -52,8 +52,12 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     protected function _construct()
     {
         $this->_productIndexer = Mage::helper('integernet_solr')->factory()->getProductIndexer();
-        $this->_categoryIndexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
-        $this->_pageIndexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
+        if ($this->_useCategoryIndexer()) {
+            $this->_categoryIndexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
+        }
+        if ($this->_useCmsIndexer()) {
+            $this->_pageIndexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
+        }
     }
 
 
@@ -73,8 +77,12 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     public function reindexAll()
     {
         $this->_reindexProducts(null, true);
-        $this->_reindexCategories(null, true);
-        $this->_reindexCmsPages(null, true);
+        if ($this->_useCategoryIndexer()) {
+            $this->_reindexCategories(null, true);
+        }
+        if ($this->_useCmsIndexer()) {
+            $this->_reindexCmsPages(null, true);
+        }
     }
 
     /**
@@ -110,7 +118,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 
         }        
         
-        if ($event->getEntity() == Mage_Catalog_Model_Category::ENTITY) {
+        if ($this->_useCategoryIndexer() && $event->getEntity() == Mage_Catalog_Model_Category::ENTITY) {
 
             $categoryIds = array();
 
@@ -228,5 +236,21 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     protected function _deleteCategoriesIndex($categoryIds)
     {
         $this->_categoryIndexer->deleteIndex($categoryIds);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _useCategoryIndexer()
+    {
+        return Mage::getStoreConfigFlag('integernet_solr/category/is_indexer_active');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _useCmsIndexer()
+    {
+        return Mage::getStoreConfigFlag('integernet_solr/cms/is_active');
     }
 }

@@ -39,6 +39,26 @@
                     </integernet_solr>
                 </observers>
             </application_clean_cache>
+
+            <cms_page_save_commit_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/cmsIndexer</class>
+                        <method>cmsPageSaveAfter</method>
+                    </integernet_solr>
+                </observers>
+            </cms_page_save_commit_after>
+
+            <cms_page_delete_commit_after>
+                <observers>
+                    <integernet_solr>
+                        <type>singleton</type>
+                        <class>integernet_solrpro/cmsIndexer</class>
+                        <method>cmsPageDeleteAfter</method>
+                    </integernet_solr>
+                </observers>
+            </cms_page_delete_commit_after>
         </events>
     </global>
 
@@ -139,7 +159,7 @@
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>integernet_solrori/observer::checkSolrServerConnection</model>
+                    <model>integernet_solrpro/observer::checkSolrServerConnection</model>
                 </run>
             </integernet_solr_check_server_connection>
         </jobs>

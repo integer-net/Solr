@@ -14,7 +14,7 @@ use IntegerNet\SolrCms\Indexer\PageIndexer;
 /**
  * Class IntegerNet_Solr_Model_CmsIndexer
  */
-class IntegerNet_Solr_Model_CmsIndexer
+class IntegerNet_SolrPro_Model_CmsIndexer
 {
     /**
      * @var PageIndexer

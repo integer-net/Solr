@@ -4,7 +4,7 @@
     <default>
         <reference name="head">
             <action method="addCss" ifconfig="integernet_solr/general/is_active">
-                <stylesheet>integernet/solr/css/topfilter.css</stylesheet>
+                <stylesheet>integernet/solr/css/filter.css</stylesheet>
             </action>
             <action method="addCss" ifconfig="integernet_solr/general/is_active">
                 <stylesheet>integernet/solr/css/loader.css</stylesheet>

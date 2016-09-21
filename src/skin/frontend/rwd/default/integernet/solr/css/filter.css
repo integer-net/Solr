@@ -5,6 +5,41 @@
   border-right: 3px solid transparent;
   border-bottom: 6px solid #cccccc; }
 
+.solr-checkbox {
+  display: none; }
+
+.crossbox {
+  position: relative;
+  display: inline-block;
+  float: left;
+  margin-top: 2px; }
+  .crossbox:before {
+    position: relative;
+    content: '';
+    display: block;
+    float: left;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #cccccc;
+    background-color: white;
+    margin-right: 10px; }
+
+.crossbox--checked:before {
+  background-color: #3399cc;
+  border-color: #3399cc; }
+
+.crossbox--checked:after {
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  content: 'x';
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: bold;
+  color: #ffffff; }
+
 .filter {
   position: relative;
   width: 100%;
@@ -68,35 +103,10 @@
 .filter-list {
   overflow: auto;
   height: 100%; }
-
-.filter-link {
-  position: relative;
-  padding-left: 15px; }
-  .filter-link:before {
-    position: relative;
-    content: '';
-    display: block;
-    float: left;
-    width: 15px;
-    height: 15px;
-    border: 1px solid #cccccc;
-    background-color: white;
-    margin-right: 10px; }
-
-.filter-link--checked:before {
-  background-color: #3399cc;
-  border-color: #3399cc; }
-
-.filter-link--checked:after {
-  position: absolute;
-  top: 2px;
-  left: 19px;
-  content: 'x';
-  width: 13px;
-  height: 13px;
-  font-size: 13px;
-  font-weight: bold;
-  color: #ffffff; }
+  .filter-list > ol > li {
+    padding: 5px 15px; }
+    .filter-list > ol > li > a {
+      padding: 0 !important; }
 
 .filter-item--active {
   background-color: #3399cc;

@@ -12,7 +12,7 @@
  * @loadFixture registry
  * @loadFixture config
  */
-class IntegerNet_Solr_Test_Controller_Suggest extends IntegerNet_Solr_Test_Controller_Abstract
+class IntegerNet_SolrPro_Test_Controller_Suggest extends IntegerNet_Solr_Test_Controller_Abstract
 {
 
     /**

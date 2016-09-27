@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_cache_index>
+        <reference name="cache.additional">
+            <block type="integernet_solrpro/adminhtml_cache" name="cache.additional.integernet.solr"
+                   template="integernet/solr/cache/additional.phtml"/>
+        </reference>
+    </adminhtml_cache_index>
+</layout>

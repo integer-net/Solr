@@ -113,6 +113,14 @@
     </admin>
 
     <adminhtml>
+        <layout>
+            <updates>
+                <integernet_solrpro>
+                    <file>integernet/solrpro.xml</file>
+                </integernet_solrpro>
+            </updates>
+        </layout>
+        
         <events>
             <admin_system_config_changed_section_integernet_solr>
                 <observers>

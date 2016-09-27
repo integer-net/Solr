@@ -49,7 +49,7 @@ class IntegerNet_SolrPro_Test_Block_Autosuggest extends  EcomDev_PHPUnit_Test_Ca
     private function instantiateCustomHelper()
     {
         $this->setCurrentStore(1);
-        $block = $this->app()->getLayout()->createBlock('integernet_solr/autosuggest');
-        $this->assertInstanceOf(IntegerNet_Solr_Helper_Custom::class, $block->getCustomHelper());
+        $block = $this->app()->getLayout()->createBlock('integernet_solrpro/autosuggest');
+        $this->assertInstanceOf(IntegerNet_SolrPro_Helper_Custom::class, $block->getCustomHelper());
     }
 }

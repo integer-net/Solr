@@ -23,8 +23,8 @@ class IntegerNet_SolrPro_Test_Controller_RebuildSuggestCache extends IntegerNet_
 
         $this->adminSession();
 
-        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
-        $cachedCategories = Mage::helper('integernet_solr')->factory()->getCacheReader()->getActiveCategories(2);
+        Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
+        $cachedCategories = Mage::helper('integernet_solrpro')->factory()->getCacheReader()->getActiveCategories(2);
         $this->assertNotEmpty($cachedCategories);
         $this->assertNotEmpty($cachedCategories[$comedyCategoryId]);
         /** @var \IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory $cachedCategory */

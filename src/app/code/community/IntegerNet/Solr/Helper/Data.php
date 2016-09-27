@@ -25,14 +25,6 @@ class IntegerNet_Solr_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return IntegerNet_Solr_Helper_Autosuggest
-     */
-    public function autosuggest()
-    {
-        return Mage::helper('integernet_solr/autosuggest');
-    }
-
-    /**
      * @return IntegerNet_Solr_Helper_Factory
      */
     public function factory()

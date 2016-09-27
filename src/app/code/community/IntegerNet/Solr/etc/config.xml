@@ -45,12 +45,6 @@
                 <class>IntegerNet_Solr_Block</class>
             </integernet_solr>
 
-            <catalogsearch>
-                <rewrite>
-                    <autocomplete>IntegerNet_Solr_Block_Autosuggest</autocomplete>
-                </rewrite>
-            </catalogsearch>
-            
             <mana_filters>
                 <rewrite>
                     <search>IntegerNet_Solr_Block_Mana_Filters_Search</search>
@@ -180,18 +174,6 @@
             </adminhtml_catalog_product_attribute_edit_prepare_form>
         </events>
     </adminhtml>
-
-    <admin>
-        <routers>
-            <adminhtml>
-                <args>
-                    <modules>
-                        <IntegerNet_Solr after="Mage_Adminhtml">IntegerNet_Solr_Adminhtml</IntegerNet_Solr>
-                    </modules>
-                </args>
-            </adminhtml>
-        </routers>
-    </admin>
 
     <frontend>
         <translate>

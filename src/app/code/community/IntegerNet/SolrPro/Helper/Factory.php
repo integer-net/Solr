@@ -272,7 +272,7 @@ class IntegerNet_SolrPro_Helper_Factory implements SolrRequestFactory, Autosugge
     public function getCacheWriter()
     {
         $customHelperClass = new ReflectionClass(
-            Mage::getConfig()->getHelperClassName('integernet_solr/custom')
+            Mage::getConfig()->getHelperClassName('integernet_solrpro/custom')
         );
         $autosuggestConfigByStore = array_map(
             function (Config $config) {
@@ -370,6 +370,6 @@ class IntegerNet_SolrPro_Helper_Factory implements SolrRequestFactory, Autosugge
      */
     protected function _getAutosuggestHelper()
     {
-        return Mage::helper('integernet_solr')->autosuggest();
+        return Mage::helper('integernet_solrpro')->autosuggest();
     }
 }

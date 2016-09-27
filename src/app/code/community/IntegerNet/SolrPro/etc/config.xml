@@ -21,6 +21,12 @@
             <integernet_solrpro>
                 <class>IntegerNet_SolrPro_Block</class>
             </integernet_solrpro>
+            
+            <catalogsearch>
+                <rewrite>
+                    <autocomplete>IntegerNet_SolrPro_Block_Autosuggest</autocomplete>
+                </rewrite>
+            </catalogsearch>
         </blocks>
 
         <helpers>
@@ -93,6 +99,18 @@
             </updates>
         </layout>
     </frontend>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <IntegerNet_SolrPro after="Mage_Adminhtml">IntegerNet_SolrPro_Adminhtml</IntegerNet_SolrPro>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 
     <adminhtml>
         <events>

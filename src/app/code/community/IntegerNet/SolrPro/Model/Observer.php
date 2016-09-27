@@ -17,7 +17,7 @@ class IntegerNet_SolrPro_Model_Observer
      */
     public function adminSystemConfigChangedSectionIntegernetSolr(Varien_Event_Observer $observer)
     {
-        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
+        Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
 
         if (!Mage::getStoreConfigFlag('integernet_solr/connection_check/is_active')) {
             return;
@@ -66,7 +66,7 @@ class IntegerNet_SolrPro_Model_Observer
         if (!is_array($tags) || sizeof($tags)) {
             return;
         }
-        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
+        Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
     }
 
     /**
@@ -74,7 +74,7 @@ class IntegerNet_SolrPro_Model_Observer
      */
     public function storeSolrConfig()
     {
-        Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
+        Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
     }
 
     /**
@@ -94,13 +94,13 @@ class IntegerNet_SolrPro_Model_Observer
                 if (($diff < 0) || ($diff > 2419200)) {
 
                     Mage::getSingleton('adminhtml/session')->addError(
-                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module has been disabled automatically.')
+                        Mage::helper('integernet_solrpro')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module has been disabled automatically.')
                     );
 
                 } else {
 
                     Mage::getSingleton('adminhtml/session')->addWarning(
-                        Mage::helper('integernet_solr')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module will stop working four weeks after installation.')
+                        Mage::helper('integernet_solrpro')->__('You haven\'t entered your license key for the IntegerNet_Solr module yet. The module will stop working four weeks after installation.')
                     );
                 }
             }

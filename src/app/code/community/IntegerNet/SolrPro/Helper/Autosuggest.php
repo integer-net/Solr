@@ -13,7 +13,7 @@ use IntegerNet\SolrSuggest\Plain\Bridge\Category;
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
+class IntegerNet_SolrPro_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     implements TemplateRepository, SerializableCategoryRepository
 {
     /**
@@ -37,7 +37,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     public function storeSolrConfig()
     {
-        $factory = Mage::helper('integernet_solr')->factory();
+        $factory = Mage::helper('integernet_solrpro')->factory();
         $factory->getCacheWriter()->write($factory->getStoreConfig());
     }
 

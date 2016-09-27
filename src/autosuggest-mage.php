@@ -38,7 +38,7 @@ class IntegerNet_Solr_Autosuggest
         }
 
         Mage::register('is_autosuggest', true);
-        $block = Mage::app()->getLayout()->createBlock('integernet_solr/autosuggest');
+        $block = Mage::app()->getLayout()->createBlock('integernet_solrpro/autosuggest');
 
         return $block->toHtml();
     }

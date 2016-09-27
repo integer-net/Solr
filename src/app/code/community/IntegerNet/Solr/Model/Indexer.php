@@ -53,10 +53,10 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         $this->_productIndexer = Mage::helper('integernet_solr')->factory()->getProductIndexer();
         if ($this->_useCategoryIndexer()) {
-            $this->_categoryIndexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
+            $this->_categoryIndexer = Mage::helper('integernet_solrpro')->factory()->getCategoryIndexer();
         }
         if ($this->_useCmsIndexer()) {
-            $this->_pageIndexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
+            $this->_pageIndexer = Mage::helper('integernet_solrpro')->factory()->getPageIndexer();
         }
     }
 

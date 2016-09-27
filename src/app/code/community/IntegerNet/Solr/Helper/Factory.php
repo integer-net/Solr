@@ -33,7 +33,7 @@ use IntegerNet\SolrSuggest\Request\SearchTermSuggestRequestFactory;
 use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use Psr\Log\NullLogger;
 
-class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestResultFactory, CacheReaderFactory, AppFactory
+class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory
 {
     /**
      * @var IntegerNet_Solr_Model_Bridge_Factory
@@ -79,44 +79,6 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
     }
 
     /**
-     * Returns new product indexer.
-     *
-     * @return CategoryIndexer
-     */
-    public function getCategoryIndexer()
-    {
-        $defaultStoreId = Mage::app()->getStore(true)->getId();
-        return new CategoryIndexer(
-            $defaultStoreId,
-            $this->getStoreConfig(),
-            $this->getSolrResource(),
-            $this->_getEventDispatcher(),
-            $this->_bridgeFactory->createCategoryRepository(),
-            $this->_bridgeFactory->createCategoryRenderer(),
-            $this->_bridgeFactory->createStoreEmulation()
-        );
-    }
-
-    /**
-     * Returns new product indexer.
-     *
-     * @return PageIndexer
-     */
-    public function getPageIndexer()
-    {
-        $defaultStoreId = Mage::app()->getStore(true)->getId();
-        return new PageIndexer(
-            $defaultStoreId,
-            $this->getStoreConfig(),
-            $this->getSolrResource(),
-            $this->_getEventDispatcher(),
-            $this->_bridgeFactory->createPageRepository(),
-            $this->_bridgeFactory->createPageRenderer(),
-            $this->_bridgeFactory->createStoreEmulation()
-        );
-    }
-
-    /**
      * Returns new Solr service (search, autosuggest or category service, depending on application state)
      *
      * @param int $requestMode
@@ -129,9 +91,7 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
         if ($config->getGeneralConfig()->isLog()) {
             $logger = $this->_getLogger();
             if ($logger instanceof IntegerNet_Solr_Helper_Log) {
-                $logger->setFile(
-                    $requestMode === self::REQUEST_MODE_SEARCHTERM_SUGGEST ? 'solr_suggest.log' : 'solr.log'
-                );
+                $logger->setFile('solr.log');
             }
         } else {
             $logger = new NullLogger;
@@ -163,29 +123,11 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
                 $storeId,
                 Mage::registry('current_category')->getId()
             );
-        } elseif ($requestMode === self::REQUEST_MODE_AUTOSUGGEST) {
-            $applicationContext
-                ->setFuzzyConfig($config->getFuzzyAutosuggestConfig())
-                ->setQuery($this->_getSearchTermSynonymHelper());
-            $factory = new AutosuggestRequestFactory(
-                $applicationContext,
-                $this->getSolrResource(),
-                $storeId,
-                $this->_getEventDispatcher()
-            );
         } else {
             switch ($requestMode) {
                 case self::REQUEST_MODE_SEARCHTERM_SUGGEST:
                     $applicationContext->setQuery($this->_getSearchTermHelper());
                     $factory = new SearchTermSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
-                    break;
-                case self::REQUEST_MODE_CATEGORY_SUGGEST:
-                    $applicationContext->setQuery($this->_getSearchTermHelper());
-                    $factory = new CategorySuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
-                    break;
-                case self::REQUEST_MODE_CMS_PAGE_SUGGEST:
-                    $applicationContext->setQuery($this->_getSearchTermHelper());
-                    $factory = new CmsPageSuggestRequestFactory($applicationContext, $this->getSolrResource(), $storeId);
                     break;
                 default:
                     $applicationContext
@@ -237,71 +179,6 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
     public function getCurrentStoreConfig()
     {
         return new IntegerNet_Solr_Model_Config_Store(Mage::app()->getStore()->getId());
-    }
-
-    /**
-     * @return AutosuggestResult
-     */
-    public function getAutosuggestResult()
-    {
-        $storeConfig = $this->getCurrentStoreConfig();
-        return new AutosuggestResult(
-            Mage::app()->getStore()->getId(),
-            $storeConfig->getGeneralConfig(),
-            $storeConfig->getAutosuggestConfig(),
-            $storeConfig->getCategoryConfig(),
-            $this->_getSearchTermHelper(),
-            $this->_getSearchUrlHelper(),
-            $this->_getSuggestCategoryRepository(),
-            $this->_getAttributeRepository(),
-            $this->getSolrRequest(self::REQUEST_MODE_AUTOSUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_SEARCHTERM_SUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_CATEGORY_SUGGEST),
-            $this->getSolrRequest(self::REQUEST_MODE_CMS_PAGE_SUGGEST)
-        );
-    }
-
-    /**
-     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheReader
-     */
-    public function getCacheReader()
-    {
-        return new CacheReader($this->_getCacheStorage());
-    }
-
-    /**
-     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheWriter
-     */
-    public function getCacheWriter()
-    {
-        $customHelperClass = new ReflectionClass(
-            Mage::getConfig()->getHelperClassName('integernet_solr/custom')
-        );
-        $autosuggestConfigByStore = array_map(
-            function (Config $config) {
-                return $config->getAutosuggestConfig();
-            },
-            $this->getStoreConfig()
-        );
-        return new CacheWriter(
-            $this->_getCacheStorage(),
-            new AttributesToSerializableAttributes($this->_getAttributeRepository(), $this->_getEventDispatcher(), $autosuggestConfigByStore),
-            $this->_getAutosuggestHelper(),
-            new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
-            $this->_getEventDispatcher(),
-            $this->_getAutosuggestHelper()
-        );
-    }
-
-    /**
-     * Override this if you want to use a different cache backend. It is important to use the same
-     * cache backend in the autosuggest.php bootstrap file
-     *
-     * @return \IntegerNet\SolrSuggest\Plain\Cache\CacheStorage
-     */
-    protected function _getCacheStorage()
-    {
-        return new PsrCache(new FileCacheBackend(Mage::getBaseDir('cache') . DS . 'integernet_solr'));
     }
 
     /**
@@ -366,13 +243,5 @@ class IntegerNet_Solr_Helper_Factory implements SolrRequestFactory, AutosuggestR
     protected function _getLogger()
     {
         return Mage::helper('integernet_solr/log');
-    }
-
-    /**
-     * @return IntegerNet_Solr_Helper_Autosuggest
-     */
-    protected function _getAutosuggestHelper()
-    {
-        return Mage::helper('integernet_solr')->autosuggest();
     }
 }

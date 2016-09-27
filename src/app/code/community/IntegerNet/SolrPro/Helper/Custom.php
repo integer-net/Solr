@@ -30,7 +30,7 @@
  *     $this->getCacheData('foo/bar')
  * </code>
  */
-class IntegerNet_Solr_Helper_Custom extends \IntegerNet\SolrSuggest\Block\AbstractCustomHelper
+class IntegerNet_SolrPro_Helper_Custom extends \IntegerNet\SolrSuggest\Block\AbstractCustomHelper
 {
 
 }

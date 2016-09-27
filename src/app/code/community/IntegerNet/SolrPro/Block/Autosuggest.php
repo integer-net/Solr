@@ -14,7 +14,7 @@ use IntegerNet\SolrSuggest\Result\AutosuggestResult;
 use IntegerNet\SolrSuggest\Util\HtmlStringHighlighter;
 use IntegerNet\SolrSuggest\Util\StringHighlighter;
 
-class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template implements AutosuggestBlock
+class IntegerNet_SolrPro_Block_Autosuggest extends Mage_Core_Block_Template implements AutosuggestBlock
 {
     protected $_attributes = array();
     protected $_result = null;
@@ -33,7 +33,7 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     {
         $this->setTemplate('integernet/solr/autosuggest.phtml');
         $this->highlighter = new HtmlStringHighlighter();
-        $this->resultFactory = Mage::helper('integernet_solr')->factory();
+        $this->resultFactory = Mage::helper('integernet_solrpro')->factory();
     }
 
     /**
@@ -147,22 +147,16 @@ class IntegerNet_Solr_Block_Autosuggest extends Mage_Core_Block_Template impleme
     }
 
     /**
-     * @return IntegerNet_Solr_Helper_Custom|IntegerNet_Solr_Autosuggest_Custom
+     * @return IntegerNet_SolrPro_Helper_Custom
      */
     public function getCustomHelper()
     {
-        if (class_exists('IntegerNet_Solr_Autosuggest_Custom')) {
-            /**
-             * @deprecated only for backwards compatibility in Magento mode
-             */
-            return new IntegerNet_Solr_Autosuggest_Custom();
-        }
-        $cacheReader = Mage::helper('integernet_solr')->factory()->getCacheReader();
+        $cacheReader = Mage::helper('integernet_solrpro')->factory()->getCacheReader();
         $storeId = Mage::app()->getStore()->getId();
         try {
             $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
         } catch (\IntegerNet\SolrSuggest\Plain\Cache\CacheItemNotFoundException $e) {
-            Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
+            Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
             $customHelperFactory = $cacheReader->getCustomHelperFactory($storeId);
         }
         return $customHelperFactory->getCustomHelper($this, $cacheReader);

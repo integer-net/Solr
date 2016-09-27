@@ -13,6 +13,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-Mage::helper('integernet_solr')->autosuggest()->storeSolrConfig();
+Mage::helper('integernet_solrpro')->autosuggest()->storeSolrConfig();
 
 $installer->endSetup();

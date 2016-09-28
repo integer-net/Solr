@@ -70,7 +70,7 @@ class ResponseDecorator implements SolrResponse
 
             $foundProductIds = array();
             foreach ($this->response->docs as $nonFuzzyDoc) {
-                /* @var $nonFuzzyDoc Apache_Solr_Document */
+                /* @var $nonFuzzyDoc \Apache_Solr_Document */
                 $field = $nonFuzzyDoc->getField('product_id');
                 $foundProductIds[] = $field['value'];
             }
@@ -78,13 +78,13 @@ class ResponseDecorator implements SolrResponse
             $numberDuplicates = 0;
 
             foreach ($other->response->docs as $fuzzyDoc) {
-                /* @var $fuzzyDoc Apache_Solr_Document */
+                /* @var $fuzzyDoc \Apache_Solr_Document */
                 $field = $fuzzyDoc->getField('product_id');
                 if (!in_array($field['value'], $foundProductIds)) {
-                    $this->response->docs[] = $fuzzyDoc;
-                    if (++$numberResults >= $pageSize) {
-                        break;
+                    if ($numberResults++ >= $pageSize) {
+                        continue;
                     }
+                    $this->response->docs[] = $fuzzyDoc;
                 } else {
                     $numberDuplicates++;
                 }

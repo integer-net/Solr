@@ -107,12 +107,12 @@ class SearchRequest implements Request, HasFilter
             $result = $this->getResultFromRequest($pageSize, $isFuzzyActive, $activeFilterAttributeCodes);
             return $this->sliceResult($result);
         } else {
-            $result = $this->getResultFromRequest($pageSize, false, $activeFilterAttributeCodes);
+            $result = $this->getResultFromRequest(99999, false, $activeFilterAttributeCodes);
 
             $numberResults = sizeof($result->response->docs);
             if ($isFuzzyActive && (($minimumResults == 0) || ($numberResults < $minimumResults))) {
 
-                $fuzzyResult = $this->getResultFromRequest($pageSize, true, $activeFilterAttributeCodes);
+                $fuzzyResult = $this->getResultFromRequest(99999, true, $activeFilterAttributeCodes);
                 $result = $result->merge($fuzzyResult, $pageSize);
             }
 
@@ -138,9 +138,7 @@ class SearchRequest implements Request, HasFilter
     {
         $pageSize = $this->getParamsBuilder()->getPageSize();
         $firstItemNumber = ($this->getParamsBuilder()->getCurrentPage() - 1) * $pageSize;
-        if ($firstItemNumber > 0) {
-            $result->slice($firstItemNumber, $pageSize);
-        }
+        $result->slice($firstItemNumber, $pageSize);
         return $result;
     }
     /**

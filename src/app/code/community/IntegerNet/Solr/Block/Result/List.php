@@ -45,6 +45,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
             ));
 
             $this->_productCollection = $productCollection;
+
+            /* @var $layer Mage_Catalog_Model_Layer */
+            $layer = $this->getLayer();
+            $this->prepareSortableFieldsByCategory($layer->getCurrentCategory());
         }
 
         return $this->_productCollection;

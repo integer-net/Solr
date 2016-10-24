@@ -4,7 +4,7 @@
     <default>
         <reference name="head">
             <action method="addCss" ifconfig="integernet_solr/general/is_active">
-                <stylesheet>integernet/solr/css/topfilter.css</stylesheet>
+                <stylesheet>integernet/solr/css/filter.css</stylesheet>
             </action>
             <action method="addCss" ifconfig="integernet_solr/general/is_active">
                 <stylesheet>integernet/solr/css/loader.css</stylesheet>
@@ -76,8 +76,13 @@
                        template="integernet/solr/layer/top/state.phtml"/>
                 <block type="integernet_solr/result_layer_filter" name="catalog.solr.topnav.layer.filter" as="filter"
                        template="integernet/solr/layer/top/filter.phtml"/>
-                <block type="core/template" template="integernet/solr/loader.phtml" name="solr.loader" as="solr.loader"/>
             </block>
+            <block type="core/template" template="integernet/solr/loader.phtml" name="solr.loader"
+                   as="solr.loader"/>
+        </reference>
+        <reference name="products">
+            <block type="core/template" template="integernet/solr/loader.phtml" name="solr.loader"
+                   as="solr.loader" after="-"/>
         </reference>
     </catalog_category_layered>
 </layout>

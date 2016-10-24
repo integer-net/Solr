@@ -9,6 +9,7 @@
  */
 
 /**
+ * @loadFixture registry
  * @loadFixture config
  * @todo test with HTML from Solr turned on and off
  */
@@ -22,18 +23,6 @@ class IntegerNet_Solr_Test_Controller_Search extends IntegerNet_Solr_Test_Contro
 
     /**
      * @test
-     * @helper catalogsearch
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldShowSearchResult()
@@ -48,18 +37,6 @@ class IntegerNet_Solr_Test_Controller_Search extends IntegerNet_Solr_Test_Contro
 
     /**
      * @test
-     * @helper catalogsearch
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldShowChildrenSearchResult()
@@ -72,18 +49,6 @@ class IntegerNet_Solr_Test_Controller_Search extends IntegerNet_Solr_Test_Contro
 
     /**
      * @test
-     * @helper catalogsearch
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture catalog
      */
     public function shouldFilterSearchResult()
@@ -98,18 +63,6 @@ class IntegerNet_Solr_Test_Controller_Search extends IntegerNet_Solr_Test_Contro
 
     /**
      * @test
-     * @helper catalogsearch
-     * @registry current_category
-     * @registry current_entity_key
-     * @singleton catalog/layer
-     * @singleton core/session
-     * @singleton catalog/session
-     * @singleton customer/session
-     * @singleton reports/session
-     * @singleton integernet_solr/bridge_attributeRepository
-     * @singleton integernet_solr/bridge_categoryRepository
-     * @singleton integernet_solr/result
-     * @singleton integernet_solr/result_collection
      * @loadFixture bigcatalog
      */
     public function shouldShowSearchResultWithPagination()

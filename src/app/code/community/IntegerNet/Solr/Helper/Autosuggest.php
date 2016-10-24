@@ -84,28 +84,45 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param array $config
      * @param $storeId
+     * @return array
      */
-    public function _addCategoriesData(&$config, $storeId)
+    protected function _getCategoriesData($storeId)
     {
-        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions'));
+        $categoryData = array();
+        $maxNumberCategories = intval(Mage::getStoreConfig('integernet_solr/autosuggest/max_number_category_suggestions', $storeId));
         if (!$maxNumberCategories) {
-            return;
+            return $categoryData;
         }
 
-        $categories = Mage::getResourceModel('catalog/category_collection')
-            ->addAttributeToSelect(array('name', 'url_key'))
-            ->addAttributeToFilter('is_active', 1)
-            ->addAttributeToFilter('include_in_menu', 1);
+        /** @var Mage_Catalog_Model_Resource_Category_Collection $categories */
+        $categories = Mage::getResourceModel('catalog/category_collection');
+        $categories->setStoreId($storeId);
+        $categories->addAttributeToSelect(array('name', 'url_key'));
+        $categories->addAttributeToFilter('is_active', 1);
+        $categories->addAttributeToFilter('include_in_menu', 1);
+
+        /*
+         * Unfortunately there is not sane way to tell the category URL model to not use the SID parameter,
+         * if current host and store host differ, so we have to switch the feature off globally while category URLs are generated.
+         */
+        $useSid = Mage::app()->getUseSessionInUrl();
+        Mage::app()->setUseSessionInUrl(false);
 
         foreach($categories as $category) {
-            $config[$storeId]['categories'][$category->getId()] = array(
+            /** @var Mage_Catalog_Model_Category $category */
+            $category->setStoreId($storeId);
+            $category->getUrlInstance()->setStore($storeId); // for URLs without rewrite
+            $category->getUrlModel()->getUrlInstance()->setStore($storeId); // for URLs with rewrites
+            $categoryData[$category->getId()] = array(
                 'id' => $category->getId(),
                 'title' => $this->_getCategoryTitle($category),
                 'url' => $category->getUrl(),
             );
         }
+
+        Mage::app()->setUseSessionInUrl($useSid);
+        return $categoryData;
     }
 
 
@@ -161,7 +178,7 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
      */
     protected function _getTranslatedTemplate($templateContents)
     {
-        preg_match_all('$->__\(\'(.*)\'$', $templateContents, $results);
+        preg_match_all('$->__\(\'(.*?)\'$', $templateContents, $results);
 
         foreach($results[1] as $key => $search) {
 
@@ -172,21 +189,15 @@ class IntegerNet_Solr_Helper_Autosuggest extends Mage_Core_Helper_Abstract
         return $templateContents;
     }
 
-    protected $_configForCache = array();
-
-
     /**
      * @param int $storeId
      * @return \IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory[]
      */
     public function findActiveCategories($storeId)
     {
-        if (! isset($this->_configForCache[$storeId]['categories'])) {
-            $this->_addCategoriesData($this->_configForCache, $storeId);
-        }
         return array_map(function(array $categoryConfig) {
             return new Category($categoryConfig['id'], $categoryConfig['title'], $categoryConfig['url']);
-        }, $this->_configForCache[$storeId]['categories']);
+        }, $this->_getCategoriesData($storeId));
     }
 
 }

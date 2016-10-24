@@ -150,7 +150,7 @@ class IntegerNet_Solr_Test_Model_Result extends EcomDev_PHPUnit_Test_Case_Contro
                 $storeId,
                 $this->stringContains($query),
                 0,
-                Mage::getStoreConfig('integernet_solr/autosuggest/max_number_product_suggestions'),
+                99999,
                 $this->logicalAnd(
                     $this->isType('array'),
                     $this->contains('score desc', true, true),

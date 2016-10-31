@@ -43,6 +43,11 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
     protected $_collectionIterator;
 
     /**
+     * @var IntegerNet_Solr_Model_Resource_Db
+     */
+    protected $_dbResource;
+
+    /**
      * @link http://php.net/manual/en/outeriterator.getinneriterator.php
      * @return Iterator The inner iterator for the current entry.
      */
@@ -60,6 +65,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
         $this->_bridgeFactory = Mage::getModel('integernet_solr/bridge_factory');
         $this->_storeId = $_storeId;
         $this->_productIdChunks = $_productIdChunks;
+        $this->_dbResource = Mage::getResourceModel('integernet_solr/db');
     }
 
     /**
@@ -99,6 +105,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
         } elseif ($this->_currentChunkId < sizeof($this->_productIdChunks) - 1) {
             $this->_currentChunkId++;
             $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdChunks, $this->_currentChunkId);
+            $this->_dbResource->disconnectMysql();
             $this->_collectionIterator = $this->_collection->getIterator();
             $this->getInnerIterator()->rewind();
             return $this->validInner();
@@ -113,6 +120,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
     {
         $this->_currentChunkId = 0;
         $this->_collection = self::getProductCollection($this->_storeId, $this->_productIdChunks, $this->_currentChunkId);
+        $this->_dbResource->disconnectMysql();
         $this->_collectionIterator = $this->_collection->getIterator();
         $this->_collectionIterator->rewind();
     }
@@ -181,6 +189,7 @@ class IntegerNet_Solr_Model_Bridge_LazyProductIterator implements PagedProductIt
     {
         $valid = $this->getInnerIterator()->valid();
         if (! $valid) {
+            $this->_dbResource->disconnectMysql();
             call_user_func($this->_pageCallback, $this);
         }
         return $valid;

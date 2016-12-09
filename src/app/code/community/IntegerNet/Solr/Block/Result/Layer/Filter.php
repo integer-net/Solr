@@ -60,7 +60,10 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             return $this->_getRangeFilterItems();
         }
 
-        return $this->_getAttributeFilterItems();
+        $items = $this->_getAttributeFilterItems();
+        usort($items, array($this, "sortItems"));
+
+        return $items;
     }
 
     /**
@@ -342,6 +345,7 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
                 $item->setIsChecked($this->_isSelected($attributeCode, $optionId));
                 $item->setType('attribute');
                 $item->setOptionId($optionId);
+                $item->setText($this->getAttribute()->getSource()->getOptionText($optionId));
 
                 Mage::dispatchEvent('integernet_solr_filter_item_create', array(
                     'item' => $item,
@@ -460,6 +464,15 @@ class IntegerNet_Solr_Block_Result_Layer_Filter extends Mage_Core_Block_Template
             return 'catalog/category/view';
         }
         return 'catalogsearch/result/*';
+    }
+
+    /**
+     * @param $a Varien_Object
+     * @param $b Varien_Object
+     * @return Varien_Object[]
+     */
+    protected function sortItems($a, $b) {
+        return strcmp($a->getData('text'), $b->getData('text'));
     }
 
     /**

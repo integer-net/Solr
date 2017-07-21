@@ -298,6 +298,14 @@ Usually filter options are sorted by number of results. In some cases it makes s
 Configure with which priority category names are handled in the Solr index. For example, if the search term "black shirts" should primarily return those products as search results which are contained in a category named "shirts", you might want to enter a higher value than 1.
 The default value is 1. If you enter a higher value, category names have a higher priority in the Solr index.
 
+#### Show products which are out of stock
+
+In the default setting, even products which are not in stock are shown on the search results page. To keep your search results clear from items which are out of stock, select "No".
+
+#### Solr Priority Multiplier for Products being out of Stock
+
+This is a factor which manipulates the ranking of search results depending on the product's stock status. If you prefer to have items which are out of stock in the list of search results, select a value that is greater than 0. To put sold out products at the very bottom of the search results, enter "0.1".  The value "1" means that the stock status has no impact on the search results ranking. 
+
 #### Size of Price Steps
 
 This setting is used by the price filter. You can set the steps which are used for the single intervals. I.e. *10* leads to the intervals *0.00-10.00*, *10.00-20.00*, *20.00-30.00* and so on.
@@ -335,6 +343,10 @@ Just like a redirect to a product page, you can also activate redirects for sear
 
 If you activate this setting, Solr will be used to displayed products on category pages. Especially for stores with a huge amount of products or filterable attributes for layered navigation, this will speed up the load time of category pages.   
 
+#### Show products which are out of stock
+
+In the default setting, products which are not in stock are shown in the product list on category pages. To remove sold out products from category pages, select "No".
+
 #### Position of Filter
 
 Independent of the filters' position on search result pages, you can choose where to display filters on category pages: either in the left column next to the products or above the products. This is a default value which can be overwritten by the category's configuration.
@@ -343,6 +355,22 @@ Independent of the filters' position on search result pages, you can choose wher
 
 When you activate this setting, categories that match the search term will be displayed in the autosuggest box. To finetune suggested categories, you can exclude single categories from being indexed.  
 
+#### Display categories as search results
+
+If you set this configuration to "Yes", your search results page will show an additional tab where matching category pages for the search term are displayed.
+
+#### Maximum number of results
+
+This value regulates how many matching category pages are listed as search results.
+
+#### Fuzzy Search is active
+
+Do you want to apply fuzzy search to category pages as results for a search term? Then select "Yes". 
+
+#### Sensitivity for Search
+
+When fuzzy search is activated, you can configure how sensitive it's supposed to be. Values between 0 and 1 are allowed. Lower values lead to more fuzzy results.
+
 ### CMS
 
 ![CMS Pages](http://www.integer-net.com/download/solr/integernet-solr-config-CMS-en.png)
@@ -350,6 +378,22 @@ When you activate this setting, categories that match the search term will be di
 #### Use Solr to index cms pages
 
 When activated, matching CMS pages are displayed in the autosuggest box. It works similar to indexing categories. To finetune suggested CMS pages, you can exclude single CMS pages from being indexed.  
+
+#### Display CMS pages as search results
+
+If you set this configuration to "Yes", your search results page will show an additional tab where matching CMS pages for the search term are displayed.
+
+#### Maximum number of results
+
+This value regulates how many matching CMS pages are listed as search results.
+
+#### Fuzzy Search is active
+
+Do you want to apply fuzzy search to CMS pages as results for a search term? Then select "Yes". 
+
+#### Sensitivity for Search
+
+When fuzzy search is activated, you can configure how sensitive it's supposed to be. Values between 0 and 1 are allowed. Lower values lead to more fuzzy results.
 
 ### Autosuggest Box
 
@@ -395,6 +439,10 @@ The link which is behind the displayed categories. It can be:
 You can enter an arbitrary number of attributes here which will be displayed in the autosuggest window, including the options which are contained in most of the corresponding products. For every row you can select the attribute and the number of displayed options. Additionally you can define the sorting of the attributes - the attribute with the lowest value in the "Sorting" field will be shown first.
 
 Only attributes with the property "Use In Search Results Layered Navigation" will be selectable.
+
+#### Show products which are out of stock
+
+In the default setting, products which are not in stock are hidden from search suggestions. To show sold out products in the autosuggest box, select "Yes".
 
 ### SEO 
 

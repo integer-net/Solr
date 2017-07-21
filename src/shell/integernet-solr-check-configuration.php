@@ -18,6 +18,9 @@ class IntegerNet_Solr_Shell extends Mage_Shell_Abstract
      */
     public function run()
     {
+        $autoloader = new IntegerNet_Solr_Helper_Autoloader();
+        $autoloader->createAndRegister();
+
         Mage::getModel('integernet_solr/observer')->checkSolrServerConnection();
     }
 }

@@ -7,6 +7,10 @@
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
+use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
+use IntegerNet\SolrCms\Indexer\PageIndexer;
 
 /**
  * Class IntegerNet_Solr_Model_Indexer
@@ -15,15 +19,43 @@
  */
 class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 {
+    /**
+     * @var ProductIndexer
+     */
+    protected $_productIndexer;
+    /**
+     * @var CategoryIndexer
+     */
+    protected $_categoryIndexer;
+    /**
+     * @var PageIndexer
+     */
+    protected $_pageIndexer;
+    /**
+     * @var string[]
+     */
     protected $_matchedEntities = array(
         Mage_Catalog_Model_Product::ENTITY => array(
             Mage_Index_Model_Event::TYPE_SAVE,
             Mage_Index_Model_Event::TYPE_DELETE,
             Mage_Index_Model_Event::TYPE_MASS_ACTION,
+        ),  
+        Mage_Catalog_Model_Category::ENTITY => array(
+            Mage_Index_Model_Event::TYPE_SAVE,
+            Mage_Index_Model_Event::TYPE_DELETE,
         ),
     );
 
-    protected $_resourceName = 'integernet_solr/solr';
+    /**
+     * Internal constructor not depended on params. Can be used for object initialization
+     */
+    protected function _construct()
+    {
+        $this->_productIndexer = Mage::helper('integernet_solr')->factory()->getProductIndexer();
+        $this->_categoryIndexer = Mage::helper('integernet_solr')->factory()->getCategoryIndexer();
+        $this->_pageIndexer = Mage::helper('integernet_solr')->factory()->getPageIndexer();
+    }
+
 
     public function getName()
     {
@@ -41,6 +73,8 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     public function reindexAll()
     {
         $this->_reindexProducts(null, true);
+        $this->_reindexCategories(null, true);
+        $this->_reindexCmsPages(null, true);
     }
 
     /**
@@ -62,7 +96,7 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
                     break;
 
                 case Mage_Index_Model_Event::TYPE_DELETE:
-                    $event->addNewData('solr_delete_product_skus', array($object->getId()));
+                    $event->addNewData('solr_delete_product_ids', array($object->getId()));
                     break;
 
                 case Mage_Index_Model_Event::TYPE_MASS_ACTION:
@@ -72,6 +106,29 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
 
             if (sizeof($productIds)) {
                 $event->addNewData('solr_update_product_ids', $productIds);
+            }
+
+        }        
+        
+        if ($event->getEntity() == Mage_Catalog_Model_Category::ENTITY) {
+
+            $categoryIds = array();
+
+            /* @var $object Varien_Object */
+            $object = $event->getDataObject();
+
+            switch ($event->getType()) {
+                case Mage_Index_Model_Event::TYPE_SAVE:
+                    $categoryIds[] = $object->getId();
+                    break;
+
+                case Mage_Index_Model_Event::TYPE_DELETE:
+                    $event->addNewData('solr_delete_category_ids', array($object->getId()));
+                    break;
+            }
+
+            if (sizeof($categoryIds)) {
+                $event->addNewData('solr_update_category_ids', $categoryIds);
             }
 
         }
@@ -85,11 +142,11 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
     {
         $data = $event->getNewData();
 
-        if (isset($data['solr_delete_product_skus'])) {
-            $productSkus = $data['solr_delete_product_skus'];
-            if (is_array($productSkus) && !empty($productSkus)) {
+        if (isset($data['solr_delete_product_ids'])) {
+            $productIds = $data['solr_delete_product_ids'];
+            if (is_array($productIds) && !empty($productIds)) {
 
-                $this->_deleteProductsIndex($productSkus);
+                $this->_deleteProductsIndex($productIds);
             }
         }
 
@@ -100,6 +157,22 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
                 $this->_reindexProducts($productIds);
             }
         }
+        
+        if (isset($data['solr_delete_category_ids'])) {
+            $categoryIds = $data['solr_delete_category_ids'];
+            if (is_array($categoryIds) && !empty($categoryIds)) {
+
+                $this->_deleteCategoriesIndex($categoryIds);
+            }
+        }
+
+        if (isset($data['solr_update_category_ids'])) {
+            $categoryIds = $data['solr_update_category_ids'];
+            if (is_array($categoryIds) && !empty($categoryIds)) {
+
+                $this->_reindexCategories($categoryIds);
+            }
+        }
     }
 
     /**
@@ -108,7 +181,37 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      */
     protected function _reindexProducts($productIds = null, $emptyIndex = false)
     {
-        Mage::getSingleton('integernet_solr/indexer_product')->reindex($productIds, $emptyIndex);
+        try {
+            $this->_productIndexer->reindex($productIds, $emptyIndex);
+        } catch (Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array|null $categoryIds
+     * @param boolean $emptyIndex
+     */
+    protected function _reindexCategories($categoryIds = null, $emptyIndex = false)
+    {
+        try {
+            $this->_categoryIndexer->reindex($categoryIds, $emptyIndex);
+        } catch (Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array|null $pageIds
+     * @param boolean $emptyIndex
+     */
+    protected function _reindexCmsPages($pageIds = null, $emptyIndex = false)
+    {
+        try {
+            $this->_pageIndexer->reindex($pageIds, $emptyIndex);
+        } catch (Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
     }
 
     /**
@@ -116,6 +219,14 @@ class IntegerNet_Solr_Model_Indexer extends Mage_Index_Model_Indexer_Abstract
      */
     protected function _deleteProductsIndex($productIds)
     {
-        Mage::getSingleton('integernet_solr/indexer_product')->deleteIndex($productIds);
+        $this->_productIndexer->deleteIndex($productIds);
+    }
+
+    /**
+     * @param string[] $categoryIds
+     */
+    protected function _deleteCategoriesIndex($categoryIds)
+    {
+        $this->_categoryIndexer->deleteIndex($categoryIds);
     }
 }

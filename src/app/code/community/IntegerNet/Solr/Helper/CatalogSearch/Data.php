@@ -6,7 +6,7 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */ 
+ */
 class IntegerNet_Solr_Helper_CatalogSearch_Data extends Mage_CatalogSearch_Helper_Data
 {
     /**
@@ -17,7 +17,7 @@ class IntegerNet_Solr_Helper_CatalogSearch_Data extends Mage_CatalogSearch_Helpe
     public function getSuggestUrl()
     {
         if (Mage::getStoreConfigFlag('integernet_solr/general/is_active')) {
-            if ($this->_getApp()->getStore()->isCurrentlySecure()) {
+            if (Mage::app()->getStore()->isCurrentlySecure()) {
                 $baseUrl = Mage::getStoreConfig('web/secure/base_url');
             } else {
                 $baseUrl = Mage::getStoreConfig('web/unsecure/base_url');

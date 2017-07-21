@@ -1,0 +1,1 @@
+a:5:{i:0;i:1;i:1;s:1:"*";i:2;i:0;i:3;i:0;i:4;a:7:{s:2:"fq";s:10:"store_id:1";s:2:"df";s:17:"text_autocomplete";s:5:"facet";s:4:"true";s:11:"facet.field";s:17:"text_autocomplete";s:10:"facet.sort";s:5:"count";s:11:"facet.limit";i:5;s:32:"f.text_autocomplete.facet.prefix";s:14:"blue bracelets";}}

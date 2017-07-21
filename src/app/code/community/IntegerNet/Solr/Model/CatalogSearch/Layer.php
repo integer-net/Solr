@@ -6,16 +6,8 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2014 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */
-if (@class_exists('GoMage_Navigation_Model_Search_Layer')) {
-    class IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract extends GoMage_Navigation_Model_Search_Layer
-    {}
-} else {
-    class IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract extends Mage_CatalogSearch_Model_Layer
-    {}
-}
-
-class IntegerNet_Solr_Model_CatalogSearch_Layer extends IntegerNet_Solr_Model_CatalogSearch_Layer_Abstract
+ */ 
+class IntegerNet_Solr_Model_CatalogSearch_Layer extends Mage_CatalogSearch_Model_Layer 
 {
     /**
      * Get current layer product collection
@@ -24,7 +16,7 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends IntegerNet_Solr_Model_Ca
      */
     public function getProductCollection()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getProductCollection();
         }
 
@@ -44,7 +36,7 @@ class IntegerNet_Solr_Model_CatalogSearch_Layer extends IntegerNet_Solr_Model_Ca
      */
     public function getFilterableAttributes()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getFilterableAttributes();
         }
 

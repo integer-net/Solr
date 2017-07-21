@@ -16,8 +16,12 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _getProductCollection()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::_getProductCollection();
+        }
+
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_getProductCollection();
         }
 
         if (Mage::getStoreConfig('integernet_solr/results/use_html_from_solr')) {
@@ -41,6 +45,10 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
             ));
 
             $this->_productCollection = $productCollection;
+
+            /* @var $layer Mage_Catalog_Model_Layer */
+            $layer = $this->getLayer();
+            $this->prepareSortableFieldsByCategory($layer->getCurrentCategory());
         }
 
         return $this->_productCollection;
@@ -51,8 +59,12 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
      */
     protected function _beforeToHtml()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::_beforeToHtml();
+        }
+
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
+            parent::_beforeToHtml();
         }
 
         $toolbar = $this->getToolbarBlock();
@@ -79,10 +91,17 @@ class IntegerNet_Solr_Block_Result_List extends Mage_Catalog_Block_Product_List
 
         $this->setChild('toolbar', $toolbar);
 
-        if (!Mage::getStoreConfigFlag('integernet_solr/results/use_html_from_solr')) {
-            $collection->setCurPage(1);
+        if (! Mage::getStoreConfigFlag('integernet_solr/results/use_html_from_solr')) {
+            // disable pagination for collection loading because we select ids based on solr result
+            // FS: the previous solution had a bug where the pagination toolbar always showed "Item(s) 1-X of Y"
+            $_pageSize = $collection->getPageSize();
+            $collection->setPageSize(false);
+            $collection->load();
+            $collection->setPageSize($_pageSize);
+        } else {
+            $collection->load();
         }
-        $collection->load();
+
 
         return $this;
     }

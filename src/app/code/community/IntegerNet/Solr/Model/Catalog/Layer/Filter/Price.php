@@ -6,16 +6,8 @@
  * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2015 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
- */
-if (@class_exists('GoMage_Navigation_Model_Layer_Filter_Price')) {
-    class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract extends GoMage_Navigation_Model_Layer_Filter_Price
-    {}
-} else {
-    class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract extends Mage_Catalog_Model_Layer_Filter_Price
-    {}
-}
-
-class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends IntegerNet_Solr_Model_Catalog_Layer_Filter_Price_Abstract 
+ */ 
+class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Model_Layer_Filter_Price 
 {
     /**
      * Get price range for building filter steps
@@ -24,11 +16,11 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends IntegerNet_Solr_M
      */
     public function getPriceRange()
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getPriceRange();
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getPriceRange();
         }
 
@@ -36,62 +28,58 @@ class IntegerNet_Solr_Model_Catalog_Layer_Filter_Price extends IntegerNet_Solr_M
     }
 
     /**
-     * Prepare text of item label
+     * Apply price range filter
      *
-     * @param   int $range
-     * @param   float $value
-     * @return  string
-     */
-    protected function _renderItemLabel($range, $value)
-    {
-        if (!Mage::helper('integernet_solr')->isActive()) {
-            return parent::_renderItemLabel($range, $value);
-        }
-
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
-            return parent::_renderItemLabel($range, $value);
-        }
-
-        $store = Mage::app()->getStore();
-        
-        if (Mage::getStoreConfigFlag('integernet_solr/results/use_custom_price_intervals')
-            && $customPriceIntervals = Mage::getStoreConfig('integernet_solr/results/custom_price_intervals')) {
-            $lowerBorder = 0;
-            $i = 1;
-            foreach (explode(',', $customPriceIntervals) as $upperBorder) {
-                if ($i == $value) {
-                    return Mage::helper('catalog')->__('%s - %s', $store->formatPrice($lowerBorder), $store->formatPrice($upperBorder - 0.01));
-                    break;
-                }
-
-                $i++;
-                $lowerBorder = $upperBorder;
-            }
-            return Mage::helper('integernet_solr')->__('from %s', $store->formatPrice($lowerBorder));
-        }
-
-        return parent::_renderItemLabel($range, $value);
-    }
-
-    /**
-     * Apply filter value to product collection based on filter range and selected value
+     * @param Zend_Controller_Request_Abstract $request
+     * @param $filterBlock
      *
-     * @param int $range
-     * @param int $index
      * @return Mage_Catalog_Model_Layer_Filter_Price
      */
-    protected function _applyToCollection($range, $index)
+    public function apply(Zend_Controller_Request_Abstract $request, $filterBlock)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
-            return parent::_applyToCollection($range, $index);
+        /**
+         * Filter must be string: $fromPrice-$toPrice
+         */
+        $filter = $request->getParam($this->getRequestVar());
+        if (!$filter) {
+            return $this;
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
-            return parent::_applyToCollection($range, $index);
+        foreach(explode(',', $filter) as $subFilter) {
+
+            //validate filter
+            $filterParams = explode(',', $subFilter);
+            $subFilter = $this->_validateFilter($filterParams[0]);
+            if (!$subFilter) {
+                return $this;
+            }
+
+            list($from, $to) = $subFilter;
+
+            $this->setInterval(array($from, $to));
+
+            $priorFilters = array();
+            for ($i = 1; $i < count($filterParams); ++$i) {
+                $priorFilter = $this->_validateFilter($filterParams[$i]);
+                if ($priorFilter) {
+                    $priorFilters[] = $priorFilter;
+                } else {
+                    //not valid data
+                    $priorFilters = array();
+                    break;
+                }
+            }
+            if ($priorFilters) {
+                $this->setPriorIntervals($priorFilters);
+            }
+
+            $this->_applyPriceRange();
+            $this->getLayer()->getState()->addFilter($this->_createItem(
+                $this->_renderRangeLabel(empty($from) ? 0 : $from, $to),
+                $filter
+            ));
         }
 
-        Mage::getSingleton('integernet_solr/result')->addPriceRangeFilterByIndex($range, $index); 
-        
         return $this;
     }
 }

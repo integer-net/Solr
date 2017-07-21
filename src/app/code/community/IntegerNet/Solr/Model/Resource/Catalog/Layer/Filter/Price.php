@@ -26,11 +26,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getMaxPrice($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getMaxPrice($filter);
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getMaxPrice($filter);
         }
 
@@ -52,11 +52,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function getCount($filter, $range)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::getCount($filter, $range);
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::getCount($filter, $range);
         }
 
@@ -97,11 +97,11 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
      */
     public function applyPriceRange($filter)
     {
-        if (!Mage::helper('integernet_solr')->isActive()) {
+        if (!Mage::helper('integernet_solr')->module()->isActive()) {
             return parent::applyPriceRange($filter);
         }
 
-        if (Mage::app()->getRequest()->getModuleName() != 'catalogsearch' && !Mage::helper('integernet_solr')->isCategoryPage()) {
+        if (!Mage::helper('integernet_solr')->page()->isSolrResultPage()) {
             return parent::applyPriceRange($filter);
         }
 
@@ -114,8 +114,17 @@ class IntegerNet_Solr_Model_Resource_Catalog_Layer_Filter_Price extends IntegerN
         if ($from === '' && $to === '') {
             return $this;
         }
-        
-        Mage::getSingleton('integernet_solr/result')->addPriceRangeFilterByMinMax($from, $to);
+
+        $priceFilters = Mage::registry('price_filters');
+        if (!is_array($priceFilters)) {
+            $priceFilters = array();
+        }
+        $priceFilters[] = array(
+            'min' => $from,
+            'max' => $to,
+        );
+        Mage::unregister('price_filters');
+        Mage::register('price_filters', $priceFilters);
 
         return $this;
 

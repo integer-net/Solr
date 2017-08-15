@@ -232,6 +232,10 @@ You should only deactivate this setting if you recreate the index completely (i.
 
 If you rebuild the Solr index regularly (i.e. nightly) we recommend to use the functionality to swap cores. You need a second core for that. In this case, you should activate this setting and enter the name of the second core into the field *Name of Core to swap active Core with* below.
 
+#### Disconnect and reconnect MySQL Connections during indexing
+
+If you experience issues due to SQL timeouts during indexing, this configuration will help you. Its default value is "No". If you switch to "Yes", MySQL connections will be automatically disconnected and reconnected during the indexing process. This feature only works with Magento CE 1.9.1 / EE 1.14.1 or newer versions.
+
 ### Fuzzy Search
 
 ![Fuzzy Search](http://www.integer-net.com/download/solr/integernet-solr-config-fuzzy-en.png)

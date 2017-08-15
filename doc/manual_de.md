@@ -233,6 +233,10 @@ Wenn diese Einstellung aktiv ist, wird der Solr-Index zu Beginn einer vollständ
 
 Wenn Sie regelmäßig den Index neu aufbauen (z. B. nächtlich), ist es sinnvoll, die Funktion zum Tauschen der Kerne einzusetzen und einen zweiten Kern zu verwenden. Aktivieren Sie in dem Fall diese Option und tragen Sie im Feld *Name des Cores, mit dem der aktive Core getauscht werden soll* den Namen des zweiten Kerns ein.
 
+#### MySQL-Verbindungen während der Indizierung trennen und neu aufbauen
+
+Falls während des Indizierungsprozesses Timeout-Fehler auftreten sollten, wird Ihnen diese Konfigurationseinstellung helfen. Auf "Ja" gestellt sorgt sie dafür, dass während der Indizierung die MySQL-Verbindung automatisch getrennt und neu aufgebaut wird. Dieses Feature funktioniert nur bei Magento CE 1.9.1 / EE 1.14.1 oder höheren Versionen.
+
 ### Unscharfe Suche 
 
 ![Unscharfe Suche](http://www.integer-net.de/download/solr/integernet-solr-config-fuzzy-de.png)
